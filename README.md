@@ -19,8 +19,8 @@ Monitors Muse headband EEG data, and triggers events (eg audio) when REM sleep i
 
 ### How to modify (and see changes in Android emulator)
 1) Open project in editor  
-	A) For changes to the JS (ui), open files in "Main/Source" folder. (I use the Atom text editor)  
-	B) For changes to the Java, open files in the "Main/android/app/src" folder. (I use Android Studio)  
+. . . A) For changes to the JS (ui), open files in "Main/Source" folder. (I use the Atom text editor)  
+. . . B) For changes to the Java, open files in the "Main/android/app/src" folder. (I use Android Studio)  
 2) Make changes.  
 3) Ensure the virtual Android device is running.  
 4) Open CMD in "Main" folder, and run "react-native run-android". This will push the updated app to the Android emulator.  
