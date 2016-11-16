@@ -1,6 +1,12 @@
 # LucidLink
 Monitors Muse headband EEG data, and triggers events (eg audio) when REM sleep is detected.
 
+### TODO
+* Add class to receive the headset data.
+* Add graph UI to display the headset data.
+* Add recording function.
+* Add dream journal system.
+
 ### How to compile (and run in Android emulator)
 1) Ensure prerequisite programs are installed: Git (+TortoiseGit), NodeJS, Android SDK, VirtualBox, Genymotion  
 2) Ensure prerequisite Android SDK packages are installed: [...]  
