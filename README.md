@@ -4,6 +4,7 @@ Monitors Muse headband EEG data, and triggers events (eg audio) when REM sleep i
 ### TODO
 * Add class to receive the headset data.
 * Add graph UI to display the headset data.
+* Add event triggering system. (eg play audio file)
 * Add recording function.
 * Add dream journal system.
 
