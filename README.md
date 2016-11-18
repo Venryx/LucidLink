@@ -2,11 +2,7 @@
 Monitors Muse headband EEG data, and triggers events (eg audio) when REM sleep is detected.
 
 ### TODO
-* Add class to receive the headset data.
-* Add graph UI to display the headset data.
-* Add event triggering system. (eg play audio file)
-* Add recording function.
-* Add dream journal system.
+Task list (trello board): https://trello.com/b/2ZYLJ2l1/lucid-link
 
 ### How to compile (and run in Android emulator)
 1) Ensure prerequisite programs are installed: Git (+TortoiseGit), NodeJS, Android SDK, VirtualBox, Genymotion  
