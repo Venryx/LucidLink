@@ -3,7 +3,7 @@ import {Dimensions, StyleSheet,
 	Text, TextInput, View} from "react-native";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
-var {JavaBridge, BaseComponent} = require("./Globals");
+//var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
 //let screenHeight = Dimensions.get("window").height;
 var styles = StyleSheet.create({
@@ -18,44 +18,74 @@ var styles = StyleSheet.create({
 class ScriptTextUI extends BaseComponent {
 	static defaultProps = {editable: true};
 	render() {
-		var {editable, onChangeText} = this.props;
-		return <TextInput {...{editable, onChangeText}} style={styles.text} multiline={true} editable={editable}/>;
+		var {editable, onChangeText, text} = this.props;
+		return <TextInput {...{editable, onChangeText}} style={styles.text} multiline={true} editable={editable} value={text}/>;
 	}
 }
+import RNFS from "react-native-fs";
 
 export default class ScriptsUI extends BaseComponent {
+	constructor(props) {
+		super(props);
+		this.state = {scriptTexts: []};
+	}
+
 	componentWillMount() {
 		this.LoadScriptTexts();
 	}
+
 	async LoadScriptTexts() {
-		var scriptTexts = await JavaBridge.Main.LoadScriptTexts();
-		this.setState({scriptText1: scriptTexts[0], scriptText2: scriptTexts[1],
-			scriptText3: scriptTexts[2], scriptText4: scriptTexts[3], scriptText5: scriptTexts[4]});
+		var scriptTexts = [];
+		scriptTexts[0] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script1.js", "test1");
+		scriptTexts[1] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script2.js", "test2");
+		scriptTexts[2] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script3.js", "test3");
+		scriptTexts[3] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script4.js", "test4");
+		scriptTexts[4] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script5.js", "test5");
+		this.setState({scriptTexts});
+		Log("Finished loading.");
 	}
+	async SaveScriptTexts() {
+		var {scriptTexts} = this.state;
+		Assert(scriptTexts.length == 5, `Script-text count should be 5, not ${scriptTexts.length}.`);
+		for (let text of scriptTexts)
+			Assert(text != null);
+		await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/");
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script1.js", scriptTexts[0]);
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script2.js", scriptTexts[1]);
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script3.js", scriptTexts[2]);
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script4.js", scriptTexts[3]);
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script5.js", scriptTexts[4]);
+		Log("Finished saving.");
+	}
+
 	render() {
-		var {scriptText1, scriptText2, scriptText3, scriptText4, scriptText5} = this.state;
+		var {scriptTexts} = this.state;
 		return (
 			<ScrollableTabView>
                 <View style={styles.tab} tabLabel="1: Built-in functions">
-					<ScriptTextUI text={scriptText1} editable={false}/>
+					<ScriptTextUI text={scriptTexts[0]} editable={false}/>
                 </View>
                 <View style={styles.tab} tabLabel="2: Built-in helpers">
-					<ScriptTextUI text={scriptText2} editable={false}/>
+					<ScriptTextUI text={scriptTexts[1]} editable={false}/>
                 </View>
                 <View style={styles.tab} tabLabel="3: Built-in script">
-					<ScriptTextUI text={scriptText3} onChangeText={text=>this.setState({script3Text: text})}/>
+					<ScriptTextUI text={scriptTexts[2]} onChangeText={text=>(scriptTexts[2] = text) | this.PostScriptChange()}/>
                 </View>
                 <View style={styles.tab} tabLabel="4: Custom helpers">
-					<ScriptTextUI text={scriptText4} onChangeText={text=>this.setState({script4Text: text})}/>
+					<ScriptTextUI text={scriptTexts[3]} onChangeText={text=>(scriptTexts[3] = text) | this.PostScriptChange()}/>
                 </View>
                 <View style={styles.tab} tabLabel="5: Custom script">
-					<ScriptTextUI text={scriptText5} onChangeText={text=>this.setState({script5Text: text})}/>
+					<ScriptTextUI text={scriptTexts[4]} onChangeText={text=>(scriptTexts[4] = text) | this.PostScriptChange()}/>
                 </View>
             </ScrollableTabView>
 		);
 	}
-	componentWillUnmount() {
-		var {scriptText1, scriptText2, scriptText3, scriptText4, scriptText5} = this.state;
-		JavaBridge.Main.SaveScriptTexts([scriptText1, scriptText2, scriptText3, scriptText4, scriptText5]);
+	PostScriptChange() {
+		BufferFuncToBeRun("PostScriptChange_1", 1000, ()=>this.SaveScriptTexts());
+		this.forceUpdate();
 	}
+
+	/*componentWillUnmount() {
+		this.SaveScriptTexts();
+	}*/
 }

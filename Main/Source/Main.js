@@ -3,7 +3,9 @@ import {AppRegistry, NativeModules, StyleSheet,
     Text, View, ViewPagerAndroid} from "react-native";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
-import {JavaBridge} from "./Globals";
+require("./CE");
+import * as Test1 from "./Globals";
+//import {JavaBridge} from "./Globals";
 import ScriptsUI from "./ScriptsUI";
 
 export default class Main extends Component {
