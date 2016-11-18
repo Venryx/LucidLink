@@ -1,0 +1,22 @@
+Monitor
+==========
+
+Tracker
+==========
+
+Journal
+==========
+
+Scripts
+==========
+Four levels:
+1) built-in functions
+2) built-in helpers
+3) custom helpers
+4) custom script
+
+Settings
+==========
+
+About
+==========
