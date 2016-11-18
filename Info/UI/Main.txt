@@ -9,7 +9,7 @@ Journal
 
 Scripts
 ==========
-Four levels:
+Five levels:
 1) built-in functions (base-level functions for stuff)
 2) built-in helpers (systems/processors)
 3) built-in script (code that calls REM-evaluator helpers, and adds to tracker)
