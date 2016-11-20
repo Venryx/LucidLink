@@ -1,33 +1,17 @@
 import React, {Component} from "react";
 import {Dimensions, StyleSheet,
-	Text, TextInput, View} from "react-native";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
-
-//var {JavaBridge, BaseComponent, VFile} = require("./Globals");
-
-//let screenHeight = Dimensions.get("window").height;
-var styles = StyleSheet.create({
-	root: {},
-	tab: {flex: 1},
-	text: {
-		//height: screenHeight,
-		flex: 1, textAlignVertical: "top",
-	},
-});
-
-class ScriptTextUI extends BaseComponent {
-	static defaultProps = {editable: true};
-	render() {
-		var {editable, onChangeText, text} = this.props;
-		return <TextInput {...{editable, onChangeText}} style={styles.text} multiline={true} editable={editable} value={text}/>;
-	}
-}
+	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
+var ScrollableTabView = require("react-native-scrollable-tab-view");
+//var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
 export default class ScriptsUI extends BaseComponent {
 	constructor(props) {
 		super(props);
-		this.state = {scriptTexts: []};
+		this.state = {
+			scriptTexts: [],
+			activeTab: 0,
+		};
 	}
 
 	componentWillMount() {
@@ -58,28 +42,48 @@ export default class ScriptsUI extends BaseComponent {
 		Log("Finished saving.");
 	}
 
+	ApplyScripts() {
+
+	}
+
 	render() {
 		var {scriptTexts} = this.state;
+		
+		var tabStyle = {width: 100, height: 10, marginLeft: 5};
 		return (
-			<ScrollableTabView>
-                <View style={styles.tab} tabLabel="1: Built-in functions">
-					<ScriptTextUI text={scriptTexts[0]} editable={false}/>
-                </View>
-                <View style={styles.tab} tabLabel="2: Built-in helpers">
-					<ScriptTextUI text={scriptTexts[1]} editable={false}/>
-                </View>
-                <View style={styles.tab} tabLabel="3: Built-in script">
-					<ScriptTextUI text={scriptTexts[2]} onChangeText={text=>(scriptTexts[2] = text) | this.PostScriptChange()}/>
-                </View>
-                <View style={styles.tab} tabLabel="4: Custom helpers">
-					<ScriptTextUI text={scriptTexts[3]} onChangeText={text=>(scriptTexts[3] = text) | this.PostScriptChange()}/>
-                </View>
-                <View style={styles.tab} tabLabel="5: Custom script">
-					<ScriptTextUI text={scriptTexts[4]} onChangeText={text=>(scriptTexts[4] = text) | this.PostScriptChange()}/>
-                </View>
-            </ScrollableTabView>
+			<View style={{flex: 1, flexDirection: "column"}}>
+				<View style={{flexDirection: "row", height: 42, padding: 3}}>
+					<View style={{flex: 1, flexDirection: "row", height: 35}}>
+						<VButton style={E(tabStyle, {marginLeft: 0})} color="#777"
+							onPress={()=>this.setState({activeTab: 0})} title="1: Built-in functions"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 1})} title="2: Built-in helpers"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 2})} title="3: Built-in script"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 3})} title="4: Custom helpers"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 4})} title="5: Custom script"/>
+					</View>
+					<View style={{flexDirection: "row", alignItems: "flex-end", height: 35}}>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.ApplyScripts()} title="Apply scripts"/>
+					</View>
+				</View>
+				<View style={{flex: 1}}>
+                	{this.GetActiveTabUI()}
+				</View>
+            </View>
 		);
 	}
+	GetActiveTabUI() {
+		var tabLabels = ["1: Core functions", "2: Built-in helpers", "3: Built-in script", "4: Custom helpers", "5: Custom script"];
+		var tabEditabilities = [false, false, true, true, true];
+		
+		var {scriptTexts, activeTab} = this.state;
+		return (
+			<View tabLabel={tabLabels[activeTab]} style={{flex: 1}}>
+				<ScriptTextUI text={scriptTexts[activeTab]} editable={tabEditabilities[activeTab]}
+					onChangeText={text=>(scriptTexts[activeTab] = text) | this.forceUpdate()}/>
+			</View>
+		);
+	}
+
 	PostScriptChange() {
 		BufferFuncToBeRun("PostScriptChange_1", 1000, ()=>this.SaveScriptTexts());
 		this.forceUpdate();
@@ -88,4 +92,16 @@ export default class ScriptsUI extends BaseComponent {
 	/*componentWillUnmount() {
 		this.SaveScriptTexts();
 	}*/
+}
+
+class ScriptTextUI extends BaseComponent {
+	static defaultProps = {editable: true};
+	render() {
+		var {editable, onChangeText, text} = this.props;
+		var textStyle = {
+			//height: screenHeight,
+			flex: 1, textAlignVertical: "top",
+		};
+		return <TextInput {...{editable, onChangeText}} style={textStyle} multiline={true} editable={editable} value={text}/>;
+	}
 }

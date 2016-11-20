@@ -28,6 +28,19 @@ g.JavaBridge = class JavaBridge {
     }
 }
 
+// general
+// ==========
+
+import {AppRegistry, StyleSheet} from "react-native";
+
+g.E = function(...objExtends) {
+    var result = {};
+    for (var extend of objExtends)
+        result.Extend(extend);
+	return result;
+	//return StyleSheet.create(result);
+}
+
 // timer stuff
 // ==========
 
@@ -153,11 +166,4 @@ g.VFile = class VFile {
 	/*static ReadAllText(filePath) {
 		return await VFile.ReadAllTextAsync(filePath);
 	}*/
-}
-
-g.BaseComponent = class BaseComponent extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {};
-	}
 }

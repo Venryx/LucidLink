@@ -697,10 +697,10 @@ Object.prototype._AddGetter_Inline = function Entries() {
 // ArrayIterator
 // ==========
 
-var ArrayIterator = [].entries().constructor;
+/*var ArrayIterator = [].entries().constructor;
 ArrayIterator.prototype._AddFunction_Inline = function ToArray() {
     return Array.from(this);
-};
+};*/
 
 // [offset construct] (e.g. {left: 10, top: 10})
 // ==========
