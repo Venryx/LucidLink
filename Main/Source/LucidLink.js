@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {AppRegistry, StyleSheet} from "react-native";
+import {AppRegistry, StyleSheet, AppState} from "react-native";
 import {Text, View, ViewPagerAndroid} from "react-native";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
@@ -30,6 +30,13 @@ g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
 	LL.forceUpdate();
+});
+
+g.appState = AppState.currentState;
+AppState.addEventListener("change", appState=> {
+	g.appState = appState;
+	if (appState == "background")
+		SaveMainData();
 });
 
 const styles = StyleSheet.create({
@@ -127,7 +134,7 @@ export default class LucidLinkUI extends Component {
         );
     }
 
-	componentWillUnmount() {
+	/*componentWillUnmount() {
 		SaveMainData();
-	}
+	}*/
 }
