@@ -52,13 +52,13 @@ export class SettingsUI extends BaseComponent {
 								<Row key={index} height={30}>
 									<Text style={{flex: 1}}>{audioFile.name}</Text>
 									<Text style={{flex: 1}}>{audioFile.path}</Text>
-									<VButton color="#777" title="X" style={{alignItems: "flex-end", marginTop: -3, paddingBottom: -5}}
+									<VButton text="X" style={{alignItems: "flex-end", marginTop: -3, paddingBottom: -5}}
 										onPress={()=>node.audioFiles.Remove(audioFile) | this.forceUpdate()}/>
 								</Row>
 							);
 						})}
 						<Row height={50}>
-							<VButton color="#777" onPress={()=>this.AddAudioFile()} title="Add"/>
+							<VButton onPress={()=>this.AddAudioFile()} text="Add"/>
 						</Row>
 					</Row>
 					<View style={{flex: 1000}}>

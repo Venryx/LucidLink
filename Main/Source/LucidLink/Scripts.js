@@ -57,15 +57,15 @@ export class ScriptsUI extends BaseComponent {
 			<View style={{flex: 1, flexDirection: "column"}}>
 				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
 					<View style={{flex: .8, flexDirection: "row"}}>
-						<VButton style={E(tabStyle, {marginLeft: 0})} color="#777"
-							onPress={()=>this.setState({activeTab: 0})} title="1: Built-in functions"/>
-						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 1})} title="2: Built-in helpers"/>
-						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 2})} title="3: Built-in script"/>
-						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 3})} title="4: Custom helpers"/>
-						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 4})} title="5: Custom script"/>
+						<VButton style={E(tabStyle, {marginLeft: 0})} text="1: Built-in functions"
+							onPress={()=>this.setState({activeTab: 0})}/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 1})} text="2: Built-in helpers"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 2})} text="3: Built-in script"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 3})} text="4: Custom helpers"/>
+						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 4})} text="5: Custom script"/>
 						<View style={{flex: .2}}/>
 						<View style={{flex: .2, flexDirection: "row", alignItems: "flex-end"}}>
-							<VButton style={tabStyle} color="#777" onPress={()=>this.ApplyScripts()} title="Apply scripts"/>
+							<VButton style={tabStyle} color="#777" onPress={()=>this.ApplyScripts()} text="Apply scripts"/>
 						</View>
 					</View>
 				</View>

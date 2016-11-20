@@ -19,13 +19,21 @@ g.BaseComponent = class BaseComponent extends Component {
 }
 
 g.VButton = class VButton extends BaseComponent {
+	static defaultProps = {caps: true};
 	render() {
-		var {style, innerStyle, height} = this.props;
-		var restProps = this.props.RemovingProps("style", "height");
+		var {text, caps, style} = this.props;
+		var restProps = this.props.RemovingProps("text", "style");
+
+		if (caps)
+			text = text.toUpperCase();
+
+		var baseStyle = {borderColor: "#777", backgroundColor: "#777", borderRadius: 3};
 		return (
-			<View style={E(style, height != null && {height})}>
-				<Button {...restProps} style={innerStyle}/>
-			</View>
+			<Button {...restProps}
+					style={E(baseStyle, style)}
+					textStyle={{color: "#FFF", fontWeight: "bold", fontSize: 15}}>
+				{text}
+			</Button>
 		);
 	}
 }
