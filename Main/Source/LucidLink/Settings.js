@@ -1,9 +1,16 @@
 import React, {Component} from "react";
-import {Dimensions, StyleSheet,
+import ReactNative, {Dimensions, StyleSheet,
 	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
+
+var FilePickerManager = NativeModules.FilePickerManager;
+/*const {
+  NativeModules: {
+    FilePickerManager
+  }
+} = ReactNative;*/
 
 g.Settings = class Settings {
 	@P() audioFiles = [];
@@ -71,10 +78,25 @@ export class SettingsUI extends BaseComponent {
 	}
 
 	SelectAudioFileForEntry(entry) {
-		// todo
+		const options = {
+			title: "Select audio file",
+			chooseFileButtonTitle: "Select"
+		};
+
+		FilePickerManager.showFilePicker(options, response=> {
+			//console.log('Response = ', response);
+			/*if (response.didCancel) return;
+			if (response.error) {
+				console.log('ImagePickerManager Error: ', response.error);
+				return;
+			}
+			//entry.path = response;
+			this.forceUpdate();*/
+		});
 	}
 
 	AddAudioFile() {
-		// todo
+		LL.settings.audioFiles.push({name: "none", path: "none"});
+		this.forceUpdate();
 	}
 }

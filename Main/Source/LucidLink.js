@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {AppRegistry, NativeModules, StyleSheet} from "react-native";
+import {AppRegistry, StyleSheet} from "react-native";
 import {Text, View, ViewPagerAndroid} from "react-native";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
@@ -24,7 +24,6 @@ import {SettingsUI} from "./LucidLink/Settings";
 import {AboutUI} from "./LucidLink/About";
 
 import Orientation from "react-native-orientation";
-//var Orientation = NativeModules.Orientation;
 
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {

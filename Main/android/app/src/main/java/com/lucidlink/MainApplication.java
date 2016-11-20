@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
+import com.filepicker.FilePickerPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactInstanceManager;
@@ -28,9 +29,10 @@ public class MainApplication extends Application implements ReactApplication {
 		protected List<ReactPackage> getPackages() {
 			return Arrays.asList(
 				new MainReactPackage(),
-            	new OrientationPackage(),
 				new Main_ReactPackage(),
-				new RNFSPackage()
+				new OrientationPackage(),
+				new RNFSPackage(),
+				new FilePickerPackage()
 			);
 		}
 	};

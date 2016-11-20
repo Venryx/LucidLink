@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {NativeModules} from "react-native";
+import {AppRegistry, NativeModules, StyleSheet} from "react-native";
 import RNFS from "react-native-fs";
 
 var g = global;
@@ -28,6 +28,8 @@ g.JavaBridge = class JavaBridge {
     }
 }
 
+g.NativeModules = NativeModules;
+
 // polyfills for constants
 // ==========
 
@@ -47,14 +49,59 @@ g.Debugger_If = function(condition) {
 // general
 // ==========
 
-import {AppRegistry, StyleSheet} from "react-native";
-
 g.E = function(...objExtends) {
     var result = {};
     for (var extend of objExtends)
         result.Extend(extend);
 	return result;
 	//return StyleSheet.create(result);
+}
+
+// methods: serialization
+// ==========
+
+// object-Json
+function FromJSON(json) { return JSON.parse(json); }
+function ToJSON(obj, excludePropNames___) {
+	try {
+		if (arguments.length > 1) {
+			var excludePropNames = V.Slice(arguments, 1);
+			return JSON.stringify(obj, function(key, value) {
+				if (excludePropNames.Contains(key))
+					return;
+				return value;
+			});
+		}
+		return JSON.stringify(obj);
+	}
+	catch (ex) {
+		if (ex.toString() == "TypeError: Converting circular structure to JSON")
+			return ToJSON_Safe.apply(this, arguments);
+		throw ex;
+	}
+}
+function ToJSON_Safe(obj, excludePropNames___) {
+	var excludePropNames = V.Slice(arguments, 1);
+
+	var cache = [];
+	var foundDuplicates = false;
+	var result = JSON.stringify(obj, function(key, value) {
+		if (excludePropNames.Contains(key))
+			return;
+		if (typeof value == 'object' && value !== null) {
+			// if circular reference found, discard key
+			if (cache.indexOf(value) !== -1) {
+				foundDuplicates = true;
+				return;
+			}
+			cache.push(value); // store value in our cache
+		}
+		return value;
+	});
+	//cache = null; // enable garbage collection
+	if (foundDuplicates)
+		result = "[was circular]" + result;
+	return result;
 }
 
 // object-VDF
