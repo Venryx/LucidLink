@@ -1,3 +1,7 @@
+// for scripts
+//import Sound from "react-native-sound";
+var Sound = require("react-native-sound");
+
 export default class ScriptRunner {
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {
@@ -21,8 +25,8 @@ export default class ScriptRunner {
 	}
 	Init(scripts) {
 		var finalScriptsText = "";
-		for (let [index, script] of scripts.entries()) {
-			finalScriptsText += (index ? "\n\n//==========\n\n" : "") + script;
+		for (let script of scripts) {
+			finalScriptsText += (finalScriptsText.length ? "\n\n//==========\n\n" : "") + script;
 		}
 		try {
 			eval(finalScriptsText);
@@ -30,7 +34,8 @@ export default class ScriptRunner {
 			var stack = error.stack.replace(/\r/g, "")
 			stack = stack.substr(0, stack.indexOf("  at ScriptRunner.Init (")) // remove out-of-user-script stack-entries
 			stack = stack.replace(/eval \([^)]+?\), (<anonymous>:)/g, (match, sub1)=>sub1);
-			alert(`${stack}`);
+			alert(`Error: ${error}
+Stack) ${stack}`);
 		}
 	}
 }

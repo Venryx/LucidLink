@@ -11,6 +11,8 @@ import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/Built
 import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
+var scriptDefaultTexts = [scriptDefaultText_CoreFunctions, scriptDefaultText_BuiltInHelpers,
+	scriptDefaultText_BuiltInScript, scriptDefaultText_CustomHelpers, scriptDefaultText_CustomScript];
 
 g.Scripts = class Scripts extends Node {
 	ui = null;
@@ -24,11 +26,13 @@ g.Scripts = class Scripts extends Node {
 	async LoadScripts() {
 		var scriptTexts = [];
 		var scriptsFolder = VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/";
-		scriptTexts[0] = await VFile.ReadAllTextAsync(scriptsFolder + "Script1.js", scriptDefaultText_CoreFunctions);
-		scriptTexts[1] = await VFile.ReadAllTextAsync(scriptsFolder + "Script2.js", scriptDefaultText_BuiltInHelpers);
-		scriptTexts[2] = await VFile.ReadAllTextAsync(scriptsFolder + "Script3.js", scriptDefaultText_BuiltInScript);
-		scriptTexts[3] = await VFile.ReadAllTextAsync(scriptsFolder + "Script4.js", scriptDefaultText_CustomHelpers);
-		scriptTexts[4] = await VFile.ReadAllTextAsync(scriptsFolder + "Script5.js", scriptDefaultText_CustomScript);
+		//scriptTexts[0] = await VFile.ReadAllTextAsync(scriptsFolder + "Script1.js", scriptDefaultText_CoreFunctions);
+		//scriptTexts[1] = await VFile.ReadAllTextAsync(scriptsFolder + "Script2.js", scriptDefaultText_BuiltInHelpers);
+		scriptTexts[0] = scriptDefaultTexts[0];
+		scriptTexts[1] = scriptDefaultTexts[1];
+		scriptTexts[2] = await VFile.ReadAllTextAsync(scriptsFolder + "Script3.js", scriptDefaultTexts[2]);
+		scriptTexts[3] = await VFile.ReadAllTextAsync(scriptsFolder + "Script4.js", scriptDefaultTexts[3]);
+		scriptTexts[4] = await VFile.ReadAllTextAsync(scriptsFolder + "Script5.js", scriptDefaultTexts[4]);
 
 		this.scriptTexts = scriptTexts;
 		if (LL.settings.applyScriptsOnLaunch)
@@ -48,8 +52,8 @@ g.Scripts = class Scripts extends Node {
 		for (let text of scriptTexts)
 			Assert(text != null);
 		await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/");
-		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script1.js", scriptTexts[0]);
-		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script2.js", scriptTexts[1]);
+		//await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script1.js", scriptTexts[0]);
+		//await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script2.js", scriptTexts[1]);
 		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script3.js", scriptTexts[2]);
 		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script4.js", scriptTexts[3]);
 		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script5.js", scriptTexts[4]);
@@ -57,6 +61,12 @@ g.Scripts = class Scripts extends Node {
 		if (this.ui)
 			this.ui.setState({scriptFilesOutdated: false});
 		Log("Finished saving scripts.");
+	}
+
+	ResetScript(index) {
+		this.scriptTexts[index] = scriptDefaultTexts[index];
+		if (this.ui)
+			this.ui.setState({scriptFilesOutdated: true});
 	}
 	
 	ApplyScripts() {

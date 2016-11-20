@@ -263,13 +263,13 @@ g._VDFPostSerialize = function(...args) {
 // timer stuff
 // ==========
 
-function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
-function Sleep(ms) {
+g.WaitXThenRun = function(waitTime, func) { setTimeout(func, waitTime); }
+g.Sleep = function(ms) {
 	var startTime = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
 	{}
 }
-function WaitXThenRun_Multiple(waitTime, func, count = -1) {
+g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
 	var countDone = 0;
 	var timerID = setInterval(function() {
 		func();
@@ -284,7 +284,7 @@ function WaitXThenRun_Multiple(waitTime, func, count = -1) {
 }
 
 // interval is in seconds (can be decimal)
-class Timer {
+g.Timer = class Timer {
 	constructor(interval, func, maxCallCount = -1) {
 	    this.interval = interval;
 	    this.func = func;
@@ -308,7 +308,7 @@ class Timer {
 		this.timerID = -1;
 	}
 }
-class TimerMS extends Timer {
+g.TimerMS = class TimerMS extends Timer {
     constructor(interval_decimal, func, maxCallCount = -1) {
         super(interval_decimal / 1000, func, maxCallCount);
     }

@@ -15,7 +15,8 @@
     "react-native-file-picker": "git+https://github.com/Lichwa/react-native-file-picker.git",
     "react-native-fs": "^2.0.1-rc.2",
     "react-native-orientation": "yamill/react-native-orientation",
-    "react-native-scrollable-tab-view": "^0.6.0"
+    "react-native-scrollable-tab-view": "^0.6.0",
+    "react-native-sound": "^0.8.3"
   },
   "jest": {
     "preset": "jest-react-native"

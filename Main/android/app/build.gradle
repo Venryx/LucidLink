@@ -172,7 +172,10 @@ dependencies {
     compile project(':react-native-file-picker')
     compile project(':react-native-orientation')
     compile project(':react-native-fs')
+    compile project(':RNSound')
+
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
     // android support
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:support-annotations:24.2.0'

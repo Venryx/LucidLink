@@ -4,13 +4,14 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
-import com.filepicker.FilePickerPackage;
-import com.github.yamill.orientation.OrientationPackage;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
+import com.filepicker.FilePickerPackage;
+import com.github.yamill.orientation.OrientationPackage;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import android.content.Intent; // <--- import
 import android.content.res.Configuration; // <--- import
@@ -30,9 +31,10 @@ public class MainApplication extends Application implements ReactApplication {
 			return Arrays.asList(
 				new MainReactPackage(),
 				new Main_ReactPackage(),
-				new OrientationPackage(),
 				new RNFSPackage(),
-				new FilePickerPackage()
+				new FilePickerPackage(),
+				new OrientationPackage(),
+				new RNSoundPackage()
 			);
 		}
 	};
