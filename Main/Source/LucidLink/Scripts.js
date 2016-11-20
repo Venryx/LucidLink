@@ -161,6 +161,7 @@ class ScriptTextUI extends BaseComponent {
 			flex: 1, textAlignVertical: "top",
 		};
 		return <TextInput {...{editable}} style={textStyle} multiline={true} editable={editable} value={text}
+			autoCapitalize="none" autoCorrect={false}
 			onChangeText={text=> {
 				parent.setState({scriptFilesOutdated: true, scriptLastRunsOutdated: true});
 				onChangeText(text);

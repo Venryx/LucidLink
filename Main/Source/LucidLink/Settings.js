@@ -63,7 +63,8 @@ export class SettingsUI extends BaseComponent {
 							}}/>
 					</RowLR>
 					<Row height={40} style={{marginTop: 5, marginBottom: 10}}>
-						<VButton onPress={()=>LL.scripts.ResetScript(2)} text="Reset 'built-in script' script" style={{width: 300, height: 40}}/>
+						<VButton onPress={()=>LL.scripts.ResetScript(2)} text='Reset "built-in script"' style={{width: 300, height: 40}}/>
+						<VButton onPress={()=>LL.scripts.ResetScript(4)} text='Reset "custom script"' style={{marginLeft: 5, width: 300, height: 40}}/>
 					</Row>
 					<RowLR height={25}>
 						<Text>Block unused keys</Text>

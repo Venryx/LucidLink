@@ -29,12 +29,12 @@ import {AboutUI} from "./LucidLink/About";
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", args=> {
 	var [keyCode] = args;
-	Log("KeyDown:" + keyCode);
+	//Log("KeyDown:" + keyCode);
 	LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
 });
 DeviceEventEmitter.addListener("OnKeyUp", args=> {
 	var [keyCode] = args;
-	Log("KeyUp:" + keyCode);
+	//Log("KeyUp:" + keyCode);
 	LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
 });
 
