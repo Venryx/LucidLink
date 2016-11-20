@@ -16,6 +16,7 @@ import * as UM6 from "./Packages/VDF/VDFTypeInfo";
 import * as Globals from "./Globals";
 import * as ReactGlobals from "./ReactGlobals";
 import * as UM7 from "./Packages/VTree/Node";
+import * as UM8 from "./Packages/V/V";
 
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
@@ -29,7 +30,7 @@ import Orientation from "react-native-orientation";
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
-	LL.forceUpdate();
+	LL.ui.forceUpdate();
 });
 
 g.appState = AppState.currentState;

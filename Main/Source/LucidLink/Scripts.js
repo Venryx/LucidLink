@@ -5,6 +5,12 @@ import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
+import scriptDefaultText_CoreFunctions from "./Scripts/UserScriptDefaults/CoreFunctions";
+import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/BuiltInHelpers";
+import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
+import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
+import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
+
 g.Scripts = class Scripts extends Node {
 }
 
@@ -23,11 +29,14 @@ export class ScriptsUI extends BaseComponent {
 
 	async LoadScriptTexts() {
 		var scriptTexts = [];
-		scriptTexts[0] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script1.js", "test1");
-		scriptTexts[1] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script2.js", "test2");
-		scriptTexts[2] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script3.js", "test3");
-		scriptTexts[3] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script4.js", "test4");
-		scriptTexts[4] = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/Script5.js", "test5");
+
+		var scriptsFolder = VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/";
+
+		scriptTexts[0] = await VFile.ReadAllTextAsync(scriptsFolder + "Script1.js", scriptDefaultText_CoreFunctions);
+		scriptTexts[1] = await VFile.ReadAllTextAsync(scriptsFolder + "Script2.js", scriptDefaultText_BuiltInHelpers);
+		scriptTexts[2] = await VFile.ReadAllTextAsync(scriptsFolder + "Script3.js", scriptDefaultText_BuiltInScript);
+		scriptTexts[3] = await VFile.ReadAllTextAsync(scriptsFolder + "Script4.js", scriptDefaultText_CustomHelpers);
+		scriptTexts[4] = await VFile.ReadAllTextAsync(scriptsFolder + "Script5.js", scriptDefaultText_CustomScript);
 		this.setState({scriptTexts});
 		Log("Finished loading.");
 	}
@@ -52,10 +61,11 @@ export class ScriptsUI extends BaseComponent {
 	render() {
 		var {scriptTexts} = this.state;
 		
-		var tabStyle = {flex: .2, marginLeft: 5, height: isLandscape ? 35 : 50};
+		var barHeight = isLandscape ? 35 : 50;
+		var tabStyle = {flex: .2, marginLeft: 5, height: barHeight + 3};
 		return (
-			<View style={{flex: 1, flexDirection: "column"}}>
-				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
+			<View style={{flex: 1, flexDirection: "column", height: barHeight + 3}}>
+				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0, height: barHeight}}>
 					<View style={{flex: .8, flexDirection: "row"}}>
 						<VButton style={E(tabStyle, {marginLeft: 0})} text="1: Built-in functions"
 							onPress={()=>this.setState({activeTab: 0})}/>
