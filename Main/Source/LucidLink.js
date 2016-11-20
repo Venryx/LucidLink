@@ -1,6 +1,7 @@
 import React, {Component} from "react";
-import {AppRegistry, StyleSheet, AppState} from "react-native";
+import {AppRegistry, StyleSheet, AppState, DeviceEventEmitter} from "react-native";
 import {Text, View, ViewPagerAndroid} from "react-native";
+import Orientation from "react-native-orientation";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
 // simple imports
@@ -25,7 +26,18 @@ import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {AboutUI} from "./LucidLink/About";
 
-import Orientation from "react-native-orientation";
+// key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
+DeviceEventEmitter.addListener("OnKeyDown", args=> {
+	var [keyCode] = args;
+	Log("KeyDown:" + keyCode);
+	LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
+});
+DeviceEventEmitter.addListener("OnKeyUp", args=> {
+	var [keyCode] = args;
+	Log("KeyUp:" + keyCode);
+	LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
+});
+
 
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
@@ -37,7 +49,7 @@ g.appState = AppState.currentState;
 AppState.addEventListener("change", appState=> {
 	g.appState = appState;
 	if (appState == "background")
-		SaveMainData();
+		LL.SaveFileSystemData();
 });
 
 const styles = StyleSheet.create({
@@ -63,6 +75,22 @@ g.LucidLink = class LucidLink extends Node {
 	@T("Scripts") @P(true, true) scripts = null;
 	@T("Settings") @P(true, true) settings = null;
 	@T("About") @P(true, true) about = null;
+
+	PushBasicDataToJava() {
+		JavaBridge.Main.SetBlockUnusedKeys(LL.settings.blockUnusedKeys);
+	}
+
+	SaveFileSystemData() {
+		this.SaveMainData();
+		
+		this.scripts.SaveFileSystemData();
+	}
+	async SaveMainData() {
+		var mainDataVDF = ToVDF(g.LL, false);
+		await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/");
+		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", mainDataVDF);
+		Log("Finished saving main-data.");
+	}
 }
 //LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
 //LucidLink.typeInfo.typeTag = new VDFType("^(?!_)(?!s$)(?!root$)", true);
@@ -81,12 +109,10 @@ async function Init(ui) {
 	else {
 		TestData.LoadInto(g.LL);
 	}
-}
-async function SaveMainData() {
-	var mainDataVDF = ToVDF(g.LL, false);
-	await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/");
-	await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", mainDataVDF);
-	Log("Finished saving main-data.");
+
+	g.LL.scripts.LoadFileSystemData();
+
+	g.LL.PushBasicDataToJava();
 }
 
 export default class LucidLinkUI extends Component {

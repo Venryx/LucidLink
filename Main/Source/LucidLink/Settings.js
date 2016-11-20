@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Dimensions, StyleSheet,
-	View, Button, Text, TextInput} from "react-native";
+	View, Button, Text, Switch, TextInput} from "react-native";
 import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
@@ -8,6 +8,9 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 var FilePickerManager = NativeModules.FilePickerManager;
 
 g.Settings = class Settings extends Node {
+	@P() applyScriptsOnLaunch = true;
+	@P() blockUnusedKeys = false;
+	//@P() captureSpecialKeys = false;
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 }
 g.AudioFileEntry = class AudioFileEntry {
@@ -28,10 +31,10 @@ class Row extends BaseComponent {
 }
 class RowLR extends BaseComponent {
     render() {
-		var {leftStyle, rightStyle, children} = this.props;
+		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<View style={{flex: 1, flexDirection: "row", padding: 3}}>
+			<View style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
 				<View style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
 				</View>
@@ -51,8 +54,25 @@ export class SettingsUI extends BaseComponent {
 		return (
 			<View style={{flex: 1}}>
 				<Row style={{flex: 1, flexDirection: "column"}}>
-					<Row height={30}><Text>Audio files</Text></Row>
-					<Row style={{flex: 1, flexDirection: "column"}}>
+					<RowLR height={25}>
+						<Text>Apply scripts on launch</Text>
+						<Switch value={node.applyScriptsOnLaunch}
+							onValueChange={value=>{
+								node.applyScriptsOnLaunch = value;
+								this.forceUpdate();
+							}}/>
+					</RowLR>
+					<RowLR height={25}>
+						<Text>Block unused keys</Text>
+						<Switch value={node.blockUnusedKeys}
+							onValueChange={value=>{
+								node.blockUnusedKeys = value;
+								LL.PushBasicDataToJava();
+								this.forceUpdate();
+							}}/>
+					</RowLR>
+					<Row height={30} style={{position: "absolute"}}><Text>Audio files</Text></Row>
+					<Row style={{marginTop: 10, flex: 1, flexDirection: "column"}}>
 						{node.audioFiles.map((audioFile, index)=> {
 							return (
 								<Row key={index} height={35}>
@@ -73,7 +93,7 @@ export class SettingsUI extends BaseComponent {
 							<VButton onPress={()=>this.AddAudioFile()} text="Add" style={{width: 100, height: 40}}/>
 						</Row>
 					</Row>
-					<View style={{flex: 1000}}>
+					<View style={{flex: 111222}}>
 					</View>
 				</Row>
             </View>

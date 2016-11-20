@@ -25,8 +25,11 @@ g.V = class V {
 		var firstCharOfSecondLinePos = text.indexOf("\n") + 1;
 		var enderOfSecondLastLine = text.lastIndexOf("\n");
 		var result = text.substring(firstCharOfSecondLinePos, enderOfSecondLastLine);
+
+		result = result.replace(/\t/g, "    ");
 		// replace the start and end tokens of special string-containers (used for keeping comments in-tact)
-		result = result.replace(/'@((?:.|\n)+)@';\n/g, (match, sub1)=>sub1.replace(/\\n/, "\n"));
+		result = result.replace(/['"]@((?:.|\n)+)@['"];(\n(?=\n))?/g, (match, sub1)=>sub1.replace(/\\n/, "\n"));
+
 		return result;
 	}
 };

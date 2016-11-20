@@ -1,3 +1,2 @@
-export default V.Multiline_NotCommented(()=> {
-
-});
+export default `
+`.trim();

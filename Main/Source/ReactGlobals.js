@@ -24,9 +24,9 @@ g.BaseComponent = class BaseComponent extends Component {
 }
 
 g.VButton = class VButton extends BaseComponent {
-	static defaultProps = {caps: true};
+	static defaultProps = {caps: true, enabled: true};
 	render() {
-		var {text, caps, style, textStyle} = this.props;
+		var {text, caps, style, textStyle, enabled} = this.props;
 		var restProps = this.props.RemovingProps("text", "style");
 
 		if (caps)
@@ -34,7 +34,7 @@ g.VButton = class VButton extends BaseComponent {
 
 		var baseStyle = {borderColor: "#777", backgroundColor: "#777", borderRadius: 3};
 		return (
-			<Button {...restProps}
+			<Button {...restProps} isDisabled={!enabled}
 					style={E(baseStyle, style)}
 					textStyle={E({color: "#FFF", fontWeight: "bold", fontSize: 15}, textStyle)}>
 				{text}
