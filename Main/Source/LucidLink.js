@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import {AppRegistry, StyleSheet, AppState, DeviceEventEmitter} from "react-native";
-import {Text, View, ViewPagerAndroid} from "react-native";
+import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter, Keyboard} from "react-native";
+import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 import Orientation from "react-native-orientation";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
@@ -38,7 +38,6 @@ DeviceEventEmitter.addListener("OnKeyUp", args=> {
 	LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
 });
 
-
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
@@ -52,23 +51,17 @@ AppState.addEventListener("change", appState=> {
 		LL.SaveFileSystemData();
 });
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#F5FCFF',
-	},
-	welcome: {
-		fontSize: 20,
-		textAlign: 'center',
-		margin: 10,
-	},
-	instructions: {
-		textAlign: 'center',
-		color: '#333333',
-		marginBottom: 5,
-	},
+g.keyboardVisible = false;
+g.keyboardHeight = 0;
+Keyboard.addListener("keyboardDidShow", e=> {
+	g.keyboardVisible = true;
+	g.keyboardHeight = e.endCoordinates.height;
+	LL.ui.forceUpdate();
+});
+Keyboard.addListener("keyboardDidHide", ()=> {
+	g.keyboardVisible = false;
+	g.keyboardHeight = 0;
+	LL.ui.forceUpdate();
 });
 
 g.LucidLink = class LucidLink extends Node {
@@ -115,6 +108,25 @@ async function Init(ui) {
 	g.LL.PushBasicDataToJava();
 }
 
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#F5FCFF',
+	},
+	welcome: {
+		fontSize: 20,
+		textAlign: 'center',
+		margin: 10,
+	},
+	instructions: {
+		textAlign: 'center',
+		color: '#333333',
+		marginBottom: 5,
+	},
+});
+
 export default class LucidLinkUI extends Component {
     constructor(props) {
         super(props);
@@ -136,28 +148,35 @@ export default class LucidLinkUI extends Component {
       var {testName} = this.state;
 
         return (
-            <ScrollableTabView>
-                <View style={styles.container} tabLabel="Monitor">
-                    <Text style={styles.welcome}>
-                    Welcome to React Native!
-                    TestName: {testName}
-                    </Text>
-                    <Text style={styles.instructions}>
-                    To get started, edit index.android.js
-                    </Text>
-                    <Text style={styles.instructions}>
-                    Double tap R on your keyboard to reload,{'\n'}
-                    Shake or press menu button for dev menu
-                    </Text>
-                </View>
-                <View style={styles.container} tabLabel="Tracker">
-                </View>
-                <View style={styles.container} tabLabel="Journal">
-                </View>
-                <ScriptsUI tabLabel="Scripts"/>
-                <SettingsUI tabLabel="Settings"/>
-                <AboutUI tabLabel="About"/>
-            </ScrollableTabView>
+			//<View style={{flex: 1}}>
+			<ScrollableTabView stylze={{flex: 1}}>
+				<View style={styles.container} tabLabel="Monitor">
+					<Text style={styles.welcome}>
+					Welcome to React Native!
+					TestName: {testName}
+					</Text>
+					<Text style={styles.instructions}>
+					To get started, edit index.android.js
+					</Text>
+					<Text style={styles.instructions}>
+					Double tap R on your keyboard to reload,{'\n'}
+					Shake or press menu button for dev menu
+					</Text>
+				</View>
+				<View style={styles.container} tabLabel="Tracker">
+				</View>
+				<View style={styles.container} tabLabel="Journal">
+				</View>
+				<ScriptsUI tabLabel="Scripts"/>
+				<SettingsUI tabLabel="Settings"/>
+				<AboutUI tabLabel="About"/>
+			</ScrollableTabView>
+				/*{keyboardVisible &&
+					<View style={{position: "absolute", bottom: 0, height: 30}}>
+						<VButton style={{alignItems: "flex-end", width: 100, height: 30}}
+							textStyle={{margin: 3}} color="#777" text="Copy" onPress={()=>alert("Test1")}/>
+					</View>}
+			</View>*/
         );
     }
 
