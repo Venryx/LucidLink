@@ -6,13 +6,17 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 require("./CE");
 import * as Test1 from "./Globals";
 import * as Test2 from "./ReactGlobals";
+import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
-import ScriptsUI from "./ScriptsUI";
+import {ScriptsUI} from "./LucidLink/Scripts";
+import {SettingsUI} from "./LucidLink/Settings";
 
-export default class Main extends Component {
+export default class LucidLink extends Component {
     constructor(props) {
         super(props);
         this.state = {};
+		g.LL = this;
+		TestData.LoadInto(this);
     }
 
     componentWillMount() {
@@ -48,8 +52,7 @@ export default class Main extends Component {
                 <View style={styles.container} tabLabel="Journal">
                 </View>
                 <ScriptsUI tabLabel="Scripts"/>
-                <View style={styles.container} tabLabel="Settings">
-                </View>
+                <SettingsUI tabLabel="Settings"/>
                 <View style={styles.container} tabLabel="About">
                 </View>
             </ScrollableTabView>

@@ -5,7 +5,10 @@ import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
-export default class ScriptsUI extends BaseComponent {
+g.Scripts = class Scripts {
+}
+
+export class ScriptsUI extends BaseComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -49,20 +52,21 @@ export default class ScriptsUI extends BaseComponent {
 	render() {
 		var {scriptTexts} = this.state;
 		
-		var tabStyle = {width: 100, height: 10, marginLeft: 5};
+		var tabStyle = {flex: .2, marginLeft: 5};
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>
-				<View style={{flexDirection: "row", height: 42, padding: 3}}>
-					<View style={{flex: 1, flexDirection: "row", height: 35}}>
+				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
+					<View style={{flex: .8, flexDirection: "row"}}>
 						<VButton style={E(tabStyle, {marginLeft: 0})} color="#777"
 							onPress={()=>this.setState({activeTab: 0})} title="1: Built-in functions"/>
 						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 1})} title="2: Built-in helpers"/>
 						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 2})} title="3: Built-in script"/>
 						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 3})} title="4: Custom helpers"/>
 						<VButton style={tabStyle} color="#777" onPress={()=>this.setState({activeTab: 4})} title="5: Custom script"/>
-					</View>
-					<View style={{flexDirection: "row", alignItems: "flex-end", height: 35}}>
-						<VButton style={tabStyle} color="#777" onPress={()=>this.ApplyScripts()} title="Apply scripts"/>
+						<View style={{flex: .2}}/>
+						<View style={{flex: .2, flexDirection: "row", alignItems: "flex-end"}}>
+							<VButton style={tabStyle} color="#777" onPress={()=>this.ApplyScripts()} title="Apply scripts"/>
+						</View>
 					</View>
 				</View>
 				<View style={{flex: 1}}>

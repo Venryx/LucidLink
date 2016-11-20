@@ -1,5 +1,5 @@
-import {AppRegistry} from 'react-native';
+import {AppRegistry} from "react-native";
 
-import Main from './Source/Main';
+import LucidLink from "./Source/LucidLink";
 
-AppRegistry.registerComponent('LucidLink', ()=>Main);
+AppRegistry.registerComponent("LucidLink", ()=>LucidLink);
