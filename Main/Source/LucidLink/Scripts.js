@@ -5,7 +5,7 @@ import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
-g.Scripts = class Scripts {
+g.Scripts = class Scripts extends Node {
 }
 
 export class ScriptsUI extends BaseComponent {

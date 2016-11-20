@@ -200,6 +200,10 @@ g.D = function(...args) {
     };
 };
 
+g._VDFTypeInfo = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFTypeInfo(...args));
+};
+
 g._IgnoreStartData = function() {
     return (target, name, descriptor)=>target[name].AddTags(new IgnoreStartData());
 };

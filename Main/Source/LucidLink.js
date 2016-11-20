@@ -15,6 +15,7 @@ import * as UM5 from "./Packages/VDF/VDFTokenParser";
 import * as UM6 from "./Packages/VDF/VDFTypeInfo";
 import * as Globals from "./Globals";
 import * as ReactGlobals from "./ReactGlobals";
+import * as UM7 from "./Packages/VTree/Node";
 
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
@@ -50,22 +51,41 @@ const styles = StyleSheet.create({
 	},
 });
 
-g.LucidLink = class LucidLink {
-	scripts = null;
-	settings = null;
-	about = null;
+g.LucidLink = class LucidLink extends Node {
+	@T("Scripts") @P(true, true) scripts = null;
+	@T("Settings") @P(true, true) settings = null;
+	@T("About") @P(true, true) about = null;
 }
+//LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
+//LucidLink.typeInfo.typeTag = new VDFType("^(?!_)(?!s$)(?!root$)", true);
+LucidLink.typeInfo.typeTag = new VDFType(null, true);
 
-function Init() {
+async function Init(ui) {
 	g.LL = new LucidLink();
-	TestData.LoadInto(g.LL);
+	g.LL.ui = ui;
+	var mainDataVDF = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", null);
+	if (mainDataVDF) {
+		var data = FromVDF(mainDataVDF, "LucidLink");
+		for (var propName in data) {
+			g.LL[propName] = data[propName];
+		}
+	}
+	else {
+		TestData.LoadInto(g.LL);
+	}
+}
+async function SaveMainData() {
+	var mainDataVDF = ToVDF(g.LL, false);
+	await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/");
+	await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", mainDataVDF);
+	Log("Finished saving main-data.");
 }
 
 export default class LucidLinkUI extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-		Init();
+		Init(this);
     }
 
     componentWillMount() {
@@ -106,4 +126,8 @@ export default class LucidLinkUI extends Component {
             </ScrollableTabView>
         );
     }
+
+	componentWillUnmount() {
+		SaveMainData();
+	}
 }

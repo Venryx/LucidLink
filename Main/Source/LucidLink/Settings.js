@@ -7,8 +7,12 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 
 var FilePickerManager = NativeModules.FilePickerManager;
 
-g.Settings = class Settings {
-	@P() audioFiles = [];
+g.Settings = class Settings extends Node {
+	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
+}
+g.AudioFileEntry = class AudioFileEntry {
+	@P() name = null;
+	@P() path = null;
 }
 
 class Row extends BaseComponent {
@@ -85,6 +89,10 @@ export class SettingsUI extends BaseComponent {
 				return;
 			}
 			entry.path = response.path;
+			Log("New content0:" + ToVDF(response.path));
+			Log("New content1:" + ToVDF(entry.path));
+			Log("New content1:" + ToVDF(entry));
+			Log("New contents:" + ToVDF(LL.settings.audioFiles));
 			this.forceUpdate();
 		});
 	}

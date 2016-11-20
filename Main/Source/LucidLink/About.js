@@ -5,7 +5,7 @@ import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
-g.About = class About {
+g.About = class About extends Node {
 	@P() jsCode = "";
 }
 

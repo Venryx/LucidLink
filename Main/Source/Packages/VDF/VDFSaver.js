@@ -1,13 +1,13 @@
 var g = global;
 var Log = g.Log, Assert = g.Assert;
-var VDFTypeMarking;
+//var VDFTypeMarking;
 (function (VDFTypeMarking) {
     VDFTypeMarking[VDFTypeMarking["None"] = 0] = "None";
     VDFTypeMarking[VDFTypeMarking["Internal"] = 1] = "Internal";
     VDFTypeMarking[VDFTypeMarking["External"] = 2] = "External";
     VDFTypeMarking[VDFTypeMarking["ExternalNoCollapse"] = 3] = "ExternalNoCollapse"; // maybe temp
-})(VDFTypeMarking || (VDFTypeMarking = {}));
-var VDFSaveOptions = (function () {
+})(g.VDFTypeMarking || (g.VDFTypeMarking = {}));
+g.VDFSaveOptions = (function () {
     function VDFSaveOptions(initializerObj, messages, typeMarking, useMetadata, useChildPopOut, useStringKeys, useNumberTrimming, useCommaSeparators) {
         if (typeMarking === void 0) { typeMarking = VDFTypeMarking.Internal; }
         if (useMetadata === void 0) { useMetadata = true; }
@@ -36,7 +36,7 @@ var VDFSaveOptions = (function () {
     };
     return VDFSaveOptions;
 }());
-var VDFSaver = (function () {
+g.VDFSaver = (function () {
     function VDFSaver() {
     }
     VDFSaver.ToVDFNode = function (obj, declaredTypeName_orOptions, options, path, declaredTypeInParentVDF) {
