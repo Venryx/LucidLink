@@ -1,4 +1,5 @@
-var VDFTokenType;
+var g = global;
+//var VDFTokenType;
 (function (VDFTokenType) {
     //WiderMetadataEndMarker,
     //MetadataBaseValue,
@@ -35,8 +36,8 @@ var VDFTokenType;
     VDFTokenType[VDFTokenType["ListEndMarker"] = 19] = "ListEndMarker";
     VDFTokenType[VDFTokenType["MapStartMarker"] = 20] = "MapStartMarker";
     VDFTokenType[VDFTokenType["MapEndMarker"] = 21] = "MapEndMarker";
-})(VDFTokenType || (VDFTokenType = {}));
-var VDFToken = (function () {
+})(g.VDFTokenType || (g.VDFTokenType = {}));
+g.VDFToken = (function () {
     function VDFToken(type, position, index, text) {
         this.type = type;
         this.position = position;
@@ -45,7 +46,7 @@ var VDFToken = (function () {
     }
     return VDFToken;
 }());
-var VDFTokenParser = (function () {
+g.VDFTokenParser = (function () {
     function VDFTokenParser() {
     }
     VDFTokenParser.ParseTokens = function (text, options, parseAllTokens, postProcessTokens) {
@@ -453,7 +454,7 @@ var VDFTokenParser = (function () {
     VDFTokenParser.chars0To9DotAndNegative = List.apply(null, ["string"].concat("0123456789\.\-\+eE".match(/./g)));
     return VDFTokenParser;
 }());
-var TokenSet = (function () {
+g.TokenSet = (function () {
     function TokenSet(tokens, line_tabsReached) {
         if (line_tabsReached === void 0) { line_tabsReached = 0; }
         this.currentTokenIndex = 0;

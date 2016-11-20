@@ -28,6 +28,22 @@ g.JavaBridge = class JavaBridge {
     }
 }
 
+// polyfills for constants
+// ==========
+
+if (Number.MIN_SAFE_INTEGER == null)
+	Number.MIN_SAFE_INTEGER = -9007199254740991;
+if (Number.MAX_SAFE_INTEGER == null)
+	Number.MAX_SAFE_INTEGER = 9007199254740991;
+
+//g.Break = function() { debugger; };
+g.Debugger = function() { debugger; }
+g.Debugger_True = function() { debugger; return true; }
+g.Debugger_If = function(condition) {
+    if (condition)
+        debugger;
+}
+
 // general
 // ==========
 
@@ -39,6 +55,77 @@ g.E = function(...objExtends) {
         result.Extend(extend);
 	return result;
 	//return StyleSheet.create(result);
+}
+
+// object-VDF
+// ----------
+
+//Function.prototype._AddGetter_Inline = function VDFSerialize() { return function() { return VDF.CancelSerialize; }; };
+Function.prototype.Serialize = function() { return VDF.CancelSerialize; }.AddTags(new VDFSerialize());
+
+g.FinalizeFromVDFOptions = function(options = null) {
+    options = options || new VDFLoadOptions();
+	options.loadUnknownTypesAsBasicTypes = true;
+	return options;
+}
+g.FromVDF = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
+	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
+		return FromVDF(vdf, null, declaredTypeName_orOptions);
+
+	try { return VDF.Deserialize(vdf, declaredTypeName_orOptions, FinalizeFromVDFOptions(options)); }
+	/*catch(error) { if (!InUnity()) throw error;
+		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf);
+	}/**/ finally {}
+}
+g.FromVDFInto = function(vdf, obj, /*o:*/ options) {
+	try { return VDF.DeserializeInto(vdf, obj, FinalizeFromVDFOptions(options)); }
+	/*catch(error) { if (!InUnity()) throw error;
+		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf); }
+	/**/ finally {}
+}
+g.FromVDFToNode = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
+	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
+		return FromVDF(vdf, null, declaredTypeName_orOptions);
+
+	try { return VDFLoader.ToVDFNode(vdf, declaredTypeName_orOptions, FinalizeFromVDFOptions(options)); }
+	/*catch(error) { if (!InUnity()) throw error;
+		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf);
+	}/**/ finally {}
+}
+g.FromVDFNode = function(node) { // alternative to .ToObject(), which applies default (program) settings
+	return node.ToObject(FinalizeFromVDFOptions());
+}
+
+g.FinalizeToVDFOptions = function(options = null) {
+    options = options || new VDFSaveOptions();
+	return options;
+}
+/*function ToVDF(obj, /*o:*#/ declaredTypeName_orOptions, options_orNothing) {
+	try { return VDF.Serialize(obj, declaredTypeName_orOptions, options_orNothing); }
+	/*catch(error) { if (!InUnity()) throw error; else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
+	//catch(error) { if (!InUnity()) { debugger; throw error; } else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
+}*/
+g.ToVDF = function(obj, /*o:*/ markRootType, typeMarking, options) {
+	markRootType = markRootType != null ? markRootType : true; // maybe temp; have JS side assume the root-type should be marked
+	typeMarking = typeMarking || VDFTypeMarking.Internal;
+
+	try {
+		options = FinalizeToVDFOptions(options);
+		options.typeMarking = typeMarking;
+		return VDF.Serialize(obj, !markRootType && obj != null ? obj.GetTypeName() : null, options);
+	}
+	/*catch(error) {
+		if (!InUnity()) throw error;
+		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nObj) " + obj);
+	}/**/ finally {}
+}
+g.ToVDFNode = function(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing) {
+	try {
+	    return VDFSaver.ToVDFNode(obj, declaredTypeName_orOptions, options_orNothing);
+	}
+	/*catch (error) { if (!InUnity()) throw error;
+		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nObj) " + obj);
+	}/**/ finally {}
 }
 
 // tags

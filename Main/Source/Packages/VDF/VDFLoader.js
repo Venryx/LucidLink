@@ -1,3 +1,4 @@
+var g = global;
 g.VDFLoadOptions = (function () {
     function VDFLoadOptions(initializerObj, messages, allowStringKeys, allowCommaSeparators, loadUnknownTypesAsBasicTypes) {
         if (allowStringKeys === void 0) { allowStringKeys = true; }

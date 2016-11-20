@@ -1,3 +1,4 @@
+var g = global;
 var Log = g.Log, Assert = g.Assert;
 var VDFTypeMarking;
 (function (VDFTypeMarking) {
