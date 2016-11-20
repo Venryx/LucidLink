@@ -49,16 +49,18 @@ export class SettingsUI extends BaseComponent {
 					<Row style={{flex: 1, flexDirection: "column"}}>
 						{node.audioFiles.map((audioFile, index)=> {
 							return (
-								<Row key={index} height={30}>
-									<Text style={{flex: 1}}>{audioFile.name}</Text>
+								<Row key={index} height={35}>
+									<Text style={{flex: 1}}>    {audioFile.name}</Text>
 									<Text style={{flex: 1}}>{audioFile.path}</Text>
-									<VButton text="X" style={{alignItems: "flex-end", marginTop: -3, paddingBottom: -5}}
+									<VButton text="Select" style={{alignItems: "flex-end", width: 100, height: 28}} textStyle={{marginBottom: 3}}
+										onPress={()=>this.SelectAudioFileForEntry(audioFile)}/>
+									<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
 										onPress={()=>node.audioFiles.Remove(audioFile) | this.forceUpdate()}/>
 								</Row>
 							);
 						})}
-						<Row height={50}>
-							<VButton onPress={()=>this.AddAudioFile()} text="Add"/>
+						<Row height={40}>
+							<VButton onPress={()=>this.AddAudioFile()} text="Add" style={{width: 100, height: 40}}/>
 						</Row>
 					</Row>
 					<View style={{flex: 1000}}>
@@ -68,7 +70,11 @@ export class SettingsUI extends BaseComponent {
 		);
 	}
 
-	AddAudioFile() {
+	SelectAudioFileForEntry(entry) {
+		// todo
+	}
 
+	AddAudioFile() {
+		// todo
 	}
 }

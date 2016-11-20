@@ -11,6 +11,11 @@ g.g = g;
 
 //g.View = View;
 
+// component.js
+import EStyleSheet from 'react-native-extended-stylesheet';
+// calculate styles
+EStyleSheet.build();
+
 g.BaseComponent = class BaseComponent extends Component {
 	constructor(props) {
 		super(props);
@@ -21,7 +26,7 @@ g.BaseComponent = class BaseComponent extends Component {
 g.VButton = class VButton extends BaseComponent {
 	static defaultProps = {caps: true};
 	render() {
-		var {text, caps, style} = this.props;
+		var {text, caps, style, textStyle} = this.props;
 		var restProps = this.props.RemovingProps("text", "style");
 
 		if (caps)
@@ -31,7 +36,7 @@ g.VButton = class VButton extends BaseComponent {
 		return (
 			<Button {...restProps}
 					style={E(baseStyle, style)}
-					textStyle={{color: "#FFF", fontWeight: "bold", fontSize: 15}}>
+					textStyle={E({color: "#FFF", fontWeight: "bold", fontSize: 15}, textStyle)}>
 				{text}
 			</Button>
 		);
