@@ -3,11 +3,20 @@ import {AppRegistry, NativeModules, StyleSheet} from "react-native";
 import {Text, View, ViewPagerAndroid} from "react-native";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
+// simple imports
 require("./CE");
-import * as Test1 from "./Globals";
-import * as Test2 from "./ReactGlobals";
+import * as Globals from "./Globals";
+import * as ReactGlobals from "./ReactGlobals";
+import * as UM1 from "./Packages/VDF/VDF";
+import * as UM2 from "./Packages/VDF/VDFLoader";
+import * as UM3 from "./Packages/VDF/VDFNode";
+import * as UM4 from "./Packages/VDF/VDFSaver";
+import * as UM5 from "./Packages/VDF/VDFTokenParser";
+import * as UM6 from "./Packages/VDF/VDFTypeInfo";
+
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
+
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 

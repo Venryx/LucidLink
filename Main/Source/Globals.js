@@ -41,6 +41,87 @@ g.E = function(...objExtends) {
 	//return StyleSheet.create(result);
 }
 
+// tags
+// ==========
+
+g.T = function(typeOrTypeName) {
+    return (target, name, descriptor)=> {
+        //target.prototype[name].AddTags(new VDFPostDeserialize());
+        //Prop(target, name, typeOrTypeName);
+        //target.p(name, typeOrTypeName);
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
+    };
+};
+g.P = function(...args) {
+    return function Temp1(target, name, descriptor) {
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.AddTags(new VDFProp(...args));
+    };
+};
+g.D = function(...args) {
+    return (target, name, descriptor)=> {
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.AddTags(new DefaultValue(...args));
+    };
+};
+
+g._IgnoreStartData = function() {
+    return (target, name, descriptor)=>target[name].AddTags(new IgnoreStartData());
+};
+
+g._NoAttach = function(...args) {
+    return (target, name, descriptor)=> {
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.AddTags(new NoAttach(...args));
+    };
+};
+g._ByPath = function(...args) {
+    return (target, name, descriptor)=> {
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.AddTags(new ByPath(...args));
+    };
+};
+g._ByPathStr = function(...args) {
+	return (target, name, descriptor)=> {
+		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+	    propInfo.AddTags(new ByPathStr(...args));
+	};
+};
+g._ByName = function(...args) {
+    return (target, name, descriptor)=> {
+        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+        propInfo.AddTags(new ByName(...args));
+    };
+};
+
+g._VDFDeserializeProp = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFDeserializeProp(...args));
+};
+g._VDFSerializeProp = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFSerializeProp(...args));
+};
+
+g._VDFPreDeserialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFPreDeserialize(...args));
+};
+g._VDFDeserialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFDeserialize(...args));
+};
+g._VDFPostDeserialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFPostDeserialize(...args));
+};
+
+g._VDFPreSerialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFPreSerialize(...args));
+};
+g._VDFSerialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFSerialize(...args));
+};
+g._VDFPostSerialize = function(...args) {
+    return (target, name, descriptor)=>target[name].AddTags(new VDFPostSerialize(...args));
+};
+
 // timer stuff
 // ==========
 

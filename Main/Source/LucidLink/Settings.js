@@ -6,7 +6,7 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
 g.Settings = class Settings {
-	audioFiles = [];
+	@P() audioFiles = [];
 }
 
 class Row extends BaseComponent {
