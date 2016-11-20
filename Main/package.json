@@ -12,6 +12,7 @@
     "react-native": "0.37.0",
     "react-native-extended-stylesheet": "^0.3.0",
     "react-native-fs": "^2.0.1-rc.2",
+    "react-native-orientation": "yamill/react-native-orientation",
     "react-native-scrollable-tab-view": "^0.6.0"
   },
   "jest": {

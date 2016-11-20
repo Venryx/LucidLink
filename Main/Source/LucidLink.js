@@ -11,6 +11,15 @@ import TestData from "./TestData";
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 
+import Orientation from "react-native-orientation";
+//var Orientation = NativeModules.Orientation;
+
+g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
+Orientation.addOrientationListener(orientation=> {
+	g.isLandscape = orientation == "LANDSCAPE";
+	LL.forceUpdate();
+});
+
 export default class LucidLink extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +34,7 @@ export default class LucidLink extends Component {
     }
     async GetTestName() {
         var result = await JavaBridge.Main.GetTestName();
-        console.log(`Got test name:${result}`);
+        console.log(`Got test name: ${result}`);
         this.setState({testName: result});
     }
 

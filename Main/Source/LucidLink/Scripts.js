@@ -52,7 +52,7 @@ export class ScriptsUI extends BaseComponent {
 	render() {
 		var {scriptTexts} = this.state;
 		
-		var tabStyle = {flex: .2, marginLeft: 5, height: 35};
+		var tabStyle = {flex: .2, marginLeft: 5, height: isLandscape ? 35 : 50};
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>
 				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
