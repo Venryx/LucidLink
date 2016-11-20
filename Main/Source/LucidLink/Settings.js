@@ -1,16 +1,11 @@
 import React, {Component} from "react";
-import ReactNative, {Dimensions, StyleSheet,
+import {Dimensions, StyleSheet,
 	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
 var FilePickerManager = NativeModules.FilePickerManager;
-/*const {
-  NativeModules: {
-    FilePickerManager
-  }
-} = ReactNative;*/
 
 g.Settings = class Settings {
 	@P() audioFiles = [];
@@ -84,14 +79,13 @@ export class SettingsUI extends BaseComponent {
 		};
 
 		FilePickerManager.showFilePicker(options, response=> {
-			//console.log('Response = ', response);
-			/*if (response.didCancel) return;
+			if (response.didCancel) return;
 			if (response.error) {
-				console.log('ImagePickerManager Error: ', response.error);
+				console.log("FilePicker error:", response.error);
 				return;
 			}
-			//entry.path = response;
-			this.forceUpdate();*/
+			entry.path = response.path;
+			this.forceUpdate();
 		});
 	}
 
