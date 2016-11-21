@@ -1,11 +1,8 @@
 export default class ConsoleUI extends BaseComponent {
 	render() {
 		var {onChangeText, text} = this.props;
-		var buttonStyle = {flex: .2, marginLeft: 5, height: isLandscape ? 35 : 50};
-		var textStyle = {
-			//height: screenHeight,
-			flex: 1, textAlignVertical: "top",
-		};
+		var buttonStyle = {flex: .2, marginLeft: 5};
+		var textStyle = {flex: 1, textAlignVertical: "top"};
 		
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>

@@ -19,6 +19,7 @@ import * as Globals from "./Globals";
 import * as ReactGlobals from "./ReactGlobals";
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
+import UM9 from "./Packages/V/VFile";
 
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
@@ -42,13 +43,14 @@ DeviceEventEmitter.addListener("OnKeyUp", args=> {
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
-	LL.ui.forceUpdate();
+	if (LL && LL.ui)
+		LL.ui.forceUpdate();
 });
 
 g.appState = AppState.currentState;
 AppState.addEventListener("change", appState=> {
 	g.appState = appState;
-	if (appState == "background")
+	if (appState == "background" && LL)
 		LL.SaveFileSystemData();
 });
 
@@ -95,6 +97,8 @@ g.LucidLink = class LucidLink extends Node {
 		await this.RootFolder.GetFile("MainData.vdf").WriteAllText(mainDataVDF);
 		Log("Finished saving main-data.");
 	}
+
+	ui = null;
 }
 //LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
 //LucidLink.typeInfo.typeTag = new VDFType("^(?!_)(?!s$)(?!root$)", true);

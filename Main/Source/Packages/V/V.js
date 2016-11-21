@@ -32,4 +32,20 @@ g.V = class V {
 
 		return result;
 	}
+
+	static StableSort(array, compare) { // needed for Chrome
+		var array2 = array.map((obj, index)=>({index: index, obj: obj}));
+		array2.sort((a, b)=> {
+			var r = compare(a.obj, b.obj);
+			return r != 0 ? r : V.Compare(a.index, b.index);
+		});
+		return array2.map(pack=>pack.obj);
+	}
+	static Compare(a, b, caseSensitive = true) {
+		if (!caseSensitive && typeof a == "string" && typeof b == "string") {
+			a = a.toLowerCase();
+			b = b.toLowerCase();
+		}
+		return a < b ? -1 : (a > b ? 1 : 0);
+	}
 };

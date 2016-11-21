@@ -644,6 +644,12 @@ Array.prototype._AddFunction_Inline = function ToDictionary(keyFunc, valFunc) {
 		result.Add(keyFunc(this[i]), valFunc(this[i]));
 	return result;
 }
+Array.prototype._AddFunction_Inline = function ToMap(keyFunc, valFunc) {
+	var result = {};
+	for (let item of this)
+		result[keyFunc(item)] = valFunc(item);
+	return result;
+}
 Array.prototype._AddFunction_Inline = function Skip(count) {
 	var result = [];
 	for (var i = count; i < this.length; i++)

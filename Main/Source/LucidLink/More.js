@@ -34,9 +34,7 @@ g.More = class More extends Node {
 	// logs
 	@P() showLogs_general = true;
 	@P() showLogs_keyboard = true;
-	@P() showLogs_custom1 = true;
-	@P() showLogs_custom2 = true;
-	@P() showLogs_custom3 = true;
+	@P() showLogs_others = true;
 
 	@P() showMoreInfo = false;
 	@P() autoScroll = true;

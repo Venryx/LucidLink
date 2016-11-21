@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet} from "react-native";
-import RNFS from "react-native-fs";
 
 var g = global;
 g.g = g;
@@ -28,7 +27,8 @@ g.Log = function(...args) {
 
 	console.log(...args);
 
-	LL.more.AddLogEntry(new LogEntry(type, message, new Date()));
+	if (g.LL && g.LL.more)
+		g.LL.more.AddLogEntry(new LogEntry(type, message, new Date()));
 };
 g.Trace = function(...args) {
 	console.trace(...args);
@@ -83,8 +83,8 @@ g.E = function(...objExtends) {
 // ==========
 
 // object-Json
-function FromJSON(json) { return JSON.parse(json); }
-function ToJSON(obj, excludePropNames___) {
+g.FromJSON = function(json) { return JSON.parse(json); }
+g.ToJSON = function(obj, excludePropNames___) {
 	try {
 		if (arguments.length > 1) {
 			var excludePropNames = V.Slice(arguments, 1);
@@ -102,7 +102,7 @@ function ToJSON(obj, excludePropNames___) {
 		throw ex;
 	}
 }
-function ToJSON_Safe(obj, excludePropNames___) {
+g.ToJSON_Safe = function(obj, excludePropNames___) {
 	var excludePropNames = V.Slice(arguments, 1);
 
 	var cache = [];
@@ -350,76 +350,4 @@ g.BufferFuncToBeRun = function(key, minInterval, func) {
         WaitXThenRun(timeTillIntervalEnd, func);
 		funcLastScheduledRunTimes[key] = intervalEndTime;
     }
-}
-
-// file stuff
-// ==========
-
-g.VFile = class VFile {
-	static get MainBundlePath() { return RNFS.MainBundlePath; }
-	static get CachesDirectoryPath() { return RNFS.CachesDirectoryPath; }
-	static get DocumentDirectoryPath() { return RNFS.DocumentDirectoryPath; }
-	static get ExternalDirectoryPath() { return RNFS.ExternalDirectoryPath; }
-	static get ExternalStorageDirectoryPath() { return RNFS.ExternalStorageDirectoryPath; }
-	static get TemporaryDirectoryPath() { return RNFS.TemporaryDirectoryPath; }
-	static get LibraryDirectoryPath() { return RNFS.LibraryDirectoryPath; }
-	static get PicturesDirectoryPath() { return RNFS.PicturesDirectoryPath; }
-}
-
-g.Folder = class Folder {
-	constructor(path) {
-		this.path = path;
-	}
-
-	path = null;
-
-	async Exists() {
-		return await RNFS.exists(this.path);
-	}
-	async Create() {
-		return RNFS.mkdir(this.path);
-	}
-
-	async GetFiles() {
-		var subs = await RNFS.readDir(this.path);
-		var result = [];
-		for (let sub of subs) {
-			let subInfo = await RNFS.stat(sub.path);
-			if (subInfo.isFile()) {
-				let file = new File(sub.path);
-				result.push(file);
-			}
-		}
-		return result;
-	}
-
-	GetFolder(subpath) {
-		return new Folder(this.path + "/" + subpath);
-	}
-	GetFile(subpath) {
-		return new File(this.path + "/" + subpath);
-	}
-}
-g.File = class File {
-	constructor(path) {
-		this.path = path;
-	}
-
-	get Name() {
-		return this.path.substr(this.path.replace(/\\/g, "/").lastIndexOf("/"));
-	}
-	get NameWithoutExtension() {
-		return this.Name.substr(0, this.Name.lastIndexOf("."));
-	}
-
-	async ReadAllText(encoding = "utf8") {
-		//if (error.toString().contains("ENOENT: no such file or directory, open "))
-		return RNFS.readFile(this.path, encoding);
-	}
-	async WriteAllText(text, encoding = "utf8") {
-		return RNFS.writeFile(this.path, text, encoding);
-	}
-	async AppendText(text, encoding = "utf8") {
-		return RNFS.appendFile(this.path, text, encoding);
-	}
 }

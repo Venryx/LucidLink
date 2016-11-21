@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {NativeModules} from "react-native";
 //import {View, Button} from "react-native";
 import {Dimensions, StyleSheet,
-	View, Text, Switch, TextInput, ScrollView} from "react-native";
+	View, Text, Switch, TextInput, ScrollView, TouchableHighlight} from "react-native";
 import RNFS from "react-native-fs";
 //import autobind from "react-autobind"; // caused error in Babel transpiler
 import Bind from "autobind-decorator";
@@ -12,12 +12,10 @@ import Button from 'apsl-react-native-button'
 var g = global;
 g.g = g;
 
-g.React = React;
-g.View = View;
-g.Text = Text;
-g.TextInput = TextInput;
-g.Switch = Switch;
-g.ScrollView = ScrollView;
+var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableHighlight};
+//g.Extend(globalComps);
+for (let key in globalComps)
+	g[key] = globalComps[key];
 
 g.Bind = Bind;
 

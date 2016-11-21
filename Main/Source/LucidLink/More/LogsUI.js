@@ -15,10 +15,7 @@ export default class LogsUI extends BaseComponent {
 			var showEntry =
 				entry.type == "general" ? node.showLogs_general :
 				entry.type == "keyboard" ? node.showLogs_keyboard :
-				entry.type == "custom1" ? node.showLogs_custom1 :
-				entry.type == "custom2" ? node.showLogs_custom2 :
-				entry.type == "custom3" ? node.showLogs_custom3 :
-				false;
+				node.showLogs_others;
 			if (showEntry) {
 				logEntriesToShow.push(entry);
 				if (LL.more.maxLogCount != -1 && logEntriesToShow.length >= LL.more.maxLogCount)
@@ -35,12 +32,8 @@ export default class LogsUI extends BaseComponent {
 					<Switch value={node.showLogs_general} onValueChange={value=>(node.showLogs_general = value) | this.forceUpdate()}/>
 					<Text>    Keyboard: </Text>
 					<Switch value={node.showLogs_keyboard} onValueChange={value=>(node.showLogs_keyboard = value) | this.forceUpdate()}/>
-					<Text>    Custom1: </Text>
-					<Switch value={node.showLogs_custom1} onValueChange={value=>(node.showLogs_custom1 = value) | this.forceUpdate()}/>
-					<Text>    Custom2: </Text>
-					<Switch value={node.showLogs_custom2} onValueChange={value=>(node.showLogs_custom2 = value) | this.forceUpdate()}/>
-					<Text>    Custom3: </Text>
-					<Switch value={node.showLogs_custom3} onValueChange={value=>(node.showLogs_custom3 = value) | this.forceUpdate()}/>
+					<Text>    Others: </Text>
+					<Switch value={node.showLogs_others} onValueChange={value=>(node.showLogs_others = value) | this.forceUpdate()}/>
 					<View style={{flex: 1}}/>
 					<View style={{flexDirection: "row", alignItems: "flex-end"}}>
 						<VButton text="Clear" style={{marginTop: -5, width: 100, height: 32}}

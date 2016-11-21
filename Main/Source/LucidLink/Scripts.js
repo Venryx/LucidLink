@@ -14,17 +14,81 @@ import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltI
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
 
-class Script {
+g.Script = class Script {
+	static async Load(file) {
+		let scriptText = await file.ReadAllText();
+		var result = new Script(file, scriptText);
+		await result.LoadMeta();
+		return result;
+	}
+	async LoadMeta() {
+		if (!await this.MetaFile.Exists()) return;
+		let scriptMetaJSON = await this.MetaFile.ReadAllText();
+		var scriptMeta = FromJSON(scriptMetaJSON);
+		this.index = scriptMeta.index;
+		this.editable = scriptMeta.editable;
+		this.enabled = scriptMeta.enabled;
+	}
+
+	async Save() {
+		await this.file.WriteAllText(this.text);
+		await this.SaveMeta();
+		this.fileOutdated = false;
+	}
+	async SaveMeta() {
+		var scriptMeta = {index: this.index, editable: this.editable, enabled: this.enabled};
+		var scriptMetaJSON = ToJSON(scriptMeta);
+		await this.MetaFile.WriteAllText(scriptMetaJSON);
+	}
+
+	Delete() {
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Delete script "${this.file.NameWithoutExtension}"`,
+			"content": `Permanently delete script?`,
+			"positiveText": "OK",
+			"negativeText": "Cancel",
+			"onPositive": ()=> {
+				LL.scripts.scripts.Remove(this);
+				if (LL.scripts.selectedScript == this)
+					LL.scripts.selectedScript = null;
+				this.file.Delete();
+				this.MetaFile.Delete();
+
+				if (LL.scripts.ui)
+					LL.scripts.ui.forceUpdate();
+			},
+		});
+		dialog.show();
+	}
+
 	constructor(file, text) {
 		this.file = file;
 		this.text = text;
 	}
+
+	file = null;
+	fileOutdated = false;
+	get MetaFile() { return this.file.Folder.GetFile(this.file.NameWithoutExtension + ".meta"); }
+
+	text = null;
+
+	// stored in meta file
+	index = -1;
+	editable = true;
+	enabled = true;
 }
 
 g.Scripts = class Scripts extends Node {
+	@_VDFSerializeProp() SerializeProp(path, options) {
+	    if (path.currentNode.prop.name == "selectedScript" && this.selectedScript)
+	        return new VDFNode(this.selectedScript.name);
+	}
+
 	ui = null;
 
 	scripts = [];
+	@P() selectedScript = null; // holds the actual script, but only the name is serialized
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData() {
@@ -32,25 +96,39 @@ g.Scripts = class Scripts extends Node {
 	}
 	async LoadScripts() {
 		var scripts = [];
-		var scriptsFolder = new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/Scripts/");
+		var scriptsFolder = LL.RootFolder.GetFolder("Scripts");
 		var scriptsFolderExists = await scriptsFolder.Exists();
 		if (!scriptsFolderExists) {
 			scriptsFolder.Create();
-			await scriptsFolder.GetFile("1) Core functions.js").WriteAllText(scriptDefaultText_CoreFunctions);
-			await scriptsFolder.GetFile("2) Built-in helpers.js").WriteAllText(scriptDefaultText_BuiltInHelpers);
-			await scriptsFolder.GetFile("3) Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
-			await scriptsFolder.GetFile("4) Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
-			await scriptsFolder.GetFile("5) Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
+			// only create these scripts once; if user deletes them, that's fine
+			await scriptsFolder.GetFile("Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
+			await scriptsFolder.GetFile("Built-in script.meta").WriteAllText("{editable: true, enabled: true}");
+			await scriptsFolder.GetFile("Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
+			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText("{editable: true, enabled: true}");
+			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
+			await scriptsFolder.GetFile("Custom script.meta").WriteAllText("{editable: true, enabled: true}");
+		}
+		// ensure these scripts always exist
+		if (!await scriptsFolder.GetFile("Core functions.js").Exists()) {
+			await scriptsFolder.GetFile("Core functions.js").WriteAllText(scriptDefaultText_CoreFunctions);
+			await scriptsFolder.GetFile("Core functions.meta").WriteAllText("{editable: false, enabled: true}");
+		}
+		if (!await scriptsFolder.GetFile("Built-in helpers.js").Exists()) {
+			await scriptsFolder.GetFile("Built-in helpers.js").WriteAllText(scriptDefaultText_BuiltInHelpers);
+			await scriptsFolder.GetFile("Built-in helpers.meta").WriteAllText("{editable: false, enabled: true}");
+		}
+		
+		var scriptFiles = (await scriptsFolder.GetFiles()).Where(a=>a.Extension == "js");
+		this.scripts = [];
+		for (let scriptFile of scriptFiles) {
+			let script = await Script.Load(scriptFile);
+			this.scripts.push(script);
 		}
 
-		var scriptFiles = await scriptsFolder.GetFiles();
-		var scripts = [];
-		for (let scriptFile of scriptFiles) {
-			let scriptText = await scriptFile.ReadAllText();
-			let script = new Script(scriptFile, scriptText);
-			scripts.push(script);
-		}
-		this.scripts = scripts;
+		var newSelectedScriptName = this.selectedScript; // was serialized as a name (if at all)
+		var newSelectedScript = this.scripts.First(a=>a.file.NameWithoutExtension == newSelectedScriptName);
+		if (newSelectedScript)
+			this.selectedScript = newSelectedScript;
 
 		if (LL.settings.applyScriptsOnLaunch)
 			this.ApplyScripts();
@@ -66,32 +144,43 @@ g.Scripts = class Scripts extends Node {
 	async SaveScripts() {
 		var {scripts} = this;
 		for (let script of scripts) {
-			script.file.WriteAllText(script.text);
+			script.Save();
 		}
-
+		
 		if (this.ui)
-			this.ui.setState({scriptFilesOutdated: false});
+			this.ui.forceUpdate();
 		Log("Finished saving scripts.");
 	}
 
-	ResetScript(script) {
+	ResetScript(scriptName) {
 		var dialog = new DialogAndroid();
 		dialog.set({
-			"title": `Reset script "${script.file.NameWithoutExtension}"`,
+			"title": `Reset script "${scriptName}"`,
 			"content": `Reset script to its factory state?
 
 This will permanently remove all custom code from the script.`,
 			"positiveText": "OK",
 			"negativeText": "Cancel",
 			"onPositive": ()=> {
-				if (script.file.Name == "3) Built-in script.js")
+				var scriptFileName = scriptName + ".js";
+				var script = this.scripts.First(a=>a.file.Name == scriptFileName);
+				if (script == null) {
+					var file = LL.RootFolder.GetFolder("Scripts").GetFile(scriptFileName);
+					var script = new Script(file, `Log("Hello world!");`);
+					script.index = LL.scripts.scripts.length;
+					LL.scripts.scripts.push(script);
+				}
+
+				if (scriptName == "Built-in script")
 					script.text = scriptDefaultText_BuiltInScript;
 				else {
-					Assert(script.file.Name == "5) Custom script.js");
+					Assert(scriptName == "Custom script");
 					script.text = scriptDefaultText_CustomScript;
 				}
+
+				script.Save();
 				if (this.ui)
-					this.ui.setState({scriptFilesOutdated: true});
+					this.ui.forceUpdate();
 			},
 		});
 		dialog.show();
@@ -99,7 +188,11 @@ This will permanently remove all custom code from the script.`,
 	
 	ApplyScripts() {
 		this.scriptRunner.Reset();
-		this.scriptRunner.Init(this.scripts);
+		var scripts_ordered = this.scripts.Where(a=>a.enabled).OrderBy(a=> {
+			AssertWarn(a.index != -1, `Script not found in script-order list: ${a.file.Name}`);
+			return a.index;
+		});
+		this.scriptRunner.Init(scripts_ordered);
 		if (this.ui)
 			this.ui.setState({scriptLastRunsOutdated: false});
 	}
@@ -110,7 +203,7 @@ import ScriptsPanel from "./Scripts/ScriptsPanel";
 export class ScriptsUI extends BaseComponent {
 	constructor(props) {
 		super(props);
-		this.state = {scriptFilesOutdated: false, scriptLastRunsOutdated: false};
+		this.state = {scriptLastRunsOutdated: false};
 		LL.scripts.ui = this;
 	}
 
@@ -122,53 +215,62 @@ export class ScriptsUI extends BaseComponent {
 			this._drawer.open();
 	}
 
+	SelectScript(script) {
+		LL.scripts.selectedScript = script;
+		this.forceUpdate();
+		this._drawer.close();
+	}
+
 	render() {
 		var node = LL.scripts;
-		var {activeScript, scriptFilesOutdated, scriptLastRunsOutdated} = this.state;
+		var {selectedScript} = node;
+		var {scriptLastRunsOutdated} = this.state;
 		
-		var barHeight = isLandscape ? 35 : 50;
-
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
 			main: {paddingLeft: 3},
 		};
 
 		return (
-			<Drawer ref={comp=>this._drawer = comp} content={<ScriptsPanel parent={this}/>}
+			<Drawer ref={comp=>this._drawer = comp}
+					content={<ScriptsPanel parent={this} scripts={node.scripts}/>}
 					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
-				<View style={{flex: 1, flexDirection: "column", height: barHeight + 3}}>
-					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0, height: barHeight}}>
+				<View style={{flex: 1, flexDirection: "column"}}>
+					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
 						<View style={{flex: .8, flexDirection: "row"}}>
 							<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleScriptsPanelOpen}/>
+							<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
+							Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
+							{selectedScript && !selectedScript.editable ? " (read only)" : ""}
+							</Text>
 							<View style={{flex: 1}}/>
 							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-								<VButton color="#777" text="Save" enabled={scriptFilesOutdated}
-									style={{width: 100, marginLeft: 5, height: barHeight + 3}}
-									onPress={()=>node.SaveScripts()}/>
-								<VButton color="#777" text="Apply" enabled={scriptLastRunsOutdated}
-									style={{width: 100, marginLeft: 5, height: barHeight + 3}}
+								<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
+									style={{width: 100, marginLeft: 5}}
+									onPress={()=>selectedScript.Save().then(()=>this.forceUpdate())}/>
+								<VButton color="#777" text="Apply all"
+									//enabled={scriptLastRunsOutdated}
+									enabled={true}
+									style={{width: 100, marginLeft: 5}}
 									onPress={()=>node.ApplyScripts()}/>
 							</View>
 						</View>
 					</View>
-					<View style={{flex: 1}}>
-						<ScriptTextUI parent={this} text={activeScript ? activeScript.text : ""} editable={true}
+					<View style={{marginTop: -7, flex: 1}}>
+						<ScriptTextUI parent={this} text={selectedScript ? selectedScript.text : ""}
+							//editable={selectedScript ? selectedScript.editable : false}
+							editable={selectedScript != null}
 							onChangeText={text=> {
-								if (!activeScript.editable) return;
-								activeScript.text = text;
+								if (!selectedScript.editable) return;
+								selectedScript.text = text;
+								selectedScript.fileOutdated = true;
 								this.forceUpdate();
 							}}/>
 					</View>
 				</View>
 			</Drawer>
 		);
-	}
-
-	PostScriptChange() {
-		var node = LL.scripts;
-		BufferFuncToBeRun("PostScriptChange_1", 1000, ()=>node.SaveScripts());
-		this.forceUpdate();
 	}
 
 	/*componentWillUnmount() {
@@ -180,14 +282,12 @@ class ScriptTextUI extends BaseComponent {
 	static defaultProps = {editable: true};
 	render() {
 		var {parent, editable, onChangeText, text} = this.props;
-		var textStyle = {
-			//height: screenHeight,
-			flex: 1, textAlignVertical: "top",
-		};
-		return <TextInput {...{editable}} style={textStyle} multiline={true} editable={editable} value={text}
-			autoCapitalize="none" autoCorrect={false}
+		return <TextInput {...{editable}}
+			style={{flex: 1, textAlignVertical: "top", borderTopWidth: 1, borderColor: "#CCC"}}
+			multiline={true} editable={editable} value={text} autoCapitalize="none" autoCorrect={false}
 			onChangeText={text=> {
-				parent.setState({scriptFilesOutdated: true, scriptLastRunsOutdated: true});
+				LL.scripts.selectedScript.fileOutdated = true;
+				parent.setState({scriptLastRunsOutdated: true});
 				onChangeText(text);
 			}}/>;
 	}
