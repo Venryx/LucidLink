@@ -3,6 +3,7 @@ export default `
 // feel free to remove or modify
 
 // when key "1" is pressed, start the air-raid-siren sound
+// (click the "More" tab, press the desired key, and see the key-code for it in the logs)
 AddKeyDownListener(8, function() {
 	GetAudioFile("air raid siren").Play();
 });

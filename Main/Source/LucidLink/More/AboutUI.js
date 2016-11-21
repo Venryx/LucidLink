@@ -1,12 +1,5 @@
 export default class ConsoleUI extends BaseComponent {
 	render() {
-		var {onChangeText, text} = this.props;
-		var buttonStyle = {flex: .2, marginLeft: 5, height: isLandscape ? 35 : 50};
-		var textStyle = {
-			//height: screenHeight,
-			flex: 1, textAlignVertical: "top",
-		};
-
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>
 				<Text>{`
@@ -18,8 +11,5 @@ GitHub repository: https://github.com/Venryx/LucidLink
 				`.trim()}</Text>
 			</View>
 		);
-	}
-	RunScript() {
-		eval(this.props.text);
 	}
 }

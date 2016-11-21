@@ -13,6 +13,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.filepicker.FilePickerPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.zmxv.RNSound.RNSoundPackage;
+import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
 
 import android.content.Intent; // <--- import
 import android.content.res.Configuration; // <--- import
@@ -31,12 +32,13 @@ public class MainApplication extends Application implements ReactApplication {
 		protected List<ReactPackage> getPackages() {
 			return Arrays.asList(
 				new MainReactPackage(),
-            new RNNumberPickerDialogPackage(),
+           		new RNNumberPickerDialogPackage(),
 				new Main_ReactPackage(),
 				new RNFSPackage(),
 				new FilePickerPackage(),
 				new OrientationPackage(),
-				new RNSoundPackage()
+				new RNSoundPackage(),
+				new ReactNativeDialogsPackage()
 			);
 		}
 	};

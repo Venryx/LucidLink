@@ -3,7 +3,8 @@ import {Dimensions, StyleSheet,
 	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
-//var {JavaBridge, BaseComponent, VFile} = require("./Globals");
+var DialogAndroid = require("react-native-dialogs");
+
 import ScriptRunner from "./Scripts/ScriptRunner";
 
 import scriptDefaultText_CoreFunctions from "./Scripts/UserScriptDefaults/CoreFunctions";
@@ -13,6 +14,7 @@ import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/Custom
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
 var scriptDefaultTexts = [scriptDefaultText_CoreFunctions, scriptDefaultText_BuiltInHelpers,
 	scriptDefaultText_BuiltInScript, scriptDefaultText_CustomHelpers, scriptDefaultText_CustomScript];
+var scriptNames = ["Core functions", "Built-in helpers", "Built-in script", "Custom helpers", "Custom script"];
 
 g.Scripts = class Scripts extends Node {
 	ui = null;
@@ -64,9 +66,21 @@ g.Scripts = class Scripts extends Node {
 	}
 
 	ResetScript(index) {
-		this.scriptTexts[index] = scriptDefaultTexts[index];
-		if (this.ui)
-			this.ui.setState({scriptFilesOutdated: true});
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Reset script "${scriptNames[index]}"`,
+			"content": `Reset script to its factory state?
+
+This will permanently remove all custom code from the script.`,
+			"positiveText": "OK",
+			"negativeText": "Cancel",
+			"onPositive": ()=> {
+				this.scriptTexts[index] = scriptDefaultTexts[index];
+				if (this.ui)
+					this.ui.setState({scriptFilesOutdated: true});
+			},
+		});
+		dialog.show();
 	}
 	
 	ApplyScripts() {
@@ -89,25 +103,25 @@ export class ScriptsUI extends BaseComponent {
 		var {scriptTexts} = node;
 		var {scriptFilesOutdated, scriptLastRunsOutdated} = this.state;
 		
-		var tabLabels = ["1: Core functions", "2: Built-in helpers", "3: Built-in script", "4: Custom helpers", "5: Custom script"];
-		
 		var barHeight = isLandscape ? 35 : 50;
 		var tabStyle = {flex: .2, marginLeft: 5, height: barHeight + 3};
+
+		function GetTabLabel(index) { return `${index + 1}: ${scriptNames[index]}`; }
 		
 		return (
 			<View style={{flex: 1, flexDirection: "column", height: barHeight + 3}}>
 				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0, height: barHeight}}>
 					<View style={{flex: .8, flexDirection: "row"}}>
-						<VButton style={E(tabStyle, {marginLeft: 0})} text={tabLabels[0]}
+						<VButton style={E(tabStyle, {marginLeft: 0})} text={GetTabLabel(0)}
 							onPress={()=>this.setState({activeTab: 0})}/>
 						<VButton style={tabStyle} color="#777" textStyle={{margin: 0}}
-							onPress={()=>this.setState({activeTab: 1})} text={tabLabels[1]}/>
+							onPress={()=>this.setState({activeTab: 1})} text={GetTabLabel(1)}/>
 						<VButton style={tabStyle} color="#777" textStyle={{margin: 5}}
-							onPress={()=>this.setState({activeTab: 2})} text={tabLabels[2]}/>
+							onPress={()=>this.setState({activeTab: 2})} text={GetTabLabel(2)}/>
 						<VButton style={tabStyle} color="#777" textStyle={{margin: 5}}
-							onPress={()=>this.setState({activeTab: 3})} text={tabLabels[3]}/>
+							onPress={()=>this.setState({activeTab: 3})} text={GetTabLabel(3)}/>
 						<VButton style={tabStyle} color="#777" textStyle={{margin: 5}}
-							onPress={()=>this.setState({activeTab: 4})} text={tabLabels[4]}/>
+							onPress={()=>this.setState({activeTab: 4})} text={GetTabLabel(4)}/>
 						<View style={{flex: .1}}/>
 						<View style={{flex: .3, flexDirection: "row", alignItems: "flex-end"}}>
 							<VButton style={tabStyle} color="#777" text="Save" enabled={scriptFilesOutdated}

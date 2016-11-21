@@ -8,6 +8,7 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 
 import LogsUI from "./More/LogsUI";
 import ConsoleUI from "./More/ConsoleUI";
+import OthersUI from "./More/OthersUI";
 import AboutUI from "./More/AboutUI";
 
 g.LogEntry = class LogEntry {
@@ -73,6 +74,7 @@ export class MoreUI extends BaseComponent {
 			<ScrollableTabView style={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
 				<LogsUI tabLabel="Logs" active={active && activeTab == 0}/>
 				<ConsoleUI tabLabel="Console" text={node.jsCode} onChangeText={text=>(node.jsCode = text) | this.forceUpdate()}/>
+				<OthersUI tabLabel="Others"/>
 				<AboutUI tabLabel="About"/>
 			</ScrollableTabView>
 		);

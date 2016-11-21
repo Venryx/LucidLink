@@ -12,6 +12,7 @@
     "moment": "^2.16.0",
     "react": "15.3.2",
     "react-native": "0.37.0",
+    "react-native-dialogs": "0.0.19",
     "react-native-extended-stylesheet": "^0.3.0",
     "react-native-file-picker": "git+https://github.com/Lichwa/react-native-file-picker.git",
     "react-native-fs": "^2.0.1-rc.2",

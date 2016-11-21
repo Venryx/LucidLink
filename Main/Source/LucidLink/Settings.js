@@ -18,34 +18,6 @@ g.AudioFileEntry = class AudioFileEntry {
 	@P() path = null;
 }
 
-class Row extends BaseComponent {
-	render() {
-		var {style, height, children} = this.props;
-		return (
-			<View style={E({flexDirection: "row", padding: 3}, style,
-					height != null ? {height} : {flex: 1})}>
-				{children}
-			</View>
-		);
-	}
-}
-class RowLR extends BaseComponent {
-    render() {
-		var {height, leftStyle, rightStyle, children} = this.props;
-        Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
-        return (
-			<View style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
-				<View style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
-					{children[0]}
-				</View>
-				<View style={E({alignItems: "flex-end", flex: 1}, rightStyle)}>
-					{children[1]}
-				</View>
-			</View>
-        );
-    }
-}
-
 export class SettingsUI extends BaseComponent {
 	render() {
 		var {scriptTexts} = this.state;
@@ -62,10 +34,6 @@ export class SettingsUI extends BaseComponent {
 								this.forceUpdate();
 							}}/>
 					</RowLR>
-					<Row height={40} style={{marginTop: 5, marginBottom: 10}}>
-						<VButton onPress={()=>LL.scripts.ResetScript(2)} text='Reset "built-in script"' style={{width: 300, height: 40}}/>
-						<VButton onPress={()=>LL.scripts.ResetScript(4)} text='Reset "custom script"' style={{marginLeft: 5, width: 300, height: 40}}/>
-					</Row>
 					<RowLR height={25}>
 						<Text>Block unused keys</Text>
 						<Switch value={node.blockUnusedKeys}

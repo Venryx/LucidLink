@@ -29,6 +29,34 @@ g.BaseComponent = class BaseComponent extends Component {
 	}
 }
 
+g.Row = class Row extends BaseComponent {
+	render() {
+		var {style, height, children} = this.props;
+		return (
+			<View style={E({flexDirection: "row", padding: 3}, style,
+					height != null ? {height} : {flex: 1})}>
+				{children}
+			</View>
+		);
+	}
+}
+g.RowLR = class RowLR extends BaseComponent {
+    render() {
+		var {height, leftStyle, rightStyle, children} = this.props;
+        Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
+        return (
+			<View style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
+				<View style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
+					{children[0]}
+				</View>
+				<View style={E({alignItems: "flex-end", flex: 1}, rightStyle)}>
+					{children[1]}
+				</View>
+			</View>
+        );
+    }
+}
+
 g.VButton = class VButton extends BaseComponent {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
