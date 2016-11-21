@@ -34,8 +34,10 @@ export default class ScriptRunner {
 			var stack = error.stack.replace(/\r/g, "")
 			stack = stack.substr(0, stack.indexOf("  at ScriptRunner.Init (")) // remove out-of-user-script stack-entries
 			stack = stack.replace(/eval \([^)]+?\), (<anonymous>:)/g, (match, sub1)=>sub1);
-			alert(`Error: ${error}
-Stack) ${stack}`);
+			var errorStr = `${error}
+Stack) ${stack}`;
+			Log(errorStr)
+			alert(errorStr);
 		}
 	}
 }

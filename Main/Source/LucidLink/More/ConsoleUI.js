@@ -6,7 +6,7 @@ export default class ConsoleUI extends BaseComponent {
 			//height: screenHeight,
 			flex: 1, textAlignVertical: "top",
 		};
-
+		
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>
 				<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
@@ -23,6 +23,10 @@ export default class ConsoleUI extends BaseComponent {
 		);
 	}
 	RunScript() {
-		eval(this.props.text);
+		try {
+			eval(this.props.text);
+		} catch(error) {
+			g.HandleError(error);
+		}
 	}
 }

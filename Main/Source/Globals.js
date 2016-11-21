@@ -5,6 +5,22 @@ import RNFS from "react-native-fs";
 var g = global;
 g.g = g;
 
+/*g.onerror = function(message, filePath, line, column, error) {
+	LogError(`JS) ${message} (at ${filePath}:${line}:${column})
+Stack) ${error.stack}`);
+};*/
+var ErrorUtils = require("ErrorUtils");
+ErrorUtils._globalHandler_orig = ErrorUtils.getGlobalHandler() || ErrorUtils._globalHandler;
+ErrorUtils.setGlobalHandler((error, isFatal)=> {
+	HandleError(error, isFatal);
+	ErrorUtils._globalHandler_orig(error, isFatal);
+});
+g.HandleError = function(error, isFatal) {
+	Log(`${error}
+Stack) ${error.stack}
+Fatal) ${isFatal}`);
+};
+
 g.Log = function(...args) {
 	var type = "general", message;
 	if (args.length == 1) message = args[0];
@@ -12,7 +28,7 @@ g.Log = function(...args) {
 
 	console.log(...args);
 
-	LL.more.AddLogEntry({type, message, time: new Date()});
+	LL.more.AddLogEntry(new LogEntry(type, message, new Date()));
 };
 g.Trace = function(...args) {
 	console.trace(...args);

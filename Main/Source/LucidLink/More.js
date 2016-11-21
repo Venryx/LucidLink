@@ -2,12 +2,32 @@ import React, {Component} from "react";
 import {Dimensions, StyleSheet,
 	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
+import Moment from "moment";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 //var {JavaBridge, BaseComponent, VFile} = require("./Globals");
 
 import LogsUI from "./More/LogsUI";
 import ConsoleUI from "./More/ConsoleUI";
 import AboutUI from "./More/AboutUI";
+
+g.LogEntry = class LogEntry {
+	constructor(type, message, time) {
+		this.type = type.toLowerCase();
+		this.message = message;
+		this.time = time;
+	}
+	toString(showMoreInfo = true) {
+		/*var dateStr = this.time.toString();
+		var dateStartPos = dateStr.IndexOf_X(3, " ") + 1;
+		dateStr = dateStr.substring(dateStartPos, dateStr.indexOf(" ", dateStartPos));*/
+		if (showMoreInfo) {
+			var dateStr = Moment(this.time).format("YYYY-M-D HH:mm:ss")			
+			return `[${dateStr}, ${this.type}] ${this.message}`;
+		}
+		var dateStr = Moment(this.time).format("HH:mm:ss")			
+		return `[${dateStr}] ${this.message}`;
+	}
+}
 
 g.More = class More extends Node {
 	// logs
@@ -17,12 +37,12 @@ g.More = class More extends Node {
 	@P() showLogs_custom2 = true;
 	@P() showLogs_custom3 = true;
 
-	@P() maxLogCount = 100;
+	@P() showMoreInfo = false;
 	@P() autoScroll = true;
+	@P() maxLogCount = 100;
 
 	logEntries = [];
 	AddLogEntry(entry) {
-		entry.type = entry.type.toLowerCase();
 		this.logEntries.push(entry);
 		if (this.maxLogCount != -1 && this.logEntries.length > this.maxLogCount)
 			this.logEntries.splice(0, this.logEntries.length - this.maxLogCount);

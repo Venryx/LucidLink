@@ -31,7 +31,11 @@ export default class LogsUI extends BaseComponent {
 					</View>
 				</View>
 				<View style={{height: 32, padding: 5, flexDirection: "row"}}>
-					<Text>Limit: </Text>
+					<Text>More info: </Text>
+					<Switch value={node.showMoreInfo} onValueChange={value=>(node.showMoreInfo = value) | this.forceUpdate()}/>
+					<Text style={{marginLeft: 10}}>Auto-scroll: </Text>
+					<Switch value={node.autoScroll} onValueChange={value=>(node.autoScroll = value) | this.forceUpdate()}/>
+					<Text style={{marginLeft: 10}}>Limit: </Text>
 					<VButton text={node.maxLogCount.toString()} style={{marginLeft: 3, marginTop: -5, width: 100, height: 32}}
 						onPress={()=> {
 							var values = [-1];
@@ -55,8 +59,6 @@ export default class LogsUI extends BaseComponent {
 								this.forceUpdate();
 							});
 						}}/>
-					<Text style={{marginLeft: 10}}>Auto-scroll: </Text>
-					<Switch value={node.autoScroll} onValueChange={value=>(node.autoScroll = value) | this.forceUpdate()}/>
 				</View>
 				<ScrollView ref="scrollView" style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}
@@ -73,12 +75,7 @@ export default class LogsUI extends BaseComponent {
 							entry.type == "custom3" ? node.showLogs_custom3 :
 							false;
 						if (!showEntry) return;
-
-						var dateStr = entry.time.toString();
-						var startIndex = dateStr.IndexOf_X(3, " ") + 1;
-						dateStr = dateStr.substring(startIndex, dateStr.indexOf(" ", startIndex));
-						var entryStr = `[${dateStr}] ${entry.message}`;
-						return <Text key={index}>{entryStr}</Text>;
+						return <Text key={index}>{entry.toString(node.showMoreInfo)}</Text>;
 					})}
 				</ScrollView>
 			</View>
