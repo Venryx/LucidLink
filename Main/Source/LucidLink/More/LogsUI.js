@@ -8,6 +8,25 @@ export default class LogsUI extends BaseComponent {
 
 	render() {
 		var node = LL.more;
+
+		var logEntriesToShow = [];
+		for (var i = node.logEntries.length - 1; i >= 0; i--) {
+			var entry = node.logEntries[i];
+			var showEntry =
+				entry.type == "general" ? node.showLogs_general :
+				entry.type == "keyboard" ? node.showLogs_keyboard :
+				entry.type == "custom1" ? node.showLogs_custom1 :
+				entry.type == "custom2" ? node.showLogs_custom2 :
+				entry.type == "custom3" ? node.showLogs_custom3 :
+				false;
+			if (showEntry) {
+				logEntriesToShow.push(entry);
+				if (LL.more.maxLogCount != -1 && logEntriesToShow.length >= LL.more.maxLogCount)
+					break;
+			}
+		}
+		logEntriesToShow.reverse();
+
 		return (
 			<View style={{flex: 1, flexDirection: "column"}}>
 				<View style={{height: 32, padding: 5, flexDirection: "row"}}>
@@ -35,7 +54,7 @@ export default class LogsUI extends BaseComponent {
 					<Switch value={node.showMoreInfo} onValueChange={value=>(node.showMoreInfo = value) | this.forceUpdate()}/>
 					<Text style={{marginLeft: 10}}>Auto-scroll: </Text>
 					<Switch value={node.autoScroll} onValueChange={value=>(node.autoScroll = value) | this.forceUpdate()}/>
-					<Text style={{marginLeft: 10}}>Limit: </Text>
+					<Text style={{marginLeft: 10}}>Display: </Text>
 					<VButton text={node.maxLogCount.toString()} style={{marginLeft: 3, marginTop: -5, width: 100, height: 32}}
 						onPress={()=> {
 							var values = [-1];
@@ -50,7 +69,7 @@ export default class LogsUI extends BaseComponent {
 								values: values.Select(a=>a.toString()),
 								positiveButtonLabel: "Ok",
 								negativeButtonLabel: "Cancel",
-								message: "Select number of log-entries to record before trimming.\n\n(-1 for unlimited)",
+								message: "Select max number of log-entries to show in the logs panel.\n\n(-1 for unlimited)",
 								title: "Max log-entry count",
 							}).then(id=> {
 								if (id == -1) return;
@@ -66,16 +85,8 @@ export default class LogsUI extends BaseComponent {
 							if (node.autoScroll)
 								this.refs.scrollView.scrollTo({x: 0, y: contentHeight, animated: false});
 						}}>
-					{node.logEntries.map((entry, index)=> {
-						var showEntry =
-							entry.type == "general" ? node.showLogs_general :
-							entry.type == "keyboard" ? node.showLogs_keyboard :
-							entry.type == "custom1" ? node.showLogs_custom1 :
-							entry.type == "custom2" ? node.showLogs_custom2 :
-							entry.type == "custom3" ? node.showLogs_custom3 :
-							false;
-						if (!showEntry) return;
-						return <Text key={index}>{entry.toString(node.showMoreInfo)}</Text>;
+					{logEntriesToShow.map(entry=> {
+						return <Text key={entry.origIndex}>{entry.toString(node.showMoreInfo)}</Text>;
 					})}
 				</ScrollView>
 			</View>

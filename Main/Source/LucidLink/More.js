@@ -44,10 +44,8 @@ g.More = class More extends Node {
 
 	logEntries = [];
 	AddLogEntry(entry) {
+		entry.origIndex = this.logEntries.length;
 		this.logEntries.push(entry);
-		if (this.maxLogCount != -1 && this.logEntries.length > this.maxLogCount)
-			this.logEntries.splice(0, this.logEntries.length - this.maxLogCount);
-
 		VFile.AppendTextAsync(LL.sessionLogFilePath, "\n" + entry.toString());
 
 		if (this.logsUI && this.logsUI.props.active)
