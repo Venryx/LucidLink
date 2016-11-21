@@ -61,6 +61,25 @@ g.Script = class Script {
 		});
 		dialog.show();
 	}
+	Rename() {
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Rename script "${this.file.NameWithoutExtension}"`,
+			"input": {
+				prefill: this.file.NameWithoutExtension,
+				callback: newName=> {
+					this.file.Delete();
+					this.file = this.file.Folder.GetFile(newName + ".js");
+					this.Save();
+					if (LL.scripts.ui)
+						LL.scripts.ui.forceUpdate();
+				}
+			},
+			"positiveText": "OK",
+			"negativeText": "Cancel"
+		});
+		dialog.show();
+	}
 
 	constructor(file, text) {
 		this.file = file;
@@ -138,7 +157,7 @@ g.Scripts = class Scripts extends Node {
 		Log("Finished loading scripts.");
 	}
 
-	SaveFileSystemData() {
+	/*SaveFileSystemData() {
 		this.SaveScripts();
 	}
 	async SaveScripts() {
@@ -150,7 +169,7 @@ g.Scripts = class Scripts extends Node {
 		if (this.ui)
 			this.ui.forceUpdate();
 		Log("Finished saving scripts.");
-	}
+	}*/
 
 	ResetScript(scriptName) {
 		var dialog = new DialogAndroid();
@@ -244,6 +263,8 @@ export class ScriptsUI extends BaseComponent {
 							Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
 							{selectedScript && !selectedScript.editable ? " (read only)" : ""}
 							</Text>
+							{selectedScript && selectedScript.editable &&
+								<VButton text="Rename" style={{marginLeft: 10, width: 100}} onPress={()=>selectedScript.Rename()}/>}
 							<View style={{flex: 1}}/>
 							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
 								<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
