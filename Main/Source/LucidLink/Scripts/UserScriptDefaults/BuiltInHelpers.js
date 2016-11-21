@@ -1,5 +1,6 @@
 export default `
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
+// (or by checking the logs for the key-codes of those pressed)
 function AddKeyDownListener(keyCode, func) {
 	LL.scripts.scriptRunner.keyDownListeners.push({keyCode: keyCode, func: func});
 }

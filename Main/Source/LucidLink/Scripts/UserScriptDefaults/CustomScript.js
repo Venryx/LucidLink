@@ -1,9 +1,16 @@
 export default `
-// the below are some examples of actions and behaviors you can set up through scripting
-// feel free to remove or modify
+// Notes
+// ========== 
+
+/*
+* To get the key-code of key (so you can add a keypress-listener), click the "More" tab and
+		press the desired key; you'll see the key-code in the logs
+*/
+
+// Examples
+// ==========
 
 // when key "1" is pressed, start the air-raid-siren sound
-// (click the "More" tab, press the desired key, and see the key-code for it in the logs)
 AddKeyDownListener(8, function() {
 	GetAudioFile("air raid siren").Play();
 });
