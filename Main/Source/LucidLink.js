@@ -89,7 +89,7 @@ g.LucidLink = class LucidLink extends Node {
 	SaveFileSystemData() {
 		this.SaveMainData();
 		
-		//this.scripts.SaveFileSystemData();
+		this.scripts.SaveFileSystemData();
 	}
 	async SaveMainData() {
 		var mainDataVDF = ToVDF(g.LL, false);

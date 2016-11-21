@@ -157,10 +157,11 @@ g.Scripts = class Scripts extends Node {
 		Log("Finished loading scripts.");
 	}
 
-	/*SaveFileSystemData() {
-		this.SaveScripts();
+	SaveFileSystemData() {
+		//this.SaveScripts();
+		this.SaveScriptMetas();
 	}
-	async SaveScripts() {
+	/*async SaveScripts() {
 		var {scripts} = this;
 		for (let script of scripts) {
 			script.Save();
@@ -170,6 +171,12 @@ g.Scripts = class Scripts extends Node {
 			this.ui.forceUpdate();
 		Log("Finished saving scripts.");
 	}*/
+	async SaveScriptMetas() {
+		var {scripts} = this;
+		for (let script of scripts)
+			script.SaveMeta();
+		Log("Finished saving script metas.");
+	}
 
 	ResetScript(scriptName) {
 		var dialog = new DialogAndroid();
