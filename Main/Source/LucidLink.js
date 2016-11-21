@@ -24,17 +24,17 @@ import TestData from "./TestData";
 
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
-import {AboutUI} from "./LucidLink/About";
+import {MoreUI} from "./LucidLink/More";
 
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", args=> {
 	var [keyCode] = args;
-	//Log("KeyDown:" + keyCode);
+	Log("keyboard", "KeyDown: " + keyCode);
 	LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
 });
 DeviceEventEmitter.addListener("OnKeyUp", args=> {
 	var [keyCode] = args;
-	//Log("KeyUp:" + keyCode);
+	Log("keyboard", "KeyUp: " + keyCode);
 	LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
 });
 
@@ -65,9 +65,9 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 });
 
 g.LucidLink = class LucidLink extends Node {
-	@T("Scripts") @P(true, true) scripts = null;
-	@T("Settings") @P(true, true) settings = null;
-	@T("About") @P(true, true) about = null;
+	@T("Scripts") @P(true, true) scripts = new Scripts();
+	@T("Settings") @P(true, true) settings = new Settings();
+	@T("More") @P(true, true) more = new More();
 
 	PushBasicDataToJava() {
 		JavaBridge.Main.SetBlockUnusedKeys(LL.settings.blockUnusedKeys);
@@ -134,26 +134,14 @@ export default class LucidLinkUI extends Component {
 		Init(this);
     }
 
-    componentWillMount() {
-        //JavaBridge.Main.GetTestName(name=>this.setState({testName: name}));
-        this.GetTestName();
-    }
-    async GetTestName() {
-        var result = await JavaBridge.Main.GetTestName();
-        console.log(`Got test name: ${result}`);
-        this.setState({testName: result});
-    }
-
     render() {
-      var {testName} = this.state;
-
+     	var {activeTab} = this.state;
         return (
 			//<View style={{flex: 1}}>
-			<ScrollableTabView stylze={{flex: 1}}>
+			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
 				<View style={styles.container} tabLabel="Monitor">
 					<Text style={styles.welcome}>
 					Welcome to React Native!
-					TestName: {testName}
 					</Text>
 					<Text style={styles.instructions}>
 					To get started, edit index.android.js
@@ -169,7 +157,7 @@ export default class LucidLinkUI extends Component {
 				</View>
 				<ScriptsUI tabLabel="Scripts"/>
 				<SettingsUI tabLabel="Settings"/>
-				<AboutUI tabLabel="About"/>
+				<MoreUI tabLabel="More" active={activeTab == 5}/>
 			</ScrollableTabView>
 				/*{keyboardVisible &&
 					<View style={{position: "absolute", bottom: 0, height: 30}}>

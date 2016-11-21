@@ -6,7 +6,13 @@ var g = global;
 g.g = g;
 
 g.Log = function(...args) {
+	var type = "general", message;
+	if (args.length == 1) message = args[0];
+	if (args.length == 2) type = args[0], message = args[1];
+
 	console.log(...args);
+
+	LL.more.AddLogEntry({type, message, time: new Date()});
 };
 g.Trace = function(...args) {
 	console.trace(...args);

@@ -522,6 +522,14 @@ Array.prototype._AddFunction_Inline = function Strings() // not recommended, bec
 	return result;
 };
 
+// for some reason, this platform doesn't have entries() defined
+Array.prototype._AddFunction_Inline = function entries() {
+	var result = [];
+	for (var i = 0; i < this.length; i++)
+		result.push([i, this[i]]);
+	return result;
+};
+
 Array.prototype._AddFunction_Inline = function Prepend(...newItems) { this.splice(0, 0, ...newItems); };
 Array.prototype._AddFunction_Inline = function Add(item) { return this.push(item); };
 Array.prototype._AddFunction_Inline = function CAdd(item) { this.push(item); return this; }; // CAdd = ChainAdd

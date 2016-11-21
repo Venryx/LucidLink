@@ -14,6 +14,7 @@
     "react-native-extended-stylesheet": "^0.3.0",
     "react-native-file-picker": "git+https://github.com/Lichwa/react-native-file-picker.git",
     "react-native-fs": "^2.0.1-rc.2",
+    "react-native-numberpicker-dialog": "0.0.1",
     "react-native-orientation": "yamill/react-native-orientation",
     "react-native-scrollable-tab-view": "^0.6.0",
     "react-native-sound": "^0.8.3"

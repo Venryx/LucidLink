@@ -1,7 +1,8 @@
 import React, {Component} from "react";
 import {NativeModules} from "react-native";
 //import {View, Button} from "react-native";
-import {View} from "react-native";
+import {Dimensions, StyleSheet,
+	View, Text, Switch, TextInput, ScrollView} from "react-native";
 import RNFS from "react-native-fs";
 
 import Button from 'apsl-react-native-button'
@@ -9,7 +10,12 @@ import Button from 'apsl-react-native-button'
 var g = global;
 g.g = g;
 
-//g.View = View;
+g.React = React;
+g.View = View;
+g.Text = Text;
+g.TextInput = TextInput;
+g.Switch = Switch;
+g.ScrollView = ScrollView;
 
 // component.js
 import EStyleSheet from 'react-native-extended-stylesheet';

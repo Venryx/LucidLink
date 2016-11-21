@@ -169,6 +169,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-numberpicker-dialog')
     compile project(':react-native-file-picker')
     compile project(':react-native-orientation')
     compile project(':react-native-fs')

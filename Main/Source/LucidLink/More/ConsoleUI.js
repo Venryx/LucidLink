@@ -1,35 +1,4 @@
-import React, {Component} from "react";
-import {Dimensions, StyleSheet,
-	View, Button, Text, TextInput} from "react-native";
-import RNFS from "react-native-fs";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
-//var {JavaBridge, BaseComponent, VFile} = require("./Globals");
-
-g.About = class About extends Node {
-	@P() jsCode = "";
-}
-
-export class AboutUI extends BaseComponent {
-	render() {
-		var {scriptTexts} = this.state;
-		var node = LL.about;
-		return (
-			<View style={{flex: 1}}>
-				<ConsoleUI text={node.jsCode} onChangeText={text=>(node.jsCode = text) | this.forceUpdate()}/>
-            </View>
-		);
-	}
-
-	SelectAudioFileForEntry(entry) {
-		// todo
-	}
-
-	AddAudioFile() {
-		// todo
-	}
-}
-
-class ConsoleUI extends BaseComponent {
+export default class ConsoleUI extends BaseComponent {
 	render() {
 		var {onChangeText, text} = this.props;
 		var buttonStyle = {flex: .2, marginLeft: 5, height: isLandscape ? 35 : 50};
