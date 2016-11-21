@@ -4,6 +4,8 @@ import {NativeModules} from "react-native";
 import {Dimensions, StyleSheet,
 	View, Text, Switch, TextInput, ScrollView} from "react-native";
 import RNFS from "react-native-fs";
+//import autobind from "react-autobind"; // caused error in Babel transpiler
+import Bind from "autobind-decorator";
 
 import Button from 'apsl-react-native-button'
 
@@ -16,6 +18,8 @@ g.Text = Text;
 g.TextInput = TextInput;
 g.Switch = Switch;
 g.ScrollView = ScrollView;
+
+g.Bind = Bind;
 
 // component.js
 import EStyleSheet from 'react-native-extended-stylesheet';

@@ -26,7 +26,7 @@ export default class ScriptRunner {
 	Init(scripts) {
 		var finalScriptsText = "";
 		for (let script of scripts) {
-			finalScriptsText += (finalScriptsText.length ? "\n\n//==========\n\n" : "") + script;
+			finalScriptsText += (finalScriptsText.length ? "\n\n//==========\n\n" : "") + script.text;
 		}
 		try {
 			eval(finalScriptsText);

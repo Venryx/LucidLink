@@ -46,7 +46,7 @@ g.More = class More extends Node {
 	AddLogEntry(entry) {
 		entry.origIndex = this.logEntries.length;
 		this.logEntries.push(entry);
-		VFile.AppendTextAsync(LL.sessionLogFilePath, "\n" + entry.toString());
+		LL.sessionLogFile.AppendText("\n" + entry.toString());
 
 		if (this.logsUI && this.logsUI.props.active)
 			this.logsUI.forceUpdate();
@@ -66,7 +66,7 @@ export class MoreUI extends BaseComponent {
 
 	render() {
 		var {active} = this.props;
-		var {activeTab, scriptTexts} = this.state;
+		var {activeTab} = this.state;
 		var node = LL.more;
 		return (
 			<ScrollableTabView style={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>

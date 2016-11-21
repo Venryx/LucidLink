@@ -364,41 +364,62 @@ g.VFile = class VFile {
 	static get TemporaryDirectoryPath() { return RNFS.TemporaryDirectoryPath; }
 	static get LibraryDirectoryPath() { return RNFS.LibraryDirectoryPath; }
 	static get PicturesDirectoryPath() { return RNFS.PicturesDirectoryPath; }
+}
 
-	static CreateFolderAsync(folderPath) {
-		//return RNFS.mkdir(filePath);
-		return new Promise((resolve, reject)=> {
-			RNFS.mkdir(folderPath).then(resolve).catch(reject);
-		});
-	}
-	static WriteAllTextAsync(filePath, text, encoding = "utf8") {
-		//return RNFS.writeFile(filePath, text);
-		return new Promise((resolve, reject)=> {
-			RNFS.writeFile(filePath, text, encoding).then(resolve).catch(reject);
-		});
-	}
-	static AppendTextAsync(filePath, text, encoding = "utf8") {
-		//return RNFS.writeFile(filePath, text);
-		return new Promise((resolve, reject)=> {
-			RNFS.appendFile(filePath, text, encoding).then(resolve).catch(reject);
-		});
+g.Folder = class Folder {
+	constructor(path) {
+		this.path = path;
 	}
 
-	static ReadAllTextAsync(filePath, defaultText = undefined, encoding = "utf8") {
-		//return RNFS.readFile(filePath);
+	path = null;
 
-		return new Promise((resolve, reject)=> {
-			RNFS.readFile(filePath, encoding).then(text=> {
-				resolve(text);
-			})
-			.catch(error=> {
-				if (error.toString().contains("ENOENT: no such file or directory, open ") && defaultText !== undefined)
-					return resolve(defaultText);
-				reject(error);
-			});
-		});
+	async Exists() {
+		return await RNFS.exists(this.path);
 	}
-	/*static ReadAllText(filePath) {
-		return await VFile.ReadAllTextAsync(filePath);
-	}*/
+	async Create() {
+		return RNFS.mkdir(this.path);
+	}
+
+	async GetFiles() {
+		var subs = await RNFS.readDir(this.path);
+		var result = [];
+		for (let sub of subs) {
+			let subInfo = await RNFS.stat(sub.path);
+			if (subInfo.isFile()) {
+				let file = new File(sub.path);
+				result.push(file);
+			}
+		}
+		return result;
+	}
+
+	GetFolder(subpath) {
+		return new Folder(this.path + "/" + subpath);
+	}
+	GetFile(subpath) {
+		return new File(this.path + "/" + subpath);
+	}
+}
+g.File = class File {
+	constructor(path) {
+		this.path = path;
+	}
+
+	get Name() {
+		return this.path.substr(this.path.replace(/\\/g, "/").lastIndexOf("/"));
+	}
+	get NameWithoutExtension() {
+		return this.Name.substr(0, this.Name.lastIndexOf("."));
+	}
+
+	async ReadAllText(encoding = "utf8") {
+		//if (error.toString().contains("ENOENT: no such file or directory, open "))
+		return RNFS.readFile(this.path, encoding);
+	}
+	async WriteAllText(text, encoding = "utf8") {
+		return RNFS.writeFile(this.path, text, encoding);
+	}
+	async AppendText(text, encoding = "utf8") {
+		return RNFS.appendFile(this.path, text, encoding);
+	}
 }

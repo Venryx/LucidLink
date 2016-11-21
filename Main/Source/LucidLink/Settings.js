@@ -20,7 +20,6 @@ g.AudioFileEntry = class AudioFileEntry {
 
 export class SettingsUI extends BaseComponent {
 	render() {
-		var {scriptTexts} = this.state;
 		var node = LL.settings;
 		
 		return (

@@ -75,14 +75,13 @@ g.LucidLink = class LucidLink extends Node {
 	}
 
 	sessionKey = null;
-	get SessionFolderPath() {
-		return `${VFile.ExternalStorageDirectoryPath}/Lucid Link/Sessions/${this.sessionKey}`;
-	}
-	sessionLogFilePath = null;
+	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
+	get SessionFolder() { return this.RootFolder.GetFolder(`Sessions/${this.sessionKey}`); }
+	sessionLogFile = null;
 	async SetUpSession() {
 		this.sessionKey = Moment().format("YYYY-M-D HH:mm:ss");
-		await VFile.CreateFolderAsync(this.SessionFolderPath);
-		this.sessionLogFilePath = `${this.SessionFolderPath}/Log.txt`;
+		await this.SessionFolder.Create();
+		this.sessionLogFile = this.SessionFolder.GetFile("Log.txt");
 	}
 
 	SaveFileSystemData() {
@@ -92,8 +91,8 @@ g.LucidLink = class LucidLink extends Node {
 	}
 	async SaveMainData() {
 		var mainDataVDF = ToVDF(g.LL, false);
-		await VFile.CreateFolderAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/");
-		await VFile.WriteAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", mainDataVDF);
+		await this.RootFolder.Create();
+		await this.RootFolder.GetFile("MainData.vdf").WriteAllText(mainDataVDF);
 		Log("Finished saving main-data.");
 	}
 }
@@ -104,7 +103,7 @@ LucidLink.typeInfo.typeTag = new VDFType(null, true);
 async function Init(ui) {
 	g.LL = new LucidLink();
 	LL.ui = ui;
-	var mainDataVDF = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", null);
+	var mainDataVDF = await LL.RootFolder.GetFile("MainData.vdf").ReadAllText();
 	if (mainDataVDF) {
 		var data = FromVDF(mainDataVDF, "LucidLink");
 		for (var propName in data) {
@@ -117,7 +116,7 @@ async function Init(ui) {
 
 	await LL.SetUpSession();
 	Log("Finished loading main-data.");
-	Log("Logging to: " + LL.sessionLogFilePath);
+	Log("Logging to: " + LL.sessionLogFile.path);
 
 	LL.scripts.LoadFileSystemData();
 
@@ -127,18 +126,18 @@ async function Init(ui) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#F5FCFF',
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#F5FCFF",
 	},
 	welcome: {
 		fontSize: 20,
-		textAlign: 'center',
+		textAlign: "center",
 		margin: 10,
 	},
 	instructions: {
-		textAlign: 'center',
-		color: '#333333',
+		textAlign: "center",
+		color: "#333333",
 		marginBottom: 5,
 	},
 });
@@ -163,7 +162,7 @@ export default class LucidLinkUI extends Component {
 					To get started, edit index.android.js
 					</Text>
 					<Text style={styles.instructions}>
-					Double tap R on your keyboard to reload,{'\n'}
+					Double tap R on your keyboard to reload,{"\n"}
 					Shake or press menu button for dev menu
 					</Text>
 				</View>
