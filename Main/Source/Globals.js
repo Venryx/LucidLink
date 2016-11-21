@@ -368,25 +368,19 @@ g.VFile = class VFile {
 	static CreateFolderAsync(folderPath) {
 		//return RNFS.mkdir(filePath);
 		return new Promise((resolve, reject)=> {
-			RNFS.mkdir(folderPath).then(()=> {
-				resolve();
-			})
-			.catch(error=> {
-				//console.log(error.message, error.code);
-				//throw error;
-				reject(error);
-			});
+			RNFS.mkdir(folderPath).then(resolve).catch(reject);
 		});
 	}
 	static WriteAllTextAsync(filePath, text, encoding = "utf8") {
 		//return RNFS.writeFile(filePath, text);
 		return new Promise((resolve, reject)=> {
-			RNFS.writeFile(filePath, text, encoding).then(()=> {
-				resolve();
-			})
-			.catch(error=> {
-				reject(error);
-			});
+			RNFS.writeFile(filePath, text, encoding).then(resolve).catch(reject);
+		});
+	}
+	static AppendTextAsync(filePath, text, encoding = "utf8") {
+		//return RNFS.writeFile(filePath, text);
+		return new Promise((resolve, reject)=> {
+			RNFS.appendFile(filePath, text, encoding).then(resolve).catch(reject);
 		});
 	}
 

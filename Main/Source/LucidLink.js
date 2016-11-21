@@ -3,6 +3,7 @@ import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter, Keybo
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 import Orientation from "react-native-orientation";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
+import Moment from "moment";
 
 // simple imports
 var g = global;
@@ -73,6 +74,17 @@ g.LucidLink = class LucidLink extends Node {
 		JavaBridge.Main.SetBlockUnusedKeys(LL.settings.blockUnusedKeys);
 	}
 
+	sessionKey = null;
+	get SessionFolderPath() {
+		return `${VFile.ExternalStorageDirectoryPath}/Lucid Link/Sessions/${this.sessionKey}`;
+	}
+	sessionLogFilePath = null;
+	async SetUpSession() {
+		this.sessionKey = Moment().format("YYYY-M-D HH:mm:ss");
+		await VFile.CreateFolderAsync(this.SessionFolderPath);
+		this.sessionLogFilePath = `${this.SessionFolderPath}/Log.txt`;
+	}
+
 	SaveFileSystemData() {
 		this.SaveMainData();
 		
@@ -91,21 +103,25 @@ LucidLink.typeInfo.typeTag = new VDFType(null, true);
 
 async function Init(ui) {
 	g.LL = new LucidLink();
-	g.LL.ui = ui;
+	LL.ui = ui;
 	var mainDataVDF = await VFile.ReadAllTextAsync(VFile.ExternalStorageDirectoryPath + "/Lucid Link/MainData.vdf", null);
 	if (mainDataVDF) {
 		var data = FromVDF(mainDataVDF, "LucidLink");
 		for (var propName in data) {
-			g.LL[propName] = data[propName];
+			LL[propName] = data[propName];
 		}
 	}
 	else {
-		TestData.LoadInto(g.LL);
+		TestData.LoadInto(LL);
 	}
 
-	g.LL.scripts.LoadFileSystemData();
+	await LL.SetUpSession();
+	Log("Finished loading main-data.");
+	Log("Logging to: " + LL.sessionLogFilePath);
 
-	g.LL.PushBasicDataToJava();
+	LL.scripts.LoadFileSystemData();
+
+	LL.PushBasicDataToJava();
 }
 
 const styles = StyleSheet.create({
