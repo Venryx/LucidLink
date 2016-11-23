@@ -1,19 +1,19 @@
-//var LibMuse = require("react-native-libmuse");
+import LibMuse from "react-native-libmuse";
 
 export default class EEGBridge {
-	data = [];
+	static data = [];
 
-	Start() {
+	static Start() {
 		LibMuse.Start();
 		LibMuse.AddMuseDataListener((type, data)=> {
 			Log(`Type: ${type} Data: ${ToJSON(data)}`);
 		});
 	}
-	Connect() {
+	static Connect() {
 		var museIndex = 0;
 		LibMuse.Connect(museIndex);		
 	}
-	Disconnect() {
+	static Disconnect() {
 		LibMuse.Disconnect();		
 	}
 }

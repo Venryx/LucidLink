@@ -1,9 +1,3 @@
-import React, {Component} from "react";
-import {Dimensions, StyleSheet,
-	View, Button, Text, TextInput} from "react-native";
-import RNFS from "react-native-fs";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
-var DialogAndroid = require("react-native-dialogs");
 import Drawer from "react-native-drawer";
 
 import EEGBridge from "../Frame/EEGBridge";
@@ -57,7 +51,7 @@ export class MonitorUI extends BaseComponent {
 
 import Chart from "react-native-chart";
 
-const styles = StyleSheet.create({
+const styles = {
     container: {
         flex: 1,
         justifyContent: "center",
@@ -68,10 +62,16 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
     },
-});
+};
 
+EEGBridge.Start();
 class ChannelsUI extends BaseComponent {
-	data = [];
+	data = [
+		[0, 1],
+		[1, 3],
+		[3, 7],
+		[4, 9]
+	];
 
 	componentDidMount() {
 		/*this.data = [];

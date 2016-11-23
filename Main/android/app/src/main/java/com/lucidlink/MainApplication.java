@@ -12,7 +12,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.filepicker.FilePickerPackage;
 import com.github.yamill.orientation.OrientationPackage;
-//import com.v.LibMuse.LibMuse;
+import com.v.LibMuse.LibMuse;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
 
@@ -39,8 +39,8 @@ public class MainApplication extends Application implements ReactApplication {
 				new FilePickerPackage(),
 				new OrientationPackage(),
 				new RNSoundPackage(),
-				new ReactNativeDialogsPackage()//,
-				//new LibMuse()
+				new ReactNativeDialogsPackage(),
+				new LibMuse()
 			);
 		}
 	};
