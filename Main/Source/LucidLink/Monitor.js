@@ -121,11 +121,14 @@ class ChannelsUI extends BaseComponent {
 		}
 	}
     render() {
-		var data = MuseBridge.columns;
+		var channelPoints = MuseBridge.channelPoints;
+		var channel0Points = channelPoints[0];
+		if (channel0Points.length == 0)
+			return <View/>;
         return (
             <View style={styles.container}>
                 <Chart style={styles.chart} type="line" verticalGridStep={5}
-					showDataPoint={true} color="black" data={data}/>
+					showDataPoint={true} color="black" data={channel0Points}/>
             </View>
         );
     }

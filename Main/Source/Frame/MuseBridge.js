@@ -62,20 +62,23 @@ import LibMuse from "react-native-libmuse";
 		MuseBridge.status = status;
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
 	}
-
-	static columns = []; // data columns
-	static columns_lastSet = -1;
-	static maxColumnCount = 100;
+	
+	// where eg. [0][1] (channel, x-pos/index) is [1,9] (x-pos, y-pos)
+	static channelPoints = Array(6).fill([]);
+	static lastX = -1;
+	static maxX = 100;
 
 	static OnReceiveMuseDataPacket(type, column) {
-		var column_current = columns_lastSet + 1;
-		if (column_current >= maxColumnCount)
-			column_current = 0;
+		var currentX = MuseBridge.lastX + 1;
+		if (currentX > MuseBridge.maxX)
+			currentX = 0;
 
-		columns[column_current] = column;
+		for (var channel = 0; channel < 6; channel++)
+			MuseBridge.channelPoints[channel][currentX] = [currentX, column[channel]];
 
-		columns_lastSet = column_current;
+		MuseBridge.lastX = currentX;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 	}
 }
+g.MuseBridge = MuseBridge;
 export default MuseBridge;
