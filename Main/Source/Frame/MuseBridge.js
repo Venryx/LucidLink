@@ -11,8 +11,7 @@ export default class MuseBridge {
 		LibMuse.AddListener_OnReceiveMuseDataPacket((type, data)=> {
 			//Log(`Type: ${type} Data: ${ToJSON(data)}`);
 			//alert(`Type: ${type} Data: ${ToJSON(data)}`);
-			//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);			
-			Log("muse link", `Type: ${type} Data: ${data}`);			
+			Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);			
 		});
 		LibMuse.AddListener_OnMuseListChange(museList=> {
 			MuseBridge.museList = museList;
