@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 class Main_ReactPackage implements ReactPackage {
+	public static ReactApplicationContext reactContext;
 
     @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
@@ -19,6 +20,7 @@ class Main_ReactPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+		Main_ReactPackage.reactContext = reactContext;
         return Collections.emptyList();
     }
 

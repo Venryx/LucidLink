@@ -11,6 +11,7 @@ export class MonitorUI extends BaseComponent {
 	constructor(props) {
 		super(props);
 		LL.monitor.ui = this;
+		this.state = {museCount: 0};
 	}
 
 	sidePanel = null;
@@ -22,6 +23,7 @@ export class MonitorUI extends BaseComponent {
 	}
 
 	render() {
+		var {museCount} = this.state;
 		var node = LL.monitor;
 		
 		const drawerStyles = {
@@ -38,6 +40,11 @@ export class MonitorUI extends BaseComponent {
 					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
 						<View style={{flex: .8, flexDirection: "row"}}>
 							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+							<View style={{flex: 1}}/>
+							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
+								<VButton text="Listen" style={{width: 100}} enabled={!EEGBridge.started} onPress={this.Listen}/>
+								<VButton text="Connect" style={{width: 100}} enabled={museCount > 0} onPress={this.Connect}/>
+							</View>
 						</View>
 					</View>
 					<View style={{marginTop: -7, flex: 1}}>
@@ -46,6 +53,13 @@ export class MonitorUI extends BaseComponent {
 				</View>
 			</Drawer>
 		);
+	}
+
+	Listen() {
+		EEGBridge.Start();
+	}
+	Connect() {
+		EEGBridge.Connect();
 	}
 }
 
@@ -64,7 +78,6 @@ const styles = {
     },
 };
 
-EEGBridge.Start();
 class ChannelsUI extends BaseComponent {
 	data = [
 		[0, 1],

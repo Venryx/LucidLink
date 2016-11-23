@@ -60,12 +60,14 @@ g.keyboardHeight = 0;
 Keyboard.addListener("keyboardDidShow", e=> {
 	g.keyboardVisible = true;
 	g.keyboardHeight = e.endCoordinates.height;
-	LL.ui.forceUpdate();
+	if (LL && LL.ui)
+		LL.ui.forceUpdate();
 });
 Keyboard.addListener("keyboardDidHide", ()=> {
 	g.keyboardVisible = false;
 	g.keyboardHeight = 0;
-	LL.ui.forceUpdate();
+	if (LL && LL.ui)
+		LL.ui.forceUpdate();
 });
 
 g.LucidLink = class LucidLink extends Node {

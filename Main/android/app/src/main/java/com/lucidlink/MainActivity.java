@@ -4,8 +4,13 @@ import android.os.Build;
 import android.view.KeyEvent;
 
 import com.facebook.react.ReactActivity;
+import com.v.LibMuse.LibMuse;
 
 public class MainActivity extends ReactActivity {
+	public MainActivity() {
+		super();
+		LibMuse.mainActivity = this;
+	}
 
     /**
      * Returns the name of the main component registered from JavaScript.

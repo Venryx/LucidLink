@@ -118,26 +118,27 @@ g.Scripts = class Scripts extends Node {
 		var scripts = [];
 		var scriptsFolder = LL.RootFolder.GetFolder("Scripts");
 		var scriptsFolderExists = await scriptsFolder.Exists();
-		if (!scriptsFolderExists) {
+		if (!scriptsFolderExists)
 			scriptsFolder.Create();
-			// only create these scripts once; if user deletes them, that's fine
-			await scriptsFolder.GetFile("Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
-			await scriptsFolder.GetFile("Built-in script.meta").WriteAllText("{editable: true, enabled: true}");
-			await scriptsFolder.GetFile("Fake-data provider.js").WriteAllText(scriptDefaultText_FakeDataProvider);
-			await scriptsFolder.GetFile("Fake-data provider.meta").WriteAllText("{editable: true, enabled: false}");
-			await scriptsFolder.GetFile("Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
-			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText("{editable: true, enabled: true}");
-			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
-			await scriptsFolder.GetFile("Custom script.meta").WriteAllText("{editable: true, enabled: true}");
-		}
 		// ensure these scripts always exist
 		if (!await scriptsFolder.GetFile("Core functions.js").Exists()) {
 			await scriptsFolder.GetFile("Core functions.js").WriteAllText(scriptDefaultText_CoreFunctions);
-			await scriptsFolder.GetFile("Core functions.meta").WriteAllText("{editable: false, enabled: true}");
+			await scriptsFolder.GetFile("Core functions.meta").WriteAllText(ToJSON({index: 0, editable: false, enabled: true}));
 		}
 		if (!await scriptsFolder.GetFile("Built-in helpers.js").Exists()) {
 			await scriptsFolder.GetFile("Built-in helpers.js").WriteAllText(scriptDefaultText_BuiltInHelpers);
-			await scriptsFolder.GetFile("Built-in helpers.meta").WriteAllText("{editable: false, enabled: true}");
+			await scriptsFolder.GetFile("Built-in helpers.meta").WriteAllText(ToJSON({index: 1, editable: false, enabled: true}));
+		}
+		// only create these scripts once; if user deletes them, that's fine
+		if (!scriptsFolderExists) {
+			await scriptsFolder.GetFile("Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
+			await scriptsFolder.GetFile("Built-in script.meta").WriteAllText(ToJSON({index: 2, editable: true, enabled: true}));
+			await scriptsFolder.GetFile("Fake-data provider.js").WriteAllText(scriptDefaultText_FakeDataProvider);
+			await scriptsFolder.GetFile("Fake-data provider.meta").WriteAllText(ToJSON({index: 3, editable: true, enabled: false}));
+			await scriptsFolder.GetFile("Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
+			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText(ToJSON({index: 4, editable: true, enabled: true}));
+			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
+			await scriptsFolder.GetFile("Custom script.meta").WriteAllText(ToJSON({index: 5, editable: true, enabled: true}));
 		}
 		
 		var scriptFiles = (await scriptsFolder.GetFiles()).Where(a=>a.Extension == "js");
