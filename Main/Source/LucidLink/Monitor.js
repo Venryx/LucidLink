@@ -1,17 +1,18 @@
 import Drawer from "react-native-drawer";
 
-import EEGBridge from "../Frame/EEGBridge";
+import MuseBridge from "../Frame/MuseBridge";
 
 g.Monitor = class Monitor extends Node {
+	ui = null;
 }
 
 import OptionsPanel from "./Monitor/OptionsPanel";
 
+@Bind
 export class MonitorUI extends BaseComponent {
 	constructor(props) {
 		super(props);
 		LL.monitor.ui = this;
-		this.state = {museCount: 0};
 	}
 
 	sidePanel = null;
@@ -23,7 +24,6 @@ export class MonitorUI extends BaseComponent {
 	}
 
 	render() {
-		var {museCount} = this.state;
 		var node = LL.monitor;
 		
 		const drawerStyles = {
@@ -42,8 +42,10 @@ export class MonitorUI extends BaseComponent {
 							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 							<View style={{flex: 1}}/>
 							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-								<VButton text="Listen" style={{width: 100}} enabled={!EEGBridge.started} onPress={this.Listen}/>
-								<VButton text="Connect" style={{width: 100}} enabled={museCount > 0} onPress={this.Connect}/>
+								<VButton text="Listen" style={{width: 100}} enabled={!MuseBridge.started} onPress={this.Listen}/>
+								<VButton text="Refresh" style={{marginLeft: 10, width: 100}} enabled={MuseBridge.started} onPress={this.Refresh}/>
+								<Text style={{top: 0, textAlignVertical: "top"}}>Found: {MuseBridge.museList.length}</Text>
+								<VButton text="Connect" style={{marginLeft: 10, width: 100}} enabled={MuseBridge.museList.length > 0} onPress={this.Connect}/>
 							</View>
 						</View>
 					</View>
@@ -56,10 +58,14 @@ export class MonitorUI extends BaseComponent {
 	}
 
 	Listen() {
-		EEGBridge.Start();
+		MuseBridge.Start();
+		this.forceUpdate();
+	}
+	Refresh() {
+		MuseBridge.Refresh();
 	}
 	Connect() {
-		EEGBridge.Connect();
+		MuseBridge.Connect();
 	}
 }
 

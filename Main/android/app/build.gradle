@@ -91,7 +91,7 @@ android {
         applicationId "com.lucidlink"
         //minSdkVersion 18
         minSdkVersion 21
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
         ndk {
