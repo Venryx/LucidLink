@@ -45,6 +45,7 @@ export class MonitorUI extends BaseComponent {
 							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 							<View style={{flex: 1}}/>
 							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
+								<VButton text="StartTest1" style={{width: 100}} onPress={this.StartTest1}/>
 								{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
 									<Text style={{transform: [{translateY: -23}]}}>Searching for muse headband...</Text>}
 								{MuseBridge.status == "connecting" &&
@@ -73,6 +74,10 @@ export class MonitorUI extends BaseComponent {
 			</Drawer>
 		);
 	}
+
+	StartTest1() {
+		JavaBridge.Main.StartTest1();
+	}
 }
 
 import Chart from "react-native-chart";
@@ -80,13 +85,11 @@ import Chart from "react-native-chart";
 const styles = {
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
         backgroundColor: "white",
     },
     chart: {
-        width: 200,
-        height: 200,
+        width: 1000,
+        height: 500,
     },
 };
 
@@ -128,7 +131,7 @@ class ChannelsUI extends BaseComponent {
         return (
             <View style={styles.container}>
                 <Chart style={styles.chart} type="line" verticalGridStep={5}
-					showDataPoint={true} color="black" data={channel0Points}/>
+					showDataPoint={false} color="black" data={channel0Points}/>
             </View>
         );
     }

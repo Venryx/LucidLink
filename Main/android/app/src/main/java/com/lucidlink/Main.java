@@ -97,4 +97,8 @@ public class Main extends ReactContextBaseJavaModule {
 			|| "google_sdk".equals(Build.PRODUCT);
 		promise.resolve(result);
 	}
+
+	@ReactMethod public void StartTest1() {
+		// todo
+	}
 }
