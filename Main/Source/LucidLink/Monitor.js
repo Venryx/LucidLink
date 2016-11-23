@@ -3,6 +3,8 @@ import Drawer from "react-native-drawer";
 import MuseBridge from "../Frame/MuseBridge";
 
 g.Monitor = class Monitor extends Node {
+	@P() connect = true;
+
 	ui = null;
 }
 
@@ -30,7 +32,7 @@ export class MonitorUI extends BaseComponent {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
 			main: {paddingLeft: 3},
 		};
-
+		
 		return (
 			<Drawer ref={comp=>this.sidePanel = comp}
 					content={<OptionsPanel parent={this}/>}
@@ -42,10 +44,24 @@ export class MonitorUI extends BaseComponent {
 							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 							<View style={{flex: 1}}/>
 							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-								<VButton text="Listen" style={{width: 100}} enabled={!MuseBridge.started} onPress={this.Listen}/>
-								<VButton text="Refresh" style={{marginLeft: 10, width: 100}} enabled={MuseBridge.started} onPress={this.Refresh}/>
-								<Text style={{top: 0, textAlignVertical: "top"}}>Found: {MuseBridge.museList.length}</Text>
-								<VButton text="Connect" style={{marginLeft: 10, width: 100}} enabled={MuseBridge.museList.length > 0} onPress={this.Connect}/>
+								{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
+									<Text style={{transform: [{translateY: -23}]}}>Searching for muse headband...</Text>}
+								{MuseBridge.status == "connecting" &&
+									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Connecting...</Text>}
+								{MuseBridge.status == "connected" &&
+									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Connected</Text>}
+								<Switch style={{transform: [{translateY: -18}]}} value={node.connect}
+									onValueChange={value=> {
+										node.connect = value;
+										if (value)
+											MuseBridge.StartSearch(); // start listening for a muse headband
+										else {
+											MuseBridge.StopSearch();
+											if (MuseBridge.status == "connected")
+												MuseBridge.Disconnect();
+										}
+										this.forceUpdate();
+									}}/>
 							</View>
 						</View>
 					</View>
@@ -55,17 +71,6 @@ export class MonitorUI extends BaseComponent {
 				</View>
 			</Drawer>
 		);
-	}
-
-	Listen() {
-		MuseBridge.Start();
-		this.forceUpdate();
-	}
-	Refresh() {
-		MuseBridge.Refresh();
-	}
-	Connect() {
-		MuseBridge.Connect();
 	}
 }
 
@@ -101,8 +106,8 @@ class ChannelsUI extends BaseComponent {
     render() {
         return (
             <View style={styles.container}>
-                <Chart style={styles.chart} type="line" verticalGridStep={5}
-					showDataPoint={true} color="black" data={this.data}/>
+                {/*<Chart style={styles.chart} type="line" verticalGridStep={5}
+					showDataPoint={true} color="black" data={this.data}/>*/}
             </View>
         );
     }

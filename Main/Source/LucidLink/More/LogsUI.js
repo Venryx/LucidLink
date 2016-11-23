@@ -10,8 +10,8 @@ export default class LogsUI extends BaseComponent {
 		var node = LL.more;
 
 		var logEntriesToShow = [];
-		for (var i = node.logEntries.length - 1; i >= 0; i--) {
-			var entry = node.logEntries[i];
+		for (var i = More.logEntries.length - 1; i >= 0; i--) {
+			var entry = More.logEntries[i];
 			var showEntry =
 				entry.type == "general" ? node.showLogs_general :
 				entry.type == "keyboard" ? node.showLogs_keyboard :
@@ -37,7 +37,7 @@ export default class LogsUI extends BaseComponent {
 					<View style={{flex: 1}}/>
 					<View style={{flexDirection: "row", alignItems: "flex-end"}}>
 						<VButton text="Clear" style={{marginTop: -5, width: 100, height: 32}}
-							onPress={()=>(LL.more.logEntries.length = 0) | this.forceUpdate()}/>
+							onPress={()=>(More.logEntries.length = 0) | this.forceUpdate()}/>
 						{/*<VButton text="Refresh" style={{marginLeft: 5, marginTop: -5, width: 100, height: 32}}
 							onPress={()=>this.forceUpdate()}/>*/}
 					</View>

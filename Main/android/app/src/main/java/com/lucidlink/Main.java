@@ -1,5 +1,6 @@
 package com.lucidlink;
 
+import android.os.Build;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
@@ -81,11 +82,19 @@ public class Main extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void show(String message, int duration) {
+    public void ShowToast(String message, int duration) {
         Toast.makeText(getReactApplicationContext(), message, duration).show();
     }
 
-    @ReactMethod public void GetTestName(Promise promise) {
-        promise.resolve("test-name-from-java");
-    }
+	@ReactMethod public void IsInEmulator(Promise promise) {
+		boolean result = Build.FINGERPRINT.startsWith("generic")
+			|| Build.FINGERPRINT.startsWith("unknown")
+			|| Build.MODEL.contains("google_sdk")
+			|| Build.MODEL.contains("Emulator")
+			|| Build.MODEL.contains("Android SDK built for x86")
+			|| Build.MANUFACTURER.contains("Genymotion")
+			|| (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+			|| "google_sdk".equals(Build.PRODUCT);
+		promise.resolve(result);
+	}
 }

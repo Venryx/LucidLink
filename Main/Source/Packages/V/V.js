@@ -1,4 +1,14 @@
 g.V = class V {
+	/*static startupInfo = null;
+	static startupInfoRequested = false;
+	static postStartupInfoReceivedFuncs = [];
+	static WaitForStartupInfoThenRun(func) {
+		if (startupInfo)
+			func(startupInfo);
+		else
+			V.postStartupInfoReceivedFuncs.push(func);
+	}*/
+	
 	// example:
 	// var multilineText = V.Multiline(function() {/*
 	//		Text that...

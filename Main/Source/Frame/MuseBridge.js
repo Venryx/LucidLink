@@ -1,41 +1,71 @@
 import LibMuse from "react-native-libmuse";
 
-export default class MuseBridge {
-	static museList = [];
-
-	static data = [];
-
-	static started = false;
-	static Start() {
-		LibMuse.Start();
-		LibMuse.AddListener_OnReceiveMuseDataPacket((type, data)=> {
-			//Log(`Type: ${type} Data: ${ToJSON(data)}`);
-			//alert(`Type: ${type} Data: ${ToJSON(data)}`);
-			Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);			
-		});
-		LibMuse.AddListener_OnMuseListChange(museList=> {
-			MuseBridge.museList = museList;
-			MuseBridge.currentMuse = museList[0];
-			Log("muse link", `Muse list changed: ${ToJSON(museList)}`);
-			if (LL.monitor.ui)
-				LL.monitor.ui.forceUpdate();
-		});
-		MuseBridge.started = true;
-		Log("muse link", `LibMuse started.`);
+@Bind class MuseBridge {
+	static initialized = false;
+	static Init() {
+		LibMuse.AddListener_OnChangeMuseList(MuseBridge.OnChangeMuseList);
+		LibMuse.AddListener_OnChangeMuseConnectStatus(MuseBridge.OnChangeMuseConnectStatus);
+		LibMuse.AddListener_OnReceiveMuseDataPacket(MuseBridge.OnReceiveMuseDataPacket);
+		LibMuse.Init();
+		MuseBridge.initialized = true;
+		Log("muse link", `LibMuse initialized.`);
 	}
-	static Refresh() {
-		LibMuse.Refresh();
+	async IfInEmulator_ReplaceLibMuseFuncsWithStubs() {
+		var inEmulator = await JavaBridge.Main.IsInEmulator();
+		if (inEmulator) {
+			for (var key in LibMuse) {
+				var value = LibMuse[key];
+				if (value instanceof Function)
+					libMuse[key] = ()=>{};
+			}
+		}
+	}
+
+	static museList = [];
+	static StopSearch() {
+		LibMuse.StopSearch();
+	}
+	static StartSearch(stopThenStart = true) {
+		if (stopThenStart)
+			LibMuse.RestartSearch();
+		else
+			LibMuse.StartSearch();
+	}
+	static OnChangeMuseList(museList) {
+		MuseBridge.museList = museList;
+		Log("muse link", `Muse list changed: ${ToJSON(museList)}`);
+
+		if (museList.length && MuseBridge.currentMuse == null && LL.monitor.connect)
+			MuseBridge.Connect();
+
+		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
 	}
 
 	static currentMuse = null;
-
 	static Connect() {
-		var museIndex = 0;
-		LibMuse.Connect(museIndex);
-		Log("muse link", "LibMuse connected.");
+		LibMuse.Connect(0); // always try to connect to first muse
 	}
 	static Disconnect() {
 		LibMuse.Disconnect();
-		Log("muse link", "LibMuse disconnected.");
+	}
+	static status = "disconnected";
+	static OnChangeMuseConnectStatus(status) {
+		Log("muse link", `Muse connection status changed: ${status}`);
+		if (status == "connected") {
+			MuseBridge.currentMuse = MuseBridge.museList[0];
+			Log("muse link", "LibMuse connected.");
+		}
+		else if (status == "disconnected") {
+			MuseBridge.currentMuse = null;
+			Log("muse link", "LibMuse disconnected.");
+		}
+		MuseBridge.status = status;
+		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
+	}
+
+	static data = [];
+	static OnReceiveMuseDataPacket(type, data) {
+		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 	}
 }
+export default MuseBridge;

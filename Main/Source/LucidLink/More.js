@@ -40,14 +40,19 @@ g.More = class More extends Node {
 	@P() autoScroll = true;
 	@P() maxLogCount = 100;
 
-	logEntries = [];
-	AddLogEntry(entry) {
-		entry.origIndex = this.logEntries.length;
-		this.logEntries.push(entry);
-		LL.sessionLogFile.AppendText("\n" + entry.toString());
+	static logEntries = [];
+	static logEntries_lastLoggedToFile = -1;
+	static AddLogEntry(entry) {
+		entry.origIndex = More.logEntries.length;
+		More.logEntries.push(entry);
+		if (LL && LL.sessionLogFile) {
+			for (let i = More.logEntries_lastLoggedToFile + 1; i < More.logEntries.length; i++)
+				LL.sessionLogFile.AppendText("\n" + More.logEntries[i].toString());
+			More.logEntries_lastLoggedToFile = More.logEntries.length - 1;
+		}
 
-		if (this.logsUI && this.logsUI.props.active)
-			this.logsUI.forceUpdate();
+		if (LL && LL.more && LL.more.logsUI && LL.more.logsUI.props.active)
+			LL.more.logsUI.forceUpdate();
 	}
 	
 	logsUI = null;

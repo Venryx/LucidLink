@@ -27,8 +27,7 @@ g.Log = function(...args) {
 
 	console.log(...args);
 
-	if (g.LL && g.LL.more)
-		g.LL.more.AddLogEntry(new LogEntry(type, message, new Date()));
+	More.AddLogEntry(new LogEntry(type, message, new Date()));
 };
 g.Trace = function(...args) {
 	console.trace(...args);
@@ -161,8 +160,8 @@ g.FromVDFToNode = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf);
 	}/**/ finally {}
 }
-g.FromVDFNode = function(node) { // alternative to .ToObject(), which applies default (program) settings
-	return node.ToObject(FinalizeFromVDFOptions());
+g.FromVDFNode = function(node, declaredTypeName = null) { // alternative to .ToObject(), which applies default (program) settings
+	return node.ToObject(declaredTypeName, FinalizeFromVDFOptions());
 }
 
 g.FinalizeToVDFOptions = function(options = null) {

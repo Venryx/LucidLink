@@ -31,14 +31,18 @@ import {MoreUI} from "./LucidLink/More";
 
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", args=> {
-	var [keyCode] = args;
-	Log("keyboard", "KeyDown: " + keyCode);
-	LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
+	try {
+		var [keyCode] = args;
+		Log("keyboard", "KeyDown: " + keyCode);
+		LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
+	} catch (ex) {}
 });
 DeviceEventEmitter.addListener("OnKeyUp", args=> {
-	var [keyCode] = args;
-	Log("keyboard", "KeyUp: " + keyCode);
-	LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
+	try {
+		var [keyCode] = args;
+		Log("keyboard", "KeyUp: " + keyCode);
+		LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
+	} catch (ex) {}
 });
 
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
@@ -84,10 +88,20 @@ g.LucidLink = class LucidLink extends Node {
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 	get SessionFolder() { return this.RootFolder.GetFolder(`Sessions/${this.sessionKey}`); }
 	sessionLogFile = null;
+	/*async WaitTillLogFileReady() { 
+		if (this.sessionLogFile) return;
+		var result = new Promise();
+		sessionLogFile_waitingPromises.push(result);
+		return result;
+	}*/
 	async SetUpSession() {
 		this.sessionKey = Moment().format("YYYY-M-D HH:mm:ss");
 		await this.SessionFolder.Create();
 		this.sessionLogFile = this.SessionFolder.GetFile("Log.txt");
+
+		/*for (let promise of sessionLogFile_waitingPromises)
+			promise.resolve();
+		this.sessionLogFile_waitingPromises = [];*/
 	}
 
 	SaveFileSystemData() {
@@ -102,6 +116,7 @@ g.LucidLink = class LucidLink extends Node {
 		Log("Finished saving main-data.");
 	}
 
+	mainDataLoaded = false;
 	ui = null;
 }
 //LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
@@ -113,8 +128,9 @@ async function Init(ui) {
 	LL.ui = ui;
 	var mainDataVDF = await LL.RootFolder.GetFile("MainData.vdf").ReadAllText();
 	if (mainDataVDF) {
-		var data = FromVDF(mainDataVDF, "LucidLink");
-		for (var propName in data) {
+		var node = FromVDFToNode(mainDataVDF, "LucidLink");
+		var data = FromVDFNode(node, "LucidLink");
+		for (var propName of node.mapChildren.keys) {
 			LL[propName] = data[propName];
 		}
 	}
@@ -123,12 +139,28 @@ async function Init(ui) {
 	}
 
 	await LL.SetUpSession();
+
+	LL.mainDataLoaded = true;
+	LL.ui.forceUpdate();
 	Log("Finished loading main-data.");
 	Log("Logging to: " + LL.sessionLogFile.path);
 
 	LL.scripts.LoadFileSystemData();
 
 	LL.PushBasicDataToJava();
+
+	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
+}
+import MuseBridge from "./Frame/MuseBridge";
+async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
+	var inEmulator = await JavaBridge.Main.IsInEmulator();
+	if (inEmulator)
+		Log("general", `In emulator: ${inEmulator}`);
+	if (!inEmulator && !MuseBridge.initialized) {
+		MuseBridge.Init();
+		if (LL.monitor.connect)
+			MuseBridge.StartSearch(); // start listening for a muse headband
+	}
 }
 
 const styles = StyleSheet.create({
@@ -158,6 +190,21 @@ export default class LucidLinkUI extends Component {
     }
 
     render() {
+		// if main-data not yet loaded, render blank ui
+		if (LL.mainDataLoaded == false) {
+			var marker = null;
+			return (
+				<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
+					<View tabLabel="Monitor">{marker}</View>
+					<View tabLabel="Tracker">{marker}</View>
+					<View tabLabel="Journal">{marker}</View>
+					<View tabLabel="Scripts">{marker}</View>
+					<View tabLabel="Settings">{marker}</View>
+					<View tabLabel="More">{marker}</View>
+				</ScrollableTabView>
+			)
+		}
+
      	var {activeTab} = this.state;
         return (
 			//<View style={{flex: 1}}>
