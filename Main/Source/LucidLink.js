@@ -209,13 +209,13 @@ export default class LucidLinkUI extends Component {
         return (
 			//<View style={{flex: 1}}>
 			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
-				<MonitorUI tabLabel="Monitor"/>
-				<View style={styles.container} tabLabel="Tracker">
+				<MonitorUI tabLabel="Monitor" active={activeTab == 0}/>
+				<View style={styles.container} tabLabel="Tracker" active={activeTab == 1}>
 				</View>
-				<View style={styles.container} tabLabel="Journal">
+				<View style={styles.container} tabLabel="Journal" active={activeTab == 2}>
 				</View>
-				<ScriptsUI tabLabel="Scripts"/>
-				<SettingsUI tabLabel="Settings"/>
+				<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
+				<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
 				<MoreUI tabLabel="More" active={activeTab == 5}/>
 			</ScrollableTabView>
 				/*{keyboardVisible &&

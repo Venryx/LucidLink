@@ -26,6 +26,7 @@ export class MonitorUI extends BaseComponent {
 	}
 
 	render() {
+		var {visible} = this.props;
 		var node = LL.monitor;
 		
 		const drawerStyles = {
@@ -66,7 +67,7 @@ export class MonitorUI extends BaseComponent {
 						</View>
 					</View>
 					<View style={{marginTop: -7, flex: 1}}>
-						<ChannelsUI parent={this}/>
+						<ChannelsUI {...{visible}} parent={this}/>
 					</View>
 				</View>
 			</Drawer>
@@ -97,17 +98,34 @@ class ChannelsUI extends BaseComponent {
 		[4, 9]
 	];
 
+	timer = null;
 	componentDidMount() {
 		/*this.data = [];
 		for (let )*/
 		// todo
 	}
 
+	componentWillReceiveProps(nextProps, nextState) {
+		var visibleChanging = nextProps.visible != this.props.visible;
+		if (visibleChanging) {
+			if (nextProps.visible) {
+				this.timer = new TimerMS(300, ()=> {
+					this.forceUpdate();
+				});
+				this.timer.Start();
+			}
+			else {
+				if (this.timer)
+					this.timer.Stop();
+			}
+		}
+	}
     render() {
+		var data = MuseBridge.columns;
         return (
             <View style={styles.container}>
-                {/*<Chart style={styles.chart} type="line" verticalGridStep={5}
-					showDataPoint={true} color="black" data={this.data}/>*/}
+                <Chart style={styles.chart} type="line" verticalGridStep={5}
+					showDataPoint={true} color="black" data={data}/>
             </View>
         );
     }

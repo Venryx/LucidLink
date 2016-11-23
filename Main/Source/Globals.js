@@ -27,7 +27,9 @@ g.Log = function(...args) {
 
 	console.log(...args);
 
-	More.AddLogEntry(new LogEntry(type, message, new Date()));
+	try {
+		More.AddLogEntry(new LogEntry(type, message, new Date()));
+	} catch (ex) {}
 };
 g.Trace = function(...args) {
 	console.trace(...args);
@@ -349,4 +351,28 @@ g.BufferFuncToBeRun = function(key, minInterval, func) {
         WaitXThenRun(timeTillIntervalEnd, func);
 		funcLastScheduledRunTimes[key] = intervalEndTime;
     }
+}
+
+// Random
+// ==========
+
+g.Random = function(seed) {
+	seed = seed != null ? seed : new Date().getTime();
+
+	if (seed == 0)
+		throw new Error("Cannot use 0 as seed. (prng algorithm isn't very good, and doesn't work with seeds that are multiples of PI)");
+
+	var s = this;
+	s.seed = seed;
+	s.NextDouble = function() {
+		s.seed = Math.sin(s.seed) * 10000; return s.seed - Math.floor(s.seed);
+	};
+	s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
+	s.NextColor_ImageStr = function() {
+		var color = s.NextColor();
+		Random.canvasContext.fillStyle = color.ToHexStr();
+		Random.canvasContext.fillRect(0, 0, Random.canvas[0].width, Random.canvas[0].height);
+		var imageStr = Random.canvas[0].toDataURL();
+		return imageStr.substr(imageStr.indexOf(",") + 1);
+	};
 }

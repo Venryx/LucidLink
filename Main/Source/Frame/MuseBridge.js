@@ -63,8 +63,18 @@ import LibMuse from "react-native-libmuse";
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
 	}
 
-	static data = [];
-	static OnReceiveMuseDataPacket(type, data) {
+	static columns = []; // data columns
+	static columns_lastSet = -1;
+	static maxColumnCount = 100;
+
+	static OnReceiveMuseDataPacket(type, column) {
+		var column_current = columns_lastSet + 1;
+		if (column_current >= maxColumnCount)
+			column_current = 0;
+
+		columns[column_current] = column;
+
+		columns_lastSet = column_current;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 	}
 }
