@@ -108,7 +108,11 @@ class ChannelsUI extends BaseComponent {
 		// todo
 	}
 
-	componentWillReceiveProps(nextProps, nextState) {
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	/*componentWillReceiveProps(nextProps, nextState) {
 		var visibleChanging = nextProps.visible != this.props.visible;
 		if (visibleChanging) {
 			if (nextProps.visible) {
@@ -122,7 +126,7 @@ class ChannelsUI extends BaseComponent {
 					this.timer.Stop();
 			}
 		}
-	}
+	}*/
     render() {
 		var channelPoints = MuseBridge.channelPoints;
 		var channel0Points = channelPoints[0];

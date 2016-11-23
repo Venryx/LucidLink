@@ -1,4 +1,11 @@
 g.V = class V {
+	static Toast(...args) {
+		if (args.length == 1)
+			JavaBridge.Main.ShowToast(args[0], 3);
+		else
+			JavaBridge.Main.ShowToast(args[0], args[1]);
+	}
+
 	/*static startupInfo = null;
 	static startupInfoRequested = false;
 	static postStartupInfoReceivedFuncs = [];

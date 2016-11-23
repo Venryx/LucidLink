@@ -1,8 +1,11 @@
 package com.lucidlink;
 
+import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -19,6 +22,16 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.shell.MainReactPackage;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -103,7 +116,78 @@ public class Main extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod public void StartTest1() {
-		View chartHolder = V.FindViewByContentDescription(V.GetRootView(), "chart holder");
-		ShowToast("ChartHolder:" + chartHolder.getId(), 3);
+		//final ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
+		final ViewGroup chartHolder = (ViewGroup)V.GetRootView();
+		//ShowToast("ChartHolder:" + chartHolder.getId(), 3);
+
+		MainActivity.main.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				V.Toast("Test1");
+				LineChart chart = new LineChart(Main.main.reactContext);
+				chartHolder.addView(chart, new ViewGroup.LayoutParams(700, 500));
+				V.Toast("Child count: " + chartHolder.getChildCount());
+
+
+				// part 1
+				// ==========
+
+				chart.setDrawGridBackground(false);
+				chart.getAxisLeft().setDrawGridLines(false);
+				chart.getAxisRight().setEnabled(false);
+				chart.getXAxis().setDrawGridLines(true);
+				chart.getXAxis().setDrawAxisLine(false);
+				// dont forget to refresh the drawing
+				chart.invalidate();
+
+				// part 2
+				// ==========
+
+				ArrayList<Entry> yVals = new ArrayList<Entry>();
+
+				int count = 1000;
+				float range = 500f;
+				for (int i = 0; i < count; i++) {
+					float mult = (range + 1);
+					float val = (float) (Math.random() * mult) + 3;// + (float)
+					// ((mult *
+					// 0.1) / 10);
+					yVals.add(new Entry(i * 0.001f, val));
+				}
+
+				// create a dataset and give it a type
+				LineDataSet set1 = new LineDataSet(yVals, "DataSet 1");
+
+				set1.setColor(Color.BLACK);
+				set1.setLineWidth(0.5f);
+				set1.setDrawValues(false);
+				set1.setDrawCircles(false);
+				set1.setMode(LineDataSet.Mode.LINEAR);
+				set1.setDrawFilled(false);
+
+				// create a data object with the datasets
+				LineData data = new LineData(set1);
+
+				// set data
+				chart.setData(data);
+
+				// get the legend (only possible after setting data)
+				Legend l = chart.getLegend();
+				l.setEnabled(false);
+
+				// redraw
+				// ==========
+
+				chart.invalidate();
+			}
+		});
+		/*Handler h=new Handler();
+		h.post(new Runnable() {
+			public void run() {
+				V.Toast("Test2");
+				LineChart chart = new LineChart(Main.main.reactContext);
+				chartHolder.addView(chart);
+			}
+		});*/
 	}
 }

@@ -24,6 +24,13 @@ public class V {
 		Log.i(tag, message);
 	}
 
+	public static void Toast(String message) {
+		Main.main.ShowToast(message, 3);
+	}
+	public static void Toast(String message, int duration) {
+		Main.main.ShowToast(message, duration);
+	}
+
 	public static View GetRootView() {
 		return MainActivity.main.getWindow().getDecorView().getRootView();
 	}
