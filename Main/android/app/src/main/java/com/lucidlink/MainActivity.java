@@ -7,8 +7,10 @@ import com.facebook.react.ReactActivity;
 import com.v.LibMuse.LibMuse;
 
 public class MainActivity extends ReactActivity {
+	public static MainActivity main;
 	public MainActivity() {
 		super();
+		main = this;
 		LibMuse.mainActivity = this;
 	}
 

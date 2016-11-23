@@ -1,7 +1,10 @@
 package com.lucidlink;
 
 import android.os.Build;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -21,6 +24,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Main extends ReactContextBaseJavaModule {
@@ -99,6 +103,7 @@ public class Main extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod public void StartTest1() {
-		// todo
+		View chartHolder = V.FindViewByContentDescription(V.GetRootView(), "chart holder");
+		ShowToast("ChartHolder:" + chartHolder.getId(), 3);
 	}
 }
