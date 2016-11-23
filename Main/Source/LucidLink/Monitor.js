@@ -80,7 +80,7 @@ export class MonitorUI extends BaseComponent {
 	}
 }
 
-import Chart from "react-native-chart";
+//import Chart from "react-native-chart";
 
 const styles = {
     container: {

@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.choosemuse.libmuse.LibmuseVersion;
+import com.facebook.imagepipeline.producers.Consumer;
 
 import java.io.File;
 import java.io.FileDescriptor;

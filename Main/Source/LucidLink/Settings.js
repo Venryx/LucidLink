@@ -8,7 +8,7 @@ var ScrollableTabView = require("react-native-scrollable-tab-view");
 var FilePickerManager = NativeModules.FilePickerManager;
 
 g.Settings = class Settings extends Node {
-	@P() applyScriptsOnLaunch = true;
+	@P() applyScriptsOnLaunch = false;
 	@P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
