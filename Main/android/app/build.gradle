@@ -177,6 +177,7 @@ dependencies {
     compile project(':react-native-fs')
     compile project(':RNSound')
     compile project(':react-native-dialogs')
+    compile project(':react-native-libmuse')
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
 

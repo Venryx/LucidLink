@@ -24,6 +24,7 @@ import UM9 from "./Packages/V/VFile";
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";
 
+import {MonitorUI} from "./LucidLink/Monitor";
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {MoreUI} from "./LucidLink/More";
@@ -68,6 +69,7 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 });
 
 g.LucidLink = class LucidLink extends Node {
+	@T("Monitor") @P(true, true) monitor = new Monitor();
 	@T("Scripts") @P(true, true) scripts = new Scripts();
 	@T("Settings") @P(true, true) settings = new Settings();
 	@T("More") @P(true, true) more = new More();
@@ -158,18 +160,7 @@ export default class LucidLinkUI extends Component {
         return (
 			//<View style={{flex: 1}}>
 			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
-				<View style={styles.container} tabLabel="Monitor">
-					<Text style={styles.welcome}>
-					Welcome to React Native!
-					</Text>
-					<Text style={styles.instructions}>
-					To get started, edit index.android.js
-					</Text>
-					<Text style={styles.instructions}>
-					Double tap R on your keyboard to reload,{"\n"}
-					Shake or press menu button for dev menu
-					</Text>
-				</View>
+				<MonitorUI tabLabel="Monitor"/>
 				<View style={styles.container} tabLabel="Tracker">
 				</View>
 				<View style={styles.container} tabLabel="Journal">

@@ -11,6 +11,7 @@ import ScriptRunner from "./Scripts/ScriptRunner";
 import scriptDefaultText_CoreFunctions from "./Scripts/UserScriptDefaults/CoreFunctions";
 import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/BuiltInHelpers";
 import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
+import scriptDefaultText_FakeDataProvider from "./Scripts/UserScriptDefaults/FakeDataProvider";
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
 
@@ -122,6 +123,8 @@ g.Scripts = class Scripts extends Node {
 			// only create these scripts once; if user deletes them, that's fine
 			await scriptsFolder.GetFile("Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
 			await scriptsFolder.GetFile("Built-in script.meta").WriteAllText("{editable: true, enabled: true}");
+			await scriptsFolder.GetFile("Fake-data provider.js").WriteAllText(scriptDefaultText_FakeDataProvider);
+			await scriptsFolder.GetFile("Fake-data provider.meta").WriteAllText("{editable: true, enabled: false}");
 			await scriptsFolder.GetFile("Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
 			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText("{editable: true, enabled: true}");
 			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
@@ -197,12 +200,13 @@ This will permanently remove all custom code from the script.`,
 					LL.scripts.scripts.push(script);
 				}
 
-				if (scriptName == "Built-in script")
-					script.text = scriptDefaultText_BuiltInScript;
-				else {
-					Assert(scriptName == "Custom script");
-					script.text = scriptDefaultText_CustomScript;
-				}
+				var nameToTextMap = {
+					"Built-in script": scriptDefaultText_BuiltInScript,
+					"Fake-data provider": scriptDefaultText_FakeDataProvider,
+					"Custom script": scriptDefaultText_CustomScript,
+				};
+				Assert(nameToTextMap[scriptName]);
+				script.text = nameToTextMap[scriptName];
 
 				script.Save();
 				if (this.ui)
