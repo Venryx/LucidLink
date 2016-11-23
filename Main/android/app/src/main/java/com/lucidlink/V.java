@@ -3,6 +3,7 @@ package com.lucidlink;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.choosemuse.libmuse.LibmuseVersion;
 
@@ -31,8 +32,11 @@ public class V {
 		Main.main.ShowToast(message, duration);
 	}
 
-	public static View GetRootView() {
-		return MainActivity.main.getWindow().getDecorView().getRootView();
+	public static ViewGroup GetRootView() {
+		return (ViewGroup)MainActivity.main.getWindow().getDecorView().getRootView();
+	}
+	public static LinearLayout GetRootLinearLayout() {
+		return (LinearLayout)((ViewGroup)MainActivity.main.getWindow().getDecorView().getRootView()).getChildAt(0);
 	}
 
 	/*public static ArrayList<View> FindDescendants(View v) {

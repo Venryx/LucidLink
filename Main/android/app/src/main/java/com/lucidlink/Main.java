@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -116,8 +117,11 @@ public class Main extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod public void StartTest1() {
-		//final ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
-		final ViewGroup chartHolder = (ViewGroup)V.GetRootView();
+		final ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
+		int[] chartHolderPos_early = new int[2];
+		chartHolder.getLocationInWindow(chartHolderPos_early);
+		final int[] chartHolderPos = chartHolderPos_early;
+
 		//ShowToast("ChartHolder:" + chartHolder.getId(), 3);
 
 		MainActivity.main.runOnUiThread(new Runnable() {
@@ -125,9 +129,11 @@ public class Main extends ReactContextBaseJavaModule {
 			public void run() {
 				V.Toast("Test1");
 				LineChart chart = new LineChart(Main.main.reactContext);
-				chartHolder.addView(chart, new ViewGroup.LayoutParams(700, 500));
+				FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(chartHolder.getWidth(), chartHolder.getHeight());
+				params.leftMargin = chartHolderPos[0];
+				params.topMargin = chartHolderPos[1];
+				V.GetRootView().addView(chart, params);
 				V.Toast("Child count: " + chartHolder.getChildCount());
-
 
 				// part 1
 				// ==========
