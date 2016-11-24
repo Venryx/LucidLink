@@ -1,4 +1,26 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // The Fabric Gradle plugin uses an open ended version to react
+        // quickly to Android tooling updates
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+plugins {
+    id "me.tatarka.retrolambda" version "3.4.0"
+}
+
 apply plugin: "com.android.application"
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
 
 import com.android.build.OutputFile
 
@@ -64,6 +86,8 @@ import com.android.build.OutputFile
  *   extraPackagerArgs: []
  * ]
  */
+
+
 
 apply from: "../../node_modules/react-native/react.gradle"
 
@@ -145,18 +169,6 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license'
         exclude 'META-INF/license.txt'
-    }
-}
-
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-    }
-
-    dependencies {
-        // The Fabric Gradle plugin uses an open ended version to react
-        // quickly to Android tooling updates
-        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 

@@ -29,6 +29,38 @@ g.BaseComponent = class BaseComponent extends Component {
 		super(props);
 		this.state = {};
 	}
+
+	componentDidMount(...args) {
+	    this.ComponentDidMount && this.ComponentDidMount(...args);
+		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(true);
+		if (this.PostRender) {
+			WaitXThenRun(0, ()=>window.requestAnimationFrame(()=> {
+				//if (!this.IsMounted()) return;
+			    this.PostRender(true);
+			}));
+			/*WaitXThenRun(0, ()=> {
+				this.PostRender(true);
+			});*/
+		}
+	}
+	componentDidUpdate(...args) {
+	    this.ComponentDidUpdate && this.ComponentDidUpdate(...args);
+		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(false);
+		if (this.PostRender) {
+			WaitXThenRun(0, ()=>window.requestAnimationFrame(()=> {
+			    //if (!this.IsMounted()) return;
+			    this.PostRender(false);
+			}));
+			/*WaitXThenRun(0, ()=> {
+				this.PostRender(false);
+			});*/
+		}
+	}
+
+	// maybe temp
+	/*IsMounted() {
+	    return ReactInstanceMap.get(this) != null;
+	}*/
 }
 
 g.Row = class Row extends BaseComponent {

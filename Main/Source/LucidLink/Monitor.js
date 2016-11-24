@@ -3,7 +3,10 @@ import Drawer from "react-native-drawer";
 import MuseBridge from "../Frame/MuseBridge";
 
 g.Monitor = class Monitor extends Node {
+	@P() updateInterval = 3;
+
 	@P() connect = true;
+	@P() monitor = true;
 
 	ui = null;
 }
@@ -42,10 +45,9 @@ export class MonitorUI extends BaseComponent {
 				<View style={{flex: 1, flexDirection: "column"}}>
 					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
 						<View style={{flex: .8, flexDirection: "row"}}>
-							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
-							<View style={{flex: 1}}/>
-							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-								<VButton text="StartTest1" style={{width: 100}} onPress={this.StartTest1}/>
+								<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+								<View style={{flex: 1}}/>
+
 								{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
 									<Text style={{transform: [{translateY: -23}]}}>Searching for muse headband...</Text>}
 								{MuseBridge.status == "connecting" &&
@@ -55,15 +57,18 @@ export class MonitorUI extends BaseComponent {
 								<Switch style={{transform: [{translateY: -18}]}} value={node.connect}
 									onValueChange={value=> {
 										node.connect = value;
-										if (value)
-											MuseBridge.StartSearch(); // start listening for a muse headband
-										else {
-											MuseBridge.StopSearch();
-											if (MuseBridge.status == "connected")
-												MuseBridge.Disconnect();
-										}
+										LL.PushBasicDataToJava();
 										this.forceUpdate();
 									}}/>
+								
+								<View style={{flexDirection: "row", alignItems: "flex-end"}}>
+									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Monitor</Text>
+									<Switch style={{transform: [{translateY: -18}]}} value={node.monitor}
+										onValueChange={value=> {
+											node.monitor = value;
+											LL.PushBasicDataToJava();
+											this.forceUpdate();
+										}}/>
 							</View>
 						</View>
 					</View>
@@ -73,10 +78,6 @@ export class MonitorUI extends BaseComponent {
 				</View>
 			</Drawer>
 		);
-	}
-
-	StartTest1() {
-		JavaBridge.Main.StartTest1();
 	}
 }
 

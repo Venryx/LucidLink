@@ -22,7 +22,6 @@ import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.JavaScriptModule;
-import com.facebook.react.bridge.JavaScriptModuleRegistration;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -30,6 +29,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -67,11 +67,6 @@ public class Main extends ReactContextBaseJavaModule {
 		main = this;
 		this.reactContext = reactContext;
     }
-
-	public Boolean blockUnusedKeys;
-	@ReactMethod public void SetBlockUnusedKeys(Boolean blockUnusedKeys) {
-		this.blockUnusedKeys = blockUnusedKeys;
-	}
 
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();
@@ -122,18 +117,25 @@ public class Main extends ReactContextBaseJavaModule {
 		boolean result = Build.FINGERPRINT.startsWith("generic")
 			|| Build.FINGERPRINT.startsWith("unknown")
 			|| Build.MODEL.contains("google_sdk")
-	|| Build.MODEL.contains("Emulator")
+			|| Build.MODEL.contains("Emulator")
 			|| Build.MODEL.contains("Android SDK built for x86")
 			|| Build.MANUFACTURER.contains("Genymotion")
 			|| (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
 			|| "google_sdk".equals(Build.PRODUCT);
-	promise.resolve(result);
-}
+			promise.resolve(result);
+	}
+
+	public Boolean blockUnusedKeys;
+	public int updateInterval = 1;
+	public Boolean monitor = true;
+	@ReactMethod public void SetBasicData(ReadableMap data) {
+		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
+		this.updateInterval = data.getInt("updateInterval");
+		this.monitor = data.getBoolean("monitor");
+
+	}
 
 	ChartManager mainChartManager = new ChartManager();
-	@ReactMethod public void StartTest1() {
-		mainChartManager.Init();
-	}
 
 	@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
 		String type = args.getString(0);
@@ -143,26 +145,41 @@ public class Main extends ReactContextBaseJavaModule {
 			columnFinal.set(i, column.getDouble(i));
 		mainChartManager.OnReceiveMuseDataPacket(type, columnFinal);
 	}
+
+	@ReactMethod public void OnTabSelected(int tab) {
+		V.Log("Part1");
+
+		MainActivity.main.runOnUiThread(()-> {
+			if (tab == 0) {
+				if (!mainChartManager.initialized)
+					mainChartManager.Init();
+				mainChartManager.chart.setVisibility(View.VISIBLE);
+			}
+			else {
+				//mainChartManager.chart.setVisibility(View.INVISIBLE);
+				mainChartManager.chart.setVisibility(View.GONE);
+			}
+			V.Log("Part1 - done inner");
+		});
+
+		V.Log("Part1 - done outer");
+	}
 }
 
 class ChartManager {
-
+	public boolean initialized;
 	public void Init() {
-		// init ui
-		// ==========
+		initialized = true;
 
 		ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
 		int[] chartHolderPos = new int[2];
 		chartHolder.getLocationInWindow(chartHolderPos);
 
 		chart = new LineChart(Main.main.reactContext) {
-			@Override
-			public boolean onInterceptTouchEvent(MotionEvent ev) {
+			@Override public boolean onInterceptTouchEvent(MotionEvent ev) {
 				return false;
 			}
-
-			@Override
-			public boolean onTouchEvent(MotionEvent event) {
+			@Override public boolean onTouchEvent(MotionEvent event) {
 				return false;
 			}
 		};
@@ -172,27 +189,22 @@ class ChartManager {
 		final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(chartHolder.getWidth(), chartHolder.getHeight());
 		params.leftMargin = chartHolderPos[0];
 		params.topMargin = chartHolderPos[1];
-		MainActivity.main.runOnUiThread(new Runnable() {
-			@Override public void run() {
-				V.GetRootView().addView(chart, params);
 
-				chart.setDrawGridBackground(false);
-				chart.getAxisLeft().setDrawGridLines(false);
-				chart.getAxisRight().setEnabled(false);
-				chart.getXAxis().setDrawGridLines(true);
-				chart.getXAxis().setDrawAxisLine(false);
+		V.GetRootView().addView(chart, params);
+		//V.GetRootLinearLayout().addView(chart, params);
 
-				/*chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.LEFT);
-				chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.RIGHT);*/
+		chart.setDrawGridBackground(false);
+		chart.getAxisLeft().setDrawGridLines(false);
+		chart.getAxisLeft().setSpaceTop(.2f);
+		chart.getAxisLeft().setSpaceBottom(.2f);
+		chart.getAxisLeft().setDrawZeroLine(false);
+		chart.getAxisRight().setEnabled(false);
+		chart.getXAxis().setDrawGridLines(true);
+		chart.getXAxis().setDrawAxisLine(false);
 
-				chart.getAxis(YAxis.AxisDependency.LEFT).setSpaceTop(.2f);
-				chart.getAxis(YAxis.AxisDependency.LEFT).setSpaceBottom(.2f);
-				chart.getAxis(YAxis.AxisDependency.LEFT).setDrawZeroLine(false);
-
-				// don't forget to refresh the drawing
-				chart.invalidate();
-			}
-		});
+		/*chart.setVisibleXRange(0, maxX); // << WARNING: THIS CAUSES A FREEZE
+		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.LEFT);
+		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.RIGHT);*/
 
 		lines = new ArrayList<>();
 		for (int i = 0; i < eegCount; i++) {
@@ -215,28 +227,22 @@ class ChartManager {
 
 		// create a data object with the lines
 		data = new LineData(lines);
-		MainActivity.main.runOnUiThread(new Runnable() {
-			@Override public void run() {
-				// set data
-				chart.setData(data);
 
-				// get the legend (only possible after setting data)
-				Legend l = chart.getLegend();
-				l.setEnabled(false);
+		// set data
+		chart.setData(data);
 
-				chart.invalidate(); // redraw
-			}
-		});
+		// get the legend (only possible after setting data)
+		Legend l = chart.getLegend();
+		l.setEnabled(false);
 
-		// add listener that adds points when muse data is received
-		/*MainModule.main.AddEventListener("OnReceiveMuseDataPacket", new MainModule.Func<WritableArray>() {
-			public void Run(WritableArray args) {
-				ChartManager.this.OnReceiveMuseDataPacket(args);
-			}
-		});*/
-		MainModule.main.RegisterDataListener(new MuseDataListener() {
+		chart.invalidate(); // draw
+
+		MainModule.main.extraListener = new MuseDataListener() {
 			@Override
 			public void receiveMuseDataPacket(final MuseDataPacket p, final Muse muse) {
+				MainModule.main.dataListenerEnabled = Main.main.monitor;
+				if (!Main.main.monitor) return;
+
 				MuseDataPacketType packetType = p.packetType();
 				String type;
 				if (packetType == MuseDataPacketType.EEG)
@@ -254,7 +260,7 @@ class ChartManager {
 
 			@Override
 			public void receiveMuseArtifactPacket(final MuseArtifactPacket p, final Muse muse) {}
-		});
+		};
 	}
 
 	LineChart chart;
@@ -291,35 +297,29 @@ class ChartManager {
 			}
 			lastX = currentX;
 
-			//V.Toast("Updating...");
-
-
 			//chart.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
 			/*chart.getAxisLeft().setSpaceTop(.2f);
 			chart.getAxisLeft().setSpaceBottom(.2f);*/
 
-			//chart.notifyDataSetChanged();
-			if (count == 0) {
-				chart.setVisibleXRange(0, maxX);
+			if (count % 100 == 0) {
 				for (int channel = 0; channel < eegCount; channel++)
 					data.getDataSetByIndex(channel).calcMinMax();
 				data.notifyDataChanged();
 				chart.notifyDataSetChanged();
 			}
-			count++;
 
-			JavaScriptModuleRegistration test = null;
-			UpdateChart();
+			if (count % Main.main.updateInterval == 0)
+				UpdateChart();
+
+			count++;
 		}
 		catch (Throwable ex) { V.Log("Error in muse-data receiver: " + ex); }
 	}
 
 	int count = 0;
 	void UpdateChart() {
-		MainActivity.main.runOnUiThread(new Runnable() {
-			@Override public void run() {
-				chart.invalidate(); // redraw
-			}
+		MainActivity.main.runOnUiThread(() -> {
+			chart.invalidate(); // redraw
 		});
 	}
 }

@@ -25,7 +25,8 @@
     "react-native-orientation": "yamill/react-native-orientation",
     "react-native-scrollable-tab-view": "^0.6.0",
     "react-native-sortable-listview": "^0.1.1",
-    "react-native-sound": "^0.8.3"
+    "react-native-sound": "^0.8.3",
+    "rn-spinner": "^0.3.0"
   },
   "jest": {
     "preset": "jest-react-native"

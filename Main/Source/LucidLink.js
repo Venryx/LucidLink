@@ -81,7 +81,11 @@ g.LucidLink = class LucidLink extends Node {
 	@T("More") @P(true, true) more = new More();
 
 	PushBasicDataToJava() {
-		JavaBridge.Main.SetBlockUnusedKeys(LL.settings.blockUnusedKeys);
+		JavaBridge.Main.SetBasicData({
+			blockUnusedKeys: LL.settings.blockUnusedKeys,
+			updateInterval: LL.monitor.updateInterval,
+			monitor: LL.monitor.monitor,
+		});
 	}
 
 	sessionKey = null;
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default class LucidLinkUI extends Component {
+export default class LucidLinkUI extends BaseComponent {
     constructor(props) {
         super(props);
         this.state = {};
@@ -208,7 +212,10 @@ export default class LucidLinkUI extends Component {
      	var {activeTab} = this.state;
         return (
 			//<View style={{flex: 1}}>
-			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
+			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=> {
+				this.setState({activeTab: data.i})
+				JavaBridge.Main.OnTabSelected(data.i);
+			}}>
 				<MonitorUI tabLabel="Monitor" active={activeTab == 0}/>
 				<View style={styles.container} tabLabel="Tracker" active={activeTab == 1}>
 				</View>
@@ -226,6 +233,15 @@ export default class LucidLinkUI extends Component {
 			</View>*/
         );
     }
+
+	PostRender(firstRender) {
+		if (firstRender) {
+			// wait 1 seconds; apparently even after componentDidMount, view is not necessarily actually accessible java-side yet
+			WaitXThenRun(1000, ()=>{
+				JavaBridge.Main.OnTabSelected(0);
+			});
+		}
+	}
 
 	/*componentWillUnmount() {
 		SaveMainData();
