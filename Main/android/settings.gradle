@@ -1,6 +1,10 @@
 rootProject.name = "LucidLink"
 
 include ":app"
+
+include ":react-native"
+project(":react-native").projectDir = new File("../../../@Modules/react-native/Custom/")
+
 include ":react-native-dialogs"
 project(":react-native-dialogs").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-dialogs/android")
 include ":react-native-numberpicker-dialog"
@@ -17,3 +21,5 @@ include ":react-native-dialogs"
 project(":react-native-dialogs").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-dialogs/android")
 include ":react-native-libmuse"
 project(":react-native-libmuse").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-libmuse/android")
+include ":MPChartLib"
+project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")

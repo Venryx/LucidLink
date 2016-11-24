@@ -187,7 +187,7 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:percent:23.0.0'
     compile 'com.android.support:recyclerview-v7:23.0.0'
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
+    //compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
 }
 
 /*dependencies {
@@ -248,4 +248,5 @@ dependencies {
 
     // kotlin extensions
     compile "com.github.Raizlabs.DBFlow:dbflow-kotlinextensions:${dbflow_version}"
+    compile project(path: ':MPChartLib')
 }

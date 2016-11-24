@@ -22,6 +22,7 @@ import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.JavaScriptModule;
+import com.facebook.react.bridge.JavaScriptModuleRegistration;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -39,6 +40,7 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -144,6 +146,7 @@ public class Main extends ReactContextBaseJavaModule {
 }
 
 class ChartManager {
+
 	public void Init() {
 		// init ui
 		// ==========
@@ -279,37 +282,42 @@ class ChartManager {
 				entry.setX(currentX * stepSizeInPixels);
 				entry.setY((float)(double)column.get(channel));*/
 				//data.getDataSetByIndex(channel).removeEntry(currentX);
-				data.getDataSetByIndex(channel).removeEntry(currentX);
-				data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));
+
+				/*data.getDataSetByIndex(channel).removeEntry(currentX);
+				data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));*/
+
+				DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
+				dataSet.getValues().set(currentX, new Entry(currentX, (float)(double)column.get(channel)));
 			}
 			lastX = currentX;
 
 			//V.Toast("Updating...");
 
-			chart.setVisibleXRange(0, maxX);
+
 			//chart.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
 			/*chart.getAxisLeft().setSpaceTop(.2f);
 			chart.getAxisLeft().setSpaceBottom(.2f);*/
 
-			data.notifyDataChanged();
-			chart.notifyDataSetChanged();
+			//chart.notifyDataSetChanged();
+			if (count == 0) {
+				chart.setVisibleXRange(0, maxX);
+				for (int channel = 0; channel < eegCount; channel++)
+					data.getDataSetByIndex(channel).calcMinMax();
+				data.notifyDataChanged();
+				chart.notifyDataSetChanged();
+			}
+			count++;
 
+			JavaScriptModuleRegistration test = null;
 			UpdateChart();
 		}
 		catch (Throwable ex) { V.Log("Error in muse-data receiver: " + ex); }
 	}
 
-	//int count = 0;
+	int count = 0;
 	void UpdateChart() {
 		MainActivity.main.runOnUiThread(new Runnable() {
 			@Override public void run() {
-				/*count++;
-
-				if (count % 100 == 0) {
-					data.notifyDataChanged();
-					chart.notifyDataSetChanged();
-				}*/
-
 				chart.invalidate(); // redraw
 			}
 		});
