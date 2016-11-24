@@ -15,7 +15,16 @@ include ":RNSound"
 project(":RNSound").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-sound/android")
 include ":react-native-dialogs"
 project(":react-native-dialogs").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-dialogs/android")
+
+String userConfig = new File('../UserConfig.json').text
+
 include ":react-native-libmuse"
-project(":react-native-libmuse").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-libmuse/android")
-include ":MPChartLib"
-project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")
+if (userConfig.contains("reactNativeLibMuse_external: true"))
+    project(":react-native-libmuse").projectDir = new File("../../../@Modules/react-native-libmuse/Main/android")
+else
+    project(":react-native-libmuse").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-libmuse/android")
+
+if (userConfig.contains("mpChartLib_external: true")) {
+    include ":MPChartLib"
+    project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")
+}
