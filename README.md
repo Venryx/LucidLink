@@ -28,7 +28,7 @@ Task list (trello board): https://trello.com/b/2ZYLJ2l1/lucid-link
 
 ### External folders
 
-To have the react-native-libmuse and/or MPAndroidChart projects in external folders (to remove the need for copying/syncing), you have to:
+To have the react-native-libmuse and/or MPAndroidChart projects in external folders (to remove the need for copying/syncing), you have to:  
 1) Create a UserConfig.json file in the Main folder, with this text:
 ```
 {
