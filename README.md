@@ -22,8 +22,8 @@ Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
 ### Making changes
 
-* For changes to the JS (ui), edit the files in "Main/Source". (I use the Atom text editor)  
-* For changes to the Java, edit the files in "Main/android/app/src". (I use Android Studio)  
+* For JS (ui) changes, edit the files in "Main/Source". (I use Visual Studio Code)  
+* For Java changes, edit the files in "Main/android/app/src". (I use Android Studio)  
 
 ### External folders
 
