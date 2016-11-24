@@ -11,20 +11,20 @@ Task list (trello board): https://trello.com/b/2ZYLJ2l1/lucid-link
 3) Ensure prerequisite npm modules are installed: react-native-cli  
 4) Ensure a virtual Android device is set up in Genymotion (which uses VirtualBox), with Android 5.0 or later.  
 
-### Install and compile (and run in Android emulator)
+### Install
 
 1) Clone this repo to your computer using git. (I use the TortoiseGit ui)  
 2) Open CMD in "Main" folder, and run "npm install".  
-3) Start up the virtual Android device.  
-4) Open CMD in "Main" folder, and run "react-native run-android".  
 
-### Modify and compile (and see changes in Android emulator)
-1) Open project in editor  
-. . . A) For changes to the JS (ui), open files in "Main/Source". (I use the Atom text editor)  
-. . . B) For changes to the Java, open files in "Main/android/app/src". (I use Android Studio)  
-2) Make changes.  
-3) Ensure the virtual Android device is running.  
-4) Open CMD in "Main" folder, and run "react-native run-android". This will push the updated app to the Android emulator.  
+### Compile and run
+
+1) Start up the virtual Android device.  
+2) Open CMD in "Main" folder, and run "react-native run-android".  
+
+### Making changes
+
+* For changes to the JS (ui), edit the files in "Main/Source". (I use the Atom text editor)  
+* For changes to the Java, edit the files in "Main/android/app/src". (I use Android Studio)  
 
 ### External folders
 
