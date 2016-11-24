@@ -45,31 +45,29 @@ export class MonitorUI extends BaseComponent {
 				<View style={{flex: 1, flexDirection: "column"}}>
 					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
 						<View style={{flex: .8, flexDirection: "row"}}>
-								<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
-								<View style={{flex: 1}}/>
+							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+							<View style={{flex: 1}}/>
 
-								{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
-									<Text style={{transform: [{translateY: -23}]}}>Searching for muse headband...</Text>}
-								{MuseBridge.status == "connecting" &&
-									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Connecting...</Text>}
-								{MuseBridge.status == "connected" &&
-									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Connected</Text>}
-								<Switch style={{transform: [{translateY: -18}]}} value={node.connect}
-									onValueChange={value=> {
-										node.connect = value;
-										LL.PushBasicDataToJava();
-										this.forceUpdate();
-									}}/>
-								
-								<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-									<Text style={{height: 50, top: 8, textAlignVertical: "top"}}>Monitor</Text>
-									<Switch style={{transform: [{translateY: -18}]}} value={node.monitor}
-										onValueChange={value=> {
-											node.monitor = value;
-											LL.PushBasicDataToJava();
-											this.forceUpdate();
-										}}/>
-							</View>
+							{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
+								<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Searching for muse headband...</Text>}
+							{MuseBridge.status == "connecting" &&
+								<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Connecting...</Text>}
+							{MuseBridge.status == "connected" &&
+								<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Connected</Text>}
+							<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]}} value={node.connect}
+								onValueChange={value=> {
+									node.connect = value;
+									LL.PushBasicDataToJava();
+									this.forceUpdate();
+								}}/>
+							
+							<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>Monitor</Text>
+							<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]}} value={node.monitor}
+								onValueChange={value=> {
+									node.monitor = value;
+									LL.PushBasicDataToJava();
+									this.forceUpdate();
+								}}/>
 						</View>
 					</View>
 					<View style={{marginTop: -7, flex: 1}}>
@@ -102,18 +100,12 @@ class ChannelsUI extends BaseComponent {
 		[4, 9]
 	];
 
-	timer = null;
-	componentDidMount() {
-		/*this.data = [];
-		for (let )*/
-		// todo
-	}
-
-	shouldComponentUpdate() {
+	/*shouldComponentUpdate() {
 		return false;
-	}
+	}*/
 
-	/*componentWillReceiveProps(nextProps, nextState) {
+	/*timer = null;
+	componentWillReceiveProps(nextProps, nextState) {
 		var visibleChanging = nextProps.visible != this.props.visible;
 		if (visibleChanging) {
 			if (nextProps.visible) {

@@ -1,6 +1,7 @@
 package com.lucidlink;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -36,6 +37,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -125,9 +127,9 @@ public class Main extends ReactContextBaseJavaModule {
 			promise.resolve(result);
 	}
 
-	public Boolean blockUnusedKeys;
+	public boolean blockUnusedKeys;
 	public int updateInterval = 1;
-	public Boolean monitor = true;
+	public boolean monitor = true;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
 		this.updateInterval = data.getInt("updateInterval");
@@ -153,12 +155,10 @@ public class Main extends ReactContextBaseJavaModule {
 			if (tab == 0) {
 				if (!mainChartManager.initialized)
 					mainChartManager.Init();
-				mainChartManager.chart.setVisibility(View.VISIBLE);
+				mainChartManager.SetChartVisible(true);
 			}
-			else {
-				//mainChartManager.chart.setVisibility(View.INVISIBLE);
-				mainChartManager.chart.setVisibility(View.GONE);
-			}
+			else
+				mainChartManager.SetChartVisible(false);
 			V.Log("Part1 - done inner");
 		});
 
@@ -171,27 +171,29 @@ class ChartManager {
 	public void Init() {
 		initialized = true;
 
+		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
+		// ==========
+
 		ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
 		int[] chartHolderPos = new int[2];
 		chartHolder.getLocationInWindow(chartHolderPos);
 
-		chart = new LineChart(Main.main.reactContext) {
-			@Override public boolean onInterceptTouchEvent(MotionEvent ev) {
-				return false;
-			}
-			@Override public boolean onTouchEvent(MotionEvent event) {
-				return false;
-			}
+		newChartHolder = new RelativeLayout(MainActivity.main);
+		newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
+		V.GetRootView().addView(newChartHolder);
+
+		// create chart
+		// ==========
+
+		chart = new LineChart(MainActivity.main) {
+			@Override public boolean onInterceptTouchEvent(MotionEvent ev) { return false; }
+			@Override public boolean onTouchEvent(MotionEvent event) { return false; }
 		};
 		chart.setFocusable(false);
 		chart.setFocusableInTouchMode(false);
 		chart.setClickable(false);
-		final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(chartHolder.getWidth(), chartHolder.getHeight());
-		params.leftMargin = chartHolderPos[0];
-		params.topMargin = chartHolderPos[1];
-
-		V.GetRootView().addView(chart, params);
-		//V.GetRootLinearLayout().addView(chart, params);
+		chart.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		newChartHolder.addView(chart);
 
 		chart.setDrawGridBackground(false);
 		chart.getAxisLeft().setDrawGridLines(false);
@@ -205,13 +207,18 @@ class ChartManager {
 		/*chart.setVisibleXRange(0, maxX); // << WARNING: THIS CAUSES A FREEZE
 		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.LEFT);
 		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.RIGHT);*/
+		// this doesn't work for some reason, so use fake-data and then call calcMinMax
+		//chart.setVisibleYRange(0, 6000, YAxis.AxisDependency.LEFT);
+
+		// fill chart with fake data
+		// ==========
 
 		lines = new ArrayList<>();
 		for (int i = 0; i < eegCount; i++) {
 			// start channels as flat
 			ArrayList<Entry> thisChannelPoints = new ArrayList<>();
 			for (int i2 = 0; i2 <= maxX; i2++)
-				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, 0));
+				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, i == 0 ? 0 : 6000));
 			channelPoints.add(thisChannelPoints);
 			LineDataSet line = new LineDataSet(thisChannelPoints, "Channel " + i);
 			line.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -224,18 +231,35 @@ class ChartManager {
 			line.setDrawFilled(false);
 			lines.add(line);
 		}
-
-		// create a data object with the lines
 		data = new LineData(lines);
-
-		// set data
 		chart.setData(data);
 
-		// get the legend (only possible after setting data)
-		Legend l = chart.getLegend();
-		l.setEnabled(false);
+		for (int channel = 0; channel < eegCount; channel++)
+			data.getDataSetByIndex(channel).calcMinMax();
+		data.notifyDataChanged();
+		chart.notifyDataSetChanged();
+
+		// hide axis-labels and such
+		Description description = new Description();
+		description.setText("");
+		chart.setDescription(description);
+		chart.getAxisLeft().setDrawLabels(false);
+		chart.getAxisRight().setDrawLabels(false);
+		//chart.getXAxis().setDrawLabels(false);
+		chart.getLegend().setEnabled(false);
 
 		chart.invalidate(); // draw
+
+		// set up current-time-marker
+		// ==========
+
+		currentTimeMarker = new View(MainActivity.main);
+		currentTimeMarker.setBackgroundColor(Color.parseColor("#00FF00"));
+		currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 0, 0));
+		newChartHolder.addView(currentTimeMarker);
+
+		// set up listeners
+		// ==========
 
 		MainModule.main.extraListener = new MuseDataListener() {
 			@Override
@@ -263,10 +287,23 @@ class ChartManager {
 		};
 	}
 
+	public void SetChartVisible(boolean visible) {
+		if (visible) {
+			chart.setVisibility(View.VISIBLE);
+			currentTimeMarker.setVisibility(View.VISIBLE);
+		} else {
+			//mainChartManager.chart.setVisibility(View.INVISIBLE);
+			chart.setVisibility(View.GONE);
+			currentTimeMarker.setVisibility(View.GONE);
+		}
+	}
+
+	ViewGroup newChartHolder;
 	LineChart chart;
+	View currentTimeMarker;
 
 	//const int eegCount = 6;
-	final int eegCount = 4; // only first 4 are real/usable
+	final int eegCount = 4; // only first 4 are the actual EEG sensors
 	int stepSizeInPixels = 1;
 
 	// where eg. [0][1] (channel, x-pos/index) is [1,9] (x-pos, y-pos)z
@@ -275,7 +312,7 @@ class ChartManager {
 	List<ILineDataSet> lines;
 
 	int lastX = -1;
-	int maxX = 500;
+	int maxX = 1000;
 
 	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> column) {
 		try {
@@ -293,20 +330,16 @@ class ChartManager {
 				data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));*/
 
 				DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
-				dataSet.getValues().set(currentX, new Entry(currentX, (float)(double)column.get(channel)));
+
+				float yBase = 4000 - (channel * 1000); // simulate lines being in different rows
+				float yValue = (float)(double)column.get(channel);
+
+				dataSet.getValues().set(currentX, new Entry(currentX, yBase + yValue));
 			}
 			lastX = currentX;
 
-			//chart.setVisibleYRange(0, 100, YAxis.AxisDependency.LEFT);
-			/*chart.getAxisLeft().setSpaceTop(.2f);
-			chart.getAxisLeft().setSpaceBottom(.2f);*/
-
-			if (count % 100 == 0) {
-				for (int channel = 0; channel < eegCount; channel++)
-					data.getDataSetByIndex(channel).calcMinMax();
-				data.notifyDataChanged();
-				chart.notifyDataSetChanged();
-			}
+			if (count == 0) // init stuff that nonetheless needs real data
+				chart.setVisibleXRange(0, maxX);
 
 			if (count % Main.main.updateInterval == 0)
 				UpdateChart();
@@ -317,9 +350,13 @@ class ChartManager {
 	}
 
 	int count = 0;
+	//void UpdateChart(int currentX) {
 	void UpdateChart() {
 		MainActivity.main.runOnUiThread(() -> {
 			chart.invalidate(); // redraw
+
+			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
+			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, ViewGroup.LayoutParams.MATCH_PARENT));
 		});
 	}
 }

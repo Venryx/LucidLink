@@ -3,7 +3,9 @@ package com.lucidlink;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.choosemuse.libmuse.LibmuseVersion;
 import com.facebook.imagepipeline.producers.Consumer;
@@ -38,6 +40,19 @@ public class V {
 	}
 	public static LinearLayout GetRootLinearLayout() {
 		return (LinearLayout)((ViewGroup)MainActivity.main.getWindow().getDecorView().getRootView()).getChildAt(0);
+	}
+
+	public static FrameLayout.LayoutParams CreateFrameLayoutParams(int marginLeft, int marginTop, int width, int height) {
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+		params.leftMargin = marginLeft;
+		params.topMargin = marginTop;
+		return params;
+	}
+	public static RelativeLayout.LayoutParams CreateRelativeLayoutParams(int marginLeft, int marginTop, int width, int height) {
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
+		params.leftMargin = marginLeft;
+		params.topMargin = marginTop;
+		return params;
 	}
 
 	/*public static ArrayList<View> FindDescendants(View v) {
