@@ -29,13 +29,14 @@ Task list (trello board): https://trello.com/b/2ZYLJ2l1/lucid-link
 ### External folders
 
 To have the react-native-libmuse and/or MPAndroidChart projects in external folders (to remove the need for copying/syncing), you have to:  
-1) Create a UserConfig.json file in the Main folder, with this text:
+1) Clone those repos into folders "../../react-native-libmuse" and "../../MPAndroidChart". (relative to this project's root folder)  
+2) Create a UserConfig.json file in the Main folder, with this text:
 ```
 {
 	reactNativeLibMuse_external: true,
 	mpChartLib_external: true,
 }
 ```
-2) If you want changes to those external folder's js files to reflect in your app, you have to either copy the contents each time into the node_modules folder, or do a directory-level "hard-link clone" from the external folder to that node_modules location. Whenever you add a new JS file that needs tracking, you also need to redo this directory-level "hard-link clone". (but at least not after every file change)
+3) If you want changes to those external folder's js files to reflect in your app, you have to either copy the contents each time into the node_modules folder, or do a directory-level "hard-link clone" from the external folder to that node_modules location. Whenever you add a new JS file that needs tracking, you also need to redo this directory-level "hard-link clone". (but at least not after every file change)
 
 For knowing what I mean by that phrase (and for doing the deed itself pretty easily on Windows), see here: http://schinagl.priv.at/nt/hardlinkshellext/linkshellextension.html#hardlinkclones
