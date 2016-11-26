@@ -20,6 +20,11 @@ export class MonitorUI extends BaseComponent {
 		LL.monitor.ui = this;
 	}
 
+	/*ComponentWillMountOrReceiveProps(props) {
+		var {visible} = props;
+		JavaBridge.Main.OnMonitorChangeVisible(visible);
+	}*/
+
 	sidePanel = null;
 	@Bind ToggleSidePanelOpen() {
 		if (this.sidePanel._open)
@@ -76,6 +81,10 @@ export class MonitorUI extends BaseComponent {
 				</View>
 			</Drawer>
 		);
+	}
+
+	componentWillUnmount() { 
+		V.Toast("Unmounting...");
 	}
 }
 

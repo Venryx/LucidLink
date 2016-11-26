@@ -77,13 +77,11 @@ public class V {
 		List<View> visited = new ArrayList<View>();
 		List<View> unvisited = new ArrayList<View>();
 		unvisited.add(root);
-
-		V.Log("Starting...");
+		
 		while (!unvisited.isEmpty()) {
 			View child = unvisited.remove(0);
 			visited.add(child);
-
-			V.Log("Content description: " + child.getContentDescription());
+			
 			if (child.getContentDescription() != null && child.getContentDescription().toString().equals(contentDescription))
 				return child;
 

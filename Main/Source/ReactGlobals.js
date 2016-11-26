@@ -30,6 +30,43 @@ g.BaseComponent = class BaseComponent extends Component {
 		this.state = {};
 	}
 
+	get FlattenedChildren() {
+	    var children = this.props.children;
+	    if (!(children instanceof Array))
+	        children = [children];
+	    return React.Children.map(children.Where(a=>a), a=>a);
+	}
+
+	changeListeners = [];
+	AddChangeListeners(host, ...funcs) {
+	    /*host.extraMethods = funcs;
+	    for (let func of funcs)
+			this.changeListeners.push({host: host, func: func});*/
+	    for (let func of funcs) {
+			//if (!host.HasExtraMethod(func)) {
+			host.extraMethod = func;
+			this.changeListeners.push({host: host, func: func});
+		}
+	}
+	RemoveChangeListeners() {
+	    for (let changeListener of this.changeListeners)
+	        changeListener.host.removeExtraMethod = changeListener.func;
+	    this.changeListeners = [];
+	}
+	RemoveChangeListenersFor(host) {
+	    var changeListenersToRemove = this.changeListeners.Where(a=>a.host == host);
+	    for (let changeListener of changeListenersToRemove)
+			changeListener.host.removeExtraMethod = changeListener.func;
+	    this.changeListeners.RemoveAll(changeListenersToRemove);
+	}
+
+	autoRemoveChangeListeners = true;
+	componentWillMount() {
+		if (this.autoRemoveChangeListeners)
+			this.RemoveChangeListeners();
+		this.ComponentWillMount && this.ComponentWillMount(); 
+	    this.ComponentWillMountOrReceiveProps && this.ComponentWillMountOrReceiveProps(this.props, true); 
+	}
 	componentDidMount(...args) {
 	    this.ComponentDidMount && this.ComponentDidMount(...args);
 		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(true);
@@ -42,6 +79,12 @@ g.BaseComponent = class BaseComponent extends Component {
 				this.PostRender(true);
 			});*/
 		}
+	}
+	componentWillReceiveProps(newProps) {
+		if (this.autoRemoveChangeListeners)
+			this.RemoveChangeListeners();
+		this.ComponentWillReceiveProps && this.ComponentWillReceiveProps(newProps);
+	    this.ComponentWillMountOrReceiveProps && this.ComponentWillMountOrReceiveProps(newProps, false);
 	}
 	componentDidUpdate(...args) {
 	    this.ComponentDidUpdate && this.ComponentDidUpdate(...args);

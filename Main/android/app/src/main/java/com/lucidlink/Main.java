@@ -63,12 +63,18 @@ public class Main extends ReactContextBaseJavaModule {
     private static final String DURATION_SHORT_KEY = "SHORT";
     private static final String DURATION_LONG_KEY = "LONG";
 
-	ReactApplicationContext reactContext;
     public Main(ReactApplicationContext reactContext) {
         super(reactContext);
+		// when the react-native Reload button is pressed, a new Main class instance is created; check if this just happened
+		firstLaunch = main == null;
+		if (!firstLaunch)
+			main.Shutdown();
+
 		main = this;
 		this.reactContext = reactContext;
     }
+	ReactApplicationContext reactContext;
+	public boolean firstLaunch;
 
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();
@@ -149,8 +155,6 @@ public class Main extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod public void OnTabSelected(int tab) {
-		V.Log("Part1");
-
 		MainActivity.main.runOnUiThread(()-> {
 			if (tab == 0) {
 				if (!mainChartManager.initialized)
@@ -159,10 +163,16 @@ public class Main extends ReactContextBaseJavaModule {
 			}
 			else
 				mainChartManager.SetChartVisible(false);
-			V.Log("Part1 - done inner");
 		});
+	}
 
-		V.Log("Part1 - done outer");
+	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {
+	}*/
+
+	void Shutdown() {
+		V.Log("Shutting down...");
+
+		mainChartManager.Shutdown();
 	}
 }
 
@@ -175,6 +185,7 @@ class ChartManager {
 		// ==========
 
 		ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
+		if (chartHolder == null) return; // must have switched to another tab quickly; just wait till they switch back and we get called again
 		int[] chartHolderPos = new int[2];
 		chartHolder.getLocationInWindow(chartHolderPos);
 
@@ -357,6 +368,14 @@ class ChartManager {
 
 			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
 			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, ViewGroup.LayoutParams.MATCH_PARENT));
+		});
+	}
+
+	public void Shutdown() {
+		if (!initialized) return;
+
+		MainActivity.main.runOnUiThread(() -> {
+			((ViewGroup) newChartHolder.getParent()).removeView(newChartHolder);
 		});
 	}
 }
