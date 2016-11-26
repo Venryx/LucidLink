@@ -140,7 +140,6 @@ public class Main extends ReactContextBaseJavaModule {
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
 		this.updateInterval = data.getInt("updateInterval");
 		this.monitor = data.getBoolean("monitor");
-
 	}
 
 	ChartManager mainChartManager = new ChartManager();
@@ -210,6 +209,8 @@ class ChartManager {
 			@Override public boolean onInterceptTouchEvent(MotionEvent ev) { return false; }
 			@Override public boolean onTouchEvent(MotionEvent event) { return false; }
 		};
+		//chart.setBackgroundColor(Color.parseColor("#303030"));
+		chart.setBackgroundColor(Color.rgb(39, 39, 39));
 		chart.setFocusable(false);
 		chart.setFocusableInTouchMode(false);
 		chart.setClickable(false);
@@ -221,6 +222,7 @@ class ChartManager {
 		chart.getAxisLeft().setSpaceTop(.2f);
 		chart.getAxisLeft().setSpaceBottom(.2f);
 		chart.getAxisLeft().setDrawZeroLine(false);
+		chart.getAxisLeft().setTextColor(V.textColor);
 		chart.getAxisRight().setEnabled(false);
 		chart.getXAxis().setDrawGridLines(true);
 		chart.getXAxis().setDrawAxisLine(false);

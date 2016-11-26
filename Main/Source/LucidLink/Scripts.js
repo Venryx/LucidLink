@@ -1,6 +1,3 @@
-import React, {Component} from "react";
-import {Dimensions, StyleSheet,
-	View, Button, Text, TextInput} from "react-native";
 import RNFS from "react-native-fs";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 var DialogAndroid = require("react-native-dialogs");
@@ -274,30 +271,28 @@ export class ScriptsUI extends BaseComponent {
 					content={<ScriptsPanel parent={this} scripts={node.scripts}/>}
 					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
-				<View style={{flex: 1, flexDirection: "column"}}>
-					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
-						<View style={{flex: .8, flexDirection: "row"}}>
-							<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleScriptsPanelOpen}/>
-							<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
-							Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
-							{selectedScript && !selectedScript.editable ? " (read only)" : ""}
-							</Text>
-							{selectedScript && selectedScript.editable &&
-								<VButton text="Rename" style={{marginLeft: 10, width: 100}} onPress={()=>selectedScript.Rename()}/>}
-							<View style={{flex: 1}}/>
-							<View style={{flexDirection: "row", alignItems: "flex-end"}}>
-								<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
-									style={{width: 100, marginLeft: 5}}
-									onPress={()=>selectedScript.Save().then(()=>this.forceUpdate())}/>
-								<VButton color="#777" text="Apply all"
-									//enabled={scriptLastRunsOutdated}
-									enabled={true}
-									style={{width: 100, marginLeft: 5}}
-									onPress={()=>node.ApplyScripts()}/>
-							</View>
-						</View>
-					</View>
-					<View style={{marginTop: -7, flex: 1}}>
+				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+					<Panel style={[styles.header, {flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: -5}]}>
+						<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleScriptsPanelOpen}/>
+						<Text style={[styles.text, {marginLeft: 10, marginTop: 8, fontSize: 18}]}>
+						Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
+						{selectedScript && !selectedScript.editable ? " (read only)" : ""}
+						</Text>
+						{selectedScript && selectedScript.editable &&
+							<VButton text="Rename" style={{marginLeft: 10, width: 100}} onPress={()=>selectedScript.Rename()}/>}
+						<Panel style={{flex: 1}}/>
+						<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
+							<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
+								style={{width: 100, marginLeft: 5}}
+								onPress={()=>selectedScript.Save().then(()=>this.forceUpdate())}/>
+							<VButton color="#777" text="Apply all"
+								//enabled={scriptLastRunsOutdated}
+								enabled={true}
+								style={{width: 100, marginLeft: 5}}
+								onPress={()=>node.ApplyScripts()}/>
+						</Panel>
+					</Panel>
+					<Panel style={{marginTop: -7, flex: 1}}>
 						<ScriptTextUI parent={this} text={selectedScript ? selectedScript.text : ""}
 							//editable={selectedScript ? selectedScript.editable : false}
 							editable={selectedScript != null}
@@ -307,8 +302,8 @@ export class ScriptsUI extends BaseComponent {
 								selectedScript.fileOutdated = true;
 								this.forceUpdate();
 							}}/>
-					</View>
-				</View>
+					</Panel>
+				</Panel>
 			</Drawer>
 		);
 	}
@@ -323,7 +318,7 @@ class ScriptTextUI extends BaseComponent {
 	render() {
 		var {parent, editable, onChangeText, text} = this.props;
 		return <TextInput {...{editable}}
-			style={{flex: 1, textAlignVertical: "top", borderTopWidth: 1, borderColor: "#CCC"}}
+			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
 			multiline={true} editable={editable} value={text} autoCapitalize="none" autoCorrect={false}
 			onChangeText={text=> {
 				LL.scripts.selectedScript.fileOutdated = true;

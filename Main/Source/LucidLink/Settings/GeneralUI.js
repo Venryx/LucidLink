@@ -2,7 +2,7 @@ export default class GeneralUI extends BaseComponent {
 	render() {
 		var node = LL.settings;
 		return (
-			<View style={{flex: 1}}>
+			<Panel style={{flex: 1, backgroundColor: colors.background}}>
 				<Row style={{flex: 1, flexDirection: "column"}}>
 					<RowLR height={25}>
 						<Text>Apply scripts on launch</Text>
@@ -22,7 +22,7 @@ export default class GeneralUI extends BaseComponent {
 							}}/>
 					</RowLR>
 				</Row>
-            </View>
+            </Panel>
 		);
 	}
 }

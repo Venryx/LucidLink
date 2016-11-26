@@ -212,7 +212,7 @@ Object.prototype._AddFunction_Inline = function Extended(x) {
 };
 //Object.prototype._AddFunction_Inline = function E(x) { return this.Extended(x); };
 
-Object.prototype._AddFunction_Inline = function RemovingProps(...propNames) {
+Object.prototype._AddFunction_Inline = function Excluding(...propNames) {
     var result = this.Extended();
     for (let propName of propNames)
         delete result[propName];

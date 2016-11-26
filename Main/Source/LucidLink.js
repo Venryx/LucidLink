@@ -1,13 +1,17 @@
+// simple imports
+var g = global;
+g.g = g;
+
+Object.freeze = obj=>obj; // mwahahaha!! React can no longer freeze it's objects, so we can do as we please
+Object.isFrozen = obj=>true;
+
 import React, {Component} from "react";
 import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter, Keyboard} from "react-native";
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 import Orientation from "react-native-orientation";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
 import Moment from "moment";
+var ScrollableTabView = require("react-native-scrollable-tab-view");
 
-// simple imports
-var g = global;
-g.g = g;
 require("./CE");
 import * as UM1 from "./Packages/VDF/VDF";
 import * as UM2 from "./Packages/VDF/VDFLoader";
@@ -16,6 +20,7 @@ import * as UM4 from "./Packages/VDF/VDFSaver";
 import * as UM5 from "./Packages/VDF/VDFTokenParser";
 import * as UM6 from "./Packages/VDF/VDFTypeInfo";
 import * as Globals from "./Globals";
+import * as UM0 from "./Frame/Styles";
 import * as ReactGlobals from "./ReactGlobals";
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
@@ -28,6 +33,20 @@ import {MonitorUI} from "./LucidLink/Monitor";
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {MoreUI} from "./LucidLink/More";
+
+//var ScrollableTabView = require("react-native-scrollable-tab-view");
+ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
+	{
+		tabBarBackgroundColor: colors.background_dark,
+		tabBarActiveTextColor: colors.text,
+		tabBarInactiveTextColor: colors.text_inactive,
+		tabBarStyle: {borderColor: "#555"},
+		tabBarUnderlineStyle: {backgroundColor: "#777"},
+		contentProps: E(ScrollableTabView.defaultProps.contentProps, {
+			contentContainerStyle: {backgroundColor: colors.background},
+		})
+	}
+);
 
 DeviceEventEmitter.addListener("PostJavaLog", args=> {
 	var [tag, message] = args;
@@ -177,7 +196,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#F5FCFF",
+		backgroundColor: colors.backgroundColor,
 	},
 	welcome: {
 		fontSize: 20,
@@ -204,39 +223,41 @@ export default class LucidLinkUI extends Component {
 		if (LL.mainDataLoaded == false) {
 			var marker = null;
 			return (
-				<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=>this.setState({activeTab: data.i})}>
-					<View tabLabel="Monitor">{marker}</View>
-					<View tabLabel="Tracker">{marker}</View>
-					<View tabLabel="Journal">{marker}</View>
-					<View tabLabel="Scripts">{marker}</View>
-					<View tabLabel="Settings">{marker}</View>
-					<View tabLabel="More">{marker}</View>
+				<ScrollableTabView style_disabled={{flex: 1}}
+						onChangeTab={data=>this.setState({activeTab: data.i})}>
+					<Panel tabLabel="Monitor">{marker}</Panel>
+					<Panel tabLabel="Tracker">{marker}</Panel>
+					<Panel tabLabel="Journal">{marker}</Panel>
+					<Panel tabLabel="Scripts">{marker}</Panel>
+					<Panel tabLabel="Settings">{marker}</Panel>
+					<Panel tabLabel="More">{marker}</Panel>
 				</ScrollableTabView>
 			)
 		}
 
      	var {activeTab} = this.state;
         return (
-			//<View style={{flex: 1}}>
-			<ScrollableTabView style_disabled={{flex: 1}} onChangeTab={data=> {
-				this.setState({activeTab: data.i})
-				JavaBridge.Main.OnTabSelected(data.i);
-			}}>
+			//<Panel style={{flex: 1}}>
+			<ScrollableTabView style_disabled={{flex: 1}}
+					onChangeTab={data=> {
+						this.setState({activeTab: data.i})
+						JavaBridge.Main.OnTabSelected(data.i);
+					}}>
 				<MonitorUI tabLabel="Monitor" active={activeTab == 0}/>
-				<View style={styles.container} tabLabel="Tracker" active={activeTab == 1}>
-				</View>
-				<View style={styles.container} tabLabel="Journal" active={activeTab == 2}>
-				</View>
+				<Panel style={styles.container} tabLabel="Tracker" active={activeTab == 1}>
+				</Panel>
+				<Panel style={styles.container} tabLabel="Journal" active={activeTab == 2}>
+				</Panel>
 				<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
 				<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
 				<MoreUI tabLabel="More" active={activeTab == 5}/>
 			</ScrollableTabView>
 				/*{keyboardVisible &&
-					<View style={{position: "absolute", bottom: 0, height: 30}}>
+					<Panel style={{position: "absolute", bottom: 0, height: 30}}>
 						<VButton style={{alignItems: "flex-end", width: 100, height: 30}}
 							textStyle={{margin: 3}} color="#777" text="Copy" onPress={()=>alert("Test1")}/>
-					</View>}
-			</View>*/
+					</Panel>}
+			</Panel>*/
         );
     }
 

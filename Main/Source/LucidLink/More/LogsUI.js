@@ -25,29 +25,29 @@ export default class LogsUI extends BaseComponent {
 		logEntriesToShow.reverse();
 
 		return (
-			<View style={{flex: 1, flexDirection: "column"}}>
-				<View style={{height: 32, padding: 5, flexDirection: "row"}}>
-					<Text>Log types: </Text>
-					<Text>    General: </Text>
+			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+				<Panel style={{height: 32, padding: 5, flexDirection: "row"}}>
+					<Text style={styles.text}>Log types: </Text>
+					<Text style={styles.text}>    General: </Text>
 					<Switch value={node.showLogs_general} onValueChange={value=>(node.showLogs_general = value) | this.forceUpdate()}/>
-					<Text>    Keyboard: </Text>
+					<Text style={styles.text}>    Keyboard: </Text>
 					<Switch value={node.showLogs_keyboard} onValueChange={value=>(node.showLogs_keyboard = value) | this.forceUpdate()}/>
-					<Text>    Others: </Text>
+					<Text style={styles.text}>    Others: </Text>
 					<Switch value={node.showLogs_others} onValueChange={value=>(node.showLogs_others = value) | this.forceUpdate()}/>
-					<View style={{flex: 1}}/>
-					<View style={{flexDirection: "row", alignItems: "flex-end"}}>
+					<Panel style={{flex: 1}}/>
+					<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
 						<VButton text="Clear" style={{marginTop: -5, width: 100, height: 32}}
 							onPress={()=>(More.logEntries.length = 0) | this.forceUpdate()}/>
 						{/*<VButton text="Refresh" style={{marginLeft: 5, marginTop: -5, width: 100, height: 32}}
 							onPress={()=>this.forceUpdate()}/>*/}
-					</View>
-				</View>
-				<View style={{height: 32, padding: 5, flexDirection: "row"}}>
-					<Text>More info: </Text>
+					</Panel>
+				</Panel>
+				<Panel style={{height: 32, padding: 5, flexDirection: "row"}}>
+					<Text style={styles.text}>More info: </Text>
 					<Switch value={node.showMoreInfo} onValueChange={value=>(node.showMoreInfo = value) | this.forceUpdate()}/>
-					<Text style={{marginLeft: 10}}>Auto-scroll: </Text>
+					<Text style={[styles.text, {marginLeft: 10}]}>Auto-scroll: </Text>
 					<Switch value={node.autoScroll} onValueChange={value=>(node.autoScroll = value) | this.forceUpdate()}/>
-					<Text style={{marginLeft: 10}}>Display: </Text>
+					<Text style={[styles.text, {marginLeft: 10}]}>Display: </Text>
 					<VButton text={node.maxLogCount.toString()} style={{marginLeft: 3, marginTop: -5, width: 100, height: 32}}
 						onPress={()=> {
 							var values = [-1];
@@ -71,7 +71,7 @@ export default class LogsUI extends BaseComponent {
 								this.forceUpdate();
 							});
 						}}/>
-				</View>
+				</Panel>
 				<ScrollView ref="scrollView" style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}
 						onContentSizeChange={(contentWidth, contentHeight)=> {
@@ -79,10 +79,10 @@ export default class LogsUI extends BaseComponent {
 								this.refs.scrollView.scrollTo({x: 0, y: contentHeight, animated: false});
 						}}>
 					{logEntriesToShow.map(entry=> {
-						return <Text key={entry.origIndex}>{entry.toString(node.showMoreInfo)}</Text>;
+						return <Text key={entry.origIndex} style={styles.text}>{entry.toString(node.showMoreInfo)}</Text>;
 					})}
 				</ScrollView>
-			</View>
+			</Panel>
 		);
 	}
 }

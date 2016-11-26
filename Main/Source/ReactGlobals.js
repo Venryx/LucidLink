@@ -19,8 +19,33 @@ for (let key in globalComps)
 
 g.Bind = Bind;
 
+function AddPropModifierFunc(type, modifierFunc) {
+	var proto = type.prototype;
+	if (proto.componentWillMount_orig) return; // was already wrapped
+
+	proto.componentWillMount_orig = proto.componentWillMount_orig || proto.componentWillMount;
+	proto.componentWillMount = function(...args) {
+		proto.componentWillMount_orig.apply(this, args);
+		modifierFunc.call(this, this.props);
+	}
+
+	proto.componentWillReceiveProps_orig = proto.componentWillReceiveProps_orig || proto.componentWillReceiveProps;
+	proto.componentWillReceiveProps = function(...args) {
+		proto.componentWillReceiveProps_orig.apply(this, args);
+		modifierFunc.call(this, args[0]);
+	}
+}
+function AddEarlyStyle(type, style) {
+	AddPropModifierFunc(type, function(props) {
+		props.style = E(style, props.style);
+	});
+}
+
+AddEarlyStyle(Text, {color: colors.text});
+AddEarlyStyle(TextInput, {color: colors.text});
+
 // component.js
-import EStyleSheet from 'react-native-extended-stylesheet';
+import EStyleSheet from "react-native-extended-stylesheet";
 // calculate styles
 EStyleSheet.build();
 
@@ -110,10 +135,10 @@ g.Row = class Row extends BaseComponent {
 	render() {
 		var {style, height, children} = this.props;
 		return (
-			<View style={E({flexDirection: "row", padding: 3}, style,
+			<Panel style={E({flexDirection: "row", padding: 3}, style,
 					height != null ? {height} : {flex: 1})}>
 				{children}
-			</View>
+			</Panel>
 		);
 	}
 }
@@ -122,14 +147,14 @@ g.RowLR = class RowLR extends BaseComponent {
 		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<View style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
-				<View style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
+			<Panel style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
+				<Panel style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
-				</View>
-				<View style={E({alignItems: "flex-end", flex: 1}, rightStyle)}>
+				</Panel>
+				<Panel style={E({alignItems: "flex-end", flex: 1}, rightStyle)}>
 					{children[1]}
-				</View>
-			</View>
+				</Panel>
+			</Panel>
         );
     }
 }
@@ -138,10 +163,22 @@ g.Column = class Column extends BaseComponent {
 	render() {
 		var {style, width, children} = this.props;
 		return (
-			<View style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
+			<Panel style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
+				{children}
+			</Panel>
+		);
+	}
+}
+
+g.Panel = class Panel extends View {
+	render() {
+		var {children, style} = this.props;
+		var restProps = this.props.Excluding("style", "children");
+		return (
+			<View {...{restProps}} style={[{backgroundColor: "transparent"}, style]}>
 				{children}
 			</View>
-		);
+		)
 	}
 }
 
@@ -149,7 +186,7 @@ g.VButton = class VButton extends BaseComponent {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled} = this.props;
-		var restProps = this.props.RemovingProps("text", "style");
+		var restProps = this.props.Excluding("text", "style");
 
 		if (caps)
 			text = text.toUpperCase();

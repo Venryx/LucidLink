@@ -1,5 +1,6 @@
 package com.lucidlink;
 
+import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class V {
+	public static int textColor = Color.rgb(255, 255, 255);
+
 	public static void Log(String message) {
 		Log("default", message);
 	}

@@ -47,11 +47,11 @@ export class MonitorUI extends BaseComponent {
 					content={<OptionsPanel parent={this}/>}
 					type="overlay" openDrawerOffset={0.7} panCloseMask={0.7} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
-				<View style={{flex: 1, flexDirection: "column"}}>
-					<View style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
-						<View style={{flex: .8, flexDirection: "row"}}>
+				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+					<Panel style={{flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: 0}}>
+						<Panel style={{flex: .8, flexDirection: "row", backgroundColor: "#303030"}}>
 							<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
-							<View style={{flex: 1}}/>
+							<Panel style={{flex: 1}}/>
 
 							{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
 								<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Searching for muse headband...</Text>}
@@ -77,12 +77,12 @@ export class MonitorUI extends BaseComponent {
 									LL.PushBasicDataToJava();
 									this.forceUpdate();
 								}}/>
-						</View>
-					</View>
-					<View style={{marginTop: -7, flex: 1}}>
+						</Panel>
+					</Panel>
+					<Panel style={{marginTop: -7, flex: 1}}>
 						<ChannelsUI {...{visible}} parent={this}/>
-					</View>
-				</View>
+					</Panel>
+				</Panel>
 			</Drawer>
 		);
 	}
@@ -97,8 +97,8 @@ export class MonitorUI extends BaseComponent {
 const styles = {
     container: {
         flex: 1,
-        backgroundColor: "white",
-    },
+        backgroundColor: colors.background
+	},
     chart: {
         width: 1000,
         height: 500,
@@ -137,14 +137,14 @@ class ChannelsUI extends BaseComponent {
 		var channelPoints = MuseBridge.channelPoints;
 		var channel0Points = channelPoints[0];
 		/*if (channel0Points.length == 0)
-			return <View/>;*/
+			return <Panel/>;*/
 
 		/*<Chart style={styles.chart} type="line" verticalGridStep={5}
 			showDataPoint={false} color="black" data={channel0Points}/>*/
 
         return (
-            <View style={styles.container} accessible={true} accessibilityLabel="chart holder">
-            </View>
+            <Panel style={styles.container} accessible={true} accessibilityLabel="chart holder">
+            </Panel>
         );
     }
 }

@@ -6,19 +6,19 @@ class ScriptEntryUI extends BaseComponent {
 		var {script} = this.props;
 		return (
 			<TouchableHighlight {...this.props.sortHandlers} underlayColor="#EEE" delayLongPress={300}
-					style={{backgroundColor: "#F8F8F8", borderBottomWidth: 1, borderColor: "#EEE"}}
+					style={{backgroundColor: colors.background_lighter, borderBottomWidth: 1, borderColor: colors.background_light}}
 					onPress={()=>LL.scripts.ui.SelectScript(script)}>
-				<View style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
-					<Text style={{paddingTop: 10}}>{script.file.Name}</Text>
-					<View style={{flex: 1}}/>
+				<Panel style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
+					<Text style={[styles.text, {paddingTop: 10}]}>{script.file.Name}</Text>
+					<Panel style={{flex: 1}}/>
 					<Switch value={script.enabled}
 						onValueChange={value=>(script.enabled = value) | this.forceUpdate()}/>
 					{script.editable
 						? <VButton text="X"
 							style={{alignItems: "flex-end", marginLeft: 5, marginTop: 6, width: 28, height: 28}}
 							textStyle={{marginBottom: 3}} onPress={()=>script.Delete()}/>
-						: <View style={{marginLeft: 5, width: 28, height: 28}}/>}
-					</View>
+						: <Panel style={{marginLeft: 5, width: 28, height: 28}}/>}
+					</Panel>
 			</TouchableHighlight>
 		);
 	}
@@ -33,9 +33,9 @@ export default class ScriptsPanel extends BaseComponent {
 		var scriptNames_ordered = scripts.OrderBy(a=>a.index).Select(a=>a.file.Name);
 
 		return (
-			<View style={{flex: 1, flexDirection: "column", backgroundColor: "#CCC"}}>
-				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder; place dependencies first)</Text>
-				<View style={{flex: 1}}>
+			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
+				<Text style={[styles.text, {padding: 5, fontSize: 15}]}>Scripts (drag to reorder; place dependencies first)</Text>
+				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
 						renderRow={script=><ScriptEntryUI parent={this} script={script}/>}
 						onRowMoved={e=> {
@@ -50,8 +50,8 @@ export default class ScriptsPanel extends BaseComponent {
 						}}/>
 					<VButton text="Add" style={{position: "absolute", top: (scripts.length * (40 + 1)) + 5, width: 100}}
 						onPress={this.AddScript}/>
-				</View>
-			</View>
+				</Panel>
+			</Panel>
 		)
 	}
 	async AddScript() {

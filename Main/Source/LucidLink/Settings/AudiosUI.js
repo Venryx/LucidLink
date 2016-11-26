@@ -2,7 +2,7 @@ export default class AudiosUI extends BaseComponent {
 	render() {
 		var node = LL.settings;
 		return (
-			<View style={{flex: 1}}>
+			<Panel style={{flex: 1, backgroundColor: colors.background}}>
 				<Row style={{flex: 1, flexDirection: "column"}}>
 					<Row style={{marginTop: 10, flex: 1, flexDirection: "column"}}>
 						{node.audioFiles.map((audioFile, index)=> {
@@ -25,10 +25,10 @@ export default class AudiosUI extends BaseComponent {
 							<VButton onPress={()=>this.CreateAudioFile()} text="Create" style={{width: 100, height: 40}}/>
 						</Row>
 					</Row>
-					<View style={{flex: 111222}}>
-					</View>
+					<Panel style={{flex: 111222}}>
+					</Panel>
 				</Row>
-            </View>
+            </Panel>
 		);
 	}
 
