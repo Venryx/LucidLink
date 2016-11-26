@@ -12,7 +12,7 @@ import Button from 'apsl-react-native-button'
 var g = global;
 g.g = g;
 
-var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableHighlight};
+var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableHighlight, Dimensions, StyleSheet};
 //g.Extend(globalComps);
 for (let key in globalComps)
 	g[key] = globalComps[key];

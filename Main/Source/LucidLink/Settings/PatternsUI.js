@@ -1,3 +1,12 @@
+import Chart from "react-native-chart";
+
+const data = [
+    [0, 1],
+    [1, 3],
+    [3, 7],
+    [4, 9],
+];
+
 export default class PatternsUI extends BaseComponent { 
 	render() {
 		var node = LL.settings;
@@ -7,20 +16,24 @@ export default class PatternsUI extends BaseComponent {
 					<Row style={{marginTop: 10, flex: 1, flexDirection: "column"}}>
 						{node.patterns.map((pattern, index)=> {
 							return (
-								<Row key={index} height={pattern.textEditorEnabled ? 70 : 35}>
+								<Row key={index} height={35 + 100 + (pattern.textEditorEnabled ? 35 : 0)}>
 									<Column>
-										<Row key={index} height={35}>
+										<Row height={35}>
 											<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 												editable={true} value={pattern.name}
 												onChangeText={text=>(pattern.name = text) | this.forceUpdate()}/>
-											<Text style={{marginTop: 5}}>Text editor enabled</Text>
+											<Text style={{marginTop: 5}}>Text editor</Text>
 											<Switch value={pattern.textEditorEnabled}
 												onValueChange={value=>(pattern.textEditorEnabled = value) | this.forceUpdate()}/>
 											<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
 												onPress={()=>node.patterns.Remove(pattern) | this.forceUpdate()}/>
 										</Row>
+										<Row height={100}>
+											<Chart style={{width: Dimensions.get("window").width - 30, height: 100}}
+												verticalGridStep={5} type="line" showDataPoint={true} color="#e1cd00" data={data}/>
+										</Row>
 										{pattern.textEditorEnabled && 
-											<Row key={index + "_2"} height={35}>
+											<Row height={35}>
 												<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 													editable={true} defaultValue={ToJSON(pattern.points)}
 													onChangeText={text=> {
