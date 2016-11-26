@@ -134,12 +134,11 @@ g.RowLR = class RowLR extends BaseComponent {
     }
 }
 
-g.Row = class Row extends BaseComponent {
+g.Column = class Column extends BaseComponent {
 	render() {
-		var {style, height, children} = this.props;
+		var {style, width, children} = this.props;
 		return (
-			<View style={E({flexDirection: "row", padding: 3}, style,
-					height != null ? {height} : {flex: 1})}>
+			<View style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</View>
 		);
