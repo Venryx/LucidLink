@@ -25,10 +25,16 @@ g.Script = class Script {
 	async LoadMeta() {
 		if (!await this.MetaFile.Exists()) return;
 		let scriptMetaJSON = await this.MetaFile.ReadAllText();
-		var scriptMeta = FromJSON(scriptMetaJSON);
-		this.index = scriptMeta.index;
-		this.editable = scriptMeta.editable;
-		this.enabled = scriptMeta.enabled;
+		try {
+			var scriptMeta = FromJSON(scriptMetaJSON);
+			this.index = scriptMeta.index;
+			this.editable = scriptMeta.editable;
+			this.enabled = scriptMeta.enabled;
+		} catch (ex) {
+			Log(`Meta file for script "${this.Name}" invalid.
+Meta file JSON: ${scriptMetaJSON}
+Error: ${ex.stack}`);
+		}
 	}
 
 	async Save() {
@@ -89,6 +95,7 @@ g.Script = class Script {
 
 	file = null;
 	fileOutdated = false;
+	get Name() { return this.file.NameWithoutExtension; }
 	get MetaFile() { return this.file.Folder.GetFile(this.file.NameWithoutExtension + ".meta"); }
 
 	text = null;

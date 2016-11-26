@@ -7,26 +7,32 @@ export default class PatternsUI extends BaseComponent {
 					<Row style={{marginTop: 10, flex: 1, flexDirection: "column"}}>
 						{node.patterns.map((pattern, index)=> {
 							return (
-								<Row key={index} height={35 + (pattern.textEditorEnabled ? 35 : 0)}>
-									<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-										editable={true} value={pattern.name}
-										onChangeText={text=>(pattern.name = text) | this.forceUpdate()}/>
-									<Text style={{marginTop: 5}}>Text editor enabled: </Text>
-									<Switch value={pattern.textEditorEnabled}
-										onValueChange={value=>(pattern.textEditorEnabled = value) | this.forceUpdate()}/>
-									<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
-										onPress={()=>node.patterns.Remove(pattern) | this.forceUpdate()}/>
-									{pattern.textEditorEnabled && 
-										<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-											editable={true} defaultValue={ToJSON(pattern.points)}
-											onChangeText={text=> {
-												try {
-													pattern.points = FromJSON(text);
-												} catch (ex) {
-													V.Toast("Invalid points JSON");
-												}
-												this.forceUpdate()
-											}}/>}
+								<Row key={index}>
+									<Column>
+										<Row key={index} height={35}>
+											<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
+												editable={true} value={pattern.name}
+												onChangeText={text=>(pattern.name = text) | this.forceUpdate()}/>
+											<Text style={{marginTop: 5}}>Text editor enabled: </Text>
+											<Switch value={pattern.textEditorEnabled}
+												onValueChange={value=>(pattern.textEditorEnabled = value) | this.forceUpdate()}/>
+											<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
+												onPress={()=>node.patterns.Remove(pattern) | this.forceUpdate()}/>
+										</Row>
+										{pattern.textEditorEnabled && 
+											<Row key={index} height={35}>
+												<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
+													editable={true} defaultValue={ToJSON(pattern.points)}
+													onChangeText={text=> {
+														try {
+															pattern.points = FromJSON(text);
+														} catch (ex) {
+															V.Toast("Invalid points JSON");
+														}
+														this.forceUpdate()
+													}}/>
+											</Row>}
+									</Column>
 								</Row>
 							);
 						})}

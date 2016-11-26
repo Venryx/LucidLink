@@ -157,12 +157,17 @@ public class Main extends ReactContextBaseJavaModule {
 	@ReactMethod public void OnTabSelected(int tab) {
 		MainActivity.main.runOnUiThread(()-> {
 			if (tab == 0) {
-				if (!mainChartManager.initialized)
-					mainChartManager.Init();
-				mainChartManager.SetChartVisible(true);
+				V.WaitXThenRun(1000, ()-> {
+					if (!mainChartManager.initialized)
+						mainChartManager.TryToInit();
+					if (mainChartManager.initialized)
+						mainChartManager.SetChartVisible(true);
+				});
 			}
-			else
-				mainChartManager.SetChartVisible(false);
+			else {
+				if (mainChartManager.initialized)
+					mainChartManager.SetChartVisible(false);
+			}
 		});
 	}
 
@@ -178,14 +183,19 @@ public class Main extends ReactContextBaseJavaModule {
 
 class ChartManager {
 	public boolean initialized;
-	public void Init() {
-		initialized = true;
-
+	public void TryToInit() {
 		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
 		// ==========
 
 		ViewGroup chartHolder = (ViewGroup)V.FindViewByContentDescription(V.GetRootView(), "chart holder");
-		if (chartHolder == null) return; // must have switched to another tab quickly; just wait till they switch back and we get called again
+		if (chartHolder == null) {
+			V.Log("Could not find chart-holder.");
+			return; // must have switched to another tab quickly; just wait till they switch back and we get called again
+		}
+		V.Log("Creating chart over chart-holder.");
+
+		initialized = true;
+
 		int[] chartHolderPos = new int[2];
 		chartHolder.getLocationInWindow(chartHolderPos);
 

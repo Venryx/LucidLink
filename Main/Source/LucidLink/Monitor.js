@@ -63,6 +63,10 @@ export class MonitorUI extends BaseComponent {
 								onValueChange={value=> {
 									node.connect = value;
 									LL.PushBasicDataToJava();
+									if (node.connect)
+										MuseBridge.StartSearch(); // start listening for a muse headband
+									else
+										MuseBridge.Disconnect();
 									this.forceUpdate();
 								}}/>
 							

@@ -29,6 +29,11 @@ import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {MoreUI} from "./LucidLink/More";
 
+DeviceEventEmitter.addListener("PostJavaLog", args=> {
+	var [tag, message] = args;
+	Log(tag + " [java]", message);
+});
+
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", args=> {
 	try {
@@ -186,7 +191,8 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default class LucidLinkUI extends BaseComponent {
+// note: DO NOT have this inherit from BaseComponent; it breaks react-native's hot-reloading
+export default class LucidLinkUI extends Component {
     constructor(props) {
         super(props);
         this.state = {};
@@ -234,13 +240,8 @@ export default class LucidLinkUI extends BaseComponent {
         );
     }
 
-	PostRender(firstRender) {
-		if (firstRender) {
-			// wait 1 seconds; apparently even after componentDidMount, view is not necessarily actually accessible java-side yet
-			WaitXThenRun(1000, ()=>{
-				JavaBridge.Main.OnTabSelected(0);
-			});
-		}
+	componentDidMount() {
+		JavaBridge.Main.OnTabSelected(0);
 	}
 
 	/*componentWillUnmount() {

@@ -52,12 +52,15 @@ import LibMuse from "react-native-libmuse";
 	static OnChangeMuseConnectStatus(status) {
 		Log("muse link", `Muse connection status changed: ${status}`);
 		if (status == "connected") {
-			MuseBridge.currentMuse = MuseBridge.museList[0];
 			Log("muse link", "LibMuse connected.");
+			MuseBridge.currentMuse = MuseBridge.museList[0];
 		}
 		else if (status == "disconnected") {
-			MuseBridge.currentMuse = null;
 			Log("muse link", "LibMuse disconnected.");
+			MuseBridge.currentMuse = null;
+			// since we're disconnected now, restart listening (assuming "connect" is enabled)
+			if (LL.monitor.connect)
+				MuseBridge.StartSearch();
 		}
 		MuseBridge.status = status;
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();

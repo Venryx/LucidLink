@@ -1,5 +1,6 @@
 package com.lucidlink;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +23,11 @@ import java.util.List;
 
 public class V {
 	public static void Log(String message) {
-		Log.i("default", message);
+		Log("default", message);
 	}
 	public static void Log(String tag, String message) {
 		Log.i(tag, message);
+		Main.main.SendEvent("PostJavaLog", tag, message);
 	}
 
 	public static void Toast(String message) {
@@ -33,6 +35,11 @@ public class V {
 	}
 	public static void Toast(String message, int duration) {
 		Main.main.ShowToast(message, duration);
+	}
+
+	public static void WaitXThenRun(int waitMS, Runnable runnable) {
+		Handler handler = new Handler();
+		handler.postDelayed(runnable, waitMS);
 	}
 
 	public static ViewGroup GetRootView() {
