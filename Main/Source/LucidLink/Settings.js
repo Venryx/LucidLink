@@ -20,6 +20,14 @@ g.Settings = class Settings extends Node {
 g.Pattern = class Pattern {
 	@P() name = null;
 	@P() points = [];
+
+	// in second-distances
+	get Duration() {
+		var min = points.Select(a=>a[0]).Min();
+		var max = points.Select(a=>a[0]).Max();
+		return max - min;
+	}
+
 	@P() textEditor = false;
 }
 g.AudioFileEntry = class AudioFileEntry {

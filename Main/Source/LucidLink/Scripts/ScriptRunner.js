@@ -2,7 +2,13 @@
 //import Sound from "react-native-sound";
 var Sound = require("react-native-sound");
 
+g.AddListener_OnUpdatePatternMatchProbabilities = function(func) {
+	ScriptRunner.Main.listeners_onUpdatePatternMatchProbabilities.push(func);
+};
+
 export default class ScriptRunner {
+	get Main() { return LL.scripts.scriptRunner; }
+
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {
 		for (let listener of this.keyDownListeners) {
@@ -19,9 +25,12 @@ export default class ScriptRunner {
 		}
 	}
 
+	listeners_onUpdatePatternMatchProbabilities = [];
+
 	Reset() {
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
+		this.listeners_onUpdatePatternMatchProbabilities = [];
 	}
 	Init(scripts) {
 		var finalScriptsText = "";

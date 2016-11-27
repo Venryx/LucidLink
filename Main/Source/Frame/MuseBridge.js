@@ -83,12 +83,35 @@ import LibMuse from "react-native-libmuse";
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 
 		// for the moment, assume 60 packets per second (get the actual number at some point)
-		var patternMatchInterval_inPackets = patternMatchInterval * 60;
-		if (currentX % LL.settings.patternMatchInterval_inPackets == 0 && LL.monitor.patternMatch) {
-			//Sketchy.shapeContextMatch
-			// todo // break point
+		var patternMatchInterval_inPackets = LL.settings.patternMatchInterval * 60;
+		if (currentX % patternMatchInterval_inPackets == 0 && LL.monitor.patternMatch) {
+			patternMatchProbabilities = {};
+
+			for (let pattern of LL.settings.patterns) {
+				var patternDuration = pattern.Duration;
+				for (var scanRight = currentX; scanRight >= currentX - patternMatchInterval_inPackets; currentX -= LL.settings.patternMatchOffset) {
+					var scanLeft = scanRight - patternDuration;
+					var points = MuseBridge.GetPointsForScanRange(scanLeft, scanRight);
+					
+					let matchProbability = Sketchy.shapeContextMatch(points, pattern.points);
+					MuseBridge.patternMatchProbabilities[pattern.name] = matchProbability;
+				}
+			}
+
+			for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
+				listener(MuseBridge.patternMatchProbabilities);
 		}
 	}
+	static GetPointsForScanRange(scanLeft, scanRight) {
+		var result = [];
+		for (let i = scanLeft; i < scanRight; i++) {
+			let iFinal = i >= 0 ? i : ((maxX + 1) + i); // if in range, get it; else, loop aroundand grab from end
+			result.push(MuseBridge.channelPoints[iFinal]);
+		}
+		return result;
+	}
+
+	static patternMatchProbabilities = {};
 }
 g.MuseBridge = MuseBridge;
 export default MuseBridge;
