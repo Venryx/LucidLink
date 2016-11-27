@@ -21,27 +21,46 @@ Fatal) ${isFatal}`);
 };
 
 g.Log = function(...args) {
-	var type = "general", message;
-	if (args.length == 1) message = args[0];
-	if (args.length == 2) type = args[0], message = args[1];
+	var type = "general", message, sendToJava = true;
+	if (args.length == 1) [message] = args;
+	else if (args.length == 2) [type, message] = args;
+	else if (args.length == 3) [type, message, sendToJava] = args;
 
 	console.log(...args);
 
 	try {
 		More.AddLogEntry(new LogEntry(type, message, new Date()));
 	} catch (ex) {}
+	if (sendToJava) {
+		try {
+			JavaLog(type, message);
+		} catch (ex) {}
+	}
 };
+g.JavaLog = function(type, message) {
+	var type = "general", message;
+	if (args.length == 1) [message] = args;
+	else if (args.length == 2) [type, message] = args;
+	JavaBridge.Main.PostJSLog(type, message);
+}
 g.Trace = function(...args) {
 	console.trace(...args);
 };
 
-g.Assert = function(condition, message) {
+g.Assert = function(condition, messageOrMessageFunc) {
 	if (condition) return;
-	throw new Error(message);
+
+	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
+
+	Log("Assert failed) " + message);
 	console.error(message);
+	throw new Error(message);
 };
-g.AssertWarn = function(condition, message) {
+g.AssertWarn = function(condition, messageOrMessageFunc) {
 	if (condition) return;
+
+	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
+
 	console.warn(message);
 };
 
@@ -125,6 +144,13 @@ g.ToJSON_Safe = function(obj, excludePropNames___) {
 	if (foundDuplicates)
 		result = "[was circular]" + result;
 	return result;
+}
+
+g.ToJSON_Try = function(...args) {
+	try {
+		return ToJSON(...args);
+	} catch (ex) {}
+	return "[converting to JSON failed]";
 }
 
 // object-VDF

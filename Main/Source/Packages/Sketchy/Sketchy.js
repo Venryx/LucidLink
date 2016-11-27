@@ -117,10 +117,22 @@
     // Scatter points around each of the paths.  The algorithm
     // will only be using these points (as feature descriptors),
     // not the shapes.
-	var shape1_points = shape1 instanceof Array ? shape1 : Sketchy.convertSVGtoPointArrays(shape1);
-	var shape2_points = shape2 instanceof Array ? shape2 : Sketchy.convertSVGtoPointArrays(shape2);
+	var shape1_points = shape1 instanceof Array ? [shape1] : Sketchy.convertSVGtoPointArrays(shape1);
+	var shape2_points = shape2 instanceof Array ? [shape2] : Sketchy.convertSVGtoPointArrays(shape2);
     points1 = Sketchy.scatterPoints(shape1_points, pointsPerShape);
     points2 = Sketchy.scatterPoints(shape2_points, pointsPerShape);
+
+	function InfoStr() {
+		return `
+Shape1-points: ${ToJSON_Try(shape1_points)}
+Shape2-points: ${ToJSON_Try(shape2_points)}
+Shape1-scattered-points: ${ToJSON_Try(points1)}
+Shape2-scattered-points: ${ToJSON_Try(points2)}
+`;
+}
+	Assert(points1 != null && points2 != null, ()=>`ScatteredPoints cannot be null. (point-scattering failed)${InfoStr()}`);
+	Assert(points1.length == pointsPerShape, ()=>`Scattered-points-1 count does not match the expected ${pointsPerShape}.${InfoStr()}`);
+	Assert(points2.length == pointsPerShape, ()=>`Scattered-points-2 count does not match the expected ${pointsPerShape}.${InfoStr()}`);
 
     // Create a square 2D array and initialize it with 0s in the diagonal
     distanceMatrix1 = [];

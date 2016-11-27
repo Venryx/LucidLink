@@ -69,6 +69,21 @@ export default class PatternsUI extends BaseComponent {
 										<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 											editable={true} value={pattern.name}
 											onChangeText={text=>(pattern.name = text) | this.forceUpdate()}/>
+
+										<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Channels: </Text>
+										<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>1</Text>
+										<Switch value={pattern.channel1}
+											onValueChange={value=>(pattern.channel1 = value) | this.forceUpdate()}/>
+										<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>2</Text>
+										<Switch value={pattern.channel2}
+											onValueChange={value=>(pattern.channel2 = value) | this.forceUpdate()}/>
+										<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>3</Text>
+										<Switch value={pattern.channel3}
+											onValueChange={value=>(pattern.channel3 = value) | this.forceUpdate()}/>
+										<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>4</Text>
+										<Switch value={pattern.channel4}
+											onValueChange={value=>(pattern.channel4 = value) | this.forceUpdate()}/>
+											
 										<Text style={{marginTop: 5}}>Text editor</Text>
 										<Switch value={pattern.textEditor}
 											onValueChange={value=>(pattern.textEditor = value) | this.forceUpdate()}/>

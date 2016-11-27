@@ -51,7 +51,7 @@ ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
 
 DeviceEventEmitter.addListener("PostJavaLog", args=> {
 	var [tag, message] = args;
-	Log(tag + " [java]", message);
+	Log(tag + " [java]", message, false);
 });
 
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html

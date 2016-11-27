@@ -173,6 +173,10 @@ public class Main extends ReactContextBaseJavaModule {
 	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {
 	}*/
 
+	@ReactMethod public void PostJSLog(String type, String message) {
+		V.Log(type + " [js]", message, false);
+	}
+
 	void Shutdown() {
 		V.Log("Shutting down...");
 

@@ -28,9 +28,11 @@ public class V {
 	public static void Log(String message) {
 		Log("default", message);
 	}
-	public static void Log(String tag, String message) {
+	public static void Log(String tag, String message) { Log(tag, message, true); }
+	public static void Log(String tag, String message, boolean sendToJS) {
 		Log.i(tag, message);
-		Main.main.SendEvent("PostJavaLog", tag, message);
+		if (sendToJS)
+			Main.main.SendEvent("PostJavaLog", tag, message);
 	}
 
 	public static void Toast(String message) {

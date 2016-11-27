@@ -72,51 +72,68 @@ import LibMuse from "react-native-libmuse";
 	static maxX = 100;
 
 	static OnReceiveMuseDataPacket(type, column) {
+		if (type != "eeg") return;
+
 		var currentX = MuseBridge.lastX + 1;
 		if (currentX > MuseBridge.maxX)
 			currentX = 0;
 
-		for (var channel = 0; channel < 6; channel++)
+		//for (var channel = 0; channel < 6; channel++)
+		for (var channel = 0; channel < 4; channel++)
 			MuseBridge.channelPoints[channel][currentX] = [currentX, column[channel]];
 
 		MuseBridge.lastX = currentX;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
-
+		
 		// for the moment, assume 60 packets per second (get the actual number at some point)
-		var patternMatchInterval_inPackets = LL.settings.patternMatchInterval * 60;
+		const packetsPerSecond = 60;
+		var patternMatchInterval_inPackets = LL.settings.patternMatchInterval * packetsPerSecond;
+		var scanOffset_inPackets = LL.settings.patternMatchOffset * packetsPerSecond;
 		if (currentX % patternMatchInterval_inPackets == 0 && LL.monitor.patternMatch) {
-			patternMatchProbabilities = {};
+			MuseBridge.patternMatchProbabilities = {};
 
 			for (let pattern of LL.settings.patterns) {
-				var patternDuration = pattern.Duration;
-				for (var scanRight = currentX; scanRight >= currentX - patternMatchInterval_inPackets; currentX -= LL.settings.patternMatchOffset) {
+				if (!pattern.channel1 && !pattern.channel2 && !pattern.channel3 && !pattern.channel4) continue;
+				Assert(pattern.points.length >= 2, `Pattern point count too low. Should be 2+, not ${pattern.points.length}.`);
+
+				let patternDuration = pattern.Duration;
+				let highestMatchProb = 0;
+				for (let scanRight = currentX; scanRight >= currentX - patternMatchInterval_inPackets; scanRight -= scanOffset_inPackets) {
 					var scanLeft = scanRight - patternDuration;
-					var points = MuseBridge.GetPointsForScanRange(scanLeft, scanRight);
-					
-					Assert(points && points.length >= 2, `Scanned points not large enough. Should be 2+, not ${points ? points.length : "n/a"}.`);
-					Assert(pattern.points.length >= 2, `Pattern points not large enough. Should be 2+, not ${points.length}.`);
-					var points_final = MuseBridge.ConvertPoints(points);
 					var patternPoints_final = MuseBridge.ConvertPoints(pattern.points);
-					let matchProbability = Sketchy.shapeContextMatch(points, pattern.points);
-					MuseBridge.patternMatchProbabilities[pattern.name] = matchProbability;
+
+					for (let channel = 0; channel < 4; channel++) {
+						if (!pattern["channel" + (channel + 1)]) continue;
+
+						let points = MuseBridge.GetPointsForScanRange(channel, scanLeft, scanRight);
+						Assert(points && points.length >= 2, `Scanned point count too low. Should be 2+, not ${points ? points.length : "n/a"}.`);
+						let channelPoints_final = MuseBridge.ConvertPoints(points);
+						
+						let matchProb = Sketchy.shapeContextMatch(channelPoints_final, patternPoints_final);
+						highestMatchProb = Math.max(highestMatchProb, matchProb);
+					}
 				}
+				MuseBridge.patternMatchProbabilities[pattern.name] = highestMatchProb;
+				//Log(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
+				//JavaLog(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
 			}
 
 			for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
 				listener(MuseBridge.patternMatchProbabilities);
 		}
 	}
-	static GetPointsForScanRange(scanLeft, scanRight) {
+	static GetPointsForScanRange(channel, scanLeft, scanRight) {
+		var channelPoints = MuseBridge.channelPoints[channel];
+		
 		var result = [];
 		for (let i = scanLeft; i < scanRight; i++) {
 			let iFinal = i >= 0 ? i : ((MuseBridge.maxX + 1) + i); // if in range, get it; else, loop aroundand grab from end
-			result.push(MuseBridge.channelPoints[iFinal]);
+			result.push(channelPoints[iFinal] || [i, 0]);
 		}
 		return result;
 	}
 	static ConvertPoints(points) {
 		var result = [];
-		// break point; fix that "point" is sometimes null
 		for (let point of points)
 			result.push({x: point[0], y: point[1]});
 		return result;

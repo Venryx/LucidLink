@@ -19,6 +19,10 @@ g.Settings = class Settings extends Node {
 }
 g.Pattern = class Pattern {
 	@P() name = null;
+	@P() channel1 = false;
+	@P() channel2 = false;
+	@P() channel3 = false;
+	@P() channel4 = false;
 	@P() points = [];
 
 	// in second-distances
