@@ -93,6 +93,10 @@ import LibMuse from "react-native-libmuse";
 					var scanLeft = scanRight - patternDuration;
 					var points = MuseBridge.GetPointsForScanRange(scanLeft, scanRight);
 					
+					Assert(points && points.length >= 2, `Scanned points not large enough. Should be 2+, not ${points ? points.length : "n/a"}.`);
+					Assert(pattern.points.length >= 2, `Pattern points not large enough. Should be 2+, not ${points.length}.`);
+					var points_final = MuseBridge.ConvertPoints(points);
+					var patternPoints_final = MuseBridge.ConvertPoints(pattern.points);
 					let matchProbability = Sketchy.shapeContextMatch(points, pattern.points);
 					MuseBridge.patternMatchProbabilities[pattern.name] = matchProbability;
 				}
@@ -105,9 +109,16 @@ import LibMuse from "react-native-libmuse";
 	static GetPointsForScanRange(scanLeft, scanRight) {
 		var result = [];
 		for (let i = scanLeft; i < scanRight; i++) {
-			let iFinal = i >= 0 ? i : ((maxX + 1) + i); // if in range, get it; else, loop aroundand grab from end
+			let iFinal = i >= 0 ? i : ((MuseBridge.maxX + 1) + i); // if in range, get it; else, loop aroundand grab from end
 			result.push(MuseBridge.channelPoints[iFinal]);
 		}
+		return result;
+	}
+	static ConvertPoints(points) {
+		var result = [];
+		// break point; fix that "point" is sometimes null
+		for (let point of points)
+			result.push({x: point[0], y: point[1]});
 		return result;
 	}
 

@@ -3,11 +3,11 @@
 var Sound = require("react-native-sound");
 
 g.AddListener_OnUpdatePatternMatchProbabilities = function(func) {
-	ScriptRunner.Main.listeners_onUpdatePatternMatchProbabilities.push(func);
+	LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities.push(func);
 };
 
 export default class ScriptRunner {
-	get Main() { return LL.scripts.scriptRunner; }
+	//get Main() { return LL.scripts.scriptRunner; }
 
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {

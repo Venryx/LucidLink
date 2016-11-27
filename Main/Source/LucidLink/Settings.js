@@ -23,8 +23,8 @@ g.Pattern = class Pattern {
 
 	// in second-distances
 	get Duration() {
-		var min = points.Select(a=>a[0]).Min();
-		var max = points.Select(a=>a[0]).Max();
+		var min = this.points.Select(a=>a[0]).Min();
+		var max = this.points.Select(a=>a[0]).Max();
 		return max - min;
 	}
 

@@ -98,7 +98,7 @@ Error: ${ex.stack}`);
 	text = null;
 
 	// stored in meta file
-	index = -1;
+	index = -1000;
 	editable = true;
 	enabled = true;
 }
@@ -224,7 +224,7 @@ This will permanently remove all custom code from the script.`,
 	ApplyScripts() {
 		this.scriptRunner.Reset();
 		var scripts_ordered = this.scripts.Where(a=>a.enabled).OrderBy(a=> {
-			AssertWarn(a.index != -1, `Script not found in script-order list: ${a.file.Name}`);
+			AssertWarn(a.index != -1000, `Script-order not found in meta file for: ${a.file.Name}`);
 			return a.index;
 		});
 		this.scriptRunner.Init(scripts_ordered);

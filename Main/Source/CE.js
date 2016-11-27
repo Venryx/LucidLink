@@ -693,10 +693,10 @@ Array.prototype._AddFunction_Inline = function Except(otherArray) {
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};
 Array.prototype._AddFunction_Inline = function Min(valFunc) {
-    return this.OrderBy(valFunc).First();
+    return this.OrderBy(valFunc || (a=>0)).First();
 };
 Array.prototype._AddFunction_Inline = function Max(valFunc) {
-    return this.OrderBy(valFunc).Last();
+    return this.OrderBy(valFunc || (a=>0)).Last();
 };
 
 // like Pairs for Dictionary, except for Array (why is this on Object.prototype instead of Array.prototype?)
