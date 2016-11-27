@@ -7,6 +7,7 @@ g.Monitor = class Monitor extends Node {
 
 	@P() connect = true;
 	@P() monitor = true;
+	@P() patternMatch = true;
 
 	ui = null;
 }
@@ -74,6 +75,14 @@ export class MonitorUI extends BaseComponent {
 							<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]}} value={node.monitor}
 								onValueChange={value=> {
 									node.monitor = value;
+									LL.PushBasicDataToJava();
+									this.forceUpdate();
+								}}/>
+
+							<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>Pattern match</Text>
+							<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]}} value={node.patternMatch}
+								onValueChange={value=> {
+									node.patternMatch = value;
 									LL.PushBasicDataToJava();
 									this.forceUpdate();
 								}}/>

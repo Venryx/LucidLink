@@ -8,6 +8,8 @@ g.Settings = class Settings extends Node {
 	@P() applyScriptsOnLaunch = false;
 	@P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
+	@P() patternMatchInterval = 1; // in seconds
+	@P() patternMatchOffset = .2; // in second-distances
 
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;

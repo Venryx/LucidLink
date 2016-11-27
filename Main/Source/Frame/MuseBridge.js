@@ -81,6 +81,13 @@ import LibMuse from "react-native-libmuse";
 
 		MuseBridge.lastX = currentX;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
+
+		// for the moment, assume 60 packets per second (get the actual number at some point)
+		var patternMatchInterval_inPackets = patternMatchInterval * 60;
+		if (currentX % LL.settings.patternMatchInterval_inPackets == 0 && LL.monitor.patternMatch) {
+			//Sketchy.shapeContextMatch
+			// todo // break point
+		}
 	}
 }
 g.MuseBridge = MuseBridge;

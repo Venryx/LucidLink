@@ -25,6 +25,7 @@ import * as ReactGlobals from "./ReactGlobals";
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";
+require("./Packages/Sketchy/Sketchy");
 
 import TestData from "./TestData";
 //import {JavaBridge} from "./Globals";

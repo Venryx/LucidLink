@@ -178,7 +178,7 @@ g.Panel = class Panel extends View {
 			<View {...{restProps}} style={E({backgroundColor: "transparent"}, style)}>
 				{children}
 			</View>
-		)
+		);
 	}
 }
 
