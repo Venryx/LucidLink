@@ -45,9 +45,9 @@ export default class LogsUI extends BaseComponent {
 				<Panel style={{height: 32, padding: 5, flexDirection: "row"}}>
 					<Text style={styles.text}>More info: </Text>
 					<Switch value={node.showMoreInfo} onValueChange={value=>(node.showMoreInfo = value) | this.forceUpdate()}/>
-					<Text style={[styles.text, {marginLeft: 10}]}>Auto-scroll: </Text>
+					<Text style={{marginLeft: 10}}>Auto-scroll: </Text>
 					<Switch value={node.autoScroll} onValueChange={value=>(node.autoScroll = value) | this.forceUpdate()}/>
-					<Text style={[styles.text, {marginLeft: 10}]}>Display: </Text>
+					<Text style={{marginLeft: 10}}>Display: </Text>
 					<VButton text={node.maxLogCount.toString()} style={{marginLeft: 3, marginTop: -5, width: 100, height: 32}}
 						onPress={()=> {
 							var values = [-1];

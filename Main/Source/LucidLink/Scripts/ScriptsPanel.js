@@ -9,7 +9,7 @@ class ScriptEntryUI extends BaseComponent {
 					style={{backgroundColor: colors.background_lighter, borderBottomWidth: 1, borderColor: colors.background_light}}
 					onPress={()=>LL.scripts.ui.SelectScript(script)}>
 				<Panel style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
-					<Text style={[styles.text, {paddingTop: 10}]}>{script.file.Name}</Text>
+					<Text style={{paddingTop: 10}}>{script.file.Name}</Text>
 					<Panel style={{flex: 1}}/>
 					<Switch value={script.enabled}
 						onValueChange={value=>(script.enabled = value) | this.forceUpdate()}/>
@@ -34,7 +34,7 @@ export default class ScriptsPanel extends BaseComponent {
 
 		return (
 			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
-				<Text style={[styles.text, {padding: 5, fontSize: 15}]}>Scripts (drag to reorder; place dependencies first)</Text>
+				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder; place dependencies first)</Text>
 				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
 						renderRow={script=><ScriptEntryUI parent={this} script={script}/>}

@@ -2,10 +2,10 @@ export default class ConsoleUI extends BaseComponent {
 	render() {
 		var {onChangeText, text} = this.props;
 		var buttonStyle = {flex: .2, marginLeft: 5};
-		var textStyle = [styles.text, {flex: 1, textAlignVertical: "top"}];
+		var textStyle = {flex: 1, textAlignVertical: "top"};
 		
 		return (
-			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+			<Column style={{flex: 1, backgroundColor: colors.background}}>
 				<Panel style={{flexDirection: "row", flexWrap: "wrap", padding: 3}}>
 					<Panel style={{flex: .8, flexDirection: "row"}}>
 						<VButton style={E(buttonStyle, {marginLeft: 0})} text="Pause/Debugger" onPress={Debugger}/>
@@ -16,7 +16,7 @@ export default class ConsoleUI extends BaseComponent {
 					</Panel>
 				</Panel>
 				<TextInput {...{onChangeText}} style={textStyle} multiline={true} editable={true} value={text}/>
-			</Panel>
+			</Column>
 		);
 	}
 	RunScript() {

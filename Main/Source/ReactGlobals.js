@@ -175,7 +175,7 @@ g.Panel = class Panel extends View {
 		var {children, style} = this.props;
 		var restProps = this.props.Excluding("style", "children");
 		return (
-			<View {...{restProps}} style={[{backgroundColor: "transparent"}, style]}>
+			<View {...{restProps}} style={E({backgroundColor: "transparent"}, style)}>
 				{children}
 			</View>
 		)

@@ -272,9 +272,9 @@ export class ScriptsUI extends BaseComponent {
 					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
 				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
-					<Panel style={[styles.header, {flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: -5}]}>
+					<Panel style={E(styles.header, {flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: -5})}>
 						<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleScriptsPanelOpen}/>
-						<Text style={[styles.text, {marginLeft: 10, marginTop: 8, fontSize: 18}]}>
+						<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
 						Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
 						{selectedScript && !selectedScript.editable ? " (read only)" : ""}
 						</Text>
