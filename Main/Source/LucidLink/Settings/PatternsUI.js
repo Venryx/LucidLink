@@ -9,7 +9,7 @@ export default class PatternsUI extends BaseComponent {
 				<Column style={{marginTop: 10, flex: 1}}>
 					<Row style={{height: 35}}>
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Preview chart value range: </Text>
-						<VButton text={node.previewChartValueRange_x.toString()} style={{width: 100, height: 32}}
+						<VButton text={node.previewChartRangeX.toString()} style={{width: 100, height: 32}}
 							onPress={()=> {
 								var values = [-1];
 								for (let val = 0; val < 100; val += 10)
@@ -19,7 +19,7 @@ export default class PatternsUI extends BaseComponent {
 								for (let val = 1000; val <= 10000; val += 1000)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.previewChartValueRange_x),
+									selectedValueIndex: values.indexOf(node.previewChartRangeX),
 									values: values.Select(a=>a.toString()),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 									message: "Select value-range (horizontal) to display in the pattern-previews below.",
@@ -27,13 +27,13 @@ export default class PatternsUI extends BaseComponent {
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];
-									node.previewChartValueRange_x = val;
+									node.previewChartRangeX = val;
 									this.forceUpdate();
 								});
 							}}/>
 
-						<Text style={[styles.text, {marginLeft: 10, marginTop: 5, marginRight: 10}]}> by </Text>
-						<VButton text={node.previewChartValueRange_y.toString()} style={{width: 100, height: 32}}
+						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}> by </Text>
+						<VButton text={node.previewChartRangeY.toString()} style={{width: 100, height: 32}}
 							onPress={()=> {
 								var values = [-1];
 								for (let val = 0; val < 100; val += 10)
@@ -43,7 +43,7 @@ export default class PatternsUI extends BaseComponent {
 								for (let val = 1000; val <= 10000; val += 1000)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.previewChartValueRange_y),
+									selectedValueIndex: values.indexOf(node.previewChartRangeY),
 									values: values.Select(a=>a.toString()),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 									message: "Select value-range (vertical) to display in the pattern-previews below.",
@@ -51,7 +51,7 @@ export default class PatternsUI extends BaseComponent {
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];
-									node.previewChartValueRange_y = val;
+									node.previewChartRangeY = val;
 									this.forceUpdate();
 								});
 							}}/>
@@ -59,14 +59,9 @@ export default class PatternsUI extends BaseComponent {
 
 
 					{node.patterns.map((pattern, index)=> {
-						var firstRealPoint = pattern.points[0] || [0, 0];
-						//var lastRealPoint = pattern.points.Last() || [0, 0];
-						var lastRealPoint = pattern.points[pattern.points.length - 1] || [0, 0];
-						var points = [];
-						//points.push([0, node.previewChartValueRange_y]);
-						//points.push([0, 0]);
-						points.AddRange(pattern.points);
-						//points.push([node.previewChartValueRange_x, lastRealPoint.y]);
+						var points = pattern.points;
+						if (points.length == 0)
+							points = [[[0, 0]]];
 						return (
 							<Row key={index} height={35 + (pattern.textEditor ? 35 : 0) + 100}>
 								<Column>
@@ -95,8 +90,9 @@ export default class PatternsUI extends BaseComponent {
 										</Row>}
 									<Row height={100} style={{backgroundColor: "#FFFFFF55"}}>
 										<Chart style={{width: Dimensions.get("window").width - 30, height: 80}}
-											//yAxisWidth={node.previewChartValueRange_x} xAxisHeight={node.previewChartValueRange_y}
-											type="line" color="#e1cd00" data={points}/>
+											minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
+											minY={-node.previewChartRangeY / 2} maxY={node.previewChartRangeY / 2} legendStepsY={5}
+											type="line" color={["#e1cd00"]} data={[points]}/>
 									</Row>
 								</Column>
 							</Row>

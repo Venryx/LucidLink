@@ -9,8 +9,8 @@ g.Settings = class Settings extends Node {
 	@P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
 
-	@P() previewChartValueRange_x = 300;
-	@P() previewChartValueRange_y = 100;
+	@P() previewChartRangeX = 200;
+	@P() previewChartRangeY = 100;
 	@T("List(Pattern)") @P(true, true) patterns = [];
 
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
