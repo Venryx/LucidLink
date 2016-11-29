@@ -15,6 +15,10 @@ g.V = class V {
 		return Math.sqrt(width * width + height * height);
 	}
 
+	static AsArray(args) { return V.Slice(args, 0); };
+	//s.ToArray = function(args) { return s.Slice(args, 0); };
+	static Slice(args, start, end) { return Array.prototype.slice.call(args, start != null ? start : 0, end); };
+
 	/*static startupInfo = null;
 	static startupInfoRequested = false;
 	static postStartupInfoReceivedFuncs = [];

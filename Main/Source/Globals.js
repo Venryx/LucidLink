@@ -32,12 +32,12 @@ g.Log = function(...args) {
 		More.AddLogEntry(new LogEntry(type, message, new Date()));
 	} catch (ex) {}
 	if (sendToJava) {
-		try {
+		//try {
 			JavaLog(type, message);
-		} catch (ex) {}
+		//} catch (ex) {}
 	}
 };
-g.JavaLog = function(type, message) {
+g.JavaLog = function(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;

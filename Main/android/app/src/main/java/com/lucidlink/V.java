@@ -30,9 +30,21 @@ public class V {
 	}
 	public static void Log(String tag, String message) { Log(tag, message, true); }
 	public static void Log(String tag, String message, boolean sendToJS) {
-		Log.i(tag, message);
+		//Log.i(tag, message);
+		LogToLogcat(tag, message);
 		if (sendToJS)
 			Main.main.SendEvent("PostJavaLog", tag, message);
+	}
+
+	// logcat has a message length limit, so cut long messages into pieces that are displayable
+	static void LogToLogcat(String tag, String message) {
+		//Log.i(tag, "Length: " + message.length());
+		if (message.length() > 4000) {
+			Log.i(tag, message.substring(0, 4000));
+			LogToLogcat(tag, message.substring(4000));
+		} else {
+			Log.i(tag, message);
+		}
 	}
 
 	public static void Toast(String message) {

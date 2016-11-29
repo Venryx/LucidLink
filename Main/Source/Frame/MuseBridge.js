@@ -67,10 +67,10 @@ import LibMuse from "react-native-libmuse";
 	}
 	
 	// where eg. [0][1] (channel, x-pos/index) is {x:1,y:9} (x-pos, y-pos)
-	static channelPoints = Array(4).fill([]); // break point; investigate cyclicnessk
+	static channelPoints = [];
 	static patternMatchProbabilities = {};
 	static lastX = -1;
-	static maxX = 100;
+	static maxX = 1000;
 
 	static OnReceiveMuseDataPacket(type, column) {
 		if (type != "eeg") return;
@@ -80,14 +80,20 @@ import LibMuse from "react-native-libmuse";
 			currentX = 0;
 
 		//for (var channel = 0; channel < 6; channel++)
-		for (var channel = 0; channel < 4; channel++)
+		for (var channel = 0; channel < 4; channel++) {
+			if (MuseBridge.channelPoints[channel] == null) {
+				MuseBridge.channelPoints[channel] = [];
+				for (let x = 0; x <= MuseBridge.maxX; x++)
+					MuseBridge.channelPoints[channel][x] = new Vector2i(x, 0);
+			}
 			MuseBridge.channelPoints[channel][currentX] = new Vector2i(currentX, column[channel]);
+		}
 
 		MuseBridge.lastX = currentX;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 		
-		// for the moment, assume 60 packets per second (get the actual number at some point)
-		const packetsPerSecond = 60;
+		// for the moment, assume X packets per second (get the actual number at some point)
+		const packetsPerSecond = 20;
 		var patternMatchInterval_inPackets = LL.settings.patternMatchInterval * packetsPerSecond;
 		var scanOffset_inPackets = LL.settings.patternMatchOffset * packetsPerSecond;
 		if (currentX % patternMatchInterval_inPackets == 0 && LL.monitor.patternMatch) {
@@ -108,7 +114,9 @@ import LibMuse from "react-native-libmuse";
 						Assert(points && points.length >= 2, `Scanned point count too low. Should be 2+, not ${points ? points.length : "n/a"}.`);
 						//let channelPoints_final = MuseBridge.ConvertPoints(points);
 						let channelBaseline = MuseBridge.GetChannelBaseline(channel);
-						let channelPoints_final = MuseBridge.CenterOnY(points, channelBaseline);
+						/*let channelPoints_final = MuseBridge.CenterOnY(points, channelBaseline);
+						channelPoints_final = MuseBridge.TrimXValuesTo(channelPoints_final, scanLeft);*/
+						let channelPoints_final = points.Select(a=>a.NewX(x=>x - scanLeft).NewY(y=>y - channelBaseline));
 						
 						const yValRange = 100; // estimate of max positive-value (from base-line)
 						let maxDistancePossible = V.Distance(new Vector2i(scanLeft, -yValRange), new Vector2i(scanRight, yValRange));
@@ -117,9 +125,13 @@ import LibMuse from "react-native-libmuse";
 						//let distance = Sketchy.hausdorff(channelPoints_final, patternPoints_final, {x: 0, y: 0});
 						let distance = MuseBridge.GetHausdorffDistance(channelPoints_final, pattern.points);
 						let matchProb = 1 - (distance / maxDistancePossible);
-						Log(`${channelBaseline} | ${distance} | ${maxDistancePossible} | ${matchProb}
-PatternPoints: ${pattern.points}
-ChannelPoints: ${channelPoints_final}`);
+
+						matchProb = Math.max(0, matchProb); // maybe temp
+
+						Log(`${channelBaseline} | ${distance} | ${maxDistancePossible} | ${matchProb}`);/*
+PatternPoints: ${ToVDF(pattern.points, false)}
+ChannelPoints: ${ToVDF(points, false)}
+ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 						highestMatchProb = Math.max(highestMatchProb, matchProb);
 					}
 				}
@@ -132,9 +144,18 @@ ChannelPoints: ${channelPoints_final}`);
 			}
 
 			var patternMatchProbabilitiesForFrame = MuseBridge.patternMatchProbabilities.Props
-				.ToDictionary(prop=>prop.name, prop=>prop.value[currentX]);
+				.ToMap(prop=>prop.name, prop=>prop.value[currentX]);
 			for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
 				listener(patternMatchProbabilitiesForFrame);
+
+			JavaBridge.Main.OnSetPatternMatchProbability(currentX, patternMatchProbabilitiesForFrame.Props[0].value);
+		}
+		else {
+			/*let lastPatternMatchProbability = null;
+			for (let x = currentX; x >= 0 && lastPatternMatchProbability == null; x++)
+				lastPatternMatchProbability = MuseBridge.patternMatchProbabilities.Props[0].value[x];
+			if (lastPatternMatchProbability != null)
+				JavaBridge.Main.OnSetPatternMatchProbability(lastPatternMatchProbability);*/
 		}
 	}
 	static GetPointsForScanRange(channel, scanLeft, scanRight) {
@@ -156,16 +177,6 @@ ChannelPoints: ${channelPoints_final}`);
 		return result;
 	}
 
-	static CenterOnY(points, yToCenterTo) {
-		//var averageY = points.Select(a=>a.y).Average();
-		var result = points.Select(point=> {
-			return new Vector2i(point.x, point.y - yToCenterTo);
-		});
-		/*Log(`Centering... ${averageY}
-=== ${ToJSON(points)}
-=== ${ToJSON(result)}`)*/
-		return result;
-	}
 	/*static ConvertPoints(points) {
 		var result = [];
 		for (let point of points)
