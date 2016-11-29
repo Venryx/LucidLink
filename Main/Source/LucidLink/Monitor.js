@@ -152,8 +152,8 @@ class ChannelsUI extends BaseComponent {
 			showDataPoint={false} color="black" data={channel0Points}/>*/
 
         return (
-            <Panel style={styles.container} accessible={true} accessibilityLabel="chart holder">
-            </Panel>
+            <View style={styles.container} accessible={true} accessibilityLabel="chart holder">
+            </View>
         );
     }
 }

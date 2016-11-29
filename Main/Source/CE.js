@@ -692,11 +692,21 @@ Array.prototype._AddFunction_Inline = function Except(otherArray) {
 };
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};
-Array.prototype._AddFunction_Inline = function Min(valFunc) {
-    return this.OrderBy(valFunc || (a=>0)).First();
+Array.prototype._AddFunction_Inline = function Min(valFunc = a=>a) {
+    return this.OrderBy(valFunc).First();
 };
-Array.prototype._AddFunction_Inline = function Max(valFunc) {
-    return this.OrderBy(valFunc || (a=>0)).Last();
+Array.prototype._AddFunction_Inline = function Max(valFunc = a=>a) {
+    return this.OrderBy(valFunc).Last();
+};
+Array.prototype._AddFunction_Inline = function Sum(valFunc = a=>a) {
+    var total = 0;
+	for (let item of this)
+		total += valFunc(item);
+	return total;
+};
+Array.prototype._AddFunction_Inline = function Average(valFunc = a=>a) {
+    var total = this.Sum(valFunc);
+	return total / this.length;
 };
 
 // like Pairs for Dictionary, except for Array (why is this on Object.prototype instead of Array.prototype?)

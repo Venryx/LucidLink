@@ -23,6 +23,7 @@ g.Pattern = class Pattern {
 	@P() channel2 = false;
 	@P() channel3 = false;
 	@P() channel4 = false;
+	//@T("Vector2i") @P() offset = new Vector2i(0, 0);
 	@P() points = [];
 
 	// in second-distances

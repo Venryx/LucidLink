@@ -22,6 +22,7 @@ import * as UM6 from "./Packages/VDF/VDFTypeInfo";
 import * as Globals from "./Globals";
 import * as UM0 from "./Frame/Styles";
 import * as ReactGlobals from "./ReactGlobals";
+require("./Frame/Graphics/VectorStructs");
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";

@@ -463,12 +463,13 @@ Shape2-scattered-points: ${ToJSON_Try(points2)}
   // Calculate the lowest upper bound over all points in shape1
   // of the distances to shape2.
   // TODO: Make it faster!
-  Sketchy.hausdorff = function(points1, points2, vector2D) {
+  Sketchy.hausdorff = function(points1, points2, center1ToCenter2PosDif) {
     var h_max = Number.MIN_VALUE, h_min, dis;
     for (var i = 0; i < points1.length; i++) {
       h_min = Number.MAX_VALUE;
       for (var j = 0; j < points2.length; j++) {
-        dis = Sketchy.euclideanDistance(points1[i].x,points1[i].y,points2[j].x+vector2D.x,points2[j].y+vector2D.y);
+        dis = Sketchy.euclideanDistance(points1[i].x,points1[i].y,
+			points2[j].x+center1ToCenter2PosDif.x,points2[j].y+center1ToCenter2PosDif.y);
         if (dis < h_min) {
              h_min = dis;
         } else if (dis == 0) {break;}
@@ -482,31 +483,42 @@ Shape2-scattered-points: ${ToJSON_Try(points2)}
   // Compute hausdorffDistance hausdorff(shape1, shape2) and hausdorff(shape2, shape1) and return
   // the maximum value.
   Sketchy.hausdorffDistance = function(shape1, shape2, center1, center2) {
-    var points1 = [], points2 = [];
-    var c1 = document.getElementById(shape1);
-    var c2 = document.getElementById(shape2);
-    var ctx1 = c1.getContext('2d');
-    var ctx2 = c2.getContext('2d');         
-    var idata1 = ctx1.getImageData(0,0,c1.width,c1.height);
-    var idata2 = ctx2.getImageData(0,0,c2.width,c2.height);
-    for (var y1=0; y1<c1.height; y1+=4) {
-      for (var x1=0; x1<c1.width; x1+=4) {
-        if (idata1.data[(x1+y1*c1.width)*4+3]>0) {
-          points1.push({x:x1, y:y1});
-        }
-        if (idata2.data[(x1+y1*c1.width)*4+3]>0) {
-          points2.push({x:x1, y:y1});
-        }
-      }
-    }
+	if (shape1 instanceof Array) {
+		var points1 = shape1, points2 = shape2; 
+	} else {
+		var points1 = [], points2 = [];
+		var c1 = document.getElementById(shape1);
+		var c2 = document.getElementById(shape2);
+		var ctx1 = c1.getContext('2d');
+		var ctx2 = c2.getContext('2d');         
+		var idata1 = ctx1.getImageData(0,0,c1.width,c1.height);
+		var idata2 = ctx2.getImageData(0,0,c2.width,c2.height);
+		for (var y1=0; y1<c1.height; y1+=4) {
+			for (var x1=0; x1<c1.width; x1+=4) {
+				if (idata1.data[(x1+y1*c1.width)*4+3]>0) {
+					points1.push({x:x1, y:y1});
+				}
+				if (idata2.data[(x1+y1*c1.width)*4+3]>0) {
+					points2.push({x:x1, y:y1});
+				}
+			}
+		}
+	}
+
     var vector2D = {x:center1.x-center2.x, y:center1.y-center2.y};
     var h1 = Sketchy.hausdorff(points1, points2, vector2D);
-    vector2D.x = -1*vector2D.x;
-    vector2D.y = -1*vector2D.y;
-    var h2 = Sketchy.hausdorff(points2, points1, vector2D);
-    var accuracy =Math.max(h1,h2) ;
+
+	if (vector2D.x != 0 || vector2D.y != 0) {
+		vector2D.x = -1*vector2D.x;
+		vector2D.y = -1*vector2D.y;
+		var h2 = Sketchy.hausdorff(points2, points1, vector2D);
+    	var accuracy =Math.max(h1,h2) ;
+	}
+	else
+		var accuracy = h1;
+
     return 1 - Math.pow(accuracy*Math.sqrt(2)/300, 1/1.4);
-  }; 
+  };
 
   Sketchy.secondMoment = function(shape)
   {

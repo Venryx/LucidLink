@@ -1,9 +1,18 @@
 g.V = class V {
+	static minInt = Number.MIN_SAFE_INTEGER;
+	static maxInt = Number.MAX_SAFE_INTEGER;
+
 	static Toast(...args) {
 		if (args.length == 1)
 			JavaBridge.Main.ShowToast(args[0], 3);
 		else
 			JavaBridge.Main.ShowToast(args[0], args[1]);
+	}
+
+	static Distance(point1, point2) {
+		var width = Math.abs(point2.x - point1.x);
+		var height = Math.abs(point2.y - point1.y); 
+		return Math.sqrt(width * width + height * height);
 	}
 
 	/*static startupInfo = null;
