@@ -250,7 +250,7 @@ class ChartManager {
 			LineDataSet line = new LineDataSet(thisChannelPoints, "Channel " + i);
 			line.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-			line.setColor(Color.BLACK);
+			line.setColor(Color.WHITE);
 			line.setLineWidth(0.5f);
 			line.setDrawValues(false);
 			line.setDrawCircles(false);
@@ -273,6 +273,9 @@ class ChartManager {
 		chart.getAxisLeft().setDrawLabels(false);
 		chart.getAxisRight().setDrawLabels(false);
 		//chart.getXAxis().setDrawLabels(false);
+		/*chart.getXAxis().setAxisLineColor(V.textColor);
+		chart.getXAxis().setGridColor(V.textColor);*/
+		chart.getXAxis().setTextColor(V.textColor);
 		chart.getLegend().setEnabled(false);
 
 		chart.invalidate(); // draw

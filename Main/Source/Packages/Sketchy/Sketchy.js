@@ -130,6 +130,7 @@ Shape1-scattered-points: ${ToJSON_Try(points1)}
 Shape2-scattered-points: ${ToJSON_Try(points2)}
 `;
 }
+	window.Assert = window.Assert || function() {};
 	Assert(points1 != null && points2 != null, ()=>`ScatteredPoints cannot be null. (point-scattering failed)${InfoStr()}`);
 	Assert(points1.length == pointsPerShape, ()=>`Scattered-points-1 count does not match the expected ${pointsPerShape}.${InfoStr()}`);
 	Assert(points2.length == pointsPerShape, ()=>`Scattered-points-2 count does not match the expected ${pointsPerShape}.${InfoStr()}`);
