@@ -19,6 +19,7 @@ export default class GeneralUI extends BaseComponent {
 						<Switch value={node.blockUnusedKeys}
 							onValueChange={value=>{
 								node.blockUnusedKeys = value;
+
 								LL.PushBasicDataToJava();
 								this.forceUpdate();
 							}}/>
@@ -42,6 +43,8 @@ export default class GeneralUI extends BaseComponent {
 									if (id == -1) return;
 									let val = values[id];
 									node.patternMatchInterval = val;
+									
+									LL.PushBasicDataToJava();
 									this.forceUpdate();
 								});
 							}}/>
@@ -65,6 +68,8 @@ export default class GeneralUI extends BaseComponent {
 									if (id == -1) return;
 									let val = values[id];
 									node.patternMatchOffset = val;
+
+									LL.PushBasicDataToJava();
 									this.forceUpdate();
 								});
 							}}/>

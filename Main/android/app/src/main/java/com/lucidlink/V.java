@@ -9,8 +9,11 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.annimon.stream.Stream;
 import com.choosemuse.libmuse.LibmuseVersion;
 import com.facebook.imagepipeline.producers.Consumer;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -18,8 +21,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class V {
@@ -45,6 +51,34 @@ public class V {
 		} else {
 			Log.i(tag, message);
 		}
+	}
+
+	public static void Assert(boolean condition) {
+		Assert(condition, "");
+	}
+	public static void Assert(boolean condition, String message) {
+		if (condition) return;
+		throw new Error("Assert failed) " + message);
+	}
+
+	public static <T extends Object> List<T> List(Stream<T> stream) {
+		List<T> result = new ArrayList<T>();
+		for (Object item : stream.toArray())
+			result.add((T)item);
+		return result;
+	}
+	public static List<ReadableMap> List_ReadableMaps(ReadableArray array) {
+		List<ReadableMap> result = new ArrayList<ReadableMap>();
+		for (int i = 0; i < array.size(); i++)
+			result.add(array.getMap(i));
+		return result;
+	}
+
+	public static String GetStackTrace(Throwable ex) {
+		StringWriter writer = new StringWriter();
+		ex.printStackTrace(new PrintWriter(writer));
+		//return writer.toString().replace("\\n", "\n");
+		return writer.toString();
 	}
 
 	public static void Toast(String message) {

@@ -107,7 +107,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     //buildToolsVersion "23.0.1"
     buildToolsVersion "25.0.0"
 
@@ -115,7 +115,7 @@ android {
         applicationId "com.lucidlink"
         //minSdkVersion 18
         minSdkVersion 21
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         ndk {
@@ -204,6 +204,7 @@ dependencies {
         compile project(':react-native-libmuse')
     if (userConfig.contains("mpChartLib_external: true"))
         compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
+    compile 'com.annimon:stream:1.1.4'
 }
 
 /*dependencies {

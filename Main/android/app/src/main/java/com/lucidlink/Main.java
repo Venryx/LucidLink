@@ -47,6 +47,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.lucidlink.Frame.Pattern;
 import com.v.LibMuse.LibMuse;
 import com.v.LibMuse.MainModule;
 
@@ -133,25 +134,43 @@ public class Main extends ReactContextBaseJavaModule {
 			promise.resolve(result);
 	}
 
-	public boolean blockUnusedKeys;
+	// monitor
 	public int updateInterval = 1;
 	public boolean monitor = true;
+	public boolean patternMatch;
+	// settings
+	public boolean blockUnusedKeys;
+	public double patternMatchInterval;
+	public double patternMatchOffset;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
-		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
+		// monitor
 		this.updateInterval = data.getInt("updateInterval");
 		this.monitor = data.getBoolean("monitor");
+		// settings
+		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
+		this.patternMatchInterval = data.getDouble("patternMatchInterval");
+		this.patternMatchOffset = data.getDouble("patternMatchOffset");
+	}
+
+	List<Pattern> patterns;
+	@ReactMethod public void SetPatterns(ReadableArray patternMaps) {
+		patterns = new ArrayList<Pattern>();
+		for (ReadableMap map : V.List_ReadableMaps(patternMaps)) {
+			Pattern pattern = Pattern.FromMap(map);
+			patterns.add(pattern);
+		}
 	}
 
 	ChartManager mainChartManager = new ChartManager();
 
-	@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
+	/*@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
 		String type = args.getString(0);
 		ReadableArray column = args.getArray(1);
 		ArrayList<Double> columnFinal = new ArrayList<>(column.size());
 		for (int i = 0; i < column.size(); i++)
 			columnFinal.set(i, column.getDouble(i));
 		mainChartManager.OnReceiveMuseDataPacket(type, columnFinal);
-	}
+	}*/
 
 	@ReactMethod public void OnTabSelected(int tab) {
 		MainActivity.main.runOnUiThread(()-> {
@@ -177,10 +196,10 @@ public class Main extends ReactContextBaseJavaModule {
 		V.Log(type + " [js]", message, false);
 	}
 
-	@ReactMethod public void OnSetPatternMatchProbability(int x, double probability) {
+	/*@ReactMethod public void OnSetPatternMatchProbability(int x, double probability) {
 		if (mainChartManager.initialized)
 			mainChartManager.OnSetPatternMatchProbability(x, probability);
-	}
+	}*/
 
 	void Shutdown() {
 		V.Log("Shutting down...");

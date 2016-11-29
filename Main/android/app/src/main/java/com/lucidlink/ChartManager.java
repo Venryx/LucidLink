@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ChartManager {
+	public ChartManager() {
+		processor = new EEGProcessor(this);
+	}
+
 	public boolean initialized;
 	public void TryToInit() {
 		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
@@ -157,28 +161,36 @@ class ChartManager {
 		MainModule.main.extraListener = new MuseDataListener() {
 			@Override
 			public void receiveMuseDataPacket(final MuseDataPacket p, final Muse muse) {
-				MainModule.main.dataListenerEnabled = Main.main.monitor;
-				if (!Main.main.monitor) return;
+				try {
+					//MainModule.main.dataListenerEnabled = Main.main.monitor;
+					MainModule.main.dataListenerEnabled = false; // atm, never send muse data to js
+					if (!Main.main.monitor) return;
 
-				MuseDataPacketType packetType = p.packetType();
-				String type;
-				if (packetType == MuseDataPacketType.EEG)
-					type = "eeg";
-				else if (packetType == MuseDataPacketType.ACCELEROMETER)
-					type = "accelerometer";
-				else if (packetType == MuseDataPacketType.ALPHA_RELATIVE)
-					type = "alpha";
-				else // currently we just ignore other packet types
-					return;
-				ArrayList<Double> data = p.values();
+					MuseDataPacketType packetType = p.packetType();
+					String type;
+					if (packetType == MuseDataPacketType.EEG)
+						type = "eeg";
+					else if (packetType == MuseDataPacketType.ACCELEROMETER)
+						type = "accelerometer";
+					else if (packetType == MuseDataPacketType.ALPHA_RELATIVE)
+						type = "alpha";
+					else // currently we just ignore other packet types
+						return;
+					ArrayList<Double> data = p.values();
 
-				ChartManager.this.OnReceiveMuseDataPacket(type, data);
+					ChartManager.this.OnReceiveMuseDataPacket(type, data);
+
+					processor.OnReceiveMuseDataPacket(type, data);
+				} catch(Throwable ex) {
+					V.Log("Error in ChartManager.receiveMuseDataPacket) " + V.GetStackTrace(ex));
+				}
 			}
 
 			@Override
 			public void receiveMuseArtifactPacket(final MuseArtifactPacket p, final Muse muse) {}
 		};
 	}
+	EEGProcessor processor;
 
 	public void SetChartVisible(boolean visible) {
 		if (visible) {
@@ -209,38 +221,35 @@ class ChartManager {
 	int maxY_fullChart = 6000;
 
 	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> column) {
-		try {
-			if (!type.equals("eeg")) return;
+		if (!type.equals("eeg")) return;
 
-			// add points
-			int currentX = lastX < maxX ? lastX + 1 : 0;
-			for (int channel = 0; channel < eegCount; channel++) {
-				/*Entry entry = data.getDataSetByIndex(channel).getEntryForIndex(currentX);
-				entry.setX(currentX * stepSizeInPixels);
-				entry.setY((float)(double)column.get(channel));*/
-				//data.getDataSetByIndex(channel).removeEntry(currentX);
+		// add points
+		int currentX = lastX < maxX ? lastX + 1 : 0;
+		for (int channel = 0; channel < eegCount; channel++) {
+			/*Entry entry = data.getDataSetByIndex(channel).getEntryForIndex(currentX);
+			entry.setX(currentX * stepSizeInPixels);
+			entry.setY((float)(double)column.get(channel));*/
+			//data.getDataSetByIndex(channel).removeEntry(currentX);
 
-				/*data.getDataSetByIndex(channel).removeEntry(currentX);
-				data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));*/
+			/*data.getDataSetByIndex(channel).removeEntry(currentX);
+			data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));*/
 
-				DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
+			DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
 
-				float yBase = 4000 - (channel * 1000); // simulate lines being in different rows
-				float yValue = (float)(double)column.get(channel);
+			float yBase = 4000 - (channel * 1000); // simulate lines being in different rows
+			float yValue = (float)(double)column.get(channel);
 
-				dataSet.getValues().set(currentX, new Entry(currentX, yBase + yValue));
-			}
-			lastX = currentX;
-
-			if (count == 0) // init stuff that nonetheless needs real data
-				chart.setVisibleXRange(0, maxX);
-
-			if (count % Main.main.updateInterval == 0)
-				UpdateChart();
-
-			count++;
+			dataSet.getValues().set(currentX, new Entry(currentX, yBase + yValue));
 		}
-		catch (Throwable ex) { V.Log("Error in muse-data receiver: " + ex); }
+		lastX = currentX;
+
+		if (count == 0) // init stuff that nonetheless needs real data
+			chart.setVisibleXRange(0, maxX);
+
+		if (count % Main.main.updateInterval == 0)
+			UpdateChart();
+
+		count++;
 	}
 	int lastSetPatternMatchProbability_x = -1;
 	public void OnSetPatternMatchProbability(int currentX, double probability) {

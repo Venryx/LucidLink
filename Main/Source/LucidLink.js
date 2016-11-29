@@ -108,10 +108,17 @@ g.LucidLink = class LucidLink extends Node {
 
 	PushBasicDataToJava() {
 		JavaBridge.Main.SetBasicData({
-			blockUnusedKeys: LL.settings.blockUnusedKeys,
+			// monitor
 			updateInterval: LL.monitor.updateInterval,
 			monitor: LL.monitor.monitor,
+			// settings
+			blockUnusedKeys: LL.settings.blockUnusedKeys,
+			patternMatchInterval: LL.settings.patternMatchInterval,
+			patternMatchOffset: LL.settings.patternMatchOffset,
 		});
+	}
+	PushPatternsToJava() {
+		JavaBridge.Main.SetPatterns(this.settings.patterns);
 	}
 
 	sessionKey = null;
@@ -178,6 +185,7 @@ async function Init(ui) {
 	LL.scripts.LoadFileSystemData();
 
 	LL.PushBasicDataToJava();
+	LL.PushPatternsToJava();
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
 }
