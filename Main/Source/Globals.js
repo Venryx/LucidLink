@@ -201,10 +201,7 @@ g.FinalizeToVDFOptions = function(options = null) {
 	/*catch(error) { if (!InUnity()) throw error; else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
 	//catch(error) { if (!InUnity()) { debugger; throw error; } else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
 }*/
-g.ToVDF = function(obj, /*o:*/ markRootType, typeMarking, options) {
-	markRootType = markRootType != null ? markRootType : true; // maybe temp; have JS side assume the root-type should be marked
-	typeMarking = typeMarking || VDFTypeMarking.Internal;
-
+g.ToVDF = function(obj, markRootType = true, typeMarking = VDFTypeMarking.Internal, options = null) {
 	try {
 		options = FinalizeToVDFOptions(options);
 		options.typeMarking = typeMarking;

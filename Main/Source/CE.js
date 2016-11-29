@@ -243,7 +243,7 @@ Object.prototype._AddGetter_Inline = function Props() {
 	get: function() { return Object.keys(this); }
 	//get: Object.keys
 });*/
-/*Object.prototype._AddFunction_Inline = function Items() {
+/*Object.prototype._AddGetter_Inline = function Items() {
 	var result = [];
 	for (var key in this)
 		if (this.hasOwnProperty(key))

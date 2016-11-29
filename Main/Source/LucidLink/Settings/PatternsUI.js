@@ -59,9 +59,9 @@ export default class PatternsUI extends BaseComponent {
 
 
 					{node.patterns.map((pattern, index)=> {
-						var points = pattern.points;
-						if (points.length == 0)
-							points = [[[0, 0]]];
+						var pointsForChart = pattern.points.Select(a=>[a.x, a.y]);
+						if (pointsForChart.length == 0)
+							pointsForChart = [[0, 0]];
 						return (
 							<Row key={index} height={35 + (pattern.textEditor ? 35 : 0) + 100}>
 								<Column>
@@ -93,10 +93,10 @@ export default class PatternsUI extends BaseComponent {
 									{pattern.textEditor && 
 										<Row height={35}>
 											<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-												editable={true} defaultValue={ToJSON(pattern.points)}
+												editable={true} defaultValue={ToVDF(pattern.points, false)}
 												onChangeText={text=> {
 													try {
-														pattern.points = FromJSON(text);
+														pattern.points = FromVDF(text, "List(Vector2i)");
 													} catch (ex) {
 														V.Toast("Invalid points JSON");
 													}
@@ -107,7 +107,7 @@ export default class PatternsUI extends BaseComponent {
 										<Chart style={{width: Dimensions.get("window").width - 30, height: 80}}
 											minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
 											minY={-node.previewChartRangeY / 2} maxY={node.previewChartRangeY / 2} legendStepsY={5}
-											type="line" color={["#e1cd00"]} data={[points]}/>
+											type="line" color={["#e1cd00"]} data={[pointsForChart]}/>
 									</Row>
 								</Column>
 							</Row>
@@ -121,6 +121,13 @@ export default class PatternsUI extends BaseComponent {
             </Panel>
 		);
 	}
+
+	/*ToVectors(points) {
+		return points.Select(a=>new Vector2i(a[0], a[1]));
+	}
+	ToArrays(points) {
+		return points.Select(a=>[a.x, a.y]);
+	}*/
 
 	CreatePattern() {
 		LL.settings.patterns.push({name: "none", points: []});

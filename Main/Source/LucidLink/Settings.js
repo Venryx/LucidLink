@@ -24,12 +24,12 @@ g.Pattern = class Pattern {
 	@P() channel3 = false;
 	@P() channel4 = false;
 	//@T("Vector2i") @P() offset = new Vector2i(0, 0);
-	@P() points = [];
+	@T("List(Vector2i)") @P() points = [];
 
 	// in second-distances
 	get Duration() {
-		var min = this.points.Select(a=>a[0]).Min();
-		var max = this.points.Select(a=>a[0]).Max();
+		var min = this.points.Select(a=>a.x).Min();
+		var max = this.points.Select(a=>a.x).Max();
 		return max - min;
 	}
 
