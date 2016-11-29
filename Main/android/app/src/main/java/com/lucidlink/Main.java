@@ -146,6 +146,7 @@ public class Main extends ReactContextBaseJavaModule {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
 		this.monitor = data.getBoolean("monitor");
+		this.patternMatch = data.getBoolean("patternMatch");
 		// settings
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
 		this.patternMatchInterval = data.getDouble("patternMatchInterval");

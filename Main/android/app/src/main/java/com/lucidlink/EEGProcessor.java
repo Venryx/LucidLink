@@ -5,6 +5,7 @@ import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,17 +18,14 @@ class EEGProcessor {
 	// for the moment, assume X packets per second (get the actual number at some point)
 	public final int packetsPerSecond = 20;
 
-	// from JS
-	// =========
-
-	List<Pattern> patterns;
-
 	// general
 	// ==========
 
 	// where eg. [0][1] (channel, x-pos/index) is {x:1,y:9} (x-pos, y-pos)
-	List<List<Vector2i>> channelPoints = new ArrayList<>();
-	HashMap<String, List<Double>> patternMatchProbabilities = new HashMap<>();
+	List<Vector2i[]> channelPoints = new ArrayList<>();
+	int[] channelBaselines = new int[4];
+
+	HashMap<String, HashMap<Integer, Double>> patternMatchProbabilities = new HashMap<>();
 	int lastX = -1;
 	int maxX = 1000;
 
@@ -41,21 +39,27 @@ class EEGProcessor {
 		//for (var channel = 0; channel < 6; channel++)
 		for (int channel = 0; channel < 4; channel++) {
 			if (channelPoints.size() <= channel) {
-				channelPoints.add(new ArrayList<>());
+				channelPoints.add(new Vector2i[maxX + 1]);
 				for (int x = 0; x <= maxX; x++)
-					channelPoints.get(channel).add(x, new Vector2i(x, 0));
+					channelPoints.get(channel)[x] = new Vector2i(x, 0);
 			}
 			Vector2i point = new Vector2i(currentX, (int)(double)column.get(channel));
-			channelPoints.get(channel).add(currentX, point);
+			channelPoints.get(channel)[currentX] = point;
 		}
 
 		lastX = currentX;
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 
+		// only update the baseline once every chart-width
+		if (currentX == maxX) {
+			for (int channel = 0; channel < 4; channel++)
+				channelBaselines[channel] = GetChannelBaseline(channel);
+		}
+
 		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
 		int scanOffset_inPackets = (int)(Main.main.patternMatchOffset * packetsPerSecond);
 		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
-			for (Pattern pattern : patterns) {
+			for (Pattern pattern : Main.main.patterns) {
 				if (!pattern.channel1 && !pattern.channel2 && !pattern.channel3 && !pattern.channel4) continue;
 				V.Assert(pattern.points.size() >= 2, "Pattern point count too low. Should be 2+, not " + pattern.points.size() + ".");
 
@@ -71,7 +75,10 @@ class EEGProcessor {
 						List<Vector2i> points = GetPointsForScanRange(channel, scanLeft, scanRight);
 						V.Assert(points != null && points.size() >= 2, "Scanned point count too low. Should be 2+, not " + (points != null ? points.size() : "n/a") + ".");
 						//let channelPoints_final = ConvertPoints(points);
-						int channelBaseline = GetChannelBaseline(channel);
+
+						//int channelBaseline = GetChannelBaseline(channel);
+						int channelBaseline = channelBaselines[channel];
+
 						/*let channelPoints_final = CenterOnY(points, channelBaseline);
 						channelPoints_final = TrimXValuesTo(channelPoints_final, scanLeft);*/
 						new Vector2i(0, 0).NewX(a->a);
@@ -87,8 +94,8 @@ class EEGProcessor {
 
 						matchProb = Math.max(0, matchProb); // maybe temp
 
-						V.Log(channelBaseline + " | " + distance + " | " + maxDistancePossible + " | " + matchProb);/*
-PatternPoints: ${ToVDF(pattern.points, false)}
+						//V.Log(channelBaseline + " | " + distance + " | " + maxDistancePossible + " | " + matchProb, false);
+/*PatternPoints: ${ToVDF(pattern.points, false)}
 ChannelPoints: ${ToVDF(points, false)}
 ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 						highestMatchProb = Math.max(highestMatchProb, matchProb);
@@ -96,8 +103,8 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 				}
 				//patternMatchProbabilities[pattern.name] = highestMatchProb;
 				if (!patternMatchProbabilities.containsKey(pattern.name))
-					patternMatchProbabilities.put(pattern.name, new ArrayList<Double>());
-				patternMatchProbabilities.get(pattern.name).add(currentX, highestMatchProb);
+					patternMatchProbabilities.put(pattern.name, new HashMap<Integer, Double>());
+				patternMatchProbabilities.get(pattern.name).put(currentX, highestMatchProb);
 				//Log(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
 				//JavaLog(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
 			}
@@ -119,22 +126,39 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		}
 	}
 	List<Vector2i> GetPointsForScanRange(int channel, int scanLeft, int scanRight) {
-		List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
+		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
 
 		List<Vector2i> result = new ArrayList<Vector2i>();
 		for (int i = scanLeft; i < scanRight; i++) {
 			int iFinal = i >= 0 ? i : ((maxX + 1) + i); // if in range, get it; else, loop around and grab from end
-			result.add(channelPoints.get(iFinal));
+			result.add(channelPoints[iFinal]);
 		}
 		return result;
 	}
 
 	int GetChannelBaseline(int channel) {
-		List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
+		/*List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		List<Vector2i> channelPoints_ordered = V.List(Stream.of(channelPoints).sortBy(a->a.y));
 		int result = channelPoints_ordered.get(channelPoints_ordered.size() / 2).y;
 		//Log("Baseline:" + result + ";" + ToJSON(channelPoints_ordered));
-		return result;
+		return result;*/
+
+		/*Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
+		int[] channelPoints_array = new int[channelPoints.length];
+		for (int i = 0; i < channelPoints.length; i++)
+			channelPoints_array[i] = channelPoints[i].y;
+		Arrays.sort(channelPoints_array);*/
+
+		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
+		Vector2i[] channelPoints_clone = channelPoints.clone();
+		Arrays.sort(channelPoints_clone);
+
+		int median;
+		if (channelPoints_clone.length % 2 == 0)
+			median = (channelPoints_clone[channelPoints_clone.length / 2].y + channelPoints_clone[channelPoints_clone.length / 2 - 1].y) / 2;
+		else
+			median = channelPoints_clone[channelPoints_clone.length / 2].y;
+		return median;
 	}
 
 	/*static ConvertPoints(points) {

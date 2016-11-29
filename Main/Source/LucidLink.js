@@ -111,6 +111,7 @@ g.LucidLink = class LucidLink extends Node {
 			// monitor
 			updateInterval: LL.monitor.updateInterval,
 			monitor: LL.monitor.monitor,
+			patternMatch: LL.monitor.patternMatch,
 			// settings
 			blockUnusedKeys: LL.settings.blockUnusedKeys,
 			patternMatchInterval: LL.settings.patternMatchInterval,

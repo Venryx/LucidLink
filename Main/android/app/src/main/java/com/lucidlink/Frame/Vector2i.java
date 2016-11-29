@@ -2,7 +2,12 @@ package com.lucidlink.Frame;
 
 import com.facebook.react.bridge.ReadableMap;
 
-public class Vector2i {
+public class Vector2i implements Comparable<Vector2i> {
+	@Override
+	public int compareTo(Vector2i other) {
+		return ((Integer)y).compareTo(other.y);
+	}
+
 	public interface Func_Int {
 		public int run(int a);
 	}

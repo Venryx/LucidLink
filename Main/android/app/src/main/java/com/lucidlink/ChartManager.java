@@ -272,7 +272,7 @@ class ChartManager {
 
 		dataSet.addEntryOrdered(new Entry(currentX, (float)(probability * maxY_fullChart)));
 
-		V.Log("Setting for X: " + currentX + ";" + probability);
+		//V.Log("Setting for X: " + currentX + ";" + probability);
 
 		lastSetPatternMatchProbability_x = currentX;
 
