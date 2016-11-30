@@ -8,7 +8,7 @@ Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 1) Ensure prerequisite programs are installed: Git (+TortoiseGit), NodeJS, Android SDK, VirtualBox, Genymotion  
 2) Ensure prerequisite Android SDK packages are installed: [...]  
 3) Ensure prerequisite npm modules are installed: react-native-cli  
-4) Ensure a virtual Android device is set up in Genymotion (which uses VirtualBox), with Android 5.0 or later.  
+4) Ensure a virtual Android 5+ device is set up in Genymotion (which uses VirtualBox). (or have an Android 5+ device)  
 
 ### Install
 
@@ -17,7 +17,7 @@ Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
 ### Compile and run
 
-1) Start up the virtual Android device.  
+1) Start up the virtual Android device. (or connect Android device through usb/wifi)  
 2) Open CMD in "Main" folder, and run "react-native run-android".  
 
 ### Making changes
