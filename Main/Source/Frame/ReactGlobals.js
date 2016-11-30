@@ -181,6 +181,17 @@ g.Panel = class Panel extends View {
 	}
 }
 
+function BasicStyles(props) {
+	var result = {};
+	for (let key in props) {
+		if (key.startsWith("ml"))
+			result.marginLeft = parseInt(key.substr(2));
+		else if (key.startsWith("mt"))
+			result.marginTop = parseInt(key.substr(2)); 
+	}
+	return result;
+}
+
 g.VButton = class VButton extends BaseComponent {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
@@ -189,14 +200,34 @@ g.VButton = class VButton extends BaseComponent {
 
 		if (caps)
 			text = text.toUpperCase();
-
-		var baseStyle = {borderColor: "#777", backgroundColor: "#777", borderRadius: 3};
+		
 		return (
 			<Button {...restProps} isDisabled={!enabled}
-					style={E(baseStyle, style)}
+					style={E(
+						{borderColor: "#777", backgroundColor: "#777", borderRadius: 3},
+						BasicStyles(this.props),
+						style
+					)}
 					textStyle={E({color: "#FFF", fontWeight: "bold", fontSize: 15}, textStyle)}>
 				{text}
 			</Button>
+		);
+	}
+}
+
+g.VSwitch = class VSwitch extends BaseComponent {
+	render() {
+		var {text, style} = this.props;
+		var restProps = this.props.Excluding("text", "style");
+		return (
+			<View style={E({flexDirection: "row"}, BasicStyles(this.props))}>
+				<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>{text}</Text>
+				<Switch {...restProps}
+					style={E(
+						{height: 50, top: 0, transform: [{translateY: -3}]},
+						style
+					)}/>
+			</View>
 		);
 	}
 }

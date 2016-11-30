@@ -12,23 +12,23 @@ import Orientation from "react-native-orientation";
 import Moment from "moment";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 
-require("./CE");
+require("./Frame/CE");
 import * as UM1 from "./Packages/VDF/VDF";
 import * as UM2 from "./Packages/VDF/VDFLoader";
 import * as UM3 from "./Packages/VDF/VDFNode";
 import * as UM4 from "./Packages/VDF/VDFSaver";
 import * as UM5 from "./Packages/VDF/VDFTokenParser";
 import * as UM6 from "./Packages/VDF/VDFTypeInfo";
-import * as Globals from "./Globals";
+import * as Globals from "./Frame/Globals";
 import * as UM0 from "./Frame/Styles";
-import * as ReactGlobals from "./ReactGlobals";
+import * as ReactGlobals from "./Frame/ReactGlobals";
 require("./Frame/Graphics/VectorStructs");
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";
 require("./Packages/Sketchy/Sketchy");
 
-import TestData from "./TestData";
+import TestData from "./Frame/TestData";
 //import {JavaBridge} from "./Globals";
 
 import {MonitorUI} from "./LucidLink/Monitor";
@@ -119,6 +119,7 @@ g.LucidLink = class LucidLink extends Node {
 		});
 	}
 	PushPatternsToJava() {
+		Assert(this.settings.patterns.All(a=>a instanceof Pattern));
 		JavaBridge.Main.SetPatterns(this.settings.patterns);
 	}
 

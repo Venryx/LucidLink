@@ -5,7 +5,7 @@ import LibMuse from "react-native-libmuse";
 	static Init() {
 		LibMuse.AddListener_OnChangeMuseList(MuseBridge.OnChangeMuseList);
 		LibMuse.AddListener_OnChangeMuseConnectStatus(MuseBridge.OnChangeMuseConnectStatus);
-		LibMuse.AddListener_OnReceiveMuseDataPacket(MuseBridge.OnReceiveMuseDataPacket);
+		//LibMuse.AddListener_OnReceiveMuseDataPacket(MuseBridge.OnReceiveMuseDataPacket);
 		LibMuse.Init();
 		MuseBridge.initialized = true;
 		Log("muse link", `LibMuse initialized.`);

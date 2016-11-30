@@ -48,6 +48,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.lucidlink.Frame.Pattern;
+import com.lucidlink.Frame.Vector2i;
 import com.v.LibMuse.LibMuse;
 import com.v.LibMuse.MainModule;
 
@@ -172,6 +173,13 @@ public class Main extends ReactContextBaseJavaModule {
 		});
 	}
 
+	@ReactMethod public void UpdateChartBounds() {
+		if (!mainChartManager.initialized) return;
+		//V.WaitXThenRun(500, ()-> {
+			mainChartManager.UpdateChartBounds();
+		//});
+	}
+
 	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {
 	}*/
 
@@ -183,6 +191,19 @@ public class Main extends ReactContextBaseJavaModule {
 		if (mainChartManager.initialized)
 			mainChartManager.OnSetPatternMatchProbability(x, probability);
 	}*/
+
+	@ReactMethod public void StartPatternGrab(int minX, int maxX, Promise promise) {
+		WritableArray channel_pointsGrabbed = Arguments.createArray();
+		for (int ch = 0; ch < 4; ch++) {
+			Vector2i[] channelPoints = this.mainChartManager.processor.channelPoints.get(ch);
+
+			WritableArray channelPointsGrabbed = Arguments.createArray();
+			for (int x = minX; x <= maxX; x++)
+				channelPointsGrabbed.pushMap(channelPoints[x].ToMap());
+			channel_pointsGrabbed.pushArray(channelPointsGrabbed);
+		}
+		promise.resolve(channel_pointsGrabbed);
+	}
 
 	void Shutdown() {
 		V.Log("Shutting down...");

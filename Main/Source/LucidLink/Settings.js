@@ -18,6 +18,10 @@ g.Settings = class Settings extends Node {
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 }
 g.Pattern = class Pattern {
+	constructor(name) {
+		this.name = name;
+	}
+
 	@P() name = null;
 	@P() channel1 = false;
 	@P() channel2 = false;

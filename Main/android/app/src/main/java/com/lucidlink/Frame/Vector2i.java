@@ -1,6 +1,8 @@
 package com.lucidlink.Frame;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 public class Vector2i implements Comparable<Vector2i> {
 	@Override
@@ -32,6 +34,13 @@ public class Vector2i implements Comparable<Vector2i> {
 		return this.x + " " + this.y;
 	}
 	@Override public boolean equals(Object other) { return this.toString() == other.toString(); }
+
+	public WritableMap ToMap() {
+		WritableMap result = Arguments.createMap();
+		result.putInt("x", x);
+		result.putInt("y", y);
+		return result;
+	}
 
 	public Vector2i NewX(int x) { return new Vector2i(x, this.y); }
 	public Vector2i NewX(Func_Int xFunc) { return new Vector2i(xFunc.run(this.x), this.y); }

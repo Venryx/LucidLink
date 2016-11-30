@@ -187,11 +187,11 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     // android support
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:24.0.1'
     compile 'com.android.support:support-annotations:24.2.0'
-    compile 'com.android.support:design:23.0.1'
-    compile 'com.android.support:percent:23.0.0'
-    compile 'com.android.support:recyclerview-v7:23.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:percent:24.0.0'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
 
     compile project(':react-native-dialogs')
     compile project(':react-native-numberpicker-dialog')
@@ -246,4 +246,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
 dependencies {
     compile project(path: ':react-native-libmuse')
     compile project(path: ':MPChartLib')
+    compile project(':RNMaterialKit')
 }

@@ -67,18 +67,24 @@ public class V {
 	}
 
 	public static <T extends Object> List<T> List(Stream<T> stream) {
-		List<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<>();
 		for (Object item : stream.toArray())
 			result.add((T)item);
 		return result;
 	}
 	public static List<ReadableMap> List_ReadableMaps(ReadableArray array) {
-		List<ReadableMap> result = new ArrayList<ReadableMap>();
+		List<ReadableMap> result = new ArrayList<>();
 		for (int i = 0; i < array.size(); i++)
 			result.add(array.getMap(i));
 		return result;
 	}
 
+	public static <T extends Object> WritableArray ToWritableArray(List<T> array) {
+		WritableArray result = Arguments.createArray();
+		for (T item : array)
+			WritableArray_Add(result, item);
+		return result;
+	}
 	public static <K extends String, V extends Object> WritableMap ToWritableMap(HashMap<K, V> map) {
 		WritableMap result = Arguments.createMap();
 		for (Map.Entry<K, V> entry : map.entrySet())

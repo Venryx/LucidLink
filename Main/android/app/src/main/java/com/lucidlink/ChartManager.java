@@ -38,6 +38,8 @@ class ChartManager {
 		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
 		// ==========
 
+		MainModule.main.dataListenerEnabled = false; // atm, never send muse data to js
+
 		ViewGroup chartHolder = (ViewGroup) V.FindViewByContentDescription(V.GetRootView(), "chart holder");
 		if (chartHolder == null) {
 			V.Log("Could not find chart-holder.");
@@ -164,7 +166,6 @@ class ChartManager {
 			public void receiveMuseDataPacket(final MuseDataPacket p, final Muse muse) {
 				try {
 					//MainModule.main.dataListenerEnabled = Main.main.monitor;
-					MainModule.main.dataListenerEnabled = false; // atm, never send muse data to js
 					if (!Main.main.monitor) return;
 
 					MuseDataPacketType packetType = p.packetType();
@@ -191,6 +192,26 @@ class ChartManager {
 			public void receiveMuseArtifactPacket(final MuseArtifactPacket p, final Muse muse) {}
 		};
 	}
+
+	public void UpdateChartBounds() {
+		ViewGroup chartHolder = (ViewGroup) V.FindViewByContentDescription(V.GetRootView(), "chart holder");
+		if (chartHolder == null) {
+			V.Log("Could not find chart-holder.");
+			return; // must have switched to another tab quickly; just wait till they switch back and we get called again
+		}
+
+		int[] chartHolderPos = new int[2];
+		chartHolder.getLocationInWindow(chartHolderPos);
+
+		// moved away from page, so x is negative, so ignore
+		if (chartHolderPos[0] < 0) return;
+
+		V.Log("Updating chart bounds: " + chartHolderPos[0] + ";" +  chartHolderPos[1] + ";" + chartHolder.getWidth() + ";" + chartHolder.getHeight());
+		MainActivity.main.runOnUiThread(() -> {
+			newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
+		});
+	}
+
 	EEGProcessor processor;
 
 	public void SetChartVisible(boolean visible) {

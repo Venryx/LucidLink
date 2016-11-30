@@ -77,7 +77,7 @@ export default class PatternsUI extends BaseComponent {
 	}*/
 
 	CreatePattern() {
-		LL.settings.patterns.push({name: "none", points: []});
+		LL.settings.patterns.push(new Pattern("none"));
 
 		LL.PushPatternsToJava();
 		this.forceUpdate();
@@ -90,10 +90,10 @@ class PatternUI extends BaseComponent {
 		var node = LL.settings;
 
 		// call this after you make any changes to a Pattern object (so Java knows of changes)
-		function Change() {
+		var Change = ()=> {
 			LL.PushPatternsToJava();
 			this.forceUpdate();
-		}
+		};
 
 		var pointsForChart = pattern.points.Select(a=>[a.x, a.y]);
 		if (pointsForChart.length == 0)
@@ -135,7 +135,7 @@ class PatternUI extends BaseComponent {
 									try {
 										pattern.points = FromVDF(text, "List(Vector2i)");
 									} catch (ex) {
-										V.Toast("Invalid points JSON");
+										Toast("Invalid points JSON");
 									}
 									Change();
 								}}/>

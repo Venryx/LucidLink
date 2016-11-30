@@ -52,6 +52,13 @@ g.Trace = function(...args) {
 	console.trace(...args);
 };
 
+g.Toast = function(...args) {
+	if (args.length == 1)
+		JavaBridge.Main.ShowToast(args[0], 3);
+	else
+		JavaBridge.Main.ShowToast(args[0], args[1]);
+}
+
 g.Assert = function(condition, messageOrMessageFunc) {
 	if (condition) return;
 
