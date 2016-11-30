@@ -118,7 +118,8 @@ export class MonitorUI extends BaseComponent {
 	}
 
 	async GrabPattern() {
-		var channelPointsGrabbed_rawData = await JavaBridge.Main.StartPatternGrab(this.patternGrab_minX, this.patternGrab_maxX);
+		var {channelPointsGrabbed: channelPointsGrabbed_rawData, channelBaselines} =
+			await JavaBridge.Main.StartPatternGrab(this.patternGrab_minX, this.patternGrab_maxX);
 		var channelPointsGrabbed = channelPointsGrabbed_rawData.Select(rawPoints=> {
 			return rawPoints.Select(rawPoint=>new Vector2i(rawPoint.x, rawPoint.y));
 		})
@@ -133,7 +134,13 @@ export class MonitorUI extends BaseComponent {
 				for (let channelIndex of ids) {
 					let pattern = new Pattern("new pattern - channel " + (channelIndex + 1));
 					pattern["channel" + (channelIndex + 1)] = true;
-					pattern.points = channelPointsGrabbed[channelIndex];
+
+					let points = channelPointsGrabbed[channelIndex];
+					let minX = points.Select(a=>a.x).Min();
+					//let medianY = points.Select(a=>a.y).Median();
+					points = points.Select(a=>a.NewX(x=>x - minX).NewY(y=>y - channelBaselines[channelIndex]));
+					pattern.points = points;
+
 					LL.settings.patterns.push(pattern);
 				}
 

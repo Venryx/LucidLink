@@ -55,6 +55,7 @@ import com.v.LibMuse.MainModule;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,7 @@ public class Main extends ReactContextBaseJavaModule {
 		// settings
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
 		this.patternMatchInterval = data.getDouble("patternMatchInterval");
+		V.Assert(this.patternMatchInterval > 0, "Pattern-match-interval must be greater than 0.");
 		this.patternMatchOffset = data.getDouble("patternMatchOffset");
 	}
 
@@ -193,6 +195,22 @@ public class Main extends ReactContextBaseJavaModule {
 	}*/
 
 	@ReactMethod public void StartPatternGrab(int minX, int maxX, Promise promise) {
+		WritableArray channelPointsGrabbed = Arguments.createArray();
+		for (int ch = 0; ch < 4; ch++) {
+			Vector2i[] channelPoints = this.mainChartManager.processor.channelPoints.get(ch);
+
+			WritableArray thisChannelPointsGrabbed = Arguments.createArray();
+			for (int x = minX; x <= maxX; x++)
+				thisChannelPointsGrabbed.pushMap(channelPoints[x].ToMap());
+			channelPointsGrabbed.pushArray(thisChannelPointsGrabbed);
+		}
+
+		WritableMap result = Arguments.createMap();
+		result.putArray("channelPointsGrabbed", channelPointsGrabbed);
+		result.putArray("channelBaselines", V.ToWritableArray(V.ToObjectArray(this.mainChartManager.processor.channelBaselines)));
+		promise.resolve(result);
+	}
+	/*@ReactMethod public void GetChannelPoints(Promise promise) {
 		WritableArray channel_pointsGrabbed = Arguments.createArray();
 		for (int ch = 0; ch < 4; ch++) {
 			Vector2i[] channelPoints = this.mainChartManager.processor.channelPoints.get(ch);
@@ -203,7 +221,7 @@ public class Main extends ReactContextBaseJavaModule {
 			channel_pointsGrabbed.pushArray(channelPointsGrabbed);
 		}
 		promise.resolve(channel_pointsGrabbed);
-	}
+	}*/
 
 	void Shutdown() {
 		V.Log("Shutting down...");

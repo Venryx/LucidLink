@@ -698,15 +698,21 @@ Array.prototype._AddFunction_Inline = function Min(valFunc = a=>a) {
 Array.prototype._AddFunction_Inline = function Max(valFunc = a=>a) {
     return this.OrderBy(valFunc).Last();
 };
-Array.prototype._AddFunction_Inline = function Sum(valFunc = a=>a) {
+Array.prototype._AddFunction_Inline = function Sum() {
     var total = 0;
 	for (let item of this)
-		total += valFunc(item);
+		total += item;
 	return total;
 };
-Array.prototype._AddFunction_Inline = function Average(valFunc = a=>a) {
-    var total = this.Sum(valFunc);
+Array.prototype._AddFunction_Inline = function Average() {
+    var total = this.Sum();
 	return total / this.length;
+};
+Array.prototype._AddFunction_Inline = function Median() {
+    var ordered = this.OrderBy(a=>a);
+	if (this.length % 2 == 0) // if even number of elements, average two middlest ones
+		return ordered[(this.length / 2) - 1] + ordered[this.length / 2];
+	return ordered[this.length / 2]; // otherwise, return the exactly-middle one
 };
 
 // like Pairs for Dictionary, except for Array (why is this on Object.prototype instead of Array.prototype?)

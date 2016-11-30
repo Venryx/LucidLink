@@ -19,11 +19,11 @@ export default class PatternsUI extends BaseComponent {
 								for (let val = 1000; val <= 10000; val += 1000)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.previewChartRangeX),
-									values: values.Select(a=>a.toString()),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-									message: "Select value-range (horizontal) to display in the pattern-previews below.",
 									title: "Preview chart value range - x (horizontal)",
+									message: "Select value-range (horizontal) to display in the pattern-previews below.",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(node.previewChartRangeX),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];
@@ -43,11 +43,11 @@ export default class PatternsUI extends BaseComponent {
 								for (let val = 1000; val <= 10000; val += 1000)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.previewChartRangeY),
-									values: values.Select(a=>a.toString()),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-									message: "Select value-range (vertical) to display in the pattern-previews below.",
 									title: "Preview chart value range - y (vertical)",
+									message: "Select value-range (vertical) to display in the pattern-previews below.",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(node.previewChartRangeY),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];
@@ -58,7 +58,7 @@ export default class PatternsUI extends BaseComponent {
 					</Row>
 					
 					{node.patterns.map((pattern, index)=> {
-						return <PatternUI key={index} pattern={pattern}/>; 
+						return <PatternUI key={index} parent={this} pattern={pattern}/>; 
 					})}
 					<Row height={45}>
 						<VButton onPress={()=>this.CreatePattern()} text="Create" style={{width: 100, height: 40}}/>
@@ -84,15 +84,16 @@ export default class PatternsUI extends BaseComponent {
 	}
 }
 
+@Bind
 class PatternUI extends BaseComponent {
 	render() {
-		var {pattern} = this.props;
+		var {parent, pattern} = this.props;
 		var node = LL.settings;
 
 		// call this after you make any changes to a Pattern object (so Java knows of changes)
 		var Change = ()=> {
 			LL.PushPatternsToJava();
-			this.forceUpdate();
+			parent.forceUpdate();
 		};
 
 		var pointsForChart = pattern.points.Select(a=>[a.x, a.y]);
@@ -100,7 +101,7 @@ class PatternUI extends BaseComponent {
 			pointsForChart = [[0, 0]];
 
 		return (
-			<Row height={35 + (pattern.textEditor ? 35 : 0) + 100}>
+			<Row height={35 + (pattern.textEditor ? 35 : 0) + (pattern.actions ? 35 : 0) + 100}>
 				<Column>
 					<Row height={35}>
 						<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
@@ -108,23 +109,22 @@ class PatternUI extends BaseComponent {
 							onChangeText={text=>Change(pattern.name = text)}/>
 
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Channels: </Text>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>1</Text>
-						<Switch value={pattern.channel1}
+						<VSwitch text="1" value={pattern.channel1}
 							onValueChange={value=>Change(pattern.channel1 = value)}/>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>2</Text>
-						<Switch value={pattern.channel2}
+						<VSwitch text="2" value={pattern.channel2}
 							onValueChange={value=>Change(pattern.channel2 = value)}/>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>3</Text>
-						<Switch value={pattern.channel3}
+						<VSwitch text="3" value={pattern.channel3}
 							onValueChange={value=>Change(pattern.channel3 = value)}/>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>4</Text>
-						<Switch value={pattern.channel4}
+						<VSwitch text="4" value={pattern.channel4}
 							onValueChange={value=>Change(pattern.channel4 = value)}/>
-							
-						<Text style={{marginTop: 5}}>Text editor</Text>
-						<Switch value={pattern.textEditor}
+						
+						<VSwitch text="Text editor" value={pattern.textEditor}
 							onValueChange={value=>Change(pattern.textEditor = value)}/>
-						<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
+
+						<VSwitch text="Actions" value={pattern.actions}
+							onValueChange={value=>Change(pattern.actions = value)}/>
+
+						<VButton text="X" style={{marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
 							onPress={()=>Change(node.patterns.Remove(pattern))}/>
 					</Row>
 					{pattern.textEditor && 
@@ -140,6 +140,11 @@ class PatternUI extends BaseComponent {
 									Change();
 								}}/>
 						</Row>}
+					{pattern.actions && 
+						<Row height={35}>
+							<VButton text="Offset X" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("x")}/>
+							<VButton text="Offset Y" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("y")}/>
+						</Row>}
 					<Row height={100} style={{backgroundColor: "#FFFFFF55"}}>
 						<Chart style={{width: Dimensions.get("window").width - 30, height: 80}}
 							minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
@@ -149,5 +154,31 @@ class PatternUI extends BaseComponent {
 				</Column>
 			</Row>
 		);
+	}
+
+	async OffsetPoints(axis) {
+		var {pattern} = this.props;
+
+		var values = [];
+		for (let val = -1000; val < -100; val += 100) values.push(val);
+		for (let val = -100; val < -10; val += 10) values.push(val);
+		for (let val = -10; val < 10; val++) values.push(val);
+		for (let val = 10; val < 100; val += 10) values.push(val);
+		for (let val = 100; val <= 1000; val += 100) values.push(val);
+		var id = await NumberPickerDialog.show({
+			title: `Offset pattern ${axis}-values`,
+			message: `Select amount to offset the ${axis}-values of the pattern's points.`,
+			values: values.Select(a=>a.toString()),
+			selectedValueIndex: values.indexOf(0),
+			positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+		});
+		if (id == -1) return;
+
+		let offsetAmount = values[id];
+		for (let point of pattern.points)
+			point[axis] = point[axis] + offsetAmount;
+		
+		LL.PushPatternsToJava();
+		this.forceUpdate();
 	}
 }

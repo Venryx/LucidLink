@@ -34,11 +34,11 @@ export default class GeneralUI extends BaseComponent {
 								for (let val = 1; val <= 10; val += .5)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.patternMatchInterval),
-									values: values.Select(a=>a.toFixed(1)),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-									message: "Select interval/repeat-time (in seconds) at which to check for eeg-pattern matches.",
 									title: "Pattern match interval",
+									message: "Select interval/repeat-time (in seconds) at which to check for eeg-pattern matches.",
+									values: values.Select(a=>a.toFixed(1)),
+									selectedValueIndex: values.indexOf(node.patternMatchInterval),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];
@@ -59,11 +59,11 @@ export default class GeneralUI extends BaseComponent {
 								for (let val = 1; val <= 10; val += .5)
 									values.push(val);
 								NumberPickerDialog.show({
-									selectedValueIndex: values.indexOf(node.patternMatchOffset),
-									values: values.Select(a=>a.toFixed(1)),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-									message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
 									title: "Pattern match offset",
+									message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
+									values: values.Select(a=>a.toFixed(1)),
+									selectedValueIndex: values.indexOf(node.patternMatchOffset),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								}).then(id=> {
 									if (id == -1) return;
 									let val = values[id];

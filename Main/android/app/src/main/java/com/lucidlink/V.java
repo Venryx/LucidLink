@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,6 +80,20 @@ public class V {
 		return result;
 	}
 
+	public static Object[] ToObjectArray(Object val){
+		int length = Array.getLength(val);
+		Object[] outputArray = new Object[length];
+		for(int i = 0; i < length; ++i)
+			outputArray[i] = Array.get(val, i);
+		return outputArray;
+	}
+
+	public static <T> WritableArray ToWritableArray(T[] array) {
+		WritableArray result = Arguments.createArray();
+		for (T item : array)
+			WritableArray_Add(result, item);
+		return result;
+	}
 	public static <T extends Object> WritableArray ToWritableArray(List<T> array) {
 		WritableArray result = Arguments.createArray();
 		for (T item : array)
@@ -108,7 +123,7 @@ public class V {
 		else {
 			//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
 			if (!(obj instanceof WritableMap))
-				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
+				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap (not " + obj.getClass().getSimpleName() + ")");
 			array.pushMap((WritableMap)obj);
 		}
 	}
@@ -128,7 +143,7 @@ public class V {
 		else {
 			//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
 			if (!(obj instanceof WritableMap))
-				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
+				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap (not " + obj.getClass().getSimpleName() + ")");
 			map.putMap(key, (WritableMap)obj);
 		}
 	}
