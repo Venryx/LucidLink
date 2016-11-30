@@ -14,6 +14,7 @@ Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
 1) Clone this repo to your computer using git. (I use the TortoiseGit ui)  
 2) Open CMD in "Main" folder, and run "npm install".  
+3) Complete installation of "react-native-libmuse" module (sorry, due to libmuse license): https://github.com/Venryx/react-native-libmuse#install  
 
 ### Compile and run
 
