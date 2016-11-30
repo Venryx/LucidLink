@@ -79,26 +79,8 @@ public class Main extends ReactContextBaseJavaModule {
 
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();
-		for (Object arg : args) {
-			if (arg == null)
-				argsList.pushNull();
-			else if (arg instanceof Boolean)
-				argsList.pushBoolean((Boolean)arg);
-			else if (arg instanceof Integer)
-				argsList.pushInt((Integer)arg);
-			else if (arg instanceof Double)
-				argsList.pushDouble((Double)arg);
-			else if (arg instanceof String)
-				argsList.pushString((String)arg);
-			else if (arg instanceof WritableArray)
-				argsList.pushArray((WritableArray)arg);
-			else {
-				//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
-				if (!(arg instanceof WritableMap))
-					throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
-				argsList.pushMap((WritableMap)arg);
-			}
-		}
+		for (Object arg : args)
+			V.WritableArray_Add(argsList, arg);
 
 		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(eventName, argsList);

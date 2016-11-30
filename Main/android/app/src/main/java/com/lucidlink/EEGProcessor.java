@@ -115,7 +115,9 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 			/*for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
 				listener(patternMatchProbabilitiesForFrame);*/
 
-			chartManager.OnSetPatternMatchProbability(currentX, (Double)patternMatchProbabilitiesForFrame.values().toArray()[0]);
+			chartManager.OnSetPatternMatchProbabilities(currentX, patternMatchProbabilitiesForFrame);
+
+			Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
 		}
 		else {
 			/*let lastPatternMatchProbability = null;

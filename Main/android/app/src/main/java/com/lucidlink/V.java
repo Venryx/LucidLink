@@ -12,8 +12,11 @@ import android.widget.RelativeLayout;
 import com.annimon.stream.Stream;
 import com.choosemuse.libmuse.LibmuseVersion;
 import com.facebook.imagepipeline.producers.Consumer;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -26,7 +29,9 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class V {
 	public static int textColor = Color.rgb(255, 255, 255);
@@ -72,6 +77,54 @@ public class V {
 		for (int i = 0; i < array.size(); i++)
 			result.add(array.getMap(i));
 		return result;
+	}
+
+	public static <K extends String, V extends Object> WritableMap ToWritableMap(HashMap<K, V> map) {
+		WritableMap result = Arguments.createMap();
+		for (Map.Entry<K, V> entry : map.entrySet())
+			WritableMap_Add(result, entry.getKey(), entry.getValue());
+		return result;
+	}
+
+	public static void WritableArray_Add(WritableArray array, Object obj) {
+		if (obj == null)
+			array.pushNull();
+		else if (obj instanceof Boolean)
+			array.pushBoolean((Boolean)obj);
+		else if (obj instanceof Integer)
+			array.pushInt((Integer)obj);
+		else if (obj instanceof Double)
+			array.pushDouble((Double)obj);
+		else if (obj instanceof String)
+			array.pushString((String)obj);
+		else if (obj instanceof WritableArray)
+			array.pushArray((WritableArray)obj);
+		else {
+			//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
+			if (!(obj instanceof WritableMap))
+				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
+			array.pushMap((WritableMap)obj);
+		}
+	}
+	public static void WritableMap_Add(WritableMap map, String key, Object obj) {
+		if (obj == null)
+			map.putNull(key);
+		else if (obj instanceof Boolean)
+			map.putBoolean(key, (Boolean)obj);
+		else if (obj instanceof Integer)
+			map.putInt(key, (Integer)obj);
+		else if (obj instanceof Double)
+			map.putDouble(key, (Double)obj);
+		else if (obj instanceof String)
+			map.putString(key, (String)obj);
+		else if (obj instanceof WritableArray)
+			map.putArray(key, (WritableArray)obj);
+		else {
+			//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
+			if (!(obj instanceof WritableMap))
+				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
+			map.putMap(key, (WritableMap)obj);
+		}
 	}
 
 	public static String GetStackTrace(Throwable ex) {
@@ -135,11 +188,11 @@ public class V {
 		List<View> visited = new ArrayList<View>();
 		List<View> unvisited = new ArrayList<View>();
 		unvisited.add(root);
-		
+
 		while (!unvisited.isEmpty()) {
 			View child = unvisited.remove(0);
 			visited.add(child);
-			
+
 			if (child.getContentDescription() != null && child.getContentDescription().toString().equals(contentDescription))
 				return child;
 

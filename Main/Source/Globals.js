@@ -1,8 +1,13 @@
 import React, {Component} from "react";
-import {AppRegistry, NativeModules, StyleSheet} from "react-native";
+import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
 
 var g = global;
 g.g = g;
+
+var globalComps = {NativeModules, DeviceEventEmitter};
+//g.Extend(globalComps);
+for (let key in globalComps)
+	g[key] = globalComps[key];
 
 /*g.onerror = function(message, filePath, line, column, error) {
 	LogError(`JS) ${message} (at ${filePath}:${line}:${column})
@@ -69,8 +74,6 @@ g.JavaBridge = class JavaBridge {
         return NativeModules.Main;
     }
 }
-
-g.NativeModules = NativeModules;
 
 // polyfills for constants
 // ==========

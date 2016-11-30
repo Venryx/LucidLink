@@ -25,6 +25,7 @@ import com.lucidlink.V;
 import com.v.LibMuse.MainModule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class ChartManager {
@@ -252,7 +253,7 @@ class ChartManager {
 		count++;
 	}
 	int lastSetPatternMatchProbability_x = -1;
-	public void OnSetPatternMatchProbability(int currentX, double probability) {
+	public void OnSetPatternMatchProbabilities(int currentX, HashMap<String, Double> probabilities) {
 		DataSet dataSet = (DataSet)data.getDataSetByIndex(4);
 
 		// if we went back to start of chart, clear end of chart's last filling
@@ -270,6 +271,7 @@ class ChartManager {
 				dataSet.removeEntry(entry);
 		}
 
+		double probability = (Double)probabilities.values().toArray()[0];
 		dataSet.addEntryOrdered(new Entry(currentX, (float)(probability * maxY_fullChart)));
 
 		//V.Log("Setting for X: " + currentX + ";" + probability);
