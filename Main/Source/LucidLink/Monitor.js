@@ -130,9 +130,11 @@ export class MonitorUI extends BaseComponent {
 			content: `Range is ${this.patternGrab_minX}-${this.patternGrab_maxX}.`,
 			items: ["Channel 1", "Channel 2", "Channel 3", "Channel 4"],
 			itemsCallbackMultiChoice: (ids, texts)=> {
+				if (ids.length == 0) return;
+
 				//Toast(ToJSON(ids) + ";" + ToJSON(texts));
 				for (let channelIndex of ids) {
-					let pattern = new Pattern("new pattern - channel " + (channelIndex + 1));
+					var pattern = new Pattern("new pattern - channel " + (channelIndex + 1));
 					pattern["channel" + (channelIndex + 1)] = true;
 
 					let points = channelPointsGrabbed[channelIndex];
@@ -146,6 +148,24 @@ export class MonitorUI extends BaseComponent {
 
 				LL.PushPatternsToJava();
 				this.forceUpdate();
+
+				var dialog = new DialogAndroid();
+				dialog.set({
+					"title": `Choose pattern name`,
+					"input": {
+						prefill: pattern.name,
+						callback: newName=> {
+							pattern.name = newName;
+
+							LL.PushPatternsToJava();
+							if (LL.scripts.ui)
+								LL.scripts.ui.forceUpdate();
+						}
+					},
+					"positiveText": "OK",
+					//"negativeText": "Cancel"
+				});
+				dialog.show();
 			},
 			"positiveText": "OK",
 			"negativeText": "Cancel"

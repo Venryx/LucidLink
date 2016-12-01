@@ -133,6 +133,7 @@ g.BaseComponent = class BaseComponent extends Component {
 g.Row = class Row extends BaseComponent {
 	render() {
 		var {style, height, children} = this.props;
+		height = height != null ? height : (style||{}).height;
 		return (
 			<Panel style={E({flexDirection: "row", padding: 3}, style,
 					height != null ? {height} : {flex: 1})}>

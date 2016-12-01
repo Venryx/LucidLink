@@ -25,7 +25,7 @@ g.Pattern = class Pattern {
 
 	@P() name = null;
 	@P() enabled = true;
-	@P() sensitivity = 50;
+	@P() sensitivity = 30;
 	@P() channel1 = false;
 	@P() channel2 = false;
 	@P() channel3 = false;
@@ -56,6 +56,12 @@ g.Pattern = class Pattern {
 			},
 		});
 		dialog.show();
+	}
+
+	Clone() {
+		var vdf = ToVDF(this);
+		var result = FromVDF(vdf);
+		return result;
 	}
 
 	ui = null;

@@ -316,6 +316,24 @@ g._VDFPostSerialize = function(...args) {
     return (target, name, descriptor)=>target[name].AddTags(new VDFPostSerialize(...args));
 };
 
+// types stuff
+// ==========
+
+g.IsPrimitive = function(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
+g.IsBool = function(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
+g.ToBool = function(boolStr) { return boolStr == "true" ? true : false; }
+g.IsNumber = function(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
+g.IsNumberString = function(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
+g.ToInt = function(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
+g.ToDouble = function(stringOrIntVal) { return parseFloat(stringOrIntVal); }
+g.IsString = function(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
+g.ToString = function(val) { return "" + val; }
+
+g.IsNaN = function(obj) { return typeof obj == "number" && obj != obj; }
+
+g.IsInt = function(obj) { return typeof obj == "number" && parseFloat(obj) == parseInt(obj); }
+g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj) != parseInt(obj); }
+
 // timer stuff
 // ==========
 

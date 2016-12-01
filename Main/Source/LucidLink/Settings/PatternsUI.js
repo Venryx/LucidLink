@@ -1,5 +1,6 @@
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 import Chart from "react-native-chart";
+var DialogAndroid = require("react-native-dialogs");
 
 export default class PatternsUI extends BaseComponent { 
 	render() {
@@ -57,13 +58,15 @@ export default class PatternsUI extends BaseComponent {
 							}}/>
 					</Row>
 					
-					{node.patterns.map((pattern, index)=> {
-						return <PatternUI key={index} parent={this} pattern={pattern}/>; 
-					})}
-					<Row height={45}>
-						<VButton onPress={()=>this.CreatePattern()} text="Create" style={{width: 100, height: 40}}/>
-					</Row>
-					<View style={{flex: 111222}}/>
+					<ScrollView ref="scrollView" style={{flex: 100, flexDirection: "column", borderTopWidth: 1}}
+							automaticallyAdjustContentInsets={false}>
+						{node.patterns.map((pattern, index)=> {
+							return <PatternUI key={index} parent={this} pattern={pattern}/>; 
+						})}
+						<Row height={45}>
+							<VButton onPress={()=>this.CreatePattern()} text="Create" style={{width: 100, height: 40}}/>
+						</Row>
+					</ScrollView>
 				</Column>
             </Panel>
 		);
@@ -167,6 +170,8 @@ class PatternUI extends BaseComponent {
 						<Row height={35}>
 							<VButton text="Offset X" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("x")}/>
 							<VButton text="Offset Y" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("y")}/>
+							<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.Clone()}/>
+							<VButton text="Transform" ml5 style={{height: 30}} onPress={()=>this.Transform()}/>
 						</Row>}
 					<Row height={100} style={{backgroundColor: "#FFFFFF55"}}>
 						<Chart style={{width: Dimensions.get("window").width - 30, height: 80}}
@@ -203,5 +208,54 @@ class PatternUI extends BaseComponent {
 		
 		LL.PushPatternsToJava();
 		this.forceUpdate();
+	}
+
+	Clone() {
+		var {pattern} = this.props;
+
+		var newPattern = pattern.Clone();
+		newPattern.name = pattern.name + " - clone";
+		LL.settings.patterns.push(newPattern);
+
+		LL.PushPatternsToJava();
+		this.forceUpdate();
+
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Choose name for pattern clone`,
+			"input": {
+				prefill: newPattern.name,
+				callback: newName=> {
+					newPattern.name = newName;
+
+					LL.PushPatternsToJava();
+					if (LL.settings.ui)
+						LL.settings.ui.forceUpdate();
+				}
+			},
+			"positiveText": "OK", //"negativeText": "Cancel"
+		});
+		dialog.show();		
+	}
+
+	Transform() {
+		var {pattern} = this.props;
+		
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Enter transformation code`,
+			"input": {
+				prefill: "new Vector2i(point.x, point.y)",
+				callback: transformCode=> {
+					for (let [index, point] of pattern.points.entries())
+						pattern.points[index] = eval(transformCode);
+					
+					LL.PushPatternsToJava();
+					this.forceUpdate();
+				}
+			},
+			"positiveText": "OK", //"negativeText": "Cancel"
+		});
+		dialog.show();		
 	}
 }
