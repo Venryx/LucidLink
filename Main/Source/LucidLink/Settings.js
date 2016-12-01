@@ -23,6 +23,7 @@ g.Pattern = class Pattern {
 	}
 
 	@P() name = null;
+	@P() sensitivity = 50;
 	@P() channel1 = false;
 	@P() channel2 = false;
 	@P() channel3 = false;

@@ -280,16 +280,16 @@ class ChartManager {
 		// if we went back to start of chart, clear end of chart's last filling
 		if (currentX < lastSetPatternMatchProbability_x) {
 			for (int x = lastSetPatternMatchProbability_x + 1; x <= maxX; x++) {
-				List<Entry> entriesToRemove = dataSet.getEntriesForXValue(x);
-				for (Entry entry : entriesToRemove)
-					dataSet.removeEntry(entry);
+				List entriesToRemove = dataSet.getEntriesForXValue(x);
+				for (Object entry : entriesToRemove)
+					dataSet.removeEntry((Entry)entry);
 			}
 		}
 
 		for (int x = lastSetPatternMatchProbability_x + 1; x <= currentX; x++) {
-			List<Entry> entriesToRemove = dataSet.getEntriesForXValue(x);
-			for (Entry entry : entriesToRemove)
-				dataSet.removeEntry(entry);
+			List entriesToRemove = dataSet.getEntriesForXValue(x);
+			for (Object entry : entriesToRemove)
+				dataSet.removeEntry((Entry)entry);
 		}
 
 		double probability = (Double)probabilities.values().toArray()[0];

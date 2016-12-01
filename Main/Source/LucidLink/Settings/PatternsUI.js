@@ -108,6 +108,27 @@ class PatternUI extends BaseComponent {
 							editable={true} value={pattern.name}
 							onChangeText={text=>Change(pattern.name = text)}/>
 
+						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Sensitivity</Text>
+						<VButton text={pattern.sensitivity.toString()} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val <= 200; val++)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Pattern match sensitivity",
+									message: "The 'sensitivity' is the average distance of channel-data points to\
+ pattern-points that yields a pattern-match certainty of 0.",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(pattern.sensitivity),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								pattern.sensitivity = val;
+								Change();
+							}}/>
+
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Channels: </Text>
 						<VSwitch text="1" value={pattern.channel1}
 							onValueChange={value=>Change(pattern.channel1 = value)}/>

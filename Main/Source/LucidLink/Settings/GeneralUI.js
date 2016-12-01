@@ -27,51 +27,50 @@ export default class GeneralUI extends BaseComponent {
 					<Row>
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Pattern match interval</Text>
 						<VButton text={node.patternMatchInterval.toFixed(1)} style={{width: 100, height: 32}}
-							onPress={()=> {
+							onPress={async ()=> {
 								var values = [];
 								for (let val = .1; val < 1; val += .1)
 									values.push(val);
 								for (let val = 1; val <= 10; val += .5)
 									values.push(val);
-								NumberPickerDialog.show({
+								var id = await NumberPickerDialog.show({
 									title: "Pattern match interval",
 									message: "Select interval/repeat-time (in seconds) at which to check for eeg-pattern matches.",
 									values: values.Select(a=>a.toFixed(1)),
 									selectedValueIndex: values.indexOf(node.patternMatchInterval),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								}).then(id=> {
-									if (id == -1) return;
-									let val = values[id];
-									node.patternMatchInterval = val;
-									
-									LL.PushBasicDataToJava();
-									this.forceUpdate();
 								});
+								if (id == -1) return;
+								let val = values[id];
+								node.patternMatchInterval = val;
+								
+								LL.PushBasicDataToJava();
+								this.forceUpdate();
 							}}/>
 					</Row>
 					<Row>
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Pattern match offset</Text>
 						<VButton text={node.patternMatchOffset.toFixed(1)} style={{width: 100, height: 32}}
-							onPress={()=> {
+							onPress={async ()=> {
 								var values = [];
 								for (let val = .1; val < 1; val += .1)
 									values.push(val);
 								for (let val = 1; val <= 10; val += .5)
 									values.push(val);
-								NumberPickerDialog.show({
+								var id = await NumberPickerDialog.show({
 									title: "Pattern match offset",
 									message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
 									values: values.Select(a=>a.toFixed(1)),
 									selectedValueIndex: values.indexOf(node.patternMatchOffset),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								}).then(id=> {
-									if (id == -1) return;
-									let val = values[id];
-									node.patternMatchOffset = val;
-
-									LL.PushBasicDataToJava();
-									this.forceUpdate();
 								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.patternMatchOffset = val;
+
+								LL.PushBasicDataToJava();
+								this.forceUpdate();
 							}}/>
 					</Row>
 				</Row>

@@ -179,14 +179,9 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
     jcenter()
-    mavenCentral()
 }
 
 String userConfig = new File('../UserConfig.json').text
-
-configurations {
-    all*.exclude group: 'org.bytedeco', module: 'javacpp-presets'
-}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -210,8 +205,6 @@ dependencies {
     if (userConfig.contains("mpChartLib_external: true"))
         compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
     compile 'com.annimon:stream:1.1.4'
-
-    compile group: 'org.bytedeco', name: 'javacv', version: '1.2'
 }
 
 /*dependencies {

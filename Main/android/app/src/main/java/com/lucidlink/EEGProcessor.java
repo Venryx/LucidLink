@@ -4,10 +4,6 @@ import com.annimon.stream.Stream;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_shape;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,29 +82,30 @@ class EEGProcessor {
 						/*let channelPoints_final = CenterOnY(points, channelBaseline);
 						channelPoints_final = TrimXValuesTo(channelPoints_final, scanLeft);*/
 						new Vector2i(0, 0).NewX(a->a);
-						List<Vector2i> channelPoints_final = V.List(Stream.of(points).map(a->a.NewX(x->x - scanLeft).NewY(y->y - channelBaseline)));
+						//List<Vector2i> channelPoints_final = V.List(Stream.of(points).map(a->a.NewX(x->x - scanLeft).NewY(y->y - channelBaseline)));
+						List<Vector2i> channelPoints_final = new ArrayList<>();
+						for (int i = 0, x = scanLeft; x < scanRight; i++, x++) {
+							boolean takenFromEnd = x < 0;
+							Vector2i point = points.get(i);
+							Vector2i point_final = new Vector2i(point.x - scanLeft, point.y - channelBaseline);
+							if (takenFromEnd)
+								point_final.x -= (maxX + 1);
+							channelPoints_final.add(point_final);
+						}
 
-						final int yValRange = 100; // estimate of max positive-value (from base-line)
-						double maxDistancePossible = new Vector2i(scanLeft, -yValRange).Distance(new Vector2i(scanRight, yValRange));
+						/*final int yValRange = 100; // estimate of max positive-value (from base-line)
+						double maxDistancePossible = new Vector2i(scanLeft, -yValRange).Distance(new Vector2i(scanRight, yValRange));*/
+						//double maxDistancePossible = 100;
+						double probability0Distance = pattern.sensitivity;
 
 						//let matchProb = Sketchy.shapeContextMatch(channelPoints_final, patternPoints_final);
 						//let distance = Sketchy.hausdorff(channelPoints_final, patternPoints_final, {x: 0, y: 0});
-						//double distance = GetHausdorffDistance(channelPoints_final, pattern.points);
+						double distance = GetAverageOfPointClosestDistances(pattern.points, channelPoints_final);
 
-						{
-							//liorg.bytedeco.javacpp.opencv_shape.fin
-
-							opencv_shape.ShapeContextDistanceExtractor extractor = opencv_shape.createShapeContextDistanceExtractor();
-							final int width = 1001, height = 400;
-							opencv_core.Mat patternImage = new opencv_core.Mat(height, width, opencv_core.CV_8S, new BytePointer(new byte[] {0, 0, 0, 0, 0, 0, 0}));
-							opencv_core.Mat channelDataImage = new opencv_core.Mat(height, width, opencv_core.CV_8S, new BytePointer(new byte[] {0, 0, 0, 0, 0, 0, 0}));
-							extractor.computeDistance(patternImage, patternImage);
-						}
-
-						double matchProb = 1 - (distance / maxDistancePossible);
+						double matchProb = 1 - (distance / probability0Distance);
 						matchProb = Math.max(0, matchProb); // maybe temp
 
-						//V.Log(channelBaseline + " | " + distance + " | " + maxDistancePossible + " | " + matchProb, false);
+						V.Log("pattern-matching", channelBaseline + " | " + distance + " | " + probability0Distance + " | " + matchProb, false);
 /*PatternPoints: ${ToVDF(pattern.points, false)}
 ChannelPoints: ${ToVDF(points, false)}
 ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
@@ -117,13 +114,13 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 				}
 				//patternMatchProbabilities[pattern.name] = highestMatchProb;
 				if (!patternMatchProbabilities.containsKey(pattern.name))
-					patternMatchProbabilities.put(pattern.name, new HashMap<Integer, Double>());
+					patternMatchProbabilities.put(pattern.name, new HashMap<>());
 				patternMatchProbabilities.get(pattern.name).put(currentX, highestMatchProb);
 				//Log(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
 				//JavaLog(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
 			}
 
-			HashMap<String, Double> patternMatchProbabilitiesForFrame = new HashMap<String, Double>();
+			HashMap<String, Double> patternMatchProbabilitiesForFrame = new HashMap<>();
 			for (String patternName : patternMatchProbabilities.keySet())
 				patternMatchProbabilitiesForFrame.put(patternName, patternMatchProbabilities.get(patternName).get(currentX));
 			/*for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
@@ -144,7 +141,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 	List<Vector2i> GetPointsForScanRange(int channel, int scanLeft, int scanRight) {
 		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
 
-		List<Vector2i> result = new ArrayList<Vector2i>();
+		List<Vector2i> result = new ArrayList<>();
 		for (int i = scanLeft; i < scanRight; i++) {
 			int iFinal = i >= 0 ? i : ((maxX + 1) + i); // if in range, get it; else, loop around and grab from end
 			result.add(channelPoints[iFinal]);
@@ -184,27 +181,56 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		return result;
 	}*/
 
-	// Compute the directed hausdorff distance of pixels1 and pixels2.
-	// Calculate the lowest upper bound over all points in shape1 of the distances to shape2.
-	static double GetHausdorffDistance(List<Vector2i> points1, List<Vector2i> points2) {
-		double h_max = Double.MIN_VALUE;
+	// essentially: points1.Select(a=>a.DistanceToClosestPointIn(points2)).Average();
+	// NOTE: points2 must have each point's x-value be one greater than the one prior!
+	static double GetAverageOfPointClosestDistances(List<Vector2i> points1, List<Vector2i> points2) {
+		double pointClosestDistances_total = 0;
+
+		int lastPoint_closestPoint2_index = -1;
+		double lastPoint_closestPoint2_dist = Double.MAX_VALUE;
 		for (int i = 0; i < points1.size(); i++) {
-			double closestOtherPointDist = Double.MAX_VALUE;
-			for (int i2 = 0; i2 < points2.size(); i2++) {
-				double dist = EuclideanDistance(points1.get(i).x, points1.get(i).y, points2.get(i2).x, points2.get(i2).y);
-				if (dist < closestOtherPointDist) {
-					closestOtherPointDist = dist;
-				} else if (dist == 0)
-					break;
+			Vector2i lastPoint1 = i > 0 ? points1.get(i - 1) : null;
+			Vector2i point1 = points1.get(i);
+
+			//double closestPoint2Dist = point.DistanceSquared(lastPoint_closestPoint2);
+			int closestPoint2_index = lastPoint_closestPoint2_index;
+			double closestPoint2_dist = lastPoint_closestPoint2_dist + (lastPoint1 != null ? lastPoint1.Distance(point1) : 0);
+			int startX = lastPoint_closestPoint2_index;
+
+			int offset = V.HasIndex(points2, startX + 1) ? 1 : -1;
+			while (true) {
+				int currentX = startX + offset;
+				Vector2i point2 = points2.get(currentX);
+				boolean closerPoint2IsPossible = V.Distance(currentX, point1.x) < closestPoint2_dist;
+				if (!closerPoint2IsPossible) break;
+
+				double dist = point1.Distance(point2);
+				if (dist < closestPoint2_dist) {
+					closestPoint2_index = currentX;
+					closestPoint2_dist = dist;
+				}
+
+				offset = offset >= 0 ? -offset : -offset + 1;
+				// if offset leads to invalid index, flip to the other side
+				currentX = startX + offset;
+				if (currentX < 0 || currentX >= points2.size())
+					offset = -offset;
+				// if still leads to invalid index, then break, as there's no more point2s
+				if (currentX < 0 || currentX >= points2.size()) break;
 			}
-			if (closestOtherPointDist > h_max)
-				h_max = closestOtherPointDist;
+
+			lastPoint_closestPoint2_index = closestPoint2_index;
+			lastPoint_closestPoint2_dist = closestPoint2_dist;
+
+			pointClosestDistances_total += closestPoint2_dist;
 		}
-		return h_max;
+
+		double pointClosestDistances_average = pointClosestDistances_total / points1.size();
+		return pointClosestDistances_average;
 	}
 	// Compute the Euclidean distance (as a crow flies) between two points.
 	// Shortest distance between two pixels
-	static double EuclideanDistance(int x1, int y1, int x2, int y2) {
+	/*static double Distance(int x1, int y1, int x2, int y2) {
 		return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-	}
+	}*/
 }

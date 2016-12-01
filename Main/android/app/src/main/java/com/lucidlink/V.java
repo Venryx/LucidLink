@@ -67,6 +67,10 @@ public class V {
 		throw new Error("Assert failed) " + message);
 	}
 
+	public static <T> boolean HasIndex(List<T> list, int index) {
+		return index >= 0 && index < list.size();
+	}
+
 	public static <T extends Object> List<T> List(Stream<T> stream) {
 		List<T> result = new ArrayList<>();
 		for (Object item : stream.toArray())
@@ -226,6 +230,10 @@ public class V {
 
 		//return visited;
 		return null;
+	}
+
+	public static int Distance(int a, int b) {
+		return Math.abs(a - b);
 	}
 }
 
