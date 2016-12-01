@@ -4,6 +4,10 @@ import com.annimon.stream.Stream;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
+import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.opencv_shape;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -89,9 +93,19 @@ class EEGProcessor {
 
 						//let matchProb = Sketchy.shapeContextMatch(channelPoints_final, patternPoints_final);
 						//let distance = Sketchy.hausdorff(channelPoints_final, patternPoints_final, {x: 0, y: 0});
-						double distance = GetHausdorffDistance(channelPoints_final, pattern.points);
-						double matchProb = 1 - (distance / maxDistancePossible);
+						//double distance = GetHausdorffDistance(channelPoints_final, pattern.points);
 
+						{
+							//liorg.bytedeco.javacpp.opencv_shape.fin
+
+							opencv_shape.ShapeContextDistanceExtractor extractor = opencv_shape.createShapeContextDistanceExtractor();
+							final int width = 1001, height = 400;
+							opencv_core.Mat patternImage = new opencv_core.Mat(height, width, opencv_core.CV_8S, new BytePointer(new byte[] {0, 0, 0, 0, 0, 0, 0}));
+							opencv_core.Mat channelDataImage = new opencv_core.Mat(height, width, opencv_core.CV_8S, new BytePointer(new byte[] {0, 0, 0, 0, 0, 0, 0}));
+							extractor.computeDistance(patternImage, patternImage);
+						}
+
+						double matchProb = 1 - (distance / maxDistancePossible);
 						matchProb = Math.max(0, matchProb); // maybe temp
 
 						//V.Log(channelBaseline + " | " + distance + " | " + maxDistancePossible + " | " + matchProb, false);
