@@ -6,6 +6,8 @@ import android.util.Log;
 import com.facebook.react.ReactApplication;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
+
+import com.mihir.react.tts.RCTTextToSpeechModule;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
@@ -42,7 +44,8 @@ public class MainApplication extends Application implements ReactApplication {
 				new OrientationPackage(),
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
-				new LibMuse()
+				new LibMuse(),
+				new RCTTextToSpeechModule()
 			);
 		}
 	};

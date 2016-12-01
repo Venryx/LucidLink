@@ -108,6 +108,8 @@ class PatternUI extends BaseComponent {
 							editable={true} value={pattern.name}
 							onChangeText={text=>Change(pattern.name = text)}/>
 
+						<VSwitch text="Enabled" value={pattern.enabled} onValueChange={value=>Change(pattern.enabled = value)}/>
+
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Sensitivity</Text>
 						<VButton text={pattern.sensitivity.toString()} style={{width: 100, height: 32}}
 							onPress={async ()=> {
@@ -146,7 +148,7 @@ class PatternUI extends BaseComponent {
 							onValueChange={value=>Change(pattern.actions = value)}/>
 
 						<VButton text="X" style={{marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
-							onPress={()=>Change(node.patterns.Remove(pattern))}/>
+							onPress={()=>pattern.Delete()}/>
 					</Row>
 					{pattern.textEditor && 
 						<Row height={35}>

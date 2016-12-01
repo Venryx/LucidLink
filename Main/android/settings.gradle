@@ -30,3 +30,6 @@ if (userConfig.contains("mpChartLib_external: true")) {
     include ":MPChartLib"
     project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")
 }
+
+include ':react-native-android-speech'
+project(':react-native-android-speech').projectDir = new File(settingsDir, '../node_modules/react-native-android-speech')

@@ -11,6 +11,7 @@ public class Pattern {
 	public static Pattern FromMap(ReadableMap map) {
 		Pattern result = new Pattern();
 		result.name = map.getString("name");
+		result.enabled = map.getBoolean("enabled");
 		result.sensitivity = map.getDouble("sensitivity");
 		result.channel1 = map.getBoolean("channel1");
 		result.channel2 = map.getBoolean("channel2");
@@ -24,6 +25,7 @@ public class Pattern {
 	}
 
 	public String name;
+	public boolean enabled;
 	public double sensitivity;
 	public boolean channel1;
 	public boolean channel2;

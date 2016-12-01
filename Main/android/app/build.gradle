@@ -202,6 +202,8 @@ dependencies {
     compile project(':react-native-dialogs')
     if (userConfig.contains("reactNativeLibMuse_external: true"))
         compile project(':react-native-libmuse')
+    compile project(':react-native-android-speech')
+
     if (userConfig.contains("mpChartLib_external: true"))
         compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
     compile 'com.annimon:stream:1.1.4'

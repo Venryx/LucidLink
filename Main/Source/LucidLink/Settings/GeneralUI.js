@@ -50,9 +50,11 @@ export default class GeneralUI extends BaseComponent {
 					</Row>
 					<Row>
 						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Pattern match offset</Text>
-						<VButton text={node.patternMatchOffset.toFixed(1)} style={{width: 100, height: 32}}
+						<VButton text={node.patternMatchOffset.toFixed(2)} style={{width: 100, height: 32}}
 							onPress={async ()=> {
 								var values = [];
+								for (let val = .01; val < .1; val += .01)
+									values.push(val);
 								for (let val = .1; val < 1; val += .1)
 									values.push(val);
 								for (let val = 1; val <= 10; val += .5)
@@ -60,7 +62,7 @@ export default class GeneralUI extends BaseComponent {
 								var id = await NumberPickerDialog.show({
 									title: "Pattern match offset",
 									message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
-									values: values.Select(a=>a.toFixed(1)),
+									values: values.Select(a=>a.toFixed(2)),
 									selectedValueIndex: values.indexOf(node.patternMatchOffset),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								});

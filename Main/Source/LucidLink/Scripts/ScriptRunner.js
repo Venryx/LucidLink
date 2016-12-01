@@ -1,16 +1,4 @@
-// for scripts
-//import Sound from "react-native-sound";
-var Sound = require("react-native-sound");
-
-DeviceEventEmitter.addListener("OnSetPatternMatchProbabilities", args=> {
-	var [x, probabilities] = args;
-	//Log(`X: ${x}; Probabilities: ${ToJSON(probabilities)}`);
-	for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
-		listener(probabilities, x);
-});
-g.AddListener_OnUpdatePatternMatchProbabilities = function(func) {
-	LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities.push(func);
-};
+require("./ScriptGlobals");
 
 export default class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }

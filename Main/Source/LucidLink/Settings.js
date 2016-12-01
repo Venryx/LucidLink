@@ -1,4 +1,5 @@
 var ScrollableTabView = require("react-native-scrollable-tab-view");
+var DialogAndroid = require("react-native-dialogs");
 
 import GeneralUI from "./Settings/GeneralUI";
 import PatternsUI from "./Settings/PatternsUI";
@@ -23,6 +24,7 @@ g.Pattern = class Pattern {
 	}
 
 	@P() name = null;
+	@P() enabled = true;
 	@P() sensitivity = 50;
 	@P() channel1 = false;
 	@P() channel2 = false;
@@ -39,6 +41,24 @@ g.Pattern = class Pattern {
 	}
 
 	@P() textEditor = false;
+
+	Delete() {
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Delete pattern "${this.name}"`,
+			"content": `Permanently delete pattern?`,
+			"positiveText": "OK",
+			"negativeText": "Cancel",
+			"onPositive": ()=> {
+				LL.settings.patterns.Remove(this);
+				if (LL.settings.ui)
+					LL.settings.ui.forceUpdate();
+			},
+		});
+		dialog.show();
+	}
+
+	ui = null;
 }
 g.AudioFileEntry = class AudioFileEntry {
 	@P() name = null;
@@ -46,6 +66,10 @@ g.AudioFileEntry = class AudioFileEntry {
 }
 
 export class SettingsUI extends BaseComponent {
+	constructor(props) {
+		super(props);
+		LL.settings.ui = this;
+	}
 	render() {
 		return (
 			<ScrollableTabView style={{flex: 1}}>

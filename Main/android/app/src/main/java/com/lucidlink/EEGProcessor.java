@@ -60,6 +60,7 @@ class EEGProcessor {
 		int scanOffset_inPackets = (int)(Main.main.patternMatchOffset * packetsPerSecond);
 		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
 			for (Pattern pattern : Main.main.patterns) {
+				if (!pattern.enabled) continue;
 				if (!pattern.channel1 && !pattern.channel2 && !pattern.channel3 && !pattern.channel4) continue;
 				V.Assert(pattern.points.size() >= 2, "Pattern point count too low. Should be 2+, not " + pattern.points.size() + ".");
 

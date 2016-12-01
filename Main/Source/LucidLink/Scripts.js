@@ -5,7 +5,6 @@ import Drawer from "react-native-drawer";
 
 import ScriptRunner from "./Scripts/ScriptRunner";
 
-import scriptDefaultText_CoreFunctions from "./Scripts/UserScriptDefaults/CoreFunctions";
 import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/BuiltInHelpers";
 import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
 import scriptDefaultText_FakeDataProvider from "./Scripts/UserScriptDefaults/FakeDataProvider";
@@ -125,13 +124,9 @@ g.Scripts = class Scripts extends Node {
 		if (!scriptsFolderExists)
 			scriptsFolder.Create();
 		// ensure these scripts always exist
-		if (!await scriptsFolder.GetFile("Core functions.js").Exists()) {
-			await scriptsFolder.GetFile("Core functions.js").WriteAllText(scriptDefaultText_CoreFunctions);
-			await scriptsFolder.GetFile("Core functions.meta").WriteAllText(ToJSON({index: 0, editable: false, enabled: true}));
-		}
 		if (!await scriptsFolder.GetFile("Built-in helpers.js").Exists()) {
 			await scriptsFolder.GetFile("Built-in helpers.js").WriteAllText(scriptDefaultText_BuiltInHelpers);
-			await scriptsFolder.GetFile("Built-in helpers.meta").WriteAllText(ToJSON({index: 1, editable: false, enabled: true}));
+			await scriptsFolder.GetFile("Built-in helpers.meta").WriteAllText(ToJSON({index: 1, editable: false, enabled: false}));
 		}
 		// only create these scripts once; if user deletes them, that's fine
 		if (!scriptsFolderExists) {

@@ -54,7 +54,7 @@ g.Trace = function(...args) {
 
 g.Toast = function(...args) {
 	if (args.length == 1)
-		JavaBridge.Main.ShowToast(args[0], 3);
+		JavaBridge.Main.ShowToast(args[0], 1);
 	else
 		JavaBridge.Main.ShowToast(args[0], args[1]);
 }
@@ -397,8 +397,17 @@ g.Random = function(seed) {
 
 	var s = this;
 	s.seed = seed;
+	s.NextInt = function() {
+		var randomDouble = Math.sin(s.seed) * 10000;
+		var randomDouble_onlyIntegerPart = Math.floor(s.seed);
+		s.seed = randomDouble;
+		return randomDouble_onlyIntegerPart;
+	};
 	s.NextDouble = function() {
-		s.seed = Math.sin(s.seed) * 10000; return s.seed - Math.floor(s.seed);
+		var randomDouble = Math.sin(s.seed) * 10000;
+		var randomDouble_onlyFractionalPart = s.seed - Math.floor(s.seed);
+		s.seed = randomDouble;
+		return randomDouble_onlyFractionalPart;
 	};
 	s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
 	s.NextColor_ImageStr = function() {
