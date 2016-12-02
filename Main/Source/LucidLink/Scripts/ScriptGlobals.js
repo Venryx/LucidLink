@@ -55,9 +55,8 @@ class AudioFile {
 	Stop() {
 		this.SetCurrentTime(0);
 		this.SetVolume(0);
-		var s = this;
-		g.WaitXThenRun(1000, function() {
-			s.baseFile.stop();
+		WaitXThenRun(1000, ()=> {
+			this.baseFile.stop();
 		});
 	}
 	Release() { this.baseFile.release(); }
