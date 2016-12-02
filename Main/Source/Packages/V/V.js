@@ -71,4 +71,14 @@ g.V = class V {
 		}
 		return a < b ? -1 : (a > b ? 1 : 0);
 	}
+
+	// just use the word 'percent', even though value is represented as fraction (e.g. 0.5, rather than 50[%])
+	static Lerp(from, to, percentFromXToY) { return from + ((to - from) * percentFromXToY); }
+	static GetPercentFromXToY(start, end, val, clampResultTo0Through1 = true) {
+		// distance-from-x / distance-from-x-required-for-result-'1'
+		var result = (val - start) / (end - start);
+		if (clampResultTo0Through1)
+			result = result.KeepBetween(0, 1);
+		return result;
+	}
 };

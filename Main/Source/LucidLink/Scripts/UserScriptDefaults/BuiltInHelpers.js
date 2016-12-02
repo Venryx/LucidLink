@@ -42,7 +42,8 @@ AddListener_OnUpdatePatternMatchProbabilities(function(patternMatchProbabilities
 // ==========
 
 GetAudioFile("air raid siren").Play();
-GetAudioFile("air raid siren").SetVolume(.5); // range: ? to ?
+GetAudioFile("air raid siren").SetVolume(.5); // range: 0 to 1
+GetAudioFile("air raid siren").FadeVolume({to: 1, over: 10}); // time in seconds
 GetAudioFile("air raid siren").SetCurrentTime(5); // set playback position, in seconds
 GetAudioFile("air raid siren").SetLoopCount(-1); // set number of times playback should loop; -1 means "loop forever"
 GetAudioFile("air raid siren").Pause();

@@ -51,7 +51,10 @@ class AudioFile {
 		this.SetVolume(1);
 		return this.baseFile.play();
 	}
-	Pause() { this.baseFile.pause(); }
+	Pause() {
+		this.baseFile.pause();
+		this.wasPaused = true;
+	}
 	Stop() {
 		this.SetCurrentTime(0);
 		this.SetVolume(0);
@@ -61,13 +64,47 @@ class AudioFile {
 	}
 	Release() { this.baseFile.release(); }
 
+	playStartTime = null;
+	wasPaused = false;
+	IsPlaying() {
+		if (playStartTime == null)
+			return false;
+		Assert(!this.wasPaused, "Cannot get IsPlaying state if audio was paused.");
+		var loopCount = this.LoopCount;
+		var playDurationMS = this.Duration * (loopCount != -1 ? loopCount : 111222333) * 1000;
+		return playStartTime + playDurationMS > new Date().getTime();
+	}
+
+	get Duration() { return this.baseFile.getDuration(); } // in seconds
+	//get ChannelCount() { return this.baseFile.getNumberOfChannels(); } // ios only
+
+	// volume range is 0-1
 	GetVolume() { return this.baseFile.getVolume(); }
 	SetVolume(volume) { return this.baseFile.setVolume(volume); }
+	FadeVolume(options) {
+		var {from, to, over} = options;
+		var startTime = new Date().getTime();
+		var endTime = startTime + (over * 1000);
+
+		var startVolume = from || this.GetVolume();
+		if (from)
+			this.SetVolume(startVolume);
+
+		var timer = new Timer(.1, ()=> {
+			var time = new Date().getTime();
+			var percentThroughFade = V.GetPercentFromXToY(startTime, endTime, time);
+			this.SetVolume(V.Lerp(startVolume, to, percentThroughFade));
+		});
+	}
+
 	GetCurrentTime(callback) { this.baseFile.getCurrentTime(callback); }
 	SetCurrentTime(newTime) { this.baseFile.setCurrentTime(newTime); }
-	//SetPan(pan) { this.baseFile.setPan(pan); }
+	get LoopCount() { return this.baseFile.getNumberOfLoops(); }
 	// set to -1 for endless loop
-	SetLoopCount(count) { this.baseFile.setNumberOfLoops(count); }
+	set LoopCount(count) { this.baseFile.setNumberOfLoops(count); }
+
+	//GetPan() { return this.baseFile.getPan(pan); } // ios only
+	//SetPan(pan) { this.baseFile.setPan(pan); } // ios only
 }
 g.GetAudioFile = function(name) {
 	if (audioFiles[name] == null) {
