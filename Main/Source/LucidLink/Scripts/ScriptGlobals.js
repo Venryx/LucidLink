@@ -49,6 +49,7 @@ class AudioFile {
 
 	Play() {
 		this.SetVolume(1);
+		this.playStartTime = new Date().getTime();
 		return this.baseFile.play();
 	}
 	Pause() {
@@ -58,6 +59,7 @@ class AudioFile {
 	Stop() {
 		this.SetCurrentTime(0);
 		this.SetVolume(0);
+		this.playStartTime = null;
 		WaitXThenRun(1000, ()=> {
 			this.baseFile.stop();
 		});
@@ -67,12 +69,13 @@ class AudioFile {
 	playStartTime = null;
 	wasPaused = false;
 	IsPlaying() {
-		if (playStartTime == null)
+		if (this.playStartTime == null)
 			return false;
 		Assert(!this.wasPaused, "Cannot get IsPlaying state if audio was paused.");
 		var loopCount = this.LoopCount;
 		var playDurationMS = this.Duration * (loopCount != -1 ? loopCount : 111222333) * 1000;
-		return playStartTime + playDurationMS > new Date().getTime();
+		//Log(this.Duration + ";" + loopCount + ";" + this.playStartTime + ";" + playDurationMS);
+		return this.playStartTime + playDurationMS > new Date().getTime();
 	}
 
 	get Duration() { return this.baseFile.getDuration(); } // in seconds
@@ -102,9 +105,17 @@ class AudioFile {
 
 	GetCurrentTime(callback) { this.baseFile.getCurrentTime(callback); }
 	SetCurrentTime(newTime) { this.baseFile.setCurrentTime(newTime); }
-	get LoopCount() { return this.baseFile.getNumberOfLoops(); }
+	get LoopCount() { 
+		var result = this.baseFile.getNumberOfLoops();
+		// library "loop count" is apparently *extra* times to play audio; so add one for first play
+		if (result != -1) result++;
+		return result;
+	}
 	// set to -1 for endless loop
-	set LoopCount(count) { this.baseFile.setNumberOfLoops(count); }
+	set LoopCount(count) {
+		if (count != -1) count++;
+		this.baseFile.setNumberOfLoops(count);
+	}
 
 	//GetPan() { return this.baseFile.getPan(pan); } // ios only
 	//SetPan(pan) { this.baseFile.setPan(pan); } // ios only
