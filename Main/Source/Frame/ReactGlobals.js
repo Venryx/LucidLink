@@ -136,7 +136,8 @@ g.Row = class Row extends BaseComponent {
 		height = height != null ? height : (style||{}).height;
 		return (
 			<Panel style={E({flexDirection: "row", padding: 3}, style,
-					height != null ? {height} : {flex: 1})}>
+					//height != null ? {height} : {flex: 1})}>
+					height != null && {height})}>
 				{children}
 			</Panel>
 		);
@@ -193,6 +194,23 @@ function BasicStyles(props) {
 	return result;
 }
 
+g.VText = class VText extends BaseComponent {
+	render() {
+		var {style, children} = this.props;
+		var restProps = this.props;
+		return (
+			<Text {...restProps}
+					style={E(
+						{},
+						BasicStyles(this.props),
+						style
+					)}>
+				{children}
+			</Text>
+		);
+	}
+}
+
 g.VButton = class VButton extends BaseComponent {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
@@ -229,6 +247,29 @@ g.VSwitch = class VSwitch extends BaseComponent {
 						style
 					)}/>
 			</View>
+		);
+	}
+}
+
+g.AutoExpandingTextInput = class AutoExpandingTextInput extends BaseComponent {
+	constructor(props) {
+  		super(props);
+		var {defaultValue, height} = props;
+		this.state = {text: defaultValue, height};
+	}
+	render() {
+		var {style} = this.props;
+		return (
+			<TextInput {...this.props} multiline={true}
+				style={E(styles.default, {height: Math.max(35, this.state.height)}, style)}
+				value={this.state.text}
+				onChange={event=> {
+					this.setState({
+						text: event.nativeEvent.text,
+						height: event.nativeEvent.contentSize.height,
+					});
+				}}
+			/>
 		);
 	}
 }

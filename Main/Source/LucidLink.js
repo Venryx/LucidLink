@@ -119,7 +119,8 @@ g.LucidLink = class LucidLink extends Node {
 		});
 	}
 	PushPatternsToJava() {
-		Assert(this.settings.patterns.All(a=>a instanceof Pattern));
+		Assert(this.settings.patterns.All(a=>a instanceof Pattern),
+			`Not all entries are Patterns! Types: ${this.settings.patterns.Select(a=>a.GetTypeName()).join(",")}`);
 		JavaBridge.Main.SetPatterns(this.settings.patterns);
 	}
 

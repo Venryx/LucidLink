@@ -339,8 +339,8 @@ String.prototype._AddFunction_Inline = function TrimEnd(chars___) {
 };
 
 String.prototype._AddFunction_Inline = function startsWith(str) { return this.indexOf(str) == 0; }; //return this.lastIndexOf(str, 0) === 0; };
-String.prototype._AddFunction_Inline = function endsWith(str) {
-	return this.indexOf(suffix, this.length - suffix.length) != -1;
+String.prototype._AddFunction_Inline = function endsWith(endStr) {
+	return this.indexOf(endStr, this.length - endStr.length) != -1;
 };
 String.prototype._AddFunction_Inline = function contains(str, /*;optional:*/ startIndex) { return -1 !== String.prototype.indexOf.call(this, str, startIndex); };
 String.prototype._AddFunction_Inline = function hashCode() {

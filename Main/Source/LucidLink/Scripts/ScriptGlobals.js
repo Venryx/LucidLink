@@ -94,7 +94,10 @@ class AudioFile {
 			var time = new Date().getTime();
 			var percentThroughFade = V.GetPercentFromXToY(startTime, endTime, time);
 			this.SetVolume(V.Lerp(startVolume, to, percentThroughFade));
+			if (percentThroughFade >= 1)
+				timer.Stop();
 		});
+		timer.Start();
 	}
 
 	GetCurrentTime(callback) { this.baseFile.getCurrentTime(callback); }

@@ -6,6 +6,15 @@ import PatternsUI from "./Settings/PatternsUI";
 import AudiosUI from "./Settings/AudiosUI";
 
 g.Settings = class Settings extends Node {
+	@_VDFSerializeProp() SerializeProp(path, options) {
+	    if (path.currentNode.prop.name == "selectedPattern" && this.selectedPattern)
+	        return new VDFNode(this.selectedPattern.name);
+	}
+	@_VDFPostDeserialize() PostDeserialize() {
+	    if (IsString(this.selectedPattern))
+			this.selectedPattern = this.patterns.First(a=>a.name == this.selectedPattern);
+	}
+	
 	@P() applyScriptsOnLaunch = false;
 	@P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
@@ -15,8 +24,11 @@ g.Settings = class Settings extends Node {
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;
 	@T("List(Pattern)") @P(true, true) patterns = [];
+	@P() selectedPattern = null; // holds the actual pattern, but only the name is serialized
 
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
+
+	ui = null;
 }
 g.Pattern = class Pattern {
 	constructor(name) {
@@ -42,6 +54,23 @@ g.Pattern = class Pattern {
 
 	@P() textEditor = false;
 
+	Rename() {
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Rename pattern "${this.name}"`,
+			"input": {
+				prefill: this.name,
+				callback: newName=> {
+					this.name = newName;
+					if (LL.settings.ui)
+						LL.settings.ui.forceUpdate();
+				}
+			},
+			"positiveText": "OK",
+			"negativeText": "Cancel"
+		});
+		dialog.show();
+	}
 	Delete() {
 		var dialog = new DialogAndroid();
 		dialog.set({
@@ -75,7 +104,7 @@ export class SettingsUI extends BaseComponent {
 	constructor(props) {
 		super(props);
 		LL.settings.ui = this;
-	}
+	}	
 	render() {
 		return (
 			<ScrollableTabView style={{flex: 1}}>

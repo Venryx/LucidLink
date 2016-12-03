@@ -11,6 +11,8 @@ import scriptDefaultText_FakeDataProvider from "./Scripts/UserScriptDefaults/Fak
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
 
+import ScriptsPanel from "./Scripts/ScriptsPanel";
+
 g.Script = class Script {
 	static async Load(file) {
 		let scriptText = await file.ReadAllText();
@@ -228,8 +230,6 @@ This will permanently remove all custom code from the script.`,
 	}
 }
 
-import ScriptsPanel from "./Scripts/ScriptsPanel";
-
 export class ScriptsUI extends BaseComponent {
 	constructor(props) {
 		super(props);
@@ -237,8 +237,7 @@ export class ScriptsUI extends BaseComponent {
 		LL.scripts.ui = this;
 	}
 
-	scriptsPanel = null;
-	@Bind ToggleScriptsPanelOpen() {
+	@Bind ToggleSidePanelOpen() {
 		if (this._drawer._open)
 			this._drawer.close();
 		else
@@ -268,7 +267,7 @@ export class ScriptsUI extends BaseComponent {
 					closedDrawerOffset={-3} styles={drawerStyles}>
 				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
 					<Panel style={E(styles.header, {flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: -5})}>
-						<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleScriptsPanelOpen}/>
+						<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 						<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
 						Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
 						{selectedScript && !selectedScript.editable ? " (read only)" : ""}

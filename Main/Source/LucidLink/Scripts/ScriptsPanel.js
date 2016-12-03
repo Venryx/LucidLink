@@ -18,7 +18,7 @@ class ScriptEntryUI extends BaseComponent {
 							style={{alignItems: "flex-end", marginLeft: 5, marginTop: 6, width: 28, height: 28}}
 							textStyle={{marginBottom: 3}} onPress={()=>script.Delete()}/>
 						: <Panel style={{marginLeft: 5, width: 28, height: 28}}/>}
-					</Panel>
+				</Panel>
 			</TouchableHighlight>
 		);
 	}
@@ -39,8 +39,8 @@ export default class ScriptsPanel extends BaseComponent {
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
 						renderRow={script=><ScriptEntryUI parent={this} script={script}/>}
 						onRowMoved={e=> {
-							var movedScriptName = scriptNames_ordered.splice(e.from, 1)[0];
-							scriptNames_ordered.Insert(e.to, movedScriptName);
+							var movedEntryName = scriptNames_ordered.splice(e.from, 1)[0];
+							scriptNames_ordered.Insert(e.to, movedEntryName);
 							for (var i = 0; i < scripts.length; i++) {
 								let scriptAtIndex_name = scriptNames_ordered[i];
 								let script = scripts.First(a=>a.file.Name == scriptAtIndex_name);

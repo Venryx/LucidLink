@@ -1,16 +1,66 @@
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 import Chart from "react-native-chart";
 var DialogAndroid = require("react-native-dialogs");
+import Drawer from "react-native-drawer";
 
-export default class PatternsUI extends BaseComponent { 
+import PatternsPanel from "./PatternsPanel";
+
+export default class PatternsUI extends BaseComponent {
+	@Bind ToggleSidePanelOpen() {
+		if (this._drawer._open)
+			this._drawer.close();
+		else
+			this._drawer.open();
+	}
+
+	SelectPattern(pattern) {
+		LL.settings.selectedPattern = pattern;
+		this.forceUpdate();
+		this._drawer.close();
+	}
+	
 	render() {
 		var node = LL.settings;
+		var {selectedPattern: pattern} = node;
+
+		// call this after you make any changes to a Pattern object (so Java knows of changes)
+		var Change = ()=> {
+			LL.PushPatternsToJava();
+			parent.forceUpdate();
+		};
+		
 		return (
-			<Panel style={{flex: 1, backgroundColor: colors.background}}>
-				<Column style={{marginTop: 10, flex: 1}}>
-					<Row style={{height: 35}}>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Preview chart value range: </Text>
-						<VButton text={node.previewChartRangeX.toString()} style={{width: 100, height: 32}}
+			<Drawer ref={comp=>this._drawer = comp}
+					content={<PatternsPanel parent={this} patterns={node.patterns}/>}
+					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
+					closedDrawerOffset={-3} styles={{
+						drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
+						main: {paddingLeft: 3},
+					}}>
+				<Column style={{backgroundColor: colors.background}}>
+					<Row style={E(styles.header, {flexWrap: "wrap", padding: 3, paddingBottom: -5})}>
+						<VButton text="Patterns" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+						<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
+						Pattern: {pattern ? pattern.name : "n/a"}
+						</Text>
+						{pattern &&
+							<VButton text="Rename" style={{marginLeft: 10, width: 100}} onPress={()=>pattern.Rename()}/>}
+						{pattern &&
+							<VSwitch text="Enabled" value={pattern.enabled} onValueChange={value=>Change(pattern.enabled = value)}/>}
+						<Panel style={{flex: 1}}/>
+						{/*<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
+							<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
+								style={{width: 100, marginLeft: 5}}
+								onPress={()=>selectedScript.Save().then(()=>this.forceUpdate())}/>
+							<VButton color="#777" text="Apply all"
+								//enabled={scriptLastRunsOutdated}
+								enabled={true}
+								style={{width: 100, marginLeft: 5}}
+								onPress={()=>node.ApplyScripts()}/>
+						</Panel>*/}
+
+						<Text style={{marginLeft: 10, marginTop: 10, marginRight: 10}}>Preview chart value range: </Text>
+						<VButton text={node.previewChartRangeX.toString()} style={{marginTop: 5, width: 100, height: 32}}
 							onPress={()=> {
 								var values = [-1];
 								for (let val = 0; val < 100; val += 10)
@@ -33,8 +83,8 @@ export default class PatternsUI extends BaseComponent {
 								});
 							}}/>
 
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}> by </Text>
-						<VButton text={node.previewChartRangeY.toString()} style={{width: 100, height: 32}}
+						<Text style={{marginLeft: 10, marginTop: 10, marginRight: 10}}> by </Text>
+						<VButton text={node.previewChartRangeY.toString()} style={{marginTop: 5, width: 100, height: 32}}
 							onPress={()=> {
 								var values = [-1];
 								for (let val = 0; val < 100; val += 10)
@@ -57,33 +107,10 @@ export default class PatternsUI extends BaseComponent {
 								});
 							}}/>
 					</Row>
-					
-					<ScrollView ref="scrollView" style={{flex: 100, flexDirection: "column", borderTopWidth: 1}}
-							automaticallyAdjustContentInsets={false}>
-						{node.patterns.map((pattern, index)=> {
-							return <PatternUI key={index} parent={this} pattern={pattern}/>; 
-						})}
-						<Row height={45}>
-							<VButton onPress={()=>this.CreatePattern()} text="Create" style={{width: 100, height: 40}}/>
-						</Row>
-					</ScrollView>
+					{pattern && <PatternUI parent={this} pattern={pattern}/>}
 				</Column>
-            </Panel>
+			</Drawer>
 		);
-	}
-
-	/*ToVectors(points) {
-		return points.Select(a=>new Vector2i(a[0], a[1]));
-	}
-	ToArrays(points) {
-		return points.Select(a=>[a.x, a.y]);
-	}*/
-
-	CreatePattern() {
-		LL.settings.patterns.push(new Pattern("none"));
-
-		LL.PushPatternsToJava();
-		this.forceUpdate();
 	}
 }
 
@@ -104,83 +131,69 @@ class PatternUI extends BaseComponent {
 			pointsForChart = [[0, 0]];
 
 		return (
-			<Row height={35 + (pattern.textEditor ? 35 : 0) + (pattern.actions ? 35 : 0) + 100}>
-				<Column>
-					<Row height={35}>
-						<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-							editable={true} value={pattern.name}
-							onChangeText={text=>Change(pattern.name = text)}/>
+			<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1, marginTop: -7}}
+					automaticallyAdjustContentInsets={false}>
+				<Row height={35}>
+					<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Sensitivity</Text>
+					<VButton text={pattern.sensitivity.toString()} style={{width: 100, height: 32}}
+						onPress={async ()=> {
+							var values = [];
+							for (let val = 0; val <= 200; val++)
+								values.push(val);
+							var id = await NumberPickerDialog.show({
+								title: "Pattern match sensitivity",
+								message: "The 'sensitivity' is the average distance of channel-data points to\
+pattern-points that yields a pattern-match certainty of 0.",
+								values: values.Select(a=>a.toString()),
+								selectedValueIndex: values.indexOf(pattern.sensitivity),
+								positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+							});
 
-						<VSwitch text="Enabled" value={pattern.enabled} onValueChange={value=>Change(pattern.enabled = value)}/>
+							if (id == -1) return;
+							let val = values[id];
+							pattern.sensitivity = val;
+							Change();
+						}}/>
 
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Sensitivity</Text>
-						<VButton text={pattern.sensitivity.toString()} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = 0; val <= 200; val++)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Pattern match sensitivity",
-									message: "The 'sensitivity' is the average distance of channel-data points to\
- pattern-points that yields a pattern-match certainty of 0.",
-									values: values.Select(a=>a.toString()),
-									selectedValueIndex: values.indexOf(pattern.sensitivity),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-
-								if (id == -1) return;
-								let val = values[id];
-								pattern.sensitivity = val;
-								Change();
-							}}/>
-
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Channels: </Text>
-						<VSwitch text="1" value={pattern.channel1}
-							onValueChange={value=>Change(pattern.channel1 = value)}/>
-						<VSwitch text="2" value={pattern.channel2}
-							onValueChange={value=>Change(pattern.channel2 = value)}/>
-						<VSwitch text="3" value={pattern.channel3}
-							onValueChange={value=>Change(pattern.channel3 = value)}/>
-						<VSwitch text="4" value={pattern.channel4}
-							onValueChange={value=>Change(pattern.channel4 = value)}/>
-						
-						<VSwitch text="Text editor" value={pattern.textEditor}
-							onValueChange={value=>Change(pattern.textEditor = value)}/>
-
-						<VSwitch text="Actions" value={pattern.actions}
-							onValueChange={value=>Change(pattern.actions = value)}/>
-
-						<VButton text="X" style={{marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
-							onPress={()=>pattern.Delete()}/>
-					</Row>
-					{pattern.textEditor && 
-						<Row height={35}>
-							<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-								editable={true} defaultValue={ToVDF(pattern.points, false)}
-								onChangeText={text=> {
-									try {
-										pattern.points = FromVDF(text, "List(Vector2i)");
-									} catch (ex) {
-										Toast("Invalid points JSON");
-									}
-									Change();
-								}}/>
-						</Row>}
-					{pattern.actions && 
-						<Row height={35}>
-							<VButton text="Offset X" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("x")}/>
-							<VButton text="Offset Y" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("y")}/>
-							<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.Clone()}/>
-							<VButton text="Transform" ml5 style={{height: 30}} onPress={()=>this.Transform()}/>
-						</Row>}
-					<Row height={100} style={{backgroundColor: "#FFFFFF55"}}>
-						<Chart style={{width: Dimensions.get("window").width - 30, height: 80}}
-							minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
-							minY={-node.previewChartRangeY / 2} maxY={node.previewChartRangeY / 2} legendStepsY={5}
-							type="line" color={["#e1cd00"]} data={[pointsForChart]}/>
-					</Row>
-				</Column>
-			</Row>
+					<VText ml10 style={{marginTop: 5, marginRight: 10}}>Channels: </VText>
+					<VSwitch text="1" value={pattern.channel1}
+						onValueChange={value=>Change(pattern.channel1 = value)}/>
+					<VSwitch text="2" value={pattern.channel2}
+						onValueChange={value=>Change(pattern.channel2 = value)}/>
+					<VSwitch text="3" value={pattern.channel3}
+						onValueChange={value=>Change(pattern.channel3 = value)}/>
+					<VSwitch text="4" value={pattern.channel4}
+						onValueChange={value=>Change(pattern.channel4 = value)}/>
+				</Row>
+				<Row height={35}>
+					<VText ml10 style={{marginTop: 5, marginRight: 10}}>Actions: </VText>
+					<VButton text="Offset X" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("x")}/>
+					<VButton text="Offset Y" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("y")}/>
+					<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.Clone()}/>
+					<VButton text="Transform" ml5 style={{height: 30}} onPress={()=>this.Transform()}/>
+				</Row>
+				<Row height={320} style={{backgroundColor: "#FFFFFF55"}}>
+					<Chart style={{width: Dimensions.get("window").width - 30, height: 300}}
+						minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
+						minY={-node.previewChartRangeY / 2} maxY={node.previewChartRangeY / 2} legendStepsY={5}
+						type="line" color={["#e1cd00"]} data={[pointsForChart]}/>
+				</Row>
+				<Row>
+					<VSwitch text="Text editor" value={pattern.textEditor}
+						onValueChange={value=>Change(pattern.textEditor = value)}/>
+				</Row>
+				{pattern.textEditor && 
+					<TextInput style={{height: 100, paddingTop: 0, paddingBottom: 0}} multiline={true}
+						editable={true} defaultValue={ToVDF(pattern.points, false)}
+						onChangeText={text=> {
+							try {
+								pattern.points = FromVDF(text, "List(Vector2i)");
+							} catch (ex) {
+								Toast("Invalid points JSON");
+							}
+							Change();
+						}}/>}
+			</ScrollView>
 		);
 	}
 
