@@ -85,7 +85,7 @@ class ChartManager {
 		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.LEFT);
 		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.RIGHT);*/
 		// this doesn't work for some reason, so use fake-data and then call calcMinMax
-		//chart.setVisibleYRange(0, 6000, YAxis.AxisDependency.LEFT);
+		//chart.setVisibleYRange(0, maxY_fullChart, YAxis.AxisDependency.LEFT);
 
 		// fill chart with fake data
 		// ==========
@@ -95,7 +95,7 @@ class ChartManager {
 			// start channels as flat
 			ArrayList<Entry> thisChannelPoints = new ArrayList<>();
 			for (int i2 = 0; i2 <= maxX; i2++)
-				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, i == 0 ? 0 : 6000));
+				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, i == 0 ? 0 : maxY_fullChart));
 			channelPoints.add(thisChannelPoints);
 			LineDataSet line = new LineDataSet(thisChannelPoints, "Channel " + i);
 			line.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -240,7 +240,8 @@ class ChartManager {
 
 	int lastX = -1;
 	int maxX = 1000;
-	int maxY_fullChart = 6000;
+	int heightPerChannel = 500;
+	int maxY_fullChart = 3000;
 
 	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> column) {
 		if (!type.equals("eeg")) return;
@@ -258,10 +259,11 @@ class ChartManager {
 
 			DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
 
-			float yBase = 4000 - (channel * 1000); // simulate lines being in different rows
+			float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
 			float yValue = (float)(double)column.get(channel);
 
-			dataSet.getValues().set(currentX, new Entry(currentX, yBase + yValue));
+			float finalY = yBase + (yValue - 500);
+			dataSet.getValues().set(currentX, new Entry(currentX, finalY));
 		}
 		lastX = currentX;
 
