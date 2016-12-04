@@ -51,8 +51,7 @@ Error: ${ex.stack}`);
 		dialog.set({
 			"title": `Delete script "${this.file.NameWithoutExtension}"`,
 			"content": `Permanently delete script?`,
-			"positiveText": "OK",
-			"negativeText": "Cancel",
+			"positiveText": "OK", "negativeText": "Cancel",
 			"onPositive": ()=> {
 				LL.scripts.scripts.Remove(this);
 				if (LL.scripts.selectedScript == this)

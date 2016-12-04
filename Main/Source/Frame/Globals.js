@@ -231,6 +231,11 @@ g.ToVDFNode = function(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing
 	}/**/ finally {}
 }
 
+g.GetTypeName = function(obj) {
+	if (obj === null || obj === undefined) return null;
+	return obj.GetTypeName();
+}
+
 // tags
 // ==========
 

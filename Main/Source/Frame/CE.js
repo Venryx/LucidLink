@@ -554,6 +554,12 @@ Array.prototype._AddFunction_Inline = function RemoveAll(items) {
 Array.prototype._AddFunction_Inline = function RemoveAt(index) { return this.splice(index, 1)[0]; };
 Array.prototype._AddFunction_Inline = function Insert(index, obj) { this.splice(index, 0, obj); }
 
+Array.prototype._AddFunction_Inline = function Reversed() { 
+	var clone = this.slice(0);
+	clone.reverse();
+	return clone;
+}
+
 Object.prototype._AddFunction_Inline = function AsRef() { return new NodeReference_ByPath(this); }
 
 // Linq replacements
@@ -733,6 +739,45 @@ Object.prototype._AddGetter_Inline = function Entries() {
 ArrayIterator.prototype._AddFunction_Inline = function ToArray() {
     return Array.from(this);
 };*/
+
+// Date
+// ==========
+
+Date.prototype._AddGetter_Inline = function MonthDate() {
+	return new Date(this.getFullYear(), this.getMonth(), 1);
+};
+
+Date.isLeapYear = function(year) {
+    return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)); 
+};
+
+Date.getDaysInMonth = function(year, month) {
+    return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+};
+
+Date.prototype.isLeapYear = function() { 
+    return Date.isLeapYear(this.getFullYear()); 
+};
+
+Date.prototype.getDaysInMonth = function() { 
+    return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+};
+
+Date.prototype.AddMonths = function(value) {
+    var n = this.getDate();
+    this.setDate(1);
+    this.setMonth(this.getMonth() + value);
+    this.setDate(Math.min(n, this.getDaysInMonth()));
+    return this;
+};
+
+Date.prototype.Clone = function(amount) {
+	return new Date(this.getTime());
+}
+Date.prototype.AddingMonths = function(amount) {
+	var clone = this.Clone();
+	clone.AddMonths(amount);
+}
 
 // [offset construct] (e.g. {left: 10, top: 10})
 // ==========

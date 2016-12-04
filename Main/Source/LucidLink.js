@@ -27,11 +27,14 @@ import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";
 require("./Packages/Sketchy/Sketchy");
+require("./Frame/LCE");
 
 import TestData from "./Frame/TestData";
 //import {JavaBridge} from "./Globals";
 
 import {MonitorUI} from "./LucidLink/Monitor";
+import {TrackerUI} from "./LucidLink/Tracker";
+import {JournalUI} from "./LucidLink/Journal";
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {MoreUI} from "./LucidLink/More";
@@ -102,6 +105,8 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 
 g.LucidLink = class LucidLink extends Node {
 	@T("Monitor") @P(true, true) monitor = new Monitor();
+	@T("Tracker") @P(true, true) tracker = new Tracker();
+	@T("Journal") @P(true, true) journal = new Journal();
 	@T("Scripts") @P(true, true) scripts = new Scripts();
 	@T("Settings") @P(true, true) settings = new Settings();
 	@T("More") @P(true, true) more = new More();
@@ -135,7 +140,7 @@ g.LucidLink = class LucidLink extends Node {
 		return result;
 	}*/
 	async SetUpSession() {
-		this.sessionKey = Moment().format("YYYY-M-D HH:mm:ss");
+		this.sessionKey = Moment().format("YYYY-MM-DD HH:mm:ss");
 		await this.SessionFolder.Create();
 		this.sessionLogFile = this.SessionFolder.GetFile("Log.txt");
 
@@ -257,10 +262,8 @@ export default class LucidLinkUI extends Component {
 						JavaBridge.Main.OnTabSelected(data.i);
 					}}>
 				<MonitorUI tabLabel="Monitor" active={activeTab == 0}/>
-				<Panel style={styles.container} tabLabel="Tracker" active={activeTab == 1}>
-				</Panel>
-				<Panel style={styles.container} tabLabel="Journal" active={activeTab == 2}>
-				</Panel>
+				<TrackerUI tabLabel="Tracker" active={activeTab == 1}/>
+				<JournalUI tabLabel="Journal" active={activeTab == 2}/>
 				<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
 				<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
 				<MoreUI tabLabel="More" active={activeTab == 5}/>

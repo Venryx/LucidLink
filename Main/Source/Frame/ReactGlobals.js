@@ -2,7 +2,8 @@ import React, {Component} from "react";
 import {NativeModules} from "react-native";
 //import {View, Button} from "react-native";
 import {Dimensions, StyleSheet,
-	View, Text, Switch, TextInput, ScrollView, TouchableHighlight} from "react-native";
+	View, Text, Switch, TextInput, ScrollView, TouchableOpacity, TouchableHighlight,
+	DatePickerAndroid, TimePickerAndroid} from "react-native";
 import RNFS from "react-native-fs";
 //import autobind from "react-autobind"; // caused error in Babel transpiler
 import Bind from "autobind-decorator";
@@ -12,7 +13,8 @@ import Button from 'apsl-react-native-button'
 var g = global;
 g.g = g;
 
-var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableHighlight, Dimensions, StyleSheet};
+var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
+	DatePickerAndroid, TimePickerAndroid};
 for (let key in globalComps)
 	g[key] = globalComps[key];
 
@@ -134,8 +136,9 @@ g.Row = class Row extends BaseComponent {
 	render() {
 		var {style, height, children} = this.props;
 		height = height != null ? height : (style||{}).height;
+		var otherProps = this.props.Excluding(style, height, children);
 		return (
-			<Panel style={E({flexDirection: "row", padding: 3}, style,
+			<Panel {...otherProps} style={E({flexDirection: "row", padding: 3}, style,
 					//height != null ? {height} : {flex: 1})}>
 					height != null && {height})}>
 				{children}
@@ -148,7 +151,7 @@ g.RowLR = class RowLR extends BaseComponent {
 		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<Panel style={E({flexDirection: "row", padding: 3}, height != null ? {height} : {flex: 1})}>
+			<Panel style={E({flexDirection: "row", padding: 3}, height != null && {height})}>
 				<Panel style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
 				</Panel>
@@ -163,8 +166,9 @@ g.RowLR = class RowLR extends BaseComponent {
 g.Column = class Column extends BaseComponent {
 	render() {
 		var {style, width, children} = this.props;
+		var otherProps = this.props.Excluding(style, width, children);
 		return (
-			<Panel style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
+			<Panel {...otherProps} style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</Panel>
 		);
@@ -174,9 +178,9 @@ g.Column = class Column extends BaseComponent {
 g.Panel = class Panel extends View {
 	render() {
 		var {children, style} = this.props;
-		var restProps = this.props.Excluding("style", "children");
+		var otherProps = this.props.Excluding("style", "children");
 		return (
-			<View {...{restProps}} style={E({backgroundColor: "transparent"}, style)}>
+			<View {...otherProps} style={E({backgroundColor: "transparent"}, style)}>
 				{children}
 			</View>
 		);
@@ -197,9 +201,9 @@ function BasicStyles(props) {
 g.VText = class VText extends BaseComponent {
 	render() {
 		var {style, children} = this.props;
-		var restProps = this.props;
+		var otherProps = this.props;
 		return (
-			<Text {...restProps}
+			<Text {...otherProps}
 					style={E(
 						{},
 						BasicStyles(this.props),
