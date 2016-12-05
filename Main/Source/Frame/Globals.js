@@ -76,6 +76,27 @@ g.AssertWarn = function(condition, messageOrMessageFunc) {
 	console.warn(message);
 };
 
+g.A = class A {
+    static set NonNull(value) {
+		Assert(value != null, "Value cannot be null.");
+	}
+	static NotEqualTo(val1) {
+	    return new A_NotEqualTo_Wrapper(val1);
+	}
+	static OfType(typeNameOrType) {
+	    var type = Type(typeNameOrType);
+	    return new A_OfType_Wrapper(type);
+	}
+} 
+g.A_NotEqualTo_Wrapper = class A_NotEqualTo_Wrapper {
+	constructor(val1) { this.val1 = val1; }
+    set a(val2) { Assert(val2 != this.val1); }
+}
+g.A_OfType_Wrapper = class A_OfType_Wrapper {
+	constructor(type) { this.type = type; }
+    set a(val) { Assert(val != null && val.GetType().IsDerivedFrom(this.type)); }
+}
+
 g.JavaBridge = class JavaBridge {
     static get Main() {
         return NativeModules.Main;

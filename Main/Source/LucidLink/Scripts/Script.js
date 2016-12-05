@@ -1,4 +1,6 @@
-g.Script = class Script {
+import DialogAndroid from "react-native-dialogs";
+
+class Script {
 	static async Load(file) {
 		let scriptText = await file.ReadAllText();
 		var result = new Script(file, scriptText);
@@ -38,9 +40,16 @@ Error: ${ex.stack}`);
 			"content": `Permanently delete script?`,
 			"positiveText": "OK", "negativeText": "Cancel",
 			"onPositive": ()=> {
-				LL.scripts.scripts.Remove(this);
-				if (LL.scripts.selectedScript == this)
-					LL.scripts.selectedScript = null;
+				if (this.DisplayerScript) {
+					A.NonNull = LL.tracker.displayerScripts.Remove(this);
+					//LL.tracker.displayerScripts.remove(this);
+					if (LL.tracker.selectedDisplayerScript == this)
+						LL.tracker.selectedDisplayerScript = null;
+				} else {
+					A.NonNull = LL.scripts.scripts.Remove(this);
+					if (LL.scripts.selectedScript == this)
+						LL.scripts.selectedScript = null;
+				}
 				this.file.Delete();
 				this.MetaFile.Delete();
 				onDelete && onDelete();
@@ -73,14 +82,16 @@ Error: ${ex.stack}`);
 	}
 
 	file = null;
+	get DisplayerScript() { return this.file.Folder.Name == "Displayer scripts"; }
 	fileOutdated = false;
 	get Name() { return this.file.NameWithoutExtension; }
 	get MetaFile() { return this.file.Folder.GetFile(this.file.NameWithoutExtension + ".meta"); }
 
-	text = null;
+	@O text = null;
 
 	// stored in meta file
 	index = -1000;
 	editable = true;
 	enabled = true;
 }
+g.Script = Script;

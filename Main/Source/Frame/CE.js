@@ -545,7 +545,8 @@ Array.prototype._AddFunction_Inline = function Remove(item) {
 		if (this[i] === item)
 			return this.splice(i, 1);*/
 	var itemIndex = this.indexOf(item);
-	this.splice(itemIndex, 1);
+	var removedItems = this.splice(itemIndex, 1);
+	return removedItems[0];
 };
 Array.prototype._AddFunction_Inline = function RemoveAll(items) {
     for (let item of items)

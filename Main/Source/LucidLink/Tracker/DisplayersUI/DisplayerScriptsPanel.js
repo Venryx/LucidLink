@@ -16,7 +16,7 @@ class DisplayerScriptUI extends BaseComponent {
 					{script.editable
 						? <VButton text="X"
 							style={{alignItems: "flex-end", marginLeft: 5, marginTop: 6, width: 28, height: 28}}
-							textStyle={{marginBottom: 3}} onPress={()=>script.Delete(()=>this.forceUpdate())}/>
+							textStyle={{marginBottom: 3}} onPress={()=>script.Delete()}/>
 						: <Panel style={{marginLeft: 5, width: 28, height: 28}}/>}
 				</Panel>
 			</TouchableHighlight>
@@ -24,22 +24,23 @@ class DisplayerScriptUI extends BaseComponent {
 	}
 }
 
+@Observer
 @Bind
 export default class ScriptsPanel extends BaseComponent {
 	render() {
-		var {parent, scripts, onSelectScript} = this.props;
+		var {parent, scripts, selectedScript} = this.props;
 
 		var scripts_map = scripts.ToMap(a=>a.file.Name, a=>a);
 		var scriptNames_ordered = scripts.OrderBy(a=>a.index).Select(a=>a.file.Name);
 
 		return (
 			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
-				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder; place dependencies first)</Text>
+				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder)</Text>
 				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
 						renderRow={script=> {
-							return <ScriptEntryUI parent={this} script={script}
-								onSelect={()=>onSelectScript(script)}/>;
+							return <DisplayerScriptUI parent={this} script={script}
+								onSelect={()=>parent.SelectScript(script)}/>;
 						}}
 						onRowMoved={e=> {
 							var movedEntryName = scriptNames_ordered.splice(e.from, 1)[0];
@@ -49,7 +50,7 @@ export default class ScriptsPanel extends BaseComponent {
 								let script = scripts.First(a=>a.file.Name == scriptAtIndex_name);
 								script.index = i;
 							}
-							this.forceUpdate();
+							//this.forceUpdate();
 						}}/>
 					<VButton text="Add" style={{position: "absolute", top: (scripts.length * (40 + 1)) + 5, width: 100}}
 						onPress={this.AddScript}/>
@@ -60,18 +61,18 @@ export default class ScriptsPanel extends BaseComponent {
 	async AddScript() {
 		var fileName;
 		for (var i = 2; i < 100; i++) {
-			fileName = `Custom script ${i}.js`;
-			if (!LL.scripts.scripts.Any(a=>a.file.Name == fileName))
+			fileName = `Displayer script ${i}.js`;
+			if (!LL.tracker.displayerScripts.Any(a=>a.file.Name == fileName))
 				break;
 		}
 
-		var file = LL.RootFolder.GetFolder("Scripts").GetFile(fileName);
-		var script = new Script(file, `Log("Hello world!");`);
-		script.index = LL.scripts.scripts.length;
-		LL.scripts.scripts.push(script);
+		var folder = LL.RootFolder.GetFolder("Displayer scripts");
+		await folder.Create();
+		var file = folder.GetFile(fileName);
+		var script = new Script(file, ``);
+		script.index = LL.tracker.displayerScripts.length;
+		LL.tracker.displayerScripts.push(script);
 
 		script.Save();
-
-		this.forceUpdate();
 	}
 }

@@ -10,11 +10,15 @@ import Bind from "autobind-decorator";
 
 import Button from 'apsl-react-native-button'
 
+import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
+import {observer as Observer} from "mobx-react/native";
+
 var g = global;
 g.g = g;
 
 var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
-	DatePickerAndroid, TimePickerAndroid};
+	DatePickerAndroid, TimePickerAndroid,
+	O, Transaction, AutoRun, Observer};
 for (let key in globalComps)
 	g[key] = globalComps[key];
 

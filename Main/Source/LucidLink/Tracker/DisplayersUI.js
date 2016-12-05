@@ -1,3 +1,8 @@
+import Drawer from "react-native-drawer";
+
+import DisplayerScriptsPanel from "./DisplayersUI/DisplayerScriptsPanel";
+
+@Observer
 export default class DisplayersUI extends BaseComponent {
 	@Bind ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -8,45 +13,47 @@ export default class DisplayersUI extends BaseComponent {
 
 	SelectScript(script) {
 		LL.tracker.selectedDisplayerScript = script;
-		this.forceUpdate();
 		this._drawer.close();
 	}
 
 	render() {
 		var node = LL.tracker;
-		var {selectedDisplayerScript} = node;
+		var {selectedDisplayerScript: selectedScript} = node;
 		var {scriptLastRunsOutdated} = this.state;
 		
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
 			main: {paddingLeft: 3},
 		};
-
+		
 		return (
 			<Drawer ref={comp=>this._drawer = comp}
-					content={<DisplayerScriptsPanel scripts={node.displayerScripts} selectedScript={node.selectedDisplayerScript}/>}
+					content={
+						<DisplayerScriptsPanel parent={this} scripts={node.displayerScripts} selectedScript={node.selectedDisplayerScript}/>
+					}
 					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
 				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
 					<Panel style={E(styles.header, {flexDirection: "row", flexWrap: "wrap", padding: 3, paddingBottom: -5})}>
-						<VButton text="Displayer scripts" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+						<VButton text="Scripts" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 						<Text style={{marginLeft: 10, marginTop: 8, fontSize: 18}}>
 						Script: {selectedScript ? selectedScript.file.NameWithoutExtension : "n/a"}
 						{selectedScript && !selectedScript.editable ? " (read only)" : ""}
 						</Text>
 						{selectedScript && selectedScript.editable &&
 							<VButton text="Rename" style={{marginLeft: 10, width: 100}}
-								onPress={()=>selectedScript.Rename(()=>this.forceUpdate())}/>}
+								onPress={()=>selectedScript.Rename()}/>}
 						<Panel style={{flex: 1}}/>
 						<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
-							<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
-								style={{width: 100, marginLeft: 5}}
-								onPress={()=>selectedScript.Save().then(()=>this.forceUpdate())}/>
-							<VButton color="#777" text="Apply all"
-								//enabled={scriptLastRunsOutdated}
-								enabled={true}
-								style={{width: 100, marginLeft: 5}}
-								onPress={()=>node.ApplyDisplayerScripts()}/>
+							<VButton color="#777" text="Save and apply all" enabled={LL.tracker.displayerScriptFilesOutdated}
+								style={{width: 200, marginLeft: 5}}
+								onPress={()=> {
+									Transaction(()=> {
+										selectedScript.Save();
+										LL.tracker.displayerScriptFilesOutdated = false;
+									});
+									LL.tracker.ApplyDisplayerScripts();
+								}}/>
 						</Panel>
 					</Panel>
 					<Panel style={{marginTop: -7, flex: 1}}>
@@ -55,9 +62,11 @@ export default class DisplayersUI extends BaseComponent {
 							editable={selectedScript != null}
 							onChangeText={text=> {
 								if (!selectedScript.editable) return;
-								selectedScript.text = text;
-								selectedScript.fileOutdated = true;
-								this.forceUpdate();
+								Transaction(()=> {
+									selectedScript.text = text;
+									//selectedScript.fileOutdated = true;
+									LL.tracker.displayerScriptFilesOutdated = true;
+								});
 							}}/>
 					</Panel>
 				</Panel>
@@ -68,4 +77,16 @@ export default class DisplayersUI extends BaseComponent {
 	/*componentWillUnmount() {
 		this.SaveScripts();
 	}*/
+}
+
+// pure
+class ScriptTextUI extends BaseComponent {
+	static defaultProps = {editable: true};
+	render() {
+		var {parent, editable, onChangeText, text} = this.props;
+		return <TextInput {...{editable}}
+			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
+			multiline={true} editable={editable} value={text} autoCapitalize="none" autoCorrect={false}
+			onChangeText={onChangeText}/>;
+	}
 }

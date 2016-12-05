@@ -1,6 +1,6 @@
 import RNFS from "react-native-fs";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
-var DialogAndroid = require("react-native-dialogs");
+import ScrollableTabView from "react-native-scrollable-tab-view";
+import DialogAndroid from "react-native-dialogs";
 import Drawer from "react-native-drawer";
 
 import ScriptRunner from "./Scripts/ScriptRunner";

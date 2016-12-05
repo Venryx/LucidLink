@@ -20,7 +20,11 @@ g.Folder = class Folder {
 	}
 
 	path = null;
-	get Path() { return this.path.replace(/\\/g, "/"); }	
+	get Path() { return this.path.replace(/\\/g, "/").replace(/\/\//g, "/"); } // cleaned-up path
+	get Name() {
+		var pathWithoutEndSlash = this.Path.replace(/\/$/, "");
+		return pathWithoutEndSlash.substr(pathWithoutEndSlash.lastIndexOf("/") + 1);
+	}
 
 	async Exists() {
 		return await RNFS.exists(this.path);
@@ -55,12 +59,12 @@ g.File = class File {
 	}
 
 	path = null;
-	get Path() { return this.path.replace(/\\/g, "/"); }
+	get Path() { return this.path.replace(/\\/g, "/").replace(/\/\//g, "/"); } // cleaned-up path
 	get Folder() {
-		return new Folder(this.path.substr(0, this.Path.lastIndexOf("/") + 1));
+		return new Folder(this.Path.substr(0, this.Path.lastIndexOf("/") + 1));
 	}
 	get Name() {
-		return this.path.substr(this.Path.lastIndexOf("/") + 1);
+		return this.Path.substr(this.Path.lastIndexOf("/") + 1);
 	}
 	get NameWithoutExtension() {
 		return this.Name.substr(0, this.Name.lastIndexOf("."));

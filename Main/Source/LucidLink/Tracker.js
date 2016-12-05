@@ -1,9 +1,10 @@
 import GraphUI from "./Tracker/GraphUI";
 import ListUI from "./Tracker/ListUI";
 import DisplayersUI from "./Tracker/DisplayersUI";
+import ScrollableTabView from "react-native-scrollable-tab-view";
 
-import scriptDefaultText_BuiltInDisplayers from "./Scripts/UserScriptDefaults/BuiltInDisplayers";
-import scriptDefaultText_CustomDisplayers from "./Scripts/UserScriptDefaults/CustomDisplayers";
+import scriptDefaultText_BuiltInDisplayers from "./Tracker/UserScriptDefaults/BuiltInDisplayers";
+import scriptDefaultText_CustomDisplayers from "./Tracker/UserScriptDefaults/CustomDisplayers";
 
 g.Tracker = class Tracker extends Node {
 	@_VDFSerializeProp() SerializeProp(path, options) {
@@ -11,8 +12,9 @@ g.Tracker = class Tracker extends Node {
 	        return new VDFNode(this.selectedDisplayerScript.name);
 	}
 
-	displayerScripts = [];
-	@P() selectedDisplayerScript = null; // holds the actual script, but only the name is serialized
+	@O displayerScripts = [];
+	@O displayerScriptFilesOutdated = false;
+	@O @P() selectedDisplayerScript = null; // holds the actual script, but only the name is serialized
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData(onDone = null) {
@@ -49,7 +51,7 @@ g.Tracker = class Tracker extends Node {
 		//if (LL.settings.applyScriptsOnLaunch)
 		this.ApplyDisplayerScripts();
 		
-		Log("Finished loading scripts.");
+		Log("Finished loading displayer scripts.");
 
 		onDone && onDone();
 	}
@@ -58,10 +60,16 @@ g.Tracker = class Tracker extends Node {
 		//this.SaveScripts();
 		this.SaveScriptMetas();
 	}
+	async SaveScriptMetas() {
+		var {displayerScripts} = this;
+		for (let script of displayerScripts)
+			script.SaveMeta();
+		Log("Finished saving displayer script metas.");
+	}
 
 	ApplyDisplayerScripts() {
 		this.scriptRunner.Reset();
-		var scripts_ordered = this.scripts.Where(a=>a.enabled).OrderBy(a=> {
+		var scripts_ordered = this.displayerScripts.Where(a=>a.enabled).OrderBy(a=> {
 			AssertWarn(a.index != -1000, `Script-order not found in meta file for: ${a.file.Name}`);
 			return a.index;
 		});

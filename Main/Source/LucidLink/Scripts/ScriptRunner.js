@@ -1,6 +1,6 @@
 require("./ScriptGlobals");
 
-export default class ScriptRunner {
+export default g.ScriptRunner = class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
 
 	keyDownListeners = [];

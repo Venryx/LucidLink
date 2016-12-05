@@ -10,7 +10,7 @@ import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter, Keybo
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 import Orientation from "react-native-orientation";
 import Moment from "moment";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
+import ScrollableTabView from "react-native-scrollable-tab-view";
 
 require("./Frame/CE");
 import * as UM1 from "./Packages/VDF/VDF";
@@ -26,7 +26,7 @@ require("./Frame/Graphics/VectorStructs");
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";
-require("./Scripts/Script");
+require("./LucidLink/Scripts/Script");
 require("./Packages/Sketchy/Sketchy");
 require("./Frame/LCE");
 
@@ -104,7 +104,7 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 		LL.ui.forceUpdate();
 });
 
-g.LucidLink = class LucidLink extends Node {
+class LucidLink extends Node {
 	@T("Monitor") @P(true, true) monitor = new Monitor();
 	@T("Tracker") @P(true, true) tracker = new Tracker();
 	@T("Journal") @P(true, true) journal = new Journal();
@@ -153,6 +153,7 @@ g.LucidLink = class LucidLink extends Node {
 	SaveFileSystemData() {
 		this.SaveMainData();
 		
+		this.tracker.SaveFileSystemData();
 		this.scripts.SaveFileSystemData();
 	}
 	async SaveMainData() {
@@ -168,8 +169,11 @@ g.LucidLink = class LucidLink extends Node {
 //LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
 //LucidLink.typeInfo.typeTag = new VDFType("^(?!_)(?!s$)(?!root$)", true);
 LucidLink.typeInfo.typeTag = new VDFType(null, true);
+g.LucidLink = LucidLink;
 
 async function Init(ui) {
+	try {
+
 	g.LL = new LucidLink();
 	LL.ui = ui;
 	var mainDataVDF = await LL.RootFolder.GetFile("MainData.vdf").ReadAllText();
@@ -191,12 +195,15 @@ async function Init(ui) {
 	Log("Finished loading main-data.");
 	Log("Logging to: " + LL.sessionLogFile.path);
 
+	LL.tracker.LoadFileSystemData();
 	LL.scripts.LoadFileSystemData();
 
 	LL.PushBasicDataToJava();
 	LL.PushPatternsToJava();
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
+
+	} catch (ex) { alert(ex); }
 }
 import MuseBridge from "./Frame/MuseBridge";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
