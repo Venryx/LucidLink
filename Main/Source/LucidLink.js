@@ -26,6 +26,7 @@ require("./Frame/Graphics/VectorStructs");
 import * as UM7 from "./Packages/VTree/Node";
 import * as UM8 from "./Packages/V/V";
 import UM9 from "./Packages/V/VFile";
+require("./Scripts/Script");
 require("./Packages/Sketchy/Sketchy");
 require("./Frame/LCE");
 

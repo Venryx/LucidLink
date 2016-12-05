@@ -1,18 +1,18 @@
 var SortableListView = require("react-native-sortable-listview");
 
 @Bind
-class ScriptEntryUI extends BaseComponent {
+class DisplayerScriptUI extends BaseComponent {
 	render() {
-		var {script} = this.props;
+		var {script, onSelect} = this.props;
 		return (
 			<TouchableHighlight {...this.props.sortHandlers} underlayColor="#EEE" delayLongPress={300}
 					style={{backgroundColor: colors.background_lighter, borderBottomWidth: 1, borderColor: colors.background_light}}
-					onPress={()=>LL.scripts.ui.SelectScript(script)}>
+					onPress={onSelect}>
 				<Panel style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
 					<Text style={{paddingTop: 10}}>{script.file.Name}</Text>
 					<Panel style={{flex: 1}}/>
-					<Switch value={script.enabled}
-						onValueChange={value=>(script.enabled = value) | this.forceUpdate()}/>
+					{/*<Switch value={script.enabled}
+						onValueChange={value=>(script.enabled = value) | this.forceUpdate()}/>*/}
 					{script.editable
 						? <VButton text="X"
 							style={{alignItems: "flex-end", marginLeft: 5, marginTop: 6, width: 28, height: 28}}
@@ -27,7 +27,7 @@ class ScriptEntryUI extends BaseComponent {
 @Bind
 export default class ScriptsPanel extends BaseComponent {
 	render() {
-		var {parent, scripts} = this.props;
+		var {parent, scripts, onSelectScript} = this.props;
 
 		var scripts_map = scripts.ToMap(a=>a.file.Name, a=>a);
 		var scriptNames_ordered = scripts.OrderBy(a=>a.index).Select(a=>a.file.Name);
@@ -37,7 +37,10 @@ export default class ScriptsPanel extends BaseComponent {
 				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder; place dependencies first)</Text>
 				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
-						renderRow={script=><ScriptEntryUI parent={this} script={script}/>}
+						renderRow={script=> {
+							return <ScriptEntryUI parent={this} script={script}
+								onSelect={()=>onSelectScript(script)}/>;
+						}}
 						onRowMoved={e=> {
 							var movedEntryName = scriptNames_ordered.splice(e.from, 1)[0];
 							scriptNames_ordered.Insert(e.to, movedEntryName);
