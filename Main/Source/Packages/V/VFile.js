@@ -32,16 +32,27 @@ g.Folder = class Folder {
 	async Create() {
 		return RNFS.mkdir(this.path);
 	}
+	async Delete() {
+		return RNFS.unlink(this.path);
+	}
 
+	async GetFolders() {
+		var subs = await RNFS.readDir(this.path);
+		var result = [];
+		for (let sub of subs) {
+			let subInfo = await RNFS.stat(sub.path);
+			if (!subInfo.isFile())
+				result.push(new Folder(sub.path));
+		}
+		return result;
+	}
 	async GetFiles() {
 		var subs = await RNFS.readDir(this.path);
 		var result = [];
 		for (let sub of subs) {
 			let subInfo = await RNFS.stat(sub.path);
-			if (subInfo.isFile()) {
-				let file = new File(sub.path);
-				result.push(file);
-			}
+			if (subInfo.isFile())
+				result.push(new File(sub.path));
 		}
 		return result;
 	}

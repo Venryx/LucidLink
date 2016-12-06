@@ -1,3 +1,5 @@
+import Moment from "moment";
+
 import GraphUI from "./Tracker/GraphUI";
 import ListUI from "./Tracker/ListUI";
 import DisplayersUI from "./Tracker/DisplayersUI";
@@ -76,6 +78,46 @@ g.Tracker = class Tracker extends Node {
 		this.scriptRunner.Init(scripts_ordered);
 		if (this.ui)
 			this.ui.setState({scriptLastRunsOutdated: false});
+	}
+
+	@O loadedSessions = [];
+	async LoadSessionsForMonth(month) {
+		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
+		//await sessionsFolder.Create();
+		
+		var sessionFolders = await sessionsFolder.GetFolders();
+		sessionFolders = sessionFolders.Where(a=> {
+			var startTime = Moment(a.Name);
+			var isInMonth = startTime >= month && startTime < month.AddingMonths(1);
+			return isInMonth;
+		});
+
+		var justLoadedSessions = [];
+		for (let folder of sessionFolders) {
+			let alreadyLoaded = this.loadedSessions.Any(a=>a.folder.Path == folder.Path);
+			if (!alreadyLoaded) {
+				let session = await Session.Load(folder);
+				justLoadedSessions.push(session);
+			}
+		}
+		Transaction(()=> {
+			this.loadedSessions.AddRange(justLoadedSessions);
+			// make sure ordered by date (otherwise current-session is ordered wrong)
+			this.loadedSessions = this.loadedSessions.OrderBy(a=>a.date);
+		});
+	}
+	GetLoadedSessionsForMonth(month) {
+		return this.loadedSessions.Where(a=> {
+			return a.date >= month && a.date < month.AddingMonths(1);
+		});
+	}
+	
+	currentSession = null;
+	async SetUpCurrentSession() {
+		var session = new Session(Moment());
+		await session.Save();
+		this.loadedSessions.push(session);
+		this.currentSession = session;
 	}
 }
 

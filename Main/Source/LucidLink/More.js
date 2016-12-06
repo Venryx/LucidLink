@@ -45,9 +45,9 @@ g.More = class More extends Node {
 	static AddLogEntry(entry) {
 		entry.origIndex = More.logEntries.length;
 		More.logEntries.push(entry);
-		if (LL && LL.sessionLogFile) {
+		if (LL && LL.tracker.currentSession) {
 			for (let i = More.logEntries_lastLoggedToFile + 1; i < More.logEntries.length; i++)
-				LL.sessionLogFile.AppendText("\n" + More.logEntries[i].toString());
+				LL.tracker.currentSession.logFile.AppendText("\n" + More.logEntries[i].toString());
 			More.logEntries_lastLoggedToFile = More.logEntries.length - 1;
 		}
 

@@ -1,7 +1,4 @@
-import RNFS from "react-native-fs";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
 var DialogAndroid = require("react-native-dialogs");
-import Drawer from "react-native-drawer";
 import Moment from "moment";
 
 import DreamUI from "./Journal/DreamUI";
@@ -72,12 +69,13 @@ g.Journal = class Journal extends Node {
 			return isInMonth;
 		});
 		for (let file of dreamFiles) {
-			let alreadyLoaded = this.loadedDreams.Any(a=>a.file.path == file.path);
+			let alreadyLoaded = this.loadedDreams.Any(a=>a.file.Path == file.Path);
 			if (!alreadyLoaded) {
 				let dream = await Dream.Load(file);
 				this.loadedDreams.push(dream);
 			}
 		}
+		//this.loadedDreams = this.loadedDreams.OrderBy(a=>a.date); // make sure ordered by date
 		onFinish && onFinish();
 	}
 	GetLoadedDreamsForMonth(month) {
@@ -91,9 +89,12 @@ g.Journal = class Journal extends Node {
 export class JournalUI extends BaseComponent {
 	state = {month: Moment(new Date().MonthDate)};
 
-	componentDidMount() {
+	loadedMonths = [];
+	ComponentDidMountOrUpdate() {
 		var {month} = this.state;
+		if (this.loadedMonths.Contains(month)) return;
 		LL.journal.LoadDreamsForMonth(month, ()=>this.forceUpdate());
+		this.loadedMonths.push(month);
 	}
 
 	ShiftMonth(amount) {
@@ -102,7 +103,7 @@ export class JournalUI extends BaseComponent {
 	}
 
 	render() {
-		var {month, dreams, openDream} = this.state;
+		var {month, openDream} = this.state;
 		var node = LL.journal;
 
 		if (openDream) {
@@ -129,7 +130,7 @@ export class JournalUI extends BaseComponent {
 						}}/>
 					<VButton text=">" style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
 				</Row>
-				<ScrollView ref="scrollView" style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
+				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}>
 					{entriesForMonth.Reversed().map((dream, index)=> {
 						return <DreamHeaderUI key={index} parent={this} dream={dream} index={index}/>;

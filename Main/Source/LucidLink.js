@@ -13,19 +13,20 @@ import Moment from "moment";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 
 require("./Frame/CE");
-import * as UM1 from "./Packages/VDF/VDF";
-import * as UM2 from "./Packages/VDF/VDFLoader";
-import * as UM3 from "./Packages/VDF/VDFNode";
-import * as UM4 from "./Packages/VDF/VDFSaver";
-import * as UM5 from "./Packages/VDF/VDFTokenParser";
-import * as UM6 from "./Packages/VDF/VDFTypeInfo";
-import * as Globals from "./Frame/Globals";
-import * as UM0 from "./Frame/Styles";
-import * as ReactGlobals from "./Frame/ReactGlobals";
+import "./Packages/VDF/VDF";
+import "./Packages/VDF/VDFLoader";
+import "./Packages/VDF/VDFNode";
+import "./Packages/VDF/VDFSaver";
+import "./Packages/VDF/VDFTokenParser";
+import "./Packages/VDF/VDFTypeInfo";
+import "./Frame/Globals";
+import "./Frame/Styles";
+import "./Frame/ReactGlobals";
 require("./Frame/Graphics/VectorStructs");
-import * as UM7 from "./Packages/VTree/Node";
-import * as UM8 from "./Packages/V/V";
-import UM9 from "./Packages/V/VFile";
+import "./Packages/VTree/Node";
+import "./Packages/V/V";
+import "./Packages/V/VFile";
+require("./LucidLink/Tracker/Session");
 require("./LucidLink/Scripts/Script");
 require("./Packages/Sketchy/Sketchy");
 require("./Frame/LCE");
@@ -130,24 +131,10 @@ class LucidLink extends Node {
 		JavaBridge.Main.SetPatterns(this.settings.patterns);
 	}
 
-	sessionKey = null;
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
-	get SessionFolder() { return this.RootFolder.GetFolder(`Sessions/${this.sessionKey}`); }
-	sessionLogFile = null;
-	/*async WaitTillLogFileReady() { 
-		if (this.sessionLogFile) return;
-		var result = new Promise();
-		sessionLogFile_waitingPromises.push(result);
-		return result;
-	}*/
-	async SetUpSession() {
-		this.sessionKey = Moment().format("YYYY-MM-DD HH:mm:ss");
-		await this.SessionFolder.Create();
-		this.sessionLogFile = this.SessionFolder.GetFile("Log.txt");
 
-		/*for (let promise of sessionLogFile_waitingPromises)
-			promise.resolve();
-		this.sessionLogFile_waitingPromises = [];*/
+	async SetUpSession() {
+		
 	}
 
 	SaveFileSystemData() {
@@ -188,12 +175,12 @@ async function Init(ui) {
 		TestData.LoadInto(LL);
 	}
 
-	await LL.SetUpSession();
+	await LL.tracker.SetUpCurrentSession();
 
 	LL.mainDataLoaded = true;
 	LL.ui.forceUpdate();
 	Log("Finished loading main-data.");
-	Log("Logging to: " + LL.sessionLogFile.path);
+	Log("Logging to: " + LL.tracker.currentSession.logFile.path);
 
 	LL.tracker.LoadFileSystemData();
 	LL.scripts.LoadFileSystemData();
