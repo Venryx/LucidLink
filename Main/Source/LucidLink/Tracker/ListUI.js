@@ -27,8 +27,9 @@ export default class ListUI extends BaseComponent {
 		if (openSession) {
 			return <SessionUI session={openSession} onBack={(save = true)=> {
 				this.setState({openSession: null});
-				if (save)
-					openSession.Save();
+				// for now, we can't change anything in the UI, so don't save
+				/*if (save)
+					openSession.Save();*/
 			}}/>
 		}
 

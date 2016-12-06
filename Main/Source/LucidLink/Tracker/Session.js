@@ -60,7 +60,13 @@ class Session {
 g.Session = Session;
 
 class Event {
-	type = null;
-	args = [];
+	constructor(type, args) {
+		this.date = Moment();
+		this.type = type;
+		this.args = args;
+	}
+	@P() date = null;
+	@P() type = null;
+	@P() args = [];
 }
 g.Event = Event;

@@ -1,12 +1,13 @@
 export default `
 // the below is a list of the most important functions you can call from your scripts
 
-// displaying information
+// storing/displaying messages
 // ==========
 
 alert("This text is displayed in a popup-dialog.");
 Log("This text is added to the program log, visible in the More>Logs panel, and also saved to the session's log file.");
 Toast("This text is displayed at the bottom of the screen as a 'toast' message.");
+AddEvent("special event", "First piece of extra data (argument).", "Second piece/argument.");
 
 // general
 // ==========

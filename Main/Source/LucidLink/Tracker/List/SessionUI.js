@@ -4,12 +4,14 @@ import Moment from "moment";
 export default class SessionUI extends BaseComponent {
 	render() {
 		var {onBack, session} = this.props;
+
+		var isCurrentSession = session == LL.tracker.currentSession;
 		return (
 			<Column>
 				<ActionBar backgroundColor="#3B373C" leftText="Back" onLeftPress={onBack} //title={session.name}
-					rightText="X" onRightPress={()=> {
-						if (session == LL.tracker.currentSession) {
-							alert("Cannot delete the current session. (restart app first)");
+					rightText={isCurrentSession ? null : "X"} onRightPress={()=> {
+						if (isCurrentSession) {
+							//alert("Cannot delete the current session. (restart app first)");
 							return;
 						}
 						session.Delete(()=>onBack(false));
@@ -34,7 +36,11 @@ class EventUI extends BaseComponent {
 	render() {
 		var {event} = this.props;
 		return (
-			<Text>{event.type} | {ToJSON(event.args)}</Text>
+			<Row>
+				<Text style={{flex: .15}}>{event.date.format("HH:mm:ss")}</Text>
+				<Text style={{flex: .15}}>{event.type}</Text>
+				<Text style={{flex: .7}}>{ToJSON(event.args)}</Text>
+			</Row>
 		);
 	}
 }

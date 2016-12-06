@@ -12,6 +12,11 @@ g.GetRandomNumber = function(options) {
 	return min + (Math.random() * range);
 }
 
+g.AddEvent = function(type, ...args) {
+	var event = new Event(type, args);
+	LL.tracker.currentSession.events.push(event);
+}
+
 // input
 // ==========
 

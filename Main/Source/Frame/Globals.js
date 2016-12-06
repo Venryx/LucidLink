@@ -1,10 +1,13 @@
 import React, {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
+import Moment from "moment";
 
 var g = global;
 g.g = g;
 
 var globalComps = {NativeModules, DeviceEventEmitter};
+globalComps.Moment = Moment;
+//globalComps.Extend({Moment});
 //g.Extend(globalComps);
 for (let key in globalComps)
 	g[key] = globalComps[key];
@@ -256,6 +259,16 @@ g.GetTypeName = function(obj) {
 	if (obj === null || obj === undefined) return null;
 	return obj.GetTypeName();
 }
+
+// vdf extensions
+// ==========
+
+Moment.prototype.Serialize = function() {
+	return new VDFNode(this.format("YYYY-MM-DD HH:mm:ss.SSS"));
+}.AddTags(new VDFSerialize());
+Moment.prototype.Deserialize = function(node) {
+	return Moment(node.primitiveValue);
+}.AddTags(new VDFDeserialize());
 
 // tags
 // ==========
