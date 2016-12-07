@@ -9,14 +9,19 @@ import scriptDefaultText_BuiltInDisplayers from "./Tracker/UserScriptDefaults/Bu
 import scriptDefaultText_CustomDisplayers from "./Tracker/UserScriptDefaults/CustomDisplayers";
 
 g.Tracker = class Tracker extends Node {
-	@_VDFSerializeProp() SerializeProp(path, options) {
-	    if (path.currentNode.prop.name == "selectedDisplayerScript" && this.selectedDisplayerScript)
-	        return new VDFNode(this.selectedDisplayerScript.name);
+	@_VDFPreSerialize() PreSerialize() {
+	    if (this.selectedDisplayerScript)
+	        this.selectedDisplayerScriptName = this.selectedDisplayerScript.Name;
 	}
+	/*@_VDFSerializeProp() SerializeProp(path, options) {
+	    if (path.currentNode.prop.name == "selectedDisplayerScript" && this.selectedDisplayerScript)
+	        return new VDFNode(this.selectedDisplayerScript.Name);
+	}*/
 
 	@O displayerScripts = [];
 	@O displayerScriptFilesOutdated = false;
-	@O @P() selectedDisplayerScript = null; // holds the actual script, but only the name is serialized
+	@O selectedDisplayerScript = null;
+	@P() selectedDisplayerScriptName = null; // used only during save-to/load-from disk 
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData(onDone = null) {
@@ -45,10 +50,7 @@ g.Tracker = class Tracker extends Node {
 			this.displayerScripts.push(script);
 		}
 
-		var newSelectedScriptName = this.selectedScript; // was serialized as a name (if at all)
-		var newSelectedScript = this.displayerScripts.First(a=>a.file.NameWithoutExtension == newSelectedScriptName);
-		if (newSelectedScript)
-			this.selectedDisplayerScript = newSelectedScript;
+		this.selectedDisplayerScript = this.displayerScripts.First(a=>a.Name == this.selectedDisplayerScriptName);
 
 		//if (LL.settings.applyScriptsOnLaunch)
 		this.ApplyDisplayerScripts();
@@ -81,34 +83,48 @@ g.Tracker = class Tracker extends Node {
 	}
 
 	@O loadedSessions = [];
-	async LoadSessionsForMonth(month) {
+	async LoadSessionsForRange(start, endOut) {
 		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
 		//await sessionsFolder.Create();
 		
 		var sessionFolders = await sessionsFolder.GetFolders();
 		sessionFolders = sessionFolders.Where(a=> {
 			var startTime = Moment(a.Name);
-			var isInMonth = startTime >= month && startTime < month.AddingMonths(1);
+			var isInMonth = startTime >= start && startTime < endOut;
 			return isInMonth;
 		});
 
 		var justLoadedSessions = [];
 		for (let folder of sessionFolders) {
 			let alreadyLoaded = this.loadedSessions.Any(a=>a.folder.Path == folder.Path);
-			if (!alreadyLoaded) {
-				let session = await Session.Load(folder);
-				justLoadedSessions.push(session);
-			}
+			if (alreadyLoaded) continue;
+			let session = await Session.Load(folder);
+			justLoadedSessions.push(session);
 		}
+		if (!justLoadedSessions.length) return;
+		
 		Transaction(()=> {
-			this.loadedSessions.AddRange(justLoadedSessions);
+			for (let session of justLoadedSessions) {
+				// check again for duplicate, cause one might have been added during one of the awaits in the loop above
+				let alreadyLoaded = this.loadedSessions.Any(a=>a.folder.Path == session.folder.Path);
+				if (alreadyLoaded) continue;
+				this.loadedSessions.push(session);
+			}
 			// make sure ordered by date (otherwise current-session is ordered wrong)
 			this.loadedSessions = this.loadedSessions.OrderBy(a=>a.date);
 		});
 	}
-	GetLoadedSessionsForMonth(month) {
+	GetLoadedSessionsForRange(start, endOut) {
 		return this.loadedSessions.Where(a=> {
-			return a.date >= month && a.date < month.AddingMonths(1);
+			return a.date >= start && a.date < endOut;
+		});
+	}
+
+	GetEventsForRange(start, endOut) {
+		return this.loadedSessions.SelectMany(session=> {
+			return session.events.Where(a=> {
+				return a.date >= start && a.date < endOut;
+			})
 		});
 	}
 	
@@ -119,6 +135,8 @@ g.Tracker = class Tracker extends Node {
 		this.loadedSessions.push(session);
 		this.currentSession = session;
 	}
+
+	@O @P() rowCount = 3;
 }
 
 export class TrackerUI extends BaseComponent {

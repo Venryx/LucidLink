@@ -1,3 +1,5 @@
+var g = global;
+
 export default class ConsoleUI extends BaseComponent {
 	render() {
 		var {onChangeText, text} = this.props;

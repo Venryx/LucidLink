@@ -5,7 +5,8 @@ g.Log = g.Log || console.log;
 g.Assert = g.Assert || (function (condition, message) {
     if (condition)
         return;
-    console.assert(false, message || "");
+    //console.assert(false, message || "");
+	alert("Assert failed) " + (message || ""));
     debugger;
 });
 // the below lets you easily add non-enumerable properties

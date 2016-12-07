@@ -6,8 +6,8 @@ export default class OptionsPanel extends BaseComponent {
 		var node = LL.monitor;
 		
 		return (
-			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
-				<Panel style={{flexDirection: "row"}}>
+			<Column style={{flex: 1, backgroundColor: colors.background_light}}>
+				<Row>
 					<Text style={{marginLeft: 5, marginTop: 5}}>UI update interval: </Text>
 					<Spinner min={1} max={1000} default={node.updateInterval} color={colors.background_dark} numColor={colors.text_dark}
 						onNumChange={value=> {
@@ -15,8 +15,8 @@ export default class OptionsPanel extends BaseComponent {
 							LL.PushBasicDataToJava();
 							//this.forceUpdate();
 						}}/>
-				</Panel>
-			</Panel>
+				</Row>
+			</Column>
 		)
 	}
 }

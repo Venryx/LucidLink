@@ -7,17 +7,14 @@ import SessionUI from "./List/SessionUI";
 export default class ListUI extends BaseComponent {
 	state = {month: Moment(new Date().MonthDate)};
 
-	loadedMonths = [];
 	ComponentDidMountOrUpdate() {
 		var {month} = this.state;
-		if (this.loadedMonths.Contains(month)) return;
-		LL.tracker.LoadSessionsForMonth(month);
-		this.loadedMonths.push(month);
+		LL.tracker.LoadSessionsForRange(month, month.C.add(1, "month"));
 	}
 
 	ShiftMonth(amount) {
 		var {month} = this.state;
-		this.setState({month: month.AddingMonths(amount)});
+		this.setState({month: month.C.add(amount, "months")});
 	}
 
 	render() {
@@ -33,7 +30,7 @@ export default class ListUI extends BaseComponent {
 			}}/>
 		}
 
-		var entriesForMonth = LL.tracker.GetLoadedSessionsForMonth(month);
+		var sessions = LL.tracker.GetLoadedSessionsForRange(month, month.C.add(1, "month"));
 
 		return (
 			<Column>
@@ -51,7 +48,7 @@ export default class ListUI extends BaseComponent {
 				</Row>
 				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}>
-					{entriesForMonth.Reversed().map((session, index)=> {
+					{sessions.Reversed().map((session, index)=> {
 						return <SessionHeaderUI key={index} parent={this} session={session} index={index}/>;
 					})}
 				</ScrollView>
@@ -60,6 +57,7 @@ export default class ListUI extends BaseComponent {
 	}
 }
 
+@Observer
 class SessionHeaderUI extends BaseComponent {
 	render() {
 		var {parent, session, index, style} = this.props;

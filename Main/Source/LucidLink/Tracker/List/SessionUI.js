@@ -37,7 +37,7 @@ class EventUI extends BaseComponent {
 		var {event} = this.props;
 		return (
 			<Row>
-				<Text style={{flex: .15}}>{event.date.format("HH:mm:ss")}</Text>
+				<Text style={{flex: .15}}>{event.date.format("HH:mm:ss.SSS")}</Text>
 				<Text style={{flex: .15}}>{event.type}</Text>
 				<Text style={{flex: .7}}>{ToJSON(event.args)}</Text>
 			</Row>

@@ -683,7 +683,7 @@ Array.prototype._AddFunction_Inline = function FindIndex(matchFunc) {
             return index;
     return -1;
 };*/
-Array.prototype._AddFunction_Inline = function OrderBy(valFunc) {
+Array.prototype._AddFunction_Inline = function OrderBy(valFunc = a=>a) {
 	/*var temp = this.ToList();
 	temp.sort((a, b)=>V.Compare(valFunc(a), valFunc(b)));
 	return temp;*/
@@ -696,8 +696,10 @@ Array.prototype._AddFunction_Inline = function Distinct() {
 			result.push(this[i]);
 	return result;
 };
-Array.prototype._AddFunction_Inline = function Except(otherArray) {
-    return this.Where(a=>!otherArray.Contains(a));
+Array.prototype._AddFunction_Inline = function Except(excludeObjOrArray) {
+	if (excludeObjOrArray instanceof Array)
+   		return this.Where(a=>!excludeArray.Contains(a));
+	return this.Where(a=>a !== excludeObjOrArray);
 };
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};

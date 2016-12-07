@@ -133,10 +133,6 @@ class LucidLink extends Node {
 
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 
-	async SetUpSession() {
-		
-	}
-
 	SaveFileSystemData() {
 		this.SaveMainData();
 		

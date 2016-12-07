@@ -65,7 +65,7 @@ g.Journal = class Journal extends Node {
 		var dreamFiles = (await journalFolder.GetFiles()).Where(a=>a.Extension == "vdf");
 		dreamFiles = dreamFiles.Where(a=> {
 			var dreamTime = Moment(a.NameWithoutExtension);
-			var isInMonth = dreamTime >= month && dreamTime < month.AddingMonths(1);
+			var isInMonth = dreamTime >= month && dreamTime < month.C.add(1, "month");
 			return isInMonth;
 		});
 		for (let file of dreamFiles) {
@@ -80,7 +80,7 @@ g.Journal = class Journal extends Node {
 	}
 	GetLoadedDreamsForMonth(month) {
 		return this.loadedDreams.Where(a=> {
-			return a.date >= month && a.date < month.AddingMonths(1);
+			return a.date >= month && a.date < month.C.add(1, "month");
 		});
 	}
 }
@@ -99,7 +99,7 @@ export class JournalUI extends BaseComponent {
 
 	ShiftMonth(amount) {
 		var {month} = this.state;
-		this.setState({month: month.AddingMonths(amount)});
+		this.setState({month: month.C.add(amount, "months")});
 	}
 
 	render() {

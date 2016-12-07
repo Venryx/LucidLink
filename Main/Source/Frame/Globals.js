@@ -1,11 +1,14 @@
 import React, {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
+import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
+import {observer as Observer} from "mobx-react/native";
 import Moment from "moment";
 
 var g = global;
 g.g = g;
 
-var globalComps = {NativeModules, DeviceEventEmitter};
+var globalComps = {NativeModules, DeviceEventEmitter,
+	O, Transaction, AutoRun, Observer};
 globalComps.Moment = Moment;
 //globalComps.Extend({Moment});
 //g.Extend(globalComps);
@@ -55,11 +58,10 @@ g.Trace = function(...args) {
 	console.trace(...args);
 };
 
-g.Toast = function(...args) {
-	if (args.length == 1)
-		JavaBridge.Main.ShowToast(args[0], 1);
-	else
-		JavaBridge.Main.ShowToast(args[0], args[1]);
+g.Toast = function(text, duration = 0) {
+	if (!IsString(text))
+		text = text != null ? text.toString() : "";
+	JavaBridge.Main.ShowToast(text, duration);
 }
 
 g.Assert = function(condition, messageOrMessageFunc) {
@@ -268,7 +270,13 @@ Moment.prototype.Serialize = function() {
 }.AddTags(new VDFSerialize());
 Moment.prototype.Deserialize = function(node) {
 	return Moment(node.primitiveValue);
-}.AddTags(new VDFDeserialize());
+}.AddTags(new VDFDeserialize(true));
+
+// fix for that ObservableArray's would be serialized as objects
+var observableHelper = O({test1: []});
+var ObservableArray = observableHelper.test1.constructor;
+ObservableArray.name_fake = "List(object)";
+//alert(ObservableArray + ";" + VDF.GetTypeNameOfObject(observableHelper.test1))
 
 // tags
 // ==========

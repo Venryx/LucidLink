@@ -14,15 +14,20 @@ import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomS
 import ScriptsPanel from "./Scripts/ScriptsPanel";
 
 g.Scripts = class Scripts extends Node {
-	@_VDFSerializeProp() SerializeProp(path, options) {
-	    if (path.currentNode.prop.name == "selectedScript" && this.selectedScript)
-	        return new VDFNode(this.selectedScript.name);
+	@_VDFPreSerialize() PreSerialize() {
+	    if (this.selectedScript)
+	        this.selectedScriptName = this.selectedScript.Name;
 	}
+	/*@_VDFSerializeProp() SerializeProp(path, options) {
+	    if (path.currentNode.prop.name == "selectedScript" && this.selectedScript)
+	        return new VDFNode(this.selectedScript.Name);
+	}*/
 
 	ui = null;
 
 	scripts = [];
-	@P() selectedScript = null; // holds the actual script, but only the name is serialized
+	selectedScript = null;
+	@P() selectedScriptName = null; // used only during save-to/load-from disk 
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData() {
@@ -57,10 +62,7 @@ g.Scripts = class Scripts extends Node {
 			this.scripts.push(script);
 		}
 
-		var newSelectedScriptName = this.selectedScript; // was serialized as a name (if at all)
-		var newSelectedScript = this.scripts.First(a=>a.file.NameWithoutExtension == newSelectedScriptName);
-		if (newSelectedScript)
-			this.selectedScript = newSelectedScript;
+		this.selectedScript = this.scripts.First(a=>a.Name == this.selectedScriptName);
 
 		if (LL.settings.applyScriptsOnLaunch)
 			this.ApplyScripts();

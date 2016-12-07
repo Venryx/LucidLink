@@ -172,10 +172,11 @@ pattern-points that yields a pattern-match certainty of 0.",
 					<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.Clone()}/>
 					<VButton text="Transform" ml5 style={{height: 30}} onPress={()=>this.Transform()}/>
 				</Row>
-				<Row height={320} style={{backgroundColor: "#FFFFFF55"}}>
+				<Row height={320}>
 					<Chart style={{width: Dimensions.get("window").width - 30, height: 300}}
 						minX={-node.previewChartRangeX / 2} maxX={node.previewChartRangeX / 2} legendStepsX={11}
 						minY={-node.previewChartRangeY / 2} maxY={node.previewChartRangeY / 2} legendStepsY={5}
+						axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
 						type="line" color={["#e1cd00"]} data={[pointsForChart]}/>
 				</Row>
 				<Row>

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.choosemuse.libmuse.Muse;
@@ -206,7 +207,13 @@ class ChartManager {
 		// moved away from page, so x is negative, so ignore
 		if (chartHolderPos[0] < 0) return;
 
-		V.Log("Updating chart bounds: " + chartHolderPos[0] + ";" +  chartHolderPos[1] + ";" + chartHolder.getWidth() + ";" + chartHolder.getHeight());
+		/*FrameLayout.LayoutParams currentLayout = (FrameLayout.LayoutParams)newChartHolder.getLayoutParams();
+		// if chart-bounds are unchanged, do not set
+		if (chartHolderPos[0] == currentLayout.leftMargin && chartHolderPos[1] == currentLayout.topMargin
+				|| chartHolder.getWidth() == currentLayout.width || chartHolder.getHeight() == currentLayout.height)
+			return;*/
+
+		//V.Log("Updating chart bounds: " + chartHolderPos[0] + ";" +  chartHolderPos[1] + ";" + chartHolder.getWidth() + ";" + chartHolder.getHeight());
 		MainActivity.main.runOnUiThread(() -> {
 			newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
 		});

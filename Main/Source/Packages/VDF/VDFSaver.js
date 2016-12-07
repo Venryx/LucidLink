@@ -96,6 +96,8 @@ g.VDFSaver = (function () {
                 }
             }
             else {
+				Assert(typeInfo instanceof VDFTypeInfo, "TypeInfo not found for type: " + typeName);
+
                 result.isMap = true;
                 // special fix; we need to write something for each declared prop (of those included anyway), so insert empty props for those not even existent on the instance
                 for (var propName_3 in typeInfo.props) {

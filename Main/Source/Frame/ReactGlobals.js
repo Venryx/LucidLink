@@ -10,15 +10,8 @@ import Bind from "autobind-decorator";
 
 import Button from 'apsl-react-native-button'
 
-import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
-import {observer as Observer} from "mobx-react/native";
-
-var g = global;
-g.g = g;
-
 var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
-	DatePickerAndroid, TimePickerAndroid,
-	O, Transaction, AutoRun, Observer};
+	DatePickerAndroid, TimePickerAndroid};
 for (let key in globalComps)
 	g[key] = globalComps[key];
 
@@ -195,9 +188,9 @@ function BasicStyles(props) {
 	var result = {};
 	for (let key in props) {
 		if (key.startsWith("ml"))
-			result.marginLeft = parseInt(key.substr(2));
+			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
 		else if (key.startsWith("mt"))
-			result.marginTop = parseInt(key.substr(2)); 
+			result.marginTop = (key.startsWith("mtN") ? -1 : 1) * parseInt(key.substr(2));
 	}
 	return result;
 }

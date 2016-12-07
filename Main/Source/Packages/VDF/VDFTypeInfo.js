@@ -52,7 +52,7 @@ g.VDFTypeInfo = (function () {
             }
             typeBase.typeInfo = result;
         }
-        return typeBase && typeBase.typeInfo;
+		return typeBase && typeBase.typeInfo;
     };
     VDFTypeInfo.prototype.GetProp = function (propName) {
         if (!(propName in this.props))

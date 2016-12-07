@@ -53,7 +53,7 @@ export class MonitorUI extends BaseComponent {
 					content={<OptionsPanel parent={this}/>}
 					type="overlay" openDrawerOffset={0.7} panCloseMask={0.7} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>
-				<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 						<VSwitch text="Pattern grabber" ml5 value={node.patternGrabber}
@@ -108,13 +108,9 @@ export class MonitorUI extends BaseComponent {
 					<Panel style={{marginTop: -7, flex: 111222333}}>
 						<ChannelsUI {...{visible}} parent={this}/>
 					</Panel>
-				</Panel>
+				</Column>
 			</Drawer>
 		);
-	}
-
-	componentWillUnmount() { 
-		Toast("Unmounting...");
 	}
 
 	async GrabPattern() {
@@ -174,59 +170,10 @@ export class MonitorUI extends BaseComponent {
 	}
 }
 
-//import Chart from "react-native-chart";
-
-const styles = {
-    container: {
-        flex: 1,
-    	backgroundColor: colors.background,
-	    //backgroundColor: "red",
-	},
-    chart: {
-        width: 1000,
-        height: 500,
-    },
-};
-
 class ChannelsUI extends BaseComponent {
-	data = [
-		[0, 1],
-		[1, 3],
-		[3, 7],
-		[4, 9]
-	];
-
-	/*shouldComponentUpdate() {
-		return false;
-	}*/
-
-	/*timer = null;
-	componentWillReceiveProps(nextProps, nextState) {
-		var visibleChanging = nextProps.visible != this.props.visible;
-		if (visibleChanging) {
-			if (nextProps.visible) {
-				this.timer = new TimerMS(300, ()=> {
-					this.forceUpdate();
-				});
-				this.timer.Start();
-			}
-			else {
-				if (this.timer)
-					this.timer.Stop();
-			}
-		}
-	}*/
     render() {
-		/*var channelPoints = MuseBridge.channelPoints;
-		var channel0Points = channelPoints[0];
-		/*if (channel0Points.length == 0)
-			return <Panel/>;*#/
-
-		<Chart style={styles.chart} type="line" verticalGridStep={5}
-			showDataPoint={false} color="black" data={channel0Points}/>*/
-
         return (
-            <View style={styles.container} accessible={true} accessibilityLabel="chart holder">
+            <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
             </View>
         );
     }
