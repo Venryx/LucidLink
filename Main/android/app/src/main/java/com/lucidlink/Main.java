@@ -126,6 +126,7 @@ public class Main extends ReactContextBaseJavaModule {
 	public boolean blockUnusedKeys;
 	public double patternMatchInterval;
 	public double patternMatchOffset;
+	public int museEEGPacketBufferSize;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
@@ -136,6 +137,7 @@ public class Main extends ReactContextBaseJavaModule {
 		this.patternMatchInterval = data.getDouble("patternMatchInterval");
 		V.Assert(this.patternMatchInterval > 0, "Pattern-match-interval must be greater than 0.");
 		this.patternMatchOffset = data.getDouble("patternMatchOffset");
+		this.museEEGPacketBufferSize = data.getInt("museEEGPacketBufferSize");
 	}
 
 	List<Pattern> patterns;

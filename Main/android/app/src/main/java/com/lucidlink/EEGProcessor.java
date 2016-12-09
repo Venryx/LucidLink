@@ -1,6 +1,5 @@
 package com.lucidlink;
 
-import com.annimon.stream.Stream;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
@@ -29,7 +28,7 @@ class EEGProcessor {
 	int lastX = -1;
 	int maxX = 1000;
 
-	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> column) {
+	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> channelValues) {
 		if (!type.equals("eeg")) return;
 
 		int currentX = lastX + 1;
@@ -43,7 +42,7 @@ class EEGProcessor {
 				for (int x = 0; x <= maxX; x++)
 					channelPoints.get(channel)[x] = new Vector2i(x, 0);
 			}
-			Vector2i point = new Vector2i(currentX, (int)(double)column.get(channel));
+			Vector2i point = new Vector2i(currentX, (int)(double) channelValues.get(channel));
 			channelPoints.get(channel)[currentX] = point;
 		}
 
@@ -57,79 +56,8 @@ class EEGProcessor {
 		}
 
 		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
-		int scanOffset_inPackets = (int)(Main.main.patternMatchOffset * packetsPerSecond);
 		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
-			for (Pattern pattern : Main.main.patterns) {
-				if (!pattern.enabled) continue;
-				if (!pattern.channel1 && !pattern.channel2 && !pattern.channel3 && !pattern.channel4) continue;
-				V.Assert(pattern.points.size() >= 2, "Pattern point count too low. Should be 2+, not " + pattern.points.size() + ".");
-
-				int patternDuration = pattern.Duration();
-				double highestMatchProb = Integer.MIN_VALUE;
-				for (int scanRight = currentX; scanRight >= currentX - patternMatchInterval_inPackets; scanRight -= scanOffset_inPackets) {
-					int scanLeft = scanRight - patternDuration;
-					//var patternPoints_final = ConvertPoints(pattern.points);
-
-					for (int channel = 0; channel < 4; channel++) {
-						if (!pattern.IsChannelEnabled(channel)) continue;
-
-						List<Vector2i> points = GetPointsForScanRange(channel, scanLeft, scanRight);
-						V.Assert(points != null && points.size() >= 2, "Scanned point count too low. Should be 2+, not " + (points != null ? points.size() : "n/a") + ".");
-						//let channelPoints_final = ConvertPoints(points);
-
-						//int channelBaseline = GetChannelBaseline(channel);
-						int channelBaseline = channelBaselines[channel];
-
-						/*let channelPoints_final = CenterOnY(points, channelBaseline);
-						channelPoints_final = TrimXValuesTo(channelPoints_final, scanLeft);*/
-						new Vector2i(0, 0).NewX(a->a);
-						//List<Vector2i> channelPoints_final = V.List(Stream.of(points).map(a->a.NewX(x->x - scanLeft).NewY(y->y - channelBaseline)));
-						List<Vector2i> channelPoints_final = new ArrayList<>();
-						for (int i = 0, x = scanLeft; x < scanRight; i++, x++) {
-							boolean takenFromEnd = x < 0;
-							Vector2i point = points.get(i);
-							Vector2i point_final = new Vector2i(point.x - scanLeft, point.y - channelBaseline);
-							if (takenFromEnd)
-								point_final.x -= (maxX + 1);
-							channelPoints_final.add(point_final);
-						}
-
-						/*final int yValRange = 100; // estimate of max positive-value (from base-line)
-						double maxDistancePossible = new Vector2i(scanLeft, -yValRange).Distance(new Vector2i(scanRight, yValRange));*/
-						//double maxDistancePossible = 100;
-						double probability0Distance = pattern.sensitivity;
-
-						//let matchProb = Sketchy.shapeContextMatch(channelPoints_final, patternPoints_final);
-						//let distance = Sketchy.hausdorff(channelPoints_final, patternPoints_final, {x: 0, y: 0});
-						double distance = GetAverageOfPointClosestDistances(pattern.points, channelPoints_final);
-
-						double matchProb = 1 - (distance / probability0Distance);
-						matchProb = Math.max(0, matchProb); // maybe temp
-
-						V.Log("pattern-matching", channelBaseline + " | " + distance + " | " + probability0Distance + " | " + matchProb, false);
-/*PatternPoints: ${ToVDF(pattern.points, false)}
-ChannelPoints: ${ToVDF(points, false)}
-ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
-						highestMatchProb = Math.max(highestMatchProb, matchProb);
-					}
-				}
-				//patternMatchProbabilities[pattern.name] = highestMatchProb;
-				if (!patternMatchProbabilities.containsKey(pattern.name))
-					patternMatchProbabilities.put(pattern.name, new HashMap<>());
-				patternMatchProbabilities.get(pattern.name).put(currentX, highestMatchProb);
-				//Log(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
-				//JavaLog(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
-			}
-
-			HashMap<String, Double> patternMatchProbabilitiesForFrame = new HashMap<>();
-			for (String patternName : patternMatchProbabilities.keySet())
-				patternMatchProbabilitiesForFrame.put(patternName, patternMatchProbabilities.get(patternName).get(currentX));
-			/*for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
-				listener(patternMatchProbabilitiesForFrame);*/
-
-			chartManager.OnSetPatternMatchProbabilities(currentX, patternMatchProbabilitiesForFrame);
-
-			Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
+			UpdateMatchProbabilities(currentX);
 		}
 		else {
 			/*let lastPatternMatchProbability = null;
@@ -148,6 +76,74 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 			result.add(channelPoints[iFinal]);
 		}
 		return result;
+	}
+
+	void UpdateMatchProbabilities(int currentX) {
+		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
+		int scanOffset_inPackets = (int)(Main.main.patternMatchOffset * packetsPerSecond);
+
+		for (Pattern pattern : Main.main.patterns) {
+			if (!pattern.enabled) continue;
+			if (!pattern.channel1 && !pattern.channel2 && !pattern.channel3 && !pattern.channel4)
+				continue;
+			V.Assert(pattern.points.size() >= 2, "Pattern point count too low. Should be 2+, not " + pattern.points.size() + ".");
+
+			int patternDuration = pattern.Duration();
+			double highestMatchProb = Integer.MIN_VALUE;
+			for (int scanRight = currentX; scanRight >= currentX - patternMatchInterval_inPackets; scanRight -= scanOffset_inPackets) {
+				int scanLeft = scanRight - patternDuration;
+
+				for (int channel = 0; channel < 4; channel++) {
+					if (!pattern.IsChannelEnabled(channel)) continue;
+
+					List<Vector2i> points = GetPointsForScanRange(channel, scanLeft, scanRight);
+					V.Assert(points != null && points.size() >= 2, "Scanned point count too low. Should be 2+, not " + (points != null ? points.size() : "n/a") + ".");
+
+					int channelBaseline = channelBaselines[channel];
+
+					new Vector2i(0, 0).NewX(a -> a);
+					//List<Vector2i> channelPoints_final = V.List(Stream.of(points).map(a->a.NewX(x->x - scanLeft).NewY(y->y - channelBaseline)));
+					List<Vector2i> channelPoints_final = new ArrayList<>();
+					for (int i = 0, x = scanLeft; x < scanRight; i++, x++) {
+						boolean takenFromEnd = x < 0;
+						Vector2i point = points.get(i);
+						Vector2i point_final = new Vector2i(point.x - scanLeft, point.y - channelBaseline);
+						if (takenFromEnd)
+							point_final.x -= (maxX + 1);
+						channelPoints_final.add(point_final);
+					}
+
+					double probability0Distance = pattern.sensitivity;
+
+					//let matchProb = Sketchy.shapeContextMatch(channelPoints_final, patternPoints_final);
+					//let distance = Sketchy.hausdorff(channelPoints_final, patternPoints_final, {x: 0, y: 0});
+					double distance = GetAverageOfPointClosestDistances(pattern.points, channelPoints_final);
+
+					double matchProb = 1 - (distance / probability0Distance);
+					matchProb = Math.max(0, matchProb); // maybe temp
+
+					//V.Log("pattern-matching", channelBaseline + " | " + distance + " | " + probability0Distance + " | " + matchProb, false);
+/*PatternPoints: ${ToVDF(pattern.points, false)}
+ChannelPoints: ${ToVDF(points, false)}
+ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
+					highestMatchProb = Math.max(highestMatchProb, matchProb);
+				}
+			}
+			if (!patternMatchProbabilities.containsKey(pattern.name))
+				patternMatchProbabilities.put(pattern.name, new HashMap<>());
+			patternMatchProbabilities.get(pattern.name).put(currentX, highestMatchProb);
+			//JavaLog(`Setting pattern match prob. Match: ${pattern.name} Prob: ${highestMatchProb}`);
+		}
+
+		HashMap<String, Double> patternMatchProbabilitiesForFrame = new HashMap<>();
+		for (String patternName : patternMatchProbabilities.keySet())
+			patternMatchProbabilitiesForFrame.put(patternName, patternMatchProbabilities.get(patternName).get(currentX));
+		/*for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
+			listener(patternMatchProbabilitiesForFrame);*/
+
+		chartManager.OnSetPatternMatchProbabilities(currentX, patternMatchProbabilitiesForFrame);
+
+		Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
 	}
 
 	int GetChannelBaseline(int channel) {

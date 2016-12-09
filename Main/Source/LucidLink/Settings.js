@@ -15,11 +15,12 @@ g.Settings = class Settings extends Node {
 			this.selectedPattern = this.patterns.First(a=>a.name == this.selectedPattern);
 	}
 	
-	@P() applyScriptsOnLaunch = false;
-	@P() blockUnusedKeys = false;
+	@O @P() applyScriptsOnLaunch = false;
+	@O @P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
-	@P() patternMatchInterval = 1; // in seconds
-	@P() patternMatchOffset = .2; // in second-distances
+	@O @P() patternMatchInterval = 1; // in seconds
+	@O @P() patternMatchOffset = .2; // in second-distances
+	@O @P() museEEGPacketBufferSize = 30;
 
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;

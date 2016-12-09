@@ -189,8 +189,12 @@ function BasicStyles(props) {
 	for (let key in props) {
 		if (key.startsWith("ml"))
 			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("mr"))
+			result.marginRight = (key.startsWith("mrN") ? -1 : 1) * parseInt(key.substr(2));
 		else if (key.startsWith("mt"))
 			result.marginTop = (key.startsWith("mtN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("mb"))
+			result.marginBottom = (key.startsWith("mbN") ? -1 : 1) * parseInt(key.substr(2));
 	}
 	return result;
 }

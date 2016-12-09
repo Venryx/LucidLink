@@ -1,5 +1,6 @@
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 
+@Observer
 export default class GeneralUI extends BaseComponent { 
 	render() {
 		var node = LL.settings;
@@ -11,7 +12,6 @@ export default class GeneralUI extends BaseComponent {
 						<Switch value={node.applyScriptsOnLaunch}
 							onValueChange={value=>{
 								node.applyScriptsOnLaunch = value;
-								this.forceUpdate();
 							}}/>
 					</RowLR>
 					<RowLR height={25}>
@@ -21,7 +21,6 @@ export default class GeneralUI extends BaseComponent {
 								node.blockUnusedKeys = value;
 
 								LL.PushBasicDataToJava();
-								this.forceUpdate();
 							}}/>
 					</RowLR>
 					<Row>
@@ -45,7 +44,6 @@ export default class GeneralUI extends BaseComponent {
 								node.patternMatchInterval = val;
 								
 								LL.PushBasicDataToJava();
-								this.forceUpdate();
 							}}/>
 					</Row>
 					<Row>
@@ -72,7 +70,28 @@ export default class GeneralUI extends BaseComponent {
 								node.patternMatchOffset = val;
 
 								LL.PushBasicDataToJava();
-								this.forceUpdate();
+							}}/>
+					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Muse EEG-packet buffer size</VText>
+						<VButton text={node.museEEGPacketBufferSize.toString()} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 1; val < 500; val++)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Muse eeg-packet buffer size",
+									message: "Select the number of eeg-packets to buffer before they're sent to the JS.",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(node.museEEGPacketBufferSize),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.museEEGPacketBufferSize = val;
+
+								LL.PushBasicDataToJava();
 							}}/>
 					</Row>
 				</Row>

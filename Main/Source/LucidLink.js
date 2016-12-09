@@ -123,6 +123,7 @@ class LucidLink extends Node {
 			blockUnusedKeys: LL.settings.blockUnusedKeys,
 			patternMatchInterval: LL.settings.patternMatchInterval,
 			patternMatchOffset: LL.settings.patternMatchOffset,
+			museEEGPacketBufferSize: LL.settings.museEEGPacketBufferSize,
 		});
 	}
 	PushPatternsToJava() {

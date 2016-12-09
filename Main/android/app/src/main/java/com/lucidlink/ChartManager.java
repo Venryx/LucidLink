@@ -12,6 +12,9 @@ import com.choosemuse.libmuse.MuseArtifactPacket;
 import com.choosemuse.libmuse.MuseDataListener;
 import com.choosemuse.libmuse.MuseDataPacket;
 import com.choosemuse.libmuse.MuseDataPacketType;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,8 +41,6 @@ class ChartManager {
 	public void TryToInit() {
 		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
 		// ==========
-
-		MainModule.main.dataListenerEnabled = false; // atm, never send muse data to js
 
 		ViewGroup chartHolder = (ViewGroup) V.FindViewByContentDescription(V.GetRootView(), "chart holder");
 		if (chartHolder == null) {
@@ -164,12 +165,14 @@ class ChartManager {
 
 		MainModule.main.extraListener = new MuseDataListener() {
 			@Override
-			public void receiveMuseDataPacket(final MuseDataPacket p, final Muse muse) {
+			public void receiveMuseDataPacket(final MuseDataPacket packet, final Muse muse) {
 				try {
-					//MainModule.main.dataListenerEnabled = Main.main.monitor;
+					MainModule.main.dataListenerEnabled = Main.main.monitor;
+					MainModule.main.packetSetSize = Main.main.museEEGPacketBufferSize;
+					//MainModule.main.dataListenerEnabled = false;
 					if (!Main.main.monitor) return;
 
-					MuseDataPacketType packetType = p.packetType();
+					MuseDataPacketType packetType = packet.packetType();
 					String type;
 					if (packetType == MuseDataPacketType.EEG)
 						type = "eeg";
@@ -179,11 +182,9 @@ class ChartManager {
 						type = "alpha";
 					else // currently we just ignore other packet types
 						return;
-					ArrayList<Double> data = p.values();
+					ArrayList<Double> channelValues = packet.values();
 
-					ChartManager.this.OnReceiveMuseDataPacket(type, data);
-
-					processor.OnReceiveMuseDataPacket(type, data);
+					ChartManager.this.OnReceiveMuseDataPacket(type, channelValues);
 				} catch(Throwable ex) {
 					V.Log("Error in ChartManager.receiveMuseDataPacket) " + V.GetStackTrace(ex));
 				}
@@ -250,7 +251,7 @@ class ChartManager {
 	int heightPerChannel = 500;
 	int maxY_fullChart = 3000;
 
-	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> column) {
+	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> channelValues) {
 		if (!type.equals("eeg")) return;
 
 		// add points
@@ -259,15 +260,11 @@ class ChartManager {
 			/*Entry entry = data.getDataSetByIndex(channel).getEntryForIndex(currentX);
 			entry.setX(currentX * stepSizeInPixels);
 			entry.setY((float)(double)column.get(channel));*/
-			//data.getDataSetByIndex(channel).removeEntry(currentX);
-
-			/*data.getDataSetByIndex(channel).removeEntry(currentX);
-			data.getDataSetByIndex(channel).addEntryOrdered(new Entry(currentX, (float)(double)column.get(channel)));*/
 
 			DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
 
 			float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
-			float yValue = (float)(double)column.get(channel);
+			float yValue = (float)(double)channelValues.get(channel);
 
 			float finalY = yBase + (yValue - 500);
 			dataSet.getValues().set(currentX, new Entry(currentX, finalY));
@@ -280,8 +277,12 @@ class ChartManager {
 		if (count % Main.main.updateInterval == 0)
 			UpdateChart();
 
+		// send data to eeg-processor
+		processor.OnReceiveMuseDataPacket(type, channelValues);
+
 		count++;
 	}
+
 	int lastSetPatternMatchProbability_x = -1;
 	public void OnSetPatternMatchProbabilities(int currentX, HashMap<String, Double> probabilities) {
 		DataSet dataSet = (DataSet)data.getDataSetByIndex(4);

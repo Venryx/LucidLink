@@ -5,7 +5,7 @@ import LibMuse from "react-native-libmuse";
 	static Init() {
 		LibMuse.AddListener_OnChangeMuseList(MuseBridge.OnChangeMuseList);
 		LibMuse.AddListener_OnChangeMuseConnectStatus(MuseBridge.OnChangeMuseConnectStatus);
-		//LibMuse.AddListener_OnReceiveMuseDataPacket(MuseBridge.OnReceiveMuseDataPacket);
+		LibMuse.AddListener_OnReceiveMuseDataPacket(MuseBridge.OnReceiveMuseDataPacket);
 		LibMuse.Init();
 		MuseBridge.initialized = true;
 		Log("muse link", `LibMuse initialized.`);
@@ -64,6 +64,10 @@ import LibMuse from "react-native-libmuse";
 		}
 		MuseBridge.status = status;
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
+	}
+
+	static OnReceiveMuseDataPacket(type, channelValues) {
+		//Log(`Type: ${type} ChannelValues: ${ToJSON(channelValues)}`);
 	}
 }
 g.MuseBridge = MuseBridge;
