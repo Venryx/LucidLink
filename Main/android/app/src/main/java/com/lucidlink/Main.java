@@ -2,6 +2,7 @@ package com.lucidlink;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -189,6 +190,12 @@ public class Main extends ReactContextBaseJavaModule {
 
 	@ReactMethod public void PostJSLog(String type, String message) {
 		V.Log(type + " [js]", message, false);
+	}
+
+	@ReactMethod public void ConvertURIToPath(String uriStr, Promise promise) {
+		Uri uri = Uri.parse(uriStr);
+		String path = VFile.URIToPath(uri);
+		promise.resolve(path);
 	}
 
 	/*@ReactMethod public void OnSetPatternMatchProbability(int x, double probability) {

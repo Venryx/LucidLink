@@ -1,3 +1,5 @@
+var FilePickerManager = NativeModules.FilePickerManager;
+
 export default class AudiosUI extends BaseComponent { 
 	render() {
 		var node = LL.settings;
@@ -34,17 +36,24 @@ export default class AudiosUI extends BaseComponent {
 			chooseFileButtonTitle: "Select"
 		};
 
-		FilePickerManager.showFilePicker(options, response=> {
+		FilePickerManager.showFilePicker(options, async response=> {
 			if (response.didCancel) return;
 			if (response.error) {
-				console.log("FilePicker error:", response.error);
+				Log("FilePicker error:", response.error);
 				return;
 			}
-			entry.path = response.path;
-			Log("New content0:" + ToVDF(response.path));
-			Log("New content1:" + ToVDF(entry.path));
-			Log("New content1:" + ToVDF(entry));
-			Log("New contents:" + ToVDF(LL.settings.audioFiles));
+
+			var path = response.path;
+			// if response contains only the uri, convert that to a path, then continue
+			/*if (path == null)
+				path = await JavaBridge.Main.ConvertURIToPath(response.uri);*/
+			// if response contains only the uri, extract path from it (not sure if this works in every case...)
+			if (path == null && response.uri.contains("%2Fstorage%2F")) {
+				path = decodeURIComponent(response.uri.substr(response.uri.indexOf("%2Fstorage%2F")));
+			}
+
+			entry.path = path;
+			Log(`Response: ${ToJSON(response)} Path: ${path}`);
 			this.forceUpdate();
 		});
 	}

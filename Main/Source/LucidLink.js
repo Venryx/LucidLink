@@ -183,7 +183,10 @@ async function Init(ui) {
 	LL.scripts.LoadFileSystemData();
 
 	LL.PushBasicDataToJava();
-	LL.PushPatternsToJava();
+	// whenever a pattern changes, push the patterns to Java
+	AutoRun(()=> {
+		LL.PushPatternsToJava();
+	});
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
 

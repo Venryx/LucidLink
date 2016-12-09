@@ -141,8 +141,7 @@ export class MonitorUI extends BaseComponent {
 
 					LL.settings.patterns.push(pattern);
 				}
-
-				LL.PushPatternsToJava();
+				
 				this.forceUpdate();
 
 				var dialog = new DialogAndroid();
@@ -152,8 +151,7 @@ export class MonitorUI extends BaseComponent {
 						prefill: pattern.name,
 						callback: newName=> {
 							pattern.name = newName;
-
-							LL.PushPatternsToJava();
+							
 							if (LL.scripts.ui)
 								LL.scripts.ui.forceUpdate();
 						}

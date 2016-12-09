@@ -5,6 +5,7 @@ import Drawer from "react-native-drawer";
 
 import PatternsPanel from "./PatternsPanel";
 
+@Observer
 export default class PatternsUI extends BaseComponent {
 	@Bind ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -15,7 +16,6 @@ export default class PatternsUI extends BaseComponent {
 
 	SelectPattern(pattern) {
 		LL.settings.selectedPattern = pattern;
-		this.forceUpdate();
 		this._drawer.close();
 	}
 	
@@ -23,12 +23,6 @@ export default class PatternsUI extends BaseComponent {
 		var node = LL.settings;
 		var {selectedPattern: pattern} = node;
 
-		// call this after you make any changes to a Pattern object (so Java knows of changes)
-		var Change = ()=> {
-			LL.PushPatternsToJava();
-			parent.forceUpdate();
-		};
-		
 		return (
 			<Drawer ref={comp=>this._drawer = comp}
 					content={<PatternsPanel parent={this} patterns={node.patterns}/>}
@@ -46,7 +40,7 @@ export default class PatternsUI extends BaseComponent {
 						{pattern &&
 							<VButton text="Rename" style={{marginLeft: 10, width: 100}} onPress={()=>pattern.Rename()}/>}
 						{pattern &&
-							<VSwitch text="Enabled" value={pattern.enabled} onValueChange={value=>Change(pattern.enabled = value)}/>}
+							<VSwitch text="Enabled" value={pattern.enabled} onValueChange={value=>pattern.enabled = value}/>}
 						<Panel style={{flex: 1}}/>
 						{/*<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
 							<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
@@ -79,7 +73,6 @@ export default class PatternsUI extends BaseComponent {
 									if (id == -1) return;
 									let val = values[id];
 									node.previewChartRangeX = val;
-									this.forceUpdate();
 								});
 							}}/>
 
@@ -103,7 +96,6 @@ export default class PatternsUI extends BaseComponent {
 									if (id == -1) return;
 									let val = values[id];
 									node.previewChartRangeY = val;
-									this.forceUpdate();
 								});
 							}}/>
 					</Row>
@@ -114,17 +106,12 @@ export default class PatternsUI extends BaseComponent {
 	}
 }
 
+@Observer
 @Bind
 class PatternUI extends BaseComponent {
 	render() {
 		var {parent, pattern} = this.props;
 		var node = LL.settings;
-
-		// call this after you make any changes to a Pattern object (so Java knows of changes)
-		var Change = ()=> {
-			LL.PushPatternsToJava();
-			parent.forceUpdate();
-		};
 
 		var pointsForChart = pattern.points.Select(a=>[a.x, a.y]);
 		if (pointsForChart.length == 0)
@@ -152,18 +139,17 @@ pattern-points that yields a pattern-match certainty of 0.",
 							if (id == -1) return;
 							let val = values[id];
 							pattern.sensitivity = val;
-							Change();
 						}}/>
 
 					<VText ml10 style={{marginTop: 5, marginRight: 10}}>Channels: </VText>
 					<VSwitch text="1" value={pattern.channel1}
-						onValueChange={value=>Change(pattern.channel1 = value)}/>
+						onValueChange={value=>pattern.channel1 = value}/>
 					<VSwitch text="2" value={pattern.channel2}
-						onValueChange={value=>Change(pattern.channel2 = value)}/>
+						onValueChange={value=>pattern.channel2 = value}/>
 					<VSwitch text="3" value={pattern.channel3}
-						onValueChange={value=>Change(pattern.channel3 = value)}/>
+						onValueChange={value=>pattern.channel3 = value}/>
 					<VSwitch text="4" value={pattern.channel4}
-						onValueChange={value=>Change(pattern.channel4 = value)}/>
+						onValueChange={value=>pattern.channel4 = value}/>
 				</Row>
 				<Row height={35}>
 					<VText ml10 style={{marginTop: 5, marginRight: 10}}>Actions: </VText>
@@ -181,7 +167,7 @@ pattern-points that yields a pattern-match certainty of 0.",
 				</Row>
 				<Row>
 					<VSwitch text="Text editor" value={pattern.textEditor}
-						onValueChange={value=>Change(pattern.textEditor = value)}/>
+						onValueChange={value=>pattern.textEditor = value}/>
 				</Row>
 				{pattern.textEditor && 
 					<TextInput style={{height: 100, paddingTop: 0, paddingBottom: 0}} multiline={true}
@@ -192,7 +178,6 @@ pattern-points that yields a pattern-match certainty of 0.",
 							} catch (ex) {
 								Toast("Invalid points JSON");
 							}
-							Change();
 						}}/>}
 			</ScrollView>
 		);
@@ -219,9 +204,8 @@ pattern-points that yields a pattern-match certainty of 0.",
 		let offsetAmount = values[id];
 		for (let point of pattern.points)
 			point[axis] = point[axis] + offsetAmount;
-		
-		LL.PushPatternsToJava();
-		this.forceUpdate();
+
+		pattern.points = pattern.points; // trigger update
 	}
 
 	Clone() {
@@ -231,9 +215,6 @@ pattern-points that yields a pattern-match certainty of 0.",
 		newPattern.name = pattern.name + " - clone";
 		LL.settings.patterns.push(newPattern);
 
-		LL.PushPatternsToJava();
-		this.forceUpdate();
-
 		var dialog = new DialogAndroid();
 		dialog.set({
 			"title": `Choose name for pattern clone`,
@@ -241,10 +222,6 @@ pattern-points that yields a pattern-match certainty of 0.",
 				prefill: newPattern.name,
 				callback: newName=> {
 					newPattern.name = newName;
-
-					LL.PushPatternsToJava();
-					if (LL.settings.ui)
-						LL.settings.ui.forceUpdate();
 				}
 			},
 			"positiveText": "OK", //"negativeText": "Cancel"
@@ -263,9 +240,7 @@ pattern-points that yields a pattern-match certainty of 0.",
 				callback: transformCode=> {
 					for (let [index, point] of pattern.points.entries())
 						pattern.points[index] = eval(transformCode);
-					
-					LL.PushPatternsToJava();
-					this.forceUpdate();
+					pattern.points = pattern.points; // trigger update
 				}
 			},
 			"positiveText": "OK", //"negativeText": "Cancel"

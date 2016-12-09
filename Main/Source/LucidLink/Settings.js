@@ -24,8 +24,8 @@ g.Settings = class Settings extends Node {
 
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;
-	@T("List(Pattern)") @P(true, true) patterns = [];
-	@P() selectedPattern = null; // holds the actual pattern, but only the name is serialized
+	@O @T("List(Pattern)") @P(true, true) patterns = [];
+	@O @P() selectedPattern = null; // holds the actual pattern, but only the name is serialized
 
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 
@@ -36,15 +36,15 @@ g.Pattern = class Pattern {
 		this.name = name;
 	}
 
-	@P() name = null;
-	@P() enabled = true;
-	@P() sensitivity = 30;
-	@P() channel1 = false;
-	@P() channel2 = false;
-	@P() channel3 = false;
-	@P() channel4 = false;
+	@O @P() name = null;
+	@O @P() enabled = true;
+	@O @P() sensitivity = 30;
+	@O @P() channel1 = false;
+	@O @P() channel2 = false;
+	@O @P() channel3 = false;
+	@O @P() channel4 = false;
 	//@T("Vector2i") @P() offset = new Vector2i(0, 0);
-	@T("List(Vector2i)") @P() points = [];
+	@O @T("List(Vector2i)") @P() points = [];
 
 	// in second-distances
 	get Duration() {
@@ -53,7 +53,7 @@ g.Pattern = class Pattern {
 		return max - min;
 	}
 
-	@P() textEditor = false;
+	@O @P() textEditor = false;
 
 	Rename() {
 		var dialog = new DialogAndroid();

@@ -1,7 +1,10 @@
 package com.lucidlink;
 
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -251,5 +254,15 @@ class VFile {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static String URIToPath(Uri uri) {
+		String[] filePathColumn = {MediaStore.Images.Media.DATA};
+		Cursor cursor = MainActivity.main.getContentResolver().query(uri, filePathColumn, null, null, null);
+		cursor.moveToFirst();
+		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		String filePath = cursor.getString(columnIndex);
+		cursor.close();
+		return filePath;
 	}
 }

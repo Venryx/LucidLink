@@ -63,8 +63,7 @@ export default class PatternsPanel extends BaseComponent {
 		}
 
 		LL.settings.patterns.push(new Pattern(name));
-
-		LL.PushPatternsToJava();
+		
 		this.forceUpdate();
 	}
 }
