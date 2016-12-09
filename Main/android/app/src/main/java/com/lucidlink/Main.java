@@ -60,6 +60,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main extends ReactContextBaseJavaModule {
 	public static Main main;
@@ -161,15 +163,31 @@ public class Main extends ReactContextBaseJavaModule {
 		mainChartManager.OnReceiveMuseDataPacket(type, columnFinal);
 	}*/
 
+	Timer chartAttachTimer;
 	@ReactMethod public void OnTabSelected(int tab) {
 		MainActivity.main.runOnUiThread(()-> {
 			if (tab == 0) {
-				V.WaitXThenRun(1000, ()-> {
-					if (!mainChartManager.initialized)
-						mainChartManager.TryToInit();
-					if (mainChartManager.initialized)
-						mainChartManager.SetChartVisible(true);
-				});
+				if (chartAttachTimer == null) {
+					chartAttachTimer = new Timer();
+					chartAttachTimer.scheduleAtFixedRate(new TimerTask() {
+						@Override
+						public void run() {
+							MainActivity.main.runOnUiThread(()-> {
+								//if (!mainChartManager.initialized)
+								mainChartManager.TryToInit();
+
+								// if we just succeeded, disable timer and run post-init code
+								if (mainChartManager.initialized) {
+									chartAttachTimer.cancel();
+									mainChartManager.SetChartVisible(true);
+								}
+							});
+						}
+					}, 1000, 1000);
+				}
+
+				if (mainChartManager.initialized)
+					mainChartManager.SetChartVisible(true);
 			}
 			else {
 				if (mainChartManager.initialized)

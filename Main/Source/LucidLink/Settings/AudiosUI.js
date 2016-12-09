@@ -53,7 +53,7 @@ export default class AudiosUI extends BaseComponent {
 			}
 
 			entry.path = path;
-			Log(`Response: ${ToJSON(response)} Path: ${path}`);
+			//Log(`Response: ${ToJSON(response)} Path: ${path}`);
 			this.forceUpdate();
 		});
 	}
