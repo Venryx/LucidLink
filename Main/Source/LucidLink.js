@@ -124,6 +124,10 @@ class LucidLink extends Node {
 			patternMatchInterval: LL.settings.patternMatchInterval,
 			patternMatchOffset: LL.settings.patternMatchOffset,
 			museEEGPacketBufferSize: LL.settings.museEEGPacketBufferSize,
+			eyeTracker_horizontalSensitivity: LL.settings.eyeTracker_horizontalSensitivity,
+			eyeTracker_verticalSensitivity: LL.settings.eyeTracker_verticalSensitivity,
+			eyeTracker_ignoreXMovementUnder: LL.settings.eyeTracker_ignoreXMovementUnder,
+			eyeTracker_ignoreYMovementUnder: LL.settings.eyeTracker_ignoreYMovementUnder,
 		});
 	}
 	PushPatternsToJava() {
@@ -182,7 +186,10 @@ async function Init(ui) {
 	LL.tracker.LoadFileSystemData();
 	LL.scripts.LoadFileSystemData();
 
-	LL.PushBasicDataToJava();
+	// whenever the basic-data changes, push it to Java
+	AutoRun(()=> {
+		LL.PushBasicDataToJava();
+	});
 	// whenever a pattern changes, push the patterns to Java
 	AutoRun(()=> {
 		LL.PushPatternsToJava();

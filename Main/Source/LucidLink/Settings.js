@@ -21,6 +21,10 @@ g.Settings = class Settings extends Node {
 	@O @P() patternMatchInterval = 1; // in seconds
 	@O @P() patternMatchOffset = .2; // in second-distances
 	@O @P() museEEGPacketBufferSize = 30;
+	@O @P() eyeTracker_horizontalSensitivity = .33;
+	@O @P() eyeTracker_verticalSensitivity = .33;
+	@O @P() eyeTracker_ignoreXMovementUnder = .01;
+	@O @P() eyeTracker_ignoreYMovementUnder = .01;
 
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;

@@ -130,6 +130,10 @@ public class Main extends ReactContextBaseJavaModule {
 	public double patternMatchInterval;
 	public double patternMatchOffset;
 	public int museEEGPacketBufferSize;
+	public double eyeTracker_horizontalSensitivity;
+	public double eyeTracker_verticalSensitivity;
+	public double eyeTracker_ignoreXMovementUnder;
+	public double eyeTracker_ignoreYMovementUnder;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
@@ -141,6 +145,10 @@ public class Main extends ReactContextBaseJavaModule {
 		V.Assert(this.patternMatchInterval > 0, "Pattern-match-interval must be greater than 0.");
 		this.patternMatchOffset = data.getDouble("patternMatchOffset");
 		this.museEEGPacketBufferSize = data.getInt("museEEGPacketBufferSize");
+		this.eyeTracker_horizontalSensitivity = data.getDouble("eyeTracker_horizontalSensitivity");
+		this.eyeTracker_verticalSensitivity = data.getDouble("eyeTracker_verticalSensitivity");
+		this.eyeTracker_ignoreXMovementUnder = data.getDouble("eyeTracker_ignoreXMovementUnder");
+		this.eyeTracker_ignoreYMovementUnder = data.getDouble("eyeTracker_ignoreYMovementUnder");
 	}
 
 	List<Pattern> patterns;

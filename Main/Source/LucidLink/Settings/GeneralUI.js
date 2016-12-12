@@ -19,12 +19,10 @@ export default class GeneralUI extends BaseComponent {
 						<Switch value={node.blockUnusedKeys}
 							onValueChange={value=>{
 								node.blockUnusedKeys = value;
-
-								LL.PushBasicDataToJava();
 							}}/>
 					</RowLR>
 					<Row>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Pattern match interval</Text>
+						<VText ml10 mt5 mr10>Pattern match interval</VText>
 						<VButton text={node.patternMatchInterval.toFixed(1)} style={{width: 100, height: 32}}
 							onPress={async ()=> {
 								var values = [];
@@ -42,12 +40,10 @@ export default class GeneralUI extends BaseComponent {
 								if (id == -1) return;
 								let val = values[id];
 								node.patternMatchInterval = val;
-								
-								LL.PushBasicDataToJava();
 							}}/>
 					</Row>
 					<Row>
-						<Text style={{marginLeft: 10, marginTop: 5, marginRight: 10}}>Pattern match offset</Text>
+						<VText ml10 mt5 mr10>Pattern match offset</VText>
 						<VButton text={node.patternMatchOffset.toFixed(2)} style={{width: 100, height: 32}}
 							onPress={async ()=> {
 								var values = [];
@@ -68,8 +64,6 @@ export default class GeneralUI extends BaseComponent {
 								if (id == -1) return;
 								let val = values[id];
 								node.patternMatchOffset = val;
-
-								LL.PushBasicDataToJava();
 							}}/>
 					</Row>
 					<Row>
@@ -90,10 +84,108 @@ export default class GeneralUI extends BaseComponent {
 								if (id == -1) return;
 								let val = values[id];
 								node.museEEGPacketBufferSize = val;
-
-								LL.PushBasicDataToJava();
 							}}/>
 					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Eye-tracker horizontal-sensitivity</VText>
+						<VButton text={(node.eyeTracker_horizontalSensitivity * 100).toFixed(0)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 1; val += .01)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker horizontal-sensitivity",
+									message: "",
+									values: values.Select(a=>(a * 100).toFixed(0)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_horizontalSensitivity),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_horizontalSensitivity = val;
+							}}/>
+					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Eye-tracker vertical-sensitivity</VText>
+						<VButton text={(node.eyeTracker_verticalSensitivity * 100).toFixed(0)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 1; val += .01)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker vertical-sensitivity",
+									message: "",
+									values: values.Select(a=>(a * 100).toFixed(0)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_verticalSensitivity),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_verticalSensitivity = val;
+							}}/>
+					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Eye-tracker ignore-x-movement-under</VText>
+						<VButton text={node.eyeTracker_ignoreXMovementUnder.toFixed(3)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 1; val += .001)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker ignore-x-movement-under",
+									message: "",
+									values: values.Select(a=>a.toFixed(3)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreXMovementUnder),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_ignoreXMovementUnder = val;
+							}}/>
+					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Eye-tracker ignore-y-movement-under</VText>
+						<VButton text={node.eyeTracker_ignoreYMovementUnder.toFixed(3)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 1; val += .001)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker ignore-y-movement-under",
+									message: "",
+									values: values.Select(a=>a.toFixed(3)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreYMovementUnder),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_ignoreYMovementUnder = val;
+							}}/>
+					</Row>
+					{/*<Row>
+						<Text ml10 mt5 mr10>Eye-tracker vertical-sensitivity</Text>
+						<VButton text={node.eyeTracker_verticalSensitivity.toFixed(2)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 100; val++)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker vertical-sensitivity",
+									//message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
+									values: values.Select(a=>a.toFixed(2)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_verticalSensitivity),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_verticalSensitivity = val;
+							}}/>
+					</Row>*/}
 				</Row>
             </Panel>
 		);

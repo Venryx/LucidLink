@@ -1,5 +1,6 @@
 import Spinner from "rn-spinner";
 
+@Observer
 export default class OptionsPanel extends BaseComponent {
 	render() {
 		var {parent} = this.props;
@@ -12,8 +13,6 @@ export default class OptionsPanel extends BaseComponent {
 					<Spinner min={1} max={1000} default={node.updateInterval} color={colors.background_dark} numColor={colors.text_dark}
 						onNumChange={value=> {
 							node.updateInterval = value;
-							LL.PushBasicDataToJava();
-							//this.forceUpdate();
 						}}/>
 				</Row>
 			</Column>

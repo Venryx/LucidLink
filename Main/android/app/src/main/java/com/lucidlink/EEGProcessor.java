@@ -22,7 +22,7 @@ class EEGProcessor {
 
 	// where eg. [0][1] (channel, x-pos/index) is {x:1,y:9} (x-pos, y-pos)
 	List<Vector2i[]> channelPoints = new ArrayList<>();
-	int[] channelBaselines = new int[4];
+	double[] channelBaselines = new double[4];
 
 	HashMap<String, HashMap<Integer, Double>> patternMatchProbabilities = new HashMap<>();
 	int lastX = -1;
@@ -42,7 +42,7 @@ class EEGProcessor {
 				for (int x = 0; x <= maxX; x++)
 					channelPoints.get(channel)[x] = new Vector2i(x, 0);
 			}
-			Vector2i point = new Vector2i(currentX, (int)(double) channelValues.get(channel));
+			Vector2i point = new Vector2i(currentX, (int)(double)channelValues.get(channel));
 			channelPoints.get(channel)[currentX] = point;
 		}
 
@@ -51,12 +51,21 @@ class EEGProcessor {
 
 		// only update the baseline once every chart-width
 		if (currentX == maxX) {
-			for (int channel = 0; channel < 4; channel++)
-				channelBaselines[channel] = GetChannelBaseline(channel);
+			for (int channel = 0; channel < 4; channel++) {
+				double oldBaseline = channelBaselines[channel];
+				double newBaseline = GetChannelBaseline(channel);
+
+				if (oldBaseline == 0)
+					oldBaseline = newBaseline;
+
+				// have new-baseline only slightly affect long-term baseline
+				channelBaselines[channel] = ((oldBaseline * 5) + newBaseline) / 6;
+			}
 		}
 
 		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
 		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
+			UpdateEyeTracking(channelValues);
 			UpdateMatchProbabilities(currentX);
 		}
 		else {
@@ -76,6 +85,77 @@ class EEGProcessor {
 			result.add(channelPoints[iFinal]);
 		}
 		return result;
+	}
+
+	public double eyePosX = .5;
+	public double eyePosY = .5;
+
+	ArrayList<Double> lastChannelValues;
+	void UpdateEyeTracking(ArrayList<Double> channelValues) {
+		if (channelBaselines[0] == 0) return; // if baselines aren't calculated yet, return now
+
+		if (lastChannelValues != null) {
+			ArrayList<Double> channelValDeltas = new ArrayList<>();
+			for (int i = 0; i < 4; i++)
+				channelValDeltas.add(channelValues.get(i) - lastChannelValues.get(i));
+
+			ArrayList<Double> channelValDistances = new ArrayList<>();
+			//for (int i = 0; i < channelValues.size(); i++)
+			for (int i = 0; i < 4; i++)
+				channelValDistances.add(channelValues.get(i) - channelBaselines[i]);
+
+			for (int i = 0; i < 4; i++) {
+				// if we're e.g. above line, but delta says we're moving down, ignore delta (set it to 0)
+				if (channelValDistances.get(i) > 0 != channelValDeltas.get(i) > 0 || channelValDistances.get(i) < 0 != channelValDeltas.get(i) < 0)
+					channelValDeltas.set(i, 0d);
+			}
+
+			//double leftness = channelValDistances.get(1) + -channelValDistances.get(2);
+			/*double rightness = channelValDistances.get(2) + -channelValDistances.get(1);
+			//double downness = -channelValDistances.get(1) + -channelValDistances.get(2);
+			double upness = channelValDistances.get(1) + channelValDistances.get(2);*/
+
+			double rightness = channelValDeltas.get(2) + -channelValDeltas.get(1);
+			double upness = channelValDeltas.get(1) + channelValDeltas.get(2);
+
+			double rightnessNeededToGoFromLeftToRight = Main.main.eyeTracker_horizontalSensitivity == 0 ? Double.POSITIVE_INFINITY
+				: V.Lerp(3000, 10, Main.main.eyeTracker_horizontalSensitivity);
+			double upnessNeededToGoFromBottomToTop = Main.main.eyeTracker_verticalSensitivity == 0 ? Double.POSITIVE_INFINITY
+				: V.Lerp(3000, 10, Main.main.eyeTracker_verticalSensitivity);
+
+			double rightMovement = (rightness / rightnessNeededToGoFromLeftToRight);
+			double upMovement = (upness / upnessNeededToGoFromBottomToTop);
+
+			/*if (Math.abs(rightMovement) < Main.main.eyeTracker_ignoreXMovementUnder)
+				rightMovement = 0;
+			if (Math.abs(upMovement) < Main.main.eyeTracker_ignoreYMovementUnder)
+				upMovement = 0;*/
+
+			if (Double.isNaN(rightMovement) || Double.isNaN(upMovement)) return;
+			if (Double.isInfinite(rightMovement) || Double.isInfinite(upMovement)) return;
+
+			double distanceFromBaseline = V.Average(Math.abs(channelValDistances.get(1)), Math.abs(channelValDistances.get(2)));
+			if (distanceFromBaseline < Main.main.eyeTracker_ignoreXMovementUnder * 1000)
+				return;
+
+			eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
+			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);
+
+			// do some slight resetting to center each frame
+			/*double amount = .01;
+			if (eyePosX < .5)
+				eyePosX += amount;
+			else if (eyePosX > .5)
+				eyePosX -= amount;
+			if (eyePosY < .5)
+				eyePosY += amount;
+			else if (eyePosY > .5)
+				eyePosY -= amount;*/
+
+			//Main.main.SendEvent("UpdateEyeTracking", eyePosX, eyePosY, rightness, upness);
+		}
+
+		lastChannelValues = channelValues;
 	}
 
 	void UpdateMatchProbabilities(int currentX) {
@@ -99,7 +179,7 @@ class EEGProcessor {
 					List<Vector2i> points = GetPointsForScanRange(channel, scanLeft, scanRight);
 					V.Assert(points != null && points.size() >= 2, "Scanned point count too low. Should be 2+, not " + (points != null ? points.size() : "n/a") + ".");
 
-					int channelBaseline = channelBaselines[channel];
+					double channelBaseline = channelBaselines[channel];
 
 					new Vector2i(0, 0).NewX(a -> a);
 					//List<Vector2i> channelPoints_final = V.List(Stream.of(points).map(a->a.NewX(x->x - scanLeft).NewY(y->y - channelBaseline)));
@@ -107,7 +187,7 @@ class EEGProcessor {
 					for (int i = 0, x = scanLeft; x < scanRight; i++, x++) {
 						boolean takenFromEnd = x < 0;
 						Vector2i point = points.get(i);
-						Vector2i point_final = new Vector2i(point.x - scanLeft, point.y - channelBaseline);
+						Vector2i point_final = new Vector2i(point.x - scanLeft, point.y - (int)channelBaseline);
 						if (takenFromEnd)
 							point_final.x -= (maxX + 1);
 						channelPoints_final.add(point_final);

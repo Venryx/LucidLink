@@ -5,18 +5,19 @@ var DialogAndroid = require("react-native-dialogs");
 import MuseBridge from "../Frame/MuseBridge";
 
 g.Monitor = class Monitor extends Node {
-	@P() updateInterval = 3;
-	@P() patternGrabber = false;
+	@O @P() updateInterval = 3;
+	@O @P() patternGrabber = false;
 
-	@P() connect = true;
-	@P() monitor = true;
-	@P() patternMatch = true;
+	@O @P() connect = true;
+	@O @P() monitor = true;
+	@O @P() patternMatch = true;
 
 	ui = null;
 }
 
 import OptionsPanel from "./Monitor/OptionsPanel";
 
+@Observer
 @Bind
 export class MonitorUI extends BaseComponent {
 	constructor(props) {
@@ -75,24 +76,18 @@ export class MonitorUI extends BaseComponent {
 						<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]}} value={node.connect}
 							onValueChange={value=> {
 								node.connect = value;
-								LL.PushBasicDataToJava();
 								if (node.connect)
 									MuseBridge.StartSearch(); // start listening for a muse headband
 								else
 									MuseBridge.Disconnect();
-								this.forceUpdate();
 							}}/>
 						<VSwitch text="Monitor" ml5 value={node.monitor}
 							onValueChange={value=> {
 								node.monitor = value;
-								LL.PushBasicDataToJava();
-								this.forceUpdate();
 							}}/>
 						<VSwitch text="Pattern match" ml5 value={node.patternMatch}
 							onValueChange={value=> {
 								node.patternMatch = value;
-								LL.PushBasicDataToJava();
-								this.forceUpdate();
 							}}/>
 					</Row>
 					{node.patternGrabber && 

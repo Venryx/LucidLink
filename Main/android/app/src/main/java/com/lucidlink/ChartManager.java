@@ -160,6 +160,14 @@ class ChartManager {
 		currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 0, 0));
 		newChartHolder.addView(currentTimeMarker);
 
+		// set up eye-pos-marker
+		// ==========
+
+		eyePosMarker = new View(MainActivity.main);
+		eyePosMarker.setBackgroundColor(Color.parseColor("#0000FF"));
+		eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 0, 0));
+		newChartHolder.addView(eyePosMarker);
+
 		// set up listeners
 		// ==========
 
@@ -224,18 +232,22 @@ class ChartManager {
 
 	public void SetChartVisible(boolean visible) {
 		if (visible) {
-			chart.setVisibility(View.VISIBLE);
+			/*chart.setVisibility(View.VISIBLE);
 			currentTimeMarker.setVisibility(View.VISIBLE);
+			eyePosMarker.setVisibility(View.VISIBLE);*/
+			newChartHolder.setVisibility(View.VISIBLE);
 		} else {
-			//mainChartManager.chart.setVisibility(View.INVISIBLE);
-			chart.setVisibility(View.GONE);
+			/*chart.setVisibility(View.GONE);
 			currentTimeMarker.setVisibility(View.GONE);
+			eyePosMarker.setVisibility(View.GONE);*/
+			newChartHolder.setVisibility(View.GONE);
 		}
 	}
 
 	ViewGroup newChartHolder;
 	LineChart chart;
 	View currentTimeMarker;
+	View eyePosMarker;
 
 	//const int eegCount = 6;
 	final int eegCount = 4; // only first 4 are the actual EEG sensors
@@ -280,6 +292,9 @@ class ChartManager {
 		// send data to eeg-processor
 		processor.OnReceiveMuseDataPacket(type, channelValues);
 
+		// update eye-tracker ui to match processor's changes
+		UpdateEyeTrackerUI();
+
 		count++;
 	}
 
@@ -323,6 +338,16 @@ class ChartManager {
 
 			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
 			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, ViewGroup.LayoutParams.MATCH_PARENT));
+		});
+	}
+
+	void UpdateEyeTrackerUI() {
+		MainActivity.main.runOnUiThread(() -> {
+			int margin = 10;
+			int size = 30;
+			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.eyePosX);
+			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.eyePosY);
+			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));
 		});
 	}
 

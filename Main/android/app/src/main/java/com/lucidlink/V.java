@@ -238,6 +238,31 @@ public class V {
 	public static int Distance(int a, int b) {
 		return Math.abs(a - b);
 	}
+
+	public static double Average(double... args) {
+		double total = 0;
+		for (double arg : args)
+			total += arg;
+		return total / args.length;
+	}
+
+	// just use the word 'percent', even though value is represented as fraction (e.g. 0.5, rather than 50[%])
+	public static double Lerp(double from, double to, double percentFromXToY) { return from + ((to - from) * percentFromXToY); }
+	public static double GetPercentFromXToY(double start, double end, double val) { return GetPercentFromXToY(start, end, val, true); }
+	public static double GetPercentFromXToY(double start, double end, double val, boolean clampResultTo0Through1) {
+		// distance-from-x / distance-from-x-required-for-result-'1'
+		double result = (val - start) / (end - start);
+		if (clampResultTo0Through1)
+			//result = result.KeepBetween(0, 1);
+			result = KeepXBetween(result, 0, 1);
+		return result;
+	}
+
+	public static double KeepXBetween(double val, double min, double max) {
+		if (val < min) return min;
+		if (val > max) return max;
+		return val;
+	}
 }
 
 class VFile {
