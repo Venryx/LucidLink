@@ -126,7 +126,7 @@ export default class GeneralUI extends BaseComponent {
 								node.eyeTracker_verticalSensitivity = val;
 							}}/>
 					</Row>
-					<Row>
+					{/*<Row>
 						<VText ml10 mt5 mr10>Eye-tracker ignore-x-movement-under</VText>
 						<VButton text={node.eyeTracker_ignoreXMovementUnder.toFixed(3)} style={{width: 100, height: 32}}
 							onPress={async ()=> {
@@ -165,7 +165,31 @@ export default class GeneralUI extends BaseComponent {
 								let val = values[id];
 								node.eyeTracker_ignoreYMovementUnder = val;
 							}}/>
+					</Row>*/}
+
+					{/* probably temp */}
+					<Row>
+						<VText ml10 mt5 mr10>Ignore frames where dist-from-baseline is under</VText>
+						<VButton text={(node.eyeTracker_ignoreXMovementUnder * 1000).toFixed(3)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val < 1; val += .001)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-tracker ignore-x-movement-under",
+									message: "",
+									values: values.Select(a=>(a * 1000).toFixed(3)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreXMovementUnder),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTracker_ignoreXMovementUnder = val;
+							}}/>
 					</Row>
+
+
 					{/*<Row>
 						<Text ml10 mt5 mr10>Eye-tracker vertical-sensitivity</Text>
 						<VButton text={node.eyeTracker_verticalSensitivity.toFixed(2)} style={{width: 100, height: 32}}

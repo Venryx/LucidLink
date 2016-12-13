@@ -65,6 +65,9 @@ export class MonitorUI extends BaseComponent {
 						{node.patternGrabber &&
 							<VButton text="Grab" ml10 mt3 style={{width: 100, height: 35}}
 								enabled={MuseBridge.status == "connected"} onPress={this.GrabPattern}/>}
+						{/*temp*/}
+						<VButton text="Center" ml10 mt3 style={{width: 100, height: 35}}
+							enabled={MuseBridge.status == "connected"} onPress={()=>JavaBridge.Main.CenterEyeTracker()}/>
 						<Panel style={{flex: 1}}/>
 
 						{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&

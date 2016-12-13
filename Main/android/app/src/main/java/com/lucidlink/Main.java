@@ -258,6 +258,11 @@ public class Main extends ReactContextBaseJavaModule {
 		promise.resolve(channel_pointsGrabbed);
 	}*/
 
+	@ReactMethod public void CenterEyeTracker() {
+		mainChartManager.processor.eyePosX = .5;
+		mainChartManager.processor.eyePosY = .5;
+	}
+
 	void Shutdown() {
 		V.Log("Shutting down...");
 
