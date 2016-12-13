@@ -1,5 +1,6 @@
 package com.lucidlink;
 
+import com.annimon.stream.Stream;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
@@ -63,9 +64,10 @@ class EEGProcessor {
 			}
 		}
 
+		UpdateEyeTracking(currentX, channelValues);
+
 		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
 		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
-			UpdateEyeTracking(channelValues);
 			UpdateMatchProbabilities(currentX);
 		}
 		else {
@@ -91,7 +93,7 @@ class EEGProcessor {
 	public double eyePosY = .5;
 
 	ArrayList<Double> lastChannelValues;
-	void UpdateEyeTracking(ArrayList<Double> channelValues) {
+	void UpdateEyeTracking(int currentX, ArrayList<Double> channelValues) {
 		if (channelBaselines[0] == 0) return; // if baselines aren't calculated yet, return now
 
 		if (lastChannelValues != null) {
@@ -137,6 +139,11 @@ class EEGProcessor {
 			double distanceFromBaseline = V.Average(Math.abs(channelValDistances.get(1)), Math.abs(channelValDistances.get(2)));
 			if (distanceFromBaseline < Main.main.eyeTracker_ignoreXMovementUnder * 1000)
 				return;
+
+			V.JavaLog(currentX + ";" + channelValues.get(1) + ";" + channelValues.get(2) + "\n"
+				+ channelValDistances.get(1) + ";" + channelValDistances.get(2) + "\n"
+				+ channelValDeltas.get(1) + ";" + channelValDeltas.get(2) + "\n"
+				+ rightMovement + ";" + upMovement);
 
 			eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
 			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);

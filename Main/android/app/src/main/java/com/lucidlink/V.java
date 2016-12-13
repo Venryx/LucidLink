@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
-import com.choosemuse.libmuse.LibmuseVersion;
-import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -22,17 +20,14 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,17 +41,18 @@ public class V {
 	public static void Log(String tag, String message) { Log(tag, message, true); }
 	public static void Log(String tag, String message, boolean sendToJS) {
 		//Log.i(tag, message);
-		LogToLogcat(tag, message);
+		JavaLog(tag, message);
 		if (sendToJS)
 			Main.main.SendEvent("PostJavaLog", tag, message);
 	}
 
 	// logcat has a message length limit, so cut long messages into pieces that are displayable
-	static void LogToLogcat(String tag, String message) {
+	static void JavaLog(String message) { JavaLog("default", message); }
+	static void JavaLog(String tag, String message) {
 		//Log.i(tag, "Length: " + message.length());
 		if (message.length() > 4000) {
 			Log.i(tag, message.substring(0, 4000));
-			LogToLogcat(tag, message.substring(4000));
+			JavaLog(tag, message.substring(4000));
 		} else {
 			Log.i(tag, message);
 		}
