@@ -101,20 +101,20 @@ class EEGProcessor {
 		try {
 			if (channelBaselines[0] == 0) return; // if baselines aren't calculated yet, return now
 
-			/*ArrayList<Double> channelValDeltas = new ArrayList<>();
+			ArrayList<Double> channelValDeltas = new ArrayList<>();
 			for (int i = 0; i < 4; i++)
-				channelValDeltas.add(channelValues.get(i) - lastChannelValues.get(i));*/
+				channelValDeltas.add(channelValues.get(i) - lastChannelValues.get(i));
 
 			ArrayList<Double> channelValDistances = new ArrayList<>();
 			//for (int i = 0; i < channelValues.size(); i++)
 			for (int i = 0; i < 4; i++)
 				channelValDistances.add(channelValues.get(i) - channelBaselines[i]);
 
-			/*for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 4; i++) {
 				// if we're e.g. above line, but delta says we're moving down, ignore delta (set it to 0)
 				if (channelValDistances.get(i) > 0 != channelValDeltas.get(i) > 0 || channelValDistances.get(i) < 0 != channelValDeltas.get(i) < 0)
 					channelValDeltas.set(i, 0d);
-			}*/
+			}
 
 			// if both channels have at least X deviance
 			if (Math.min(Math.abs(channelValDistances.get(1)), Math.abs(channelValDistances.get(2))) > 30) {
@@ -125,30 +125,31 @@ class EEGProcessor {
 			// offset strength of channel-1's val to compensate for strength difference
 			channelValDistances.set(1, channelValDistances.get(1) / channel1VSChannel2Strength_averageOfLastX);
 
+			channelValDeltas.set(1, channelValDeltas.get(1) / channel1VSChannel2Strength_averageOfLastX);
+
+			// approach 1
 			//double leftness = channelValDistances.get(1) + -channelValDistances.get(2);
-			double rightness = channelValDistances.get(2) + -channelValDistances.get(1);
+			/*double rightness = channelValDistances.get(2) + -channelValDistances.get(1);
 			//double downness = -channelValDistances.get(1) + -channelValDistances.get(2);
 			double upness = channelValDistances.get(1) + channelValDistances.get(2);
-
-			/*{
-				double upVSDownAmount = upness > 0 ? 1 : upness < 0 ? -1 : 0;
-				upVSDownAmount_averageOfLastX = ((upVSDownAmount_averageOfLastX * 999) + upVSDownAmount) / 1000;
-			}
-			if (upness < 0)
-				upness /= upVSDownAmount_averageOfLastX;*/
+			double rangeStart = 30000;
+			double rangeEnd = 1000;*/
 
 			/*if (Math.abs(rightness) > Math.abs(upness))
 				upness = 0;
 			else if (Math.abs(upness) > Math.abs(rightness))
 				rightness = 0;*/
 
-			/*double rightness = channelValDeltas.get(2) + -channelValDeltas.get(1);
-			double upness = channelValDeltas.get(1) + channelValDeltas.get(2);*/
+			// approach 2
+			double rightness = channelValDeltas.get(2) + -channelValDeltas.get(1);
+			double upness = channelValDeltas.get(1) + channelValDeltas.get(2);
+			double rangeStart = 1500;
+			double rangeEnd = 50;
 
 			double rightnessNeededToGoFromLeftToRight = Main.main.eyeTracker_horizontalSensitivity == 0 ? Double.POSITIVE_INFINITY
-					: V.Lerp(30000, 1000, Main.main.eyeTracker_horizontalSensitivity);
+					: V.Lerp(rangeStart, rangeEnd, Main.main.eyeTracker_horizontalSensitivity);
 			double upnessNeededToGoFromBottomToTop = Main.main.eyeTracker_verticalSensitivity == 0 ? Double.POSITIVE_INFINITY
-					: V.Lerp(30000, 1000, Main.main.eyeTracker_verticalSensitivity);
+					: V.Lerp(rangeStart, rangeEnd, Main.main.eyeTracker_verticalSensitivity);
 
 			double rightMovement = (rightness / rightnessNeededToGoFromLeftToRight);
 			double upMovement = (upness / upnessNeededToGoFromBottomToTop);
