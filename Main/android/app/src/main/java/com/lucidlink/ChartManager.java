@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.choosemuse.libmuse.Muse;
 import com.choosemuse.libmuse.MuseArtifactPacket;
@@ -168,6 +169,14 @@ class ChartManager {
 		eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 0, 0));
 		newChartHolder.addView(eyePosMarker);
 
+		// set up debug-text
+		// ==========
+
+		debugText = new TextView(MainActivity.main);
+		//debugText.setBackgroundColor(Color.parseColor("#0000FF"));
+		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
+		newChartHolder.addView(debugText);
+
 		// set up listeners
 		// ==========
 
@@ -248,6 +257,7 @@ class ChartManager {
 	LineChart chart;
 	View currentTimeMarker;
 	View eyePosMarker;
+	TextView debugText;
 
 	//const int eegCount = 6;
 	final int eegCount = 4; // only first 4 are the actual EEG sensors
@@ -295,6 +305,8 @@ class ChartManager {
 		// update eye-tracker ui to match processor's changes
 		UpdateEyeTrackerUI();
 
+		UpdateDebugUI();
+
 		count++;
 	}
 
@@ -337,7 +349,7 @@ class ChartManager {
 			chart.invalidate(); // redraw
 
 			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
-			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, ViewGroup.LayoutParams.MATCH_PARENT));
+			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, V.MATCH_PARENT));
 		});
 	}
 
@@ -348,6 +360,12 @@ class ChartManager {
 			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.eyePosX);
 			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.eyePosY);
 			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));
+		});
+	}
+
+	void UpdateDebugUI() {
+		MainActivity.main.runOnUiThread(() -> {
+			debugText.setText("1VS2: " + processor.channel1VSChannel2Strength_averageOfLastX);
 		});
 	}
 

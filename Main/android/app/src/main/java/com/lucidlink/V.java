@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 public class V {
+	public static int MATCH_PARENT = -1;
+	public static int WRAP_CONTENT = -2;
+
 	public static int textColor = Color.rgb(255, 255, 255);
 
 	public static void Log(String message) {

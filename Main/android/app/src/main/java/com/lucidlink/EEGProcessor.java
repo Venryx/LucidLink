@@ -93,6 +93,9 @@ class EEGProcessor {
 	public double eyePosX = .5;
 	public double eyePosY = .5;
 
+	public double channel1VSChannel2Strength_averageOfLastX = 1;
+	public double upVSDownAmount_averageOfLastX = 0;
+
 	ArrayList<Double> lastChannelValues;
 	void UpdateEyeTracking(int currentX, ArrayList<Double> channelValues) {
 		try {
@@ -113,10 +116,31 @@ class EEGProcessor {
 					channelValDeltas.set(i, 0d);
 			}*/
 
+			// if both channels have at least X deviance
+			if (Math.min(Math.abs(channelValDistances.get(1)), Math.abs(channelValDistances.get(2))) > 30) {
+				double channel1VSChannel2Strength = Math.abs(channelValDistances.get(1)) / Math.abs(channelValDistances.get(2));
+				channel1VSChannel2Strength_averageOfLastX = ((channel1VSChannel2Strength_averageOfLastX * 999) + channel1VSChannel2Strength) / 1000;
+			}
+
+			// offset strength of channel-1's val to compensate for strength difference
+			channelValDistances.set(1, channelValDistances.get(1) / channel1VSChannel2Strength_averageOfLastX);
+
 			//double leftness = channelValDistances.get(1) + -channelValDistances.get(2);
 			double rightness = channelValDistances.get(2) + -channelValDistances.get(1);
 			//double downness = -channelValDistances.get(1) + -channelValDistances.get(2);
 			double upness = channelValDistances.get(1) + channelValDistances.get(2);
+
+			/*{
+				double upVSDownAmount = upness > 0 ? 1 : upness < 0 ? -1 : 0;
+				upVSDownAmount_averageOfLastX = ((upVSDownAmount_averageOfLastX * 999) + upVSDownAmount) / 1000;
+			}
+			if (upness < 0)
+				upness /= upVSDownAmount_averageOfLastX;*/
+
+			/*if (Math.abs(rightness) > Math.abs(upness))
+				upness = 0;
+			else if (Math.abs(upness) > Math.abs(rightness))
+				rightness = 0;*/
 
 			/*double rightness = channelValDeltas.get(2) + -channelValDeltas.get(1);
 			double upness = channelValDeltas.get(1) + channelValDeltas.get(2);*/
