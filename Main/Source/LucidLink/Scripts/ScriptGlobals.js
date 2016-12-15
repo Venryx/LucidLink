@@ -17,6 +17,12 @@ g.AddEvent = function(type, ...args) {
 	LL.tracker.currentSession.events.push(event);
 }
 
+g.EveryXSecondsRun = function(seconds, func, maxCallCount = -1) {
+	var timer = new Timer(seconds, func, rightMovement);
+	timer.Start();
+	return timer;
+};
+
 // input
 // ==========
 

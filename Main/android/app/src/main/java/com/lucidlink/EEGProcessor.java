@@ -129,11 +129,14 @@ class EEGProcessor {
 
 			// approach 1
 			//double leftness = channelValDifs.get(1) + -channelValDifs.get(2);
-			/*double rightness = channelValDifs.get(2) + -channelValDifs.get(1);
+			double rightness = channelValDifs.get(2) + -channelValDifs.get(1);
 			//double downness = -channelValDifs.get(1) + -channelValDifs.get(2);
-			double upness = channelValDifs.get(1) + channelValDifs.get(2);
+			double upness =
+				channelValDifs.get(1) < 0 ? (channelValDifs.get(1) / Main.main.eyeTracker_relaxVSTenseIntensity) + channelValDifs.get(2) :
+				channelValDifs.get(2) < 0 ? channelValDifs.get(1) + (channelValDifs.get(2) / Main.main.eyeTracker_relaxVSTenseIntensity) :
+				channelValDifs.get(1) + channelValDifs.get(2);
 			double rangeStart = 30000;
-			double rangeEnd = 1000;*/
+			double rangeEnd = 1000;
 
 			/*if (Math.abs(rightness) > Math.abs(upness))
 				upness = 0;
@@ -148,17 +151,17 @@ class EEGProcessor {
 
 			// approach 3
 			// extract left-right component from eeg data
-			double rightVSLeftAbsValDif = Math.abs(channelValDifs.get(2)) - Math.abs(channelValDifs.get(1));
+			/*double rightVSLeftAbsValDif = Math.abs(channelValDifs.get(2)) - Math.abs(channelValDifs.get(1));
 			double leftRightComponent_val_asForRightness = rightVSLeftAbsValDif / (1 - Main.main.eyeTracker_relaxVSTenseIntensity); // is negative if looking left
 			// extract close-far component from eeg data
 			/*double highPointY = Math.max(channelValDifs.get(1), channelValDifs.get(2));
-			double closeFarComponent_val_asForFarness = highPointY - Math.abs(leftRightComponent_val_asForRightness);*/
+			double closeFarComponent_val_asForFarness = highPointY - Math.abs(leftRightComponent_val_asForRightness);*#/
 			double closeFarComponent_val_asForFarness = channelValDifs.get(2) - leftRightComponent_val_asForRightness;
 			// rename
 			double rightness = leftRightComponent_val_asForRightness;
 			double upness = closeFarComponent_val_asForFarness;
 			double rangeStart = 30000;
-			double rangeEnd = 1000;
+			double rangeEnd = 1000;*/
 
 			// apply sensitivity
 			double rightnessNeededToGoFromLeftToRight = Main.main.eyeTracker_horizontalSensitivity == 0 ? Double.POSITIVE_INFINITY

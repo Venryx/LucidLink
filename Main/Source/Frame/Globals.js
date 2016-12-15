@@ -423,6 +423,7 @@ g.Timer = class Timer {
 			if (this.maxCallCount != -1 && this.callCount >= this.maxCallCount)
 				this.Stop();
 		}, this.interval * 1000);
+		return this;
 	}
 	Stop() {
 		clearInterval(this.timerID);
