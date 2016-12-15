@@ -128,6 +128,7 @@ class LucidLink extends Node {
 			eyeTracker_verticalSensitivity: LL.settings.eyeTracker_verticalSensitivity,
 			eyeTracker_ignoreXMovementUnder: LL.settings.eyeTracker_ignoreXMovementUnder,
 			eyeTracker_ignoreYMovementUnder: LL.settings.eyeTracker_ignoreYMovementUnder,
+			eyeTracker_relaxVSTenseIntensity: LL.settings.eyeTracker_relaxVSTenseIntensity,
 		});
 	}
 	PushPatternsToJava() {

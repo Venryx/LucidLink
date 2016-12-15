@@ -13,14 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.choosemuse.libmuse.Accelerometer;
-import com.choosemuse.libmuse.Eeg;
-import com.choosemuse.libmuse.Muse;
-import com.choosemuse.libmuse.MuseArtifactPacket;
-import com.choosemuse.libmuse.MuseDataListener;
-import com.choosemuse.libmuse.MuseDataPacket;
-import com.choosemuse.libmuse.MuseDataPacketType;
-import com.facebook.imagepipeline.producers.Consumer;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -35,19 +27,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.shell.MainReactPackage;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 import com.v.LibMuse.LibMuse;
@@ -134,6 +113,7 @@ public class Main extends ReactContextBaseJavaModule {
 	public double eyeTracker_verticalSensitivity;
 	public double eyeTracker_ignoreXMovementUnder;
 	public double eyeTracker_ignoreYMovementUnder;
+	public double eyeTracker_relaxVSTenseIntensity;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
@@ -149,6 +129,7 @@ public class Main extends ReactContextBaseJavaModule {
 		this.eyeTracker_verticalSensitivity = data.getDouble("eyeTracker_verticalSensitivity");
 		this.eyeTracker_ignoreXMovementUnder = data.getDouble("eyeTracker_ignoreXMovementUnder");
 		this.eyeTracker_ignoreYMovementUnder = data.getDouble("eyeTracker_ignoreYMovementUnder");
+		this.eyeTracker_relaxVSTenseIntensity = data.getDouble("eyeTracker_relaxVSTenseIntensity");
 	}
 
 	List<Pattern> patterns;

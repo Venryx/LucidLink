@@ -237,6 +237,9 @@ public class V {
 	public static int Distance(int a, int b) {
 		return Math.abs(a - b);
 	}
+	public static double Distance(double a, double b) {
+		return Math.abs(a - b);
+	}
 
 	public static double Average(double... args) {
 		double total = 0;

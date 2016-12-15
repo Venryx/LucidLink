@@ -25,6 +25,7 @@ g.Settings = class Settings extends Node {
 	@O @P() eyeTracker_verticalSensitivity = .33;
 	@O @P() eyeTracker_ignoreXMovementUnder = .01;
 	@O @P() eyeTracker_ignoreYMovementUnder = .01;
+	@O @P() eyeTracker_relaxVSTenseIntensity = .85;
 
 	@P() previewChartRangeX = 200;
 	@P() previewChartRangeY = 100;
