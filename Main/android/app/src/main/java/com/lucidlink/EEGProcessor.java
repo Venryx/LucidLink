@@ -50,19 +50,20 @@ class EEGProcessor {
 		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
 
 		// only update the baseline once every chart-width
-		if (currentX == maxX) {
+		//if (currentX == maxX) {
 			for (int channel = 0; channel < 4; channel++) {
 				double oldBaseline = channelBaselines[channel];
-				double newBaseline = GetChannelBaseline(channel);
-
+				//double newBaseline = GetChannelBaseline(channel);
+				double newBaseline = channelValues.get(channel);
+				if (Double.isNaN(newBaseline)) continue;
 				if (oldBaseline == 0)
 					oldBaseline = newBaseline;
 
 				// have new-baseline only slightly affect long-term baseline
-				//channelBaselines[channel] = ((oldBaseline * 5) + newBaseline) / 6;
-				channelBaselines[channel] = (oldBaseline + newBaseline) / 2;
+				channelBaselines[channel] = ((oldBaseline * 999) + newBaseline) / 1000;
+				//channelBaselines[channel] = (oldBaseline + newBaseline) / 2;
 			}
-		}
+		//}
 
 		UpdateEyeTracking(currentX, channelValues);
 
@@ -324,7 +325,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
 	}
 
-	int GetChannelBaseline(int channel) {
+	/*int GetChannelBaseline(int channel) {
 		/*List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		List<Vector2i> channelPoints_ordered = V.List(Stream.of(channelPoints).sortBy(a->a.y));
 		int result = channelPoints_ordered.get(channelPoints_ordered.size() / 2).y;
@@ -335,7 +336,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		int[] channelPoints_array = new int[channelPoints.length];
 		for (int i = 0; i < channelPoints.length; i++)
 			channelPoints_array[i] = channelPoints[i].y;
-		Arrays.sort(channelPoints_array);*/
+		Arrays.sort(channelPoints_array);*#/
 
 		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		Vector2i[] channelPoints_clone = channelPoints.clone();
@@ -347,7 +348,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		else
 			median = channelPoints_clone[channelPoints_clone.length / 2].y;
 		return median;
-	}
+	}*/
 
 	/*static ConvertPoints(points) {
 		var result = [];
