@@ -194,18 +194,15 @@ class EEGProcessor {
 
 			//if (Double.isNaN(eyePosX_atStartOfCurrentSegment)) eyePosX_atStartOfCurrentSegment = eyePosX;
 			//if (Double.isNaN(xTravelAverageOfLastNSegments)) xTravelAverageOfLastNSegments = eyePosX;
-			if (lastNSegmentValues.length != Main.main.eyeTraceSegmentCount)
-				lastNSegmentValues = new double[Main.main.eyeTraceSegmentCount];
+			if (lastNPositions.length != Main.main.eyeTraceSegmentCount)
+				ResetLastNPositions();
 
-			double xTravelForCurrentSegmentsLeftToProcess = eyePosX - eyePosX_atStartOfCurrentSegment;
-			while (Math.abs(xTravelForCurrentSegmentsLeftToProcess) > Main.main.eyeTraceSegmentSize) {
-				int currentIndex = lastNSegments_lastSetIndex < lastNSegmentValues.length - 1 ? lastNSegments_lastSetIndex + 1 : 0;
-				double currentOffset = xTravelForCurrentSegmentsLeftToProcess < 0 ? -Main.main.eyeTraceSegmentSize : Main.main.eyeTraceSegmentSize;
-				lastNSegmentValues[currentIndex] = currentOffset;
-				lastNSegments_lastSetIndex = currentIndex;
-
-				xTravelForCurrentSegmentsLeftToProcess -= currentOffset;
-				eyePosX_atStartOfCurrentSegment += currentOffset; // var could also be named "xTravelForAllSegments"
+			while (V.Distance(eyePosX, lastProcessedEyePosX) > Main.main.eyeTraceSegmentSize) {
+				int currentIndex = lastNPositions_lastSetIndex < lastNPositions.length - 1 ? lastNPositions_lastSetIndex + 1 : 0;
+				double currentOffset = eyePosX > lastProcessedEyePosX ? Main.main.eyeTraceSegmentSize : -Main.main.eyeTraceSegmentSize;
+				lastNPositions[currentIndex] = lastProcessedEyePosX + currentOffset;
+				lastNPositions_lastSetIndex = currentIndex;
+				lastProcessedEyePosX += currentOffset; // var could also be named "xTravelForAllSegments"
 			}
 
 			// do some slight resetting to center each frame
@@ -225,35 +222,31 @@ class EEGProcessor {
 			lastChannelValues = channelValues;
 		}
 	}
-	double[] lastNSegmentValues = new double[0];
-	int lastNSegments_lastSetIndex = -1;
-	//double eyePosX_atStartOfCurrentSegment = Double.NaN;
-	double eyePosX_atStartOfCurrentSegment = .5;
-	public double GetCenterPoint_RelativeToCurXPos() {
+	public void ResetLastNPositions() {
+		lastNPositions = new double[Main.main.eyeTraceSegmentCount];
+		for (int i = 0; i < lastNPositions.length; i++)
+			lastNPositions[i] = .5;
+	}
+
+	double[] lastNPositions = new double[0];
+	int lastNPositions_lastSetIndex = -1;
+	double lastProcessedEyePosX = .5;
+	public double GetCenterPoint() {
 		//double centerPoint = xTravelAverageOfLastNSegments;
-		double[] lastNSegments_offsetsFromCurrent = new double[lastNSegmentValues.length];
+		/*double[] lastNSegments_offsetsFromCurrent = new double[lastNSegmentValues.length];
 		double lastOffset = 0;
 		// backtrack through segments-vals, constructing last-n-segments trace-image
 		for (int i = lastNSegments_offsetsFromCurrent.length - 1; i >= 0; i--) {
 			double currentOffset = lastOffset - lastNSegmentValues[i];
 			lastNSegments_offsetsFromCurrent[i] = currentOffset;
 			lastOffset = currentOffset;
-		}
+		}*/
 		// then finding average of points in it
-		double centerPoint_relativeToCurXPos = V.Average(lastNSegments_offsetsFromCurrent);
-		return centerPoint_relativeToCurXPos;
+		double result = V.Average(lastNPositions);
+		return result;
 	}
 	public double GetXPosForDisplay() {
-		double eyePoint = eyePosX;
-
-		double centerPoint_relativeToCurXPos = GetCenterPoint_RelativeToCurXPos();
-
-		/*eyePoint -= centerPoint;
-		eyePoint = V.KeepXBetween(eyePoint, 0, 1);
-		return eyePoint;*/
-
-		///double result = eyePoint - centerPoint_relativeToCurXPos;
-		double result = .5 + -centerPoint_relativeToCurXPos;
+		double result = .5 + (eyePosX - GetCenterPoint());
 		result = V.KeepXBetween(result, 0, 1);
 		return result;
 	}

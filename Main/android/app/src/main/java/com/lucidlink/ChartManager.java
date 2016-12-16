@@ -368,7 +368,7 @@ class ChartManager {
 			debugText.setText(
 				"1VS2: " + processor.channel1VSChannel2Strength_averageOfLastX + "\n"
 				+ "EyePos: " + processor.eyePosX + "\n"
-				+ "EyePosRel: " + -processor.GetCenterPoint_RelativeToCurXPos()
+				+ "EyePosRel: " + processor.GetCenterPoint()
 			);
 		});
 	}

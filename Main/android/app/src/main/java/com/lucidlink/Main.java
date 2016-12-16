@@ -246,6 +246,7 @@ public class Main extends ReactContextBaseJavaModule {
 	@ReactMethod public void CenterEyeTracker() {
 		mainChartManager.processor.eyePosX = .5;
 		mainChartManager.processor.eyePosY = .5;
+		mainChartManager.processor.ResetLastNPositions();
 	}
 
 	void Shutdown() {
