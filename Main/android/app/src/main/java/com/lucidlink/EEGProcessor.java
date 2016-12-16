@@ -187,10 +187,10 @@ class EEGProcessor {
 				+ channelValDeltas.get(1) + ";" + channelValDeltas.get(2) + "\n"
 				+ rightMovement + ";" + upMovement);*/
 
-			/*eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
-			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);*/
 			eyePosX = eyePosX + rightMovement;
-			eyePosY = eyePosY + upMovement;
+			//eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
+			//eyePosY = eyePosY + upMovement;
+			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);
 
 			//if (Double.isNaN(eyePosX_atStartOfCurrentSegment)) eyePosX_atStartOfCurrentSegment = eyePosX;
 			//if (Double.isNaN(xTravelAverageOfLastNSegments)) xTravelAverageOfLastNSegments = eyePosX;
@@ -251,8 +251,9 @@ class EEGProcessor {
 		return result;
 	}
 	double GetYPosForDisplay() {
-		double result = V.KeepXBetween(eyePosY, 0, 1);
-		return result;
+		/*double result = V.KeepXBetween(eyePosY, 0, 1);
+		return result;*/
+		return eyePosY;
 	}
 
 	void UpdateMatchProbabilities(int currentX) {
