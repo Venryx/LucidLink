@@ -241,11 +241,16 @@ public class V {
 		return Math.abs(a - b);
 	}
 
-	public static double Average(double... args) {
+	public static double Average(double... vals) {
 		double total = 0;
-		for (double arg : args)
+		for (double arg : vals)
 			total += arg;
-		return total / args.length;
+		return total / vals.length;
+	}
+	public static double Median(double... vals) {
+		if (vals.length % 2 == 0)
+			return (vals[vals.length / 2] + vals[vals.length / 2 - 1]) / 2;
+		return vals[vals.length / 2];
 	}
 
 	// just use the word 'percent', even though value is represented as fraction (e.g. 0.5, rather than 50[%])

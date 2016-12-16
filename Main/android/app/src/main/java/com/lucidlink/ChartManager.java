@@ -357,15 +357,19 @@ class ChartManager {
 		MainActivity.main.runOnUiThread(() -> {
 			int margin = 10;
 			int size = 30;
-			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.eyePosX);
-			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.eyePosY);
+			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.GetXPosForDisplay());
+			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.GetYPosForDisplay());
 			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));
 		});
 	}
 
 	void UpdateDebugUI() {
 		MainActivity.main.runOnUiThread(() -> {
-			debugText.setText("1VS2: " + processor.channel1VSChannel2Strength_averageOfLastX);
+			debugText.setText(
+				"1VS2: " + processor.channel1VSChannel2Strength_averageOfLastX + "\n"
+				+ "EyePos: " + processor.eyePosX + "\n"
+				+ "EyePosRel: " + -processor.GetCenterPoint_RelativeToCurXPos()
+			);
 		});
 	}
 

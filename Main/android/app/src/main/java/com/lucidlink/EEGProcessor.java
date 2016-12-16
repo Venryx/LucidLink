@@ -1,6 +1,5 @@
 package com.lucidlink;
 
-import com.annimon.stream.Stream;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
@@ -188,8 +187,26 @@ class EEGProcessor {
 				+ channelValDeltas.get(1) + ";" + channelValDeltas.get(2) + "\n"
 				+ rightMovement + ";" + upMovement);*/
 
-			eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
-			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);
+			/*eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
+			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);*/
+			eyePosX = eyePosX + rightMovement;
+			eyePosY = eyePosY + upMovement;
+
+			//if (Double.isNaN(eyePosX_atStartOfCurrentSegment)) eyePosX_atStartOfCurrentSegment = eyePosX;
+			//if (Double.isNaN(xTravelAverageOfLastNSegments)) xTravelAverageOfLastNSegments = eyePosX;
+			if (lastNSegmentValues.length != Main.main.eyeTraceSegmentCount)
+				lastNSegmentValues = new double[Main.main.eyeTraceSegmentCount];
+
+			double xTravelForCurrentSegmentsLeftToProcess = eyePosX - eyePosX_atStartOfCurrentSegment;
+			while (Math.abs(xTravelForCurrentSegmentsLeftToProcess) > Main.main.eyeTraceSegmentSize) {
+				int currentIndex = lastNSegments_lastSetIndex < lastNSegmentValues.length - 1 ? lastNSegments_lastSetIndex + 1 : 0;
+				double currentOffset = xTravelForCurrentSegmentsLeftToProcess < 0 ? -Main.main.eyeTraceSegmentSize : Main.main.eyeTraceSegmentSize;
+				lastNSegmentValues[currentIndex] = currentOffset;
+				lastNSegments_lastSetIndex = currentIndex;
+
+				xTravelForCurrentSegmentsLeftToProcess -= currentOffset;
+				eyePosX_atStartOfCurrentSegment += currentOffset; // var could also be named "xTravelForAllSegments"
+			}
 
 			// do some slight resetting to center each frame
 			/*double amount = .01;
@@ -207,6 +224,42 @@ class EEGProcessor {
 		} finally {
 			lastChannelValues = channelValues;
 		}
+	}
+	double[] lastNSegmentValues = new double[0];
+	int lastNSegments_lastSetIndex = -1;
+	//double eyePosX_atStartOfCurrentSegment = Double.NaN;
+	double eyePosX_atStartOfCurrentSegment = .5;
+	public double GetCenterPoint_RelativeToCurXPos() {
+		//double centerPoint = xTravelAverageOfLastNSegments;
+		double[] lastNSegments_offsetsFromCurrent = new double[lastNSegmentValues.length];
+		double lastOffset = 0;
+		// backtrack through segments-vals, constructing last-n-segments trace-image
+		for (int i = lastNSegments_offsetsFromCurrent.length - 1; i >= 0; i--) {
+			double currentOffset = lastOffset - lastNSegmentValues[i];
+			lastNSegments_offsetsFromCurrent[i] = currentOffset;
+			lastOffset = currentOffset;
+		}
+		// then finding average of points in it
+		double centerPoint_relativeToCurXPos = V.Average(lastNSegments_offsetsFromCurrent);
+		return centerPoint_relativeToCurXPos;
+	}
+	public double GetXPosForDisplay() {
+		double eyePoint = eyePosX;
+
+		double centerPoint_relativeToCurXPos = GetCenterPoint_RelativeToCurXPos();
+
+		/*eyePoint -= centerPoint;
+		eyePoint = V.KeepXBetween(eyePoint, 0, 1);
+		return eyePoint;*/
+
+		///double result = eyePoint - centerPoint_relativeToCurXPos;
+		double result = .5 + -centerPoint_relativeToCurXPos;
+		result = V.KeepXBetween(result, 0, 1);
+		return result;
+	}
+	double GetYPosForDisplay() {
+		double result = V.KeepXBetween(eyePosY, 0, 1);
+		return result;
 	}
 
 	void UpdateMatchProbabilities(int currentX) {

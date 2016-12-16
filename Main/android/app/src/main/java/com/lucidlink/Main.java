@@ -114,6 +114,8 @@ public class Main extends ReactContextBaseJavaModule {
 	public double eyeTracker_ignoreXMovementUnder;
 	public double eyeTracker_ignoreYMovementUnder;
 	public double eyeTracker_relaxVSTenseIntensity;
+	public double eyeTraceSegmentSize;
+	public int eyeTraceSegmentCount;
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
@@ -130,6 +132,8 @@ public class Main extends ReactContextBaseJavaModule {
 		this.eyeTracker_ignoreXMovementUnder = data.getDouble("eyeTracker_ignoreXMovementUnder");
 		this.eyeTracker_ignoreYMovementUnder = data.getDouble("eyeTracker_ignoreYMovementUnder");
 		this.eyeTracker_relaxVSTenseIntensity = data.getDouble("eyeTracker_relaxVSTenseIntensity");
+		this.eyeTraceSegmentSize = data.getDouble("eyeTraceSegmentSize");
+		this.eyeTraceSegmentCount = data.getInt("eyeTraceSegmentCount");
 	}
 
 	List<Pattern> patterns;

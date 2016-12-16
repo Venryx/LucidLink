@@ -210,6 +210,47 @@ export default class GeneralUI extends BaseComponent {
 							}}/>
 					</Row>
 
+					<Row>
+						<VText ml10 mt5 mr10>Eye-trace segment size</VText>
+						<VButton text={node.eyeTraceSegmentSize.toFixed(2)} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = .01; val <= .5; val += .01)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-trace segment size",
+									message: "",
+									values: values.Select(a=>a.toFixed(2)),
+									selectedValueIndex: values.indexOf(node.eyeTraceSegmentSize),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTraceSegmentSize = val;
+							}}/>
+					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Eye-trace segment count</VText>
+						<VButton text={node.eyeTraceSegmentCount.toString()} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 0; val <= 1000; val += 10)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Eye-trace segment count",
+									message: "",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(node.eyeTraceSegmentCount),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.eyeTraceSegmentCount = val;
+							}}/>
+					</Row>
+
 
 					{/*<Row>
 						<Text ml10 mt5 mr10>Eye-tracker vertical-sensitivity</Text>
