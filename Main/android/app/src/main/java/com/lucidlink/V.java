@@ -208,6 +208,13 @@ public class V {
 		params.topMargin = marginTop;
 		return params;
 	}
+	public static LinearLayout.LayoutParams CreateLinearLayoutParams(int marginLeft, int marginTop, int width, int height, int weight) {
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
+		params.leftMargin = marginLeft;
+		params.topMargin = marginTop;
+		params.weight = weight;
+		return params;
+	}
 
 	/*public static ArrayList<View> FindDescendants(View v) {
 		ArrayList<View> visited = new ArrayList<View>();

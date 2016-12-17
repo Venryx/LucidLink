@@ -170,20 +170,21 @@ var didFirstRender = false;
 class ChannelsUI extends BaseComponent {
     render() {
         return (
-            <View style={{flex: 1, backgroundColor: "red" /*colors.background*/}} accessible={true} accessibilityLabel="chart holder">
+            <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
             </View>
         );
     }
 
 	PostRender() {
-		if (didFirstRender) return;
-		didFirstRender = true;
-
-		//JavaBridge.Main.UpdateChartBounds();
-		JavaBridge.Main.AddChart();
-		DeviceEventEmitter.addListener("PostAddChart", args=> {
-			// do one more render, to fix positioning
-			this.forceUpdate();
-		});
+		if (!didFirstRender) {
+			didFirstRender = true;
+			JavaBridge.Main.AddChart();
+			/*DeviceEventEmitter.addListener("PostAddChart", args=> {
+				// do one more render, to fix positioning
+				this.forceUpdate();
+			});*/
+		} else {
+			JavaBridge.Main.UpdateChartBounds();
+		}
 	}
 }

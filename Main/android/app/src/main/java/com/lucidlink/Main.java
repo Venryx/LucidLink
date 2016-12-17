@@ -160,12 +160,6 @@ public class Main extends ReactContextBaseJavaModule {
 	@ReactMethod public void OnTabSelected(int tab) {
 	}
 
-	/*@ReactMethod public void UpdateChartBounds() {
-		if (!mainChartManager.initialized) return;
-		//V.WaitXThenRun(500, ()-> {
-			mainChartManager.UpdateChartBounds();
-		//});
-	}*/
 	@ReactMethod public void AddChart() {
 		Timer chartAttachTimer = new Timer();
 		chartAttachTimer.scheduleAtFixedRate(new TimerTask() {
@@ -185,6 +179,12 @@ public class Main extends ReactContextBaseJavaModule {
 				});
 			}
 		}, 1000, 1000);
+	}
+	@ReactMethod public void UpdateChartBounds() {
+		if (!mainChartManager.initialized) return;
+		//V.WaitXThenRun(500, ()-> {
+		mainChartManager.UpdateChartBounds();
+		//});
 	}
 
 	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {

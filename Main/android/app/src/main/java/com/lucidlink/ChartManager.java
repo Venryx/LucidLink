@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,10 +14,6 @@ import com.choosemuse.libmuse.MuseArtifactPacket;
 import com.choosemuse.libmuse.MuseDataListener;
 import com.choosemuse.libmuse.MuseDataPacket;
 import com.choosemuse.libmuse.MuseDataPacketType;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
@@ -26,9 +22,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.lucidlink.Main;
-import com.lucidlink.MainActivity;
-import com.lucidlink.V;
 import com.v.LibMuse.MainModule;
 
 import java.util.ArrayList;
@@ -44,22 +37,41 @@ class RelativeLayout_NonReactRoot extends RelativeLayout {
 	public void requestLayout() {
 		super.requestLayout();
 
-		// The spinner relies on a measure + layout pass happening after it calls requestLayout().
+		// The view relies on a measure + layout pass happening after it calls requestLayout().
 		// Without this, the widget never actually changes the selection and doesn't call the
 		// appropriate listeners. Since we override onLayout in our ViewGroups, a layout pass never
 		// happens after a call to requestLayout, so we simulate one here.
 		post(measureAndLayout);
 	}
 
-	private final Runnable measureAndLayout = new Runnable() {
-		@Override
-		public void run() {
-			measure(MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
-				MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
-			layout(getLeft(), getTop(), getRight(), getBottom());
-		}
+	private final Runnable measureAndLayout = ()-> {
+		measure(MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
+			MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
+		layout(getLeft(), getTop(), getRight(), getBottom());
 	};
 }
+/*class LinearLayout_NonReactRoot extends LinearLayout {
+	public LinearLayout_NonReactRoot(Context context) {
+		super(context);
+	}
+
+	@Override
+	public void requestLayout() {
+		super.requestLayout();
+
+		// The view relies on a measure + layout pass happening after it calls requestLayout().
+		// Without this, the widget never actually changes the selection and doesn't call the
+		// appropriate listeners. Since we override onLayout in our ViewGroups, a layout pass never
+		// happens after a call to requestLayout, so we simulate one here.
+		post(measureAndLayout);
+	}
+
+	private final Runnable measureAndLayout = ()-> {
+		measure(MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
+				MeasureSpec.makeMeasureSpec(getHeight(), MeasureSpec.EXACTLY));
+		layout(getLeft(), getTop(), getRight(), getBottom());
+	};
+}*/
 
 class ChartManager {
 	public ChartManager() {
@@ -68,7 +80,7 @@ class ChartManager {
 
 	public boolean initialized;
 	public void TryToInit() {
-		// create new chart-holder (with same pos and size as react-native, placeholder chart-holder)
+		// create non-react chart-holder, inside the react-native one (it doesn't lay out children properly)
 		// ==========
 
 		ViewGroup chartHolder = (ViewGroup) V.FindViewByContentDescription(V.GetRootView(), "chart holder");
@@ -80,35 +92,33 @@ class ChartManager {
 
 		initialized = true;
 
-		/*int[] chartHolderPos = new int[2];
-		chartHolder.getLocationInWindow(chartHolderPos);
-
-		newChartHolder = new RelativeLayout(MainActivity.main);
-		newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
-		V.GetRootView().addView(newChartHolder);*/
-
 		newChartHolder = new RelativeLayout_NonReactRoot(MainActivity.main);
-		newChartHolder.setLayoutParams(V.CreateViewGroupLayoutParams(chartHolder.getWidth(), chartHolder.getHeight()));
-		//newChartHolder.setLayoutParams(V.CreateViewGroupLayoutParams(V.MATCH_PARENT, V.MATCH_PARENT));
-		//V.GetRootView().addView(newChartHolder);
-		/*newChartHolder.measure(1000, 1000);
-		newChartHolder.layout(0, 0, 1000, 1000);
-		newChartHolder.setRight(1000);
-		newChartHolder.setBottom(1000);*/
+		//newChartHolder.setLayoutParams(V.CreateViewGroupLayoutParams(chartHolder.getWidth(), chartHolder.getHeight()));
+		newChartHolder.setLayoutParams(V.CreateViewGroupLayoutParams(V.MATCH_PARENT, V.MATCH_PARENT));
 		chartHolder.addView(newChartHolder);
-
 		// actually layout new-chart-holder (react won't do it, since it's not a react view)
+		newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
+
+		// create view-distance and chart holder
 		// ==========
 
-		//newChartHolder.measure(chartHolder.getWidth(), chartHolder.getHeight());
-		/*newChartHolder.measure(View.MeasureSpec.makeMeasureSpec(chartHolder.getWidth(), View.MeasureSpec.EXACTLY),
-			View.MeasureSpec.makeMeasureSpec(chartHolder.getHeight(), View.MeasureSpec.EXACTLY));*/
-		newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
-		/*newChartHolder.setRight(1000);
-		newChartHolder.setBottom(1000);*/
-		/*newChartHolder.invalidate();
-		newChartHolder.requestLayout();
-		newChartHolder.forceLayout();*/
+		viewDistanceAndChartHolder = new LinearLayout(MainActivity.main);
+		viewDistanceAndChartHolder.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
+		newChartHolder.addView(viewDistanceAndChartHolder);
+
+		// create view-distance marker
+		// ==========
+
+		//viewDistanceBackground = new LinearLayout(MainActivity.main);
+		viewDistanceBackground = new RelativeLayout(MainActivity.main);
+		viewDistanceBackground.setLayoutParams(V.CreateLinearLayoutParams(0, 0, 50, V.MATCH_PARENT, 0));
+		viewDistanceAndChartHolder.addView(viewDistanceBackground);
+
+		viewDistanceForeground = new View(MainActivity.main);
+		viewDistanceForeground.setBackgroundColor(Color.parseColor("#0000FF"));
+		//viewDistanceForeground.setLayoutParams(V.CreateLinearLayoutParams(0, 0, V.MATCH_PARENT, 0, 0));
+		viewDistanceForeground.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, 0));
+		viewDistanceBackground.addView(viewDistanceForeground);
 
 		// create chart
 		// ==========
@@ -122,8 +132,10 @@ class ChartManager {
 		chart.setFocusable(false);
 		chart.setFocusableInTouchMode(false);
 		chart.setClickable(false);
-		chart.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-		newChartHolder.addView(chart);
+		//chart.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		chart.setLayoutParams(V.CreateLinearLayoutParams(0, 0, 0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+		//newChartHolder.addView(chart);
+		viewDistanceAndChartHolder.addView(chart);
 
 		chart.setDrawGridBackground(false);
 		chart.getAxisLeft().setDrawGridLines(false);
@@ -228,28 +240,6 @@ class ChartManager {
 		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
 		newChartHolder.addView(debugText);
 
-		// actually layout new-chart-holder (react won't do it, since it's not a react view)
-		// ==========
-
-		//newChartHolder.measure(chartHolder.getWidth(), chartHolder.getHeight());
-		/*newChartHolder.measure(View.MeasureSpec.makeMeasureSpec(chartHolder.getWidth(), View.MeasureSpec.EXACTLY),
-			View.MeasureSpec.makeMeasureSpec(chartHolder.getHeight(), View.MeasureSpec.EXACTLY));
-		newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
-		/*newChartHolder.setRight(1000);
-		newChartHolder.setBottom(1000);*#/
-		newChartHolder.invalidate();
-		newChartHolder.requestLayout();
-		newChartHolder.forceLayout();*/
-
-		/*for (View child : V.GetChildren(newChartHolder)) {
-			/*child.measure(View.MeasureSpec.makeMeasureSpec(chartHolder.getWidth(), View.MeasureSpec.AT_MOST),
-				View.MeasureSpec.makeMeasureSpec(chartHolder.getHeight(), View.MeasureSpec.AT_MOST));*#/
-			child.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-			child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
-			/*child.invalidate();
-			child.requestLayout();*#/
-		}*/
-
 		// set up listeners
 		// ==========
 
@@ -285,7 +275,7 @@ class ChartManager {
 		};
 	}
 
-	/*public void UpdateChartBounds() {
+	public void UpdateChartBounds() {
 		ViewGroup chartHolder = (ViewGroup) V.FindViewByContentDescription(V.GetRootView(), "chart holder");
 		if (chartHolder == null) {
 			V.Log("Could not find chart-holder.");
@@ -302,16 +292,12 @@ class ChartManager {
 		// if chart-bounds are unchanged, do not set
 		if (chartHolderPos[0] == currentLayout.leftMargin && chartHolderPos[1] == currentLayout.topMargin
 				|| chartHolder.getWidth() == currentLayout.width || chartHolder.getHeight() == currentLayout.height)
-			return;*#/
+			return;*/
 
-		//V.Log("Updating chart bounds: " + chartHolderPos[0] + ";" +  chartHolderPos[1] + ";" + chartHolder.getWidth() + ";" + chartHolder.getHeight());
 		MainActivity.main.runOnUiThread(() -> {
-			newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
+			//newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
+			newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
 		});
-	}*/
-
-	public void AddChart() {
-
 	}
 
 	EEGProcessor processor;
@@ -331,6 +317,10 @@ class ChartManager {
 	}*/
 
 	ViewGroup newChartHolder;
+	LinearLayout viewDistanceAndChartHolder;
+	// view-distance
+	RelativeLayout viewDistanceBackground;
+	View viewDistanceForeground;
 	LineChart chart;
 	View currentTimeMarker;
 	View eyePosMarker;
@@ -427,27 +417,6 @@ class ChartManager {
 
 			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
 			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, V.MATCH_PARENT));
-
-			//newChartHolder.updateViewLayout(currentTimeMarker, V.CreateRelativeLayoutParams(xPos, 0, 5, V.MATCH_PARENT));
-
-			/*newChartHolder.measure(View.MeasureSpec.makeMeasureSpec(newChartHolder.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
-				View.MeasureSpec.makeMeasureSpec(newChartHolder.getMeasuredHeight(), View.MeasureSpec.EXACTLY));
-			newChartHolder.layout(0, 0, newChartHolder.getMeasuredWidth(), newChartHolder.getMeasuredHeight());
-			newChartHolder.invalidate();
-			newChartHolder.requestLayout();*/
-
-			/*currentTimeMarker.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-			currentTimeMarker.layout(0, 0, currentTimeMarker.getMeasuredWidth(), currentTimeMarker.getMeasuredHeight());
-			currentTimeMarker.invalidate();
-			currentTimeMarker.requestLayout();*/
-
-			/*currentTimeMarker.invalidate();
-			currentTimeMarker.requestLayout();
-			currentTimeMarker.forceLayout();
-
-			newChartHolder.invalidate();
-			newChartHolder.requestLayout();
-			newChartHolder.forceLayout();*/
 		});
 	}
 
@@ -456,8 +425,17 @@ class ChartManager {
 			int margin = 10;
 			int size = 30;
 			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.GetXPosForDisplay());
+			/*int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.GetYPosForDisplay());
+			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));*/
+			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), newChartHolder.getHeight() / 2, size, size));
+
 			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.GetYPosForDisplay());
-			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));
+			//viewDistanceForeground.setLayoutParams(V.CreateLinearLayoutParams(0, yPos, V.MATCH_PARENT, 30, 0));
+			viewDistanceForeground.setLayoutParams(V.CreateRelativeLayoutParams(0, yPos, V.MATCH_PARENT, 30));
+			viewDistanceForeground.setBackgroundColor(Color.parseColor("#00000FF"));
+			/*viewDistanceForeground.invalidate();
+			viewDistanceForeground.requestLayout();
+			viewDistanceForeground.forceLayout();*/
 		});
 	}
 
