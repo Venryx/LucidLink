@@ -81,4 +81,19 @@ g.V = class V {
 			result = result.KeepBetween(0, 1);
 		return result;
 	}
+
+	static GetXToY(minX, maxY, interval = 1) {
+		var result = [];
+		for (var val = minX; val <= maxY; val += interval) {
+			result.push(val);
+		}
+		return result;
+	}
+	static GetXToYOut(minX, maxOutY, interval = 1) {
+		var result = [];
+		for (var val = minX; val < maxOutY; val += interval) {
+			result.push(val);
+		}
+		return result;
+	}
 };

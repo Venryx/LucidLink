@@ -103,7 +103,7 @@ export class MonitorUI extends BaseComponent {
 									//this.forceUpdate();
 								}}/>
 						</Row>}
-					<Panel style={{marginTop: -7, flex: 111222333}}>
+					<Panel style={{marginTop: -7, flex: 1}}>
 						<ChannelsUI {...{visible}} parent={this}/>
 					</Panel>
 				</Column>
@@ -166,15 +166,24 @@ export class MonitorUI extends BaseComponent {
 	}
 }
 
+var didFirstRender = false;
 class ChannelsUI extends BaseComponent {
     render() {
         return (
-            <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
+            <View style={{flex: 1, backgroundColor: "red" /*colors.background*/}} accessible={true} accessibilityLabel="chart holder">
             </View>
         );
     }
 
 	PostRender() {
-		JavaBridge.Main.UpdateChartBounds();
+		if (didFirstRender) return;
+		didFirstRender = true;
+
+		//JavaBridge.Main.UpdateChartBounds();
+		JavaBridge.Main.AddChart();
+		DeviceEventEmitter.addListener("PostAddChart", args=> {
+			// do one more render, to fix positioning
+			this.forceUpdate();
+		});
 	}
 }

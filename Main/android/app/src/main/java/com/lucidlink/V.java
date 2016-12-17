@@ -33,8 +33,21 @@ import java.util.List;
 import java.util.Map;
 
 public class V {
+	// ui
+	// ==========
+
 	public static int MATCH_PARENT = -1;
 	public static int WRAP_CONTENT = -2;
+
+	public static List<View> GetChildren(ViewGroup parent) {
+		List<View> result = new ArrayList<>();
+		for (int i = 0; i < parent.getChildCount(); i++)
+			result.add(parent.getChildAt(i));
+		return result;
+	}
+
+	// general
+	// ==========
 
 	public static int textColor = Color.rgb(255, 255, 255);
 
@@ -180,6 +193,9 @@ public class V {
 		return (LinearLayout)((ViewGroup)MainActivity.main.getWindow().getDecorView().getRootView()).getChildAt(0);
 	}
 
+	public static ViewGroup.LayoutParams CreateViewGroupLayoutParams(int width, int height) {
+		return new ViewGroup.LayoutParams(width, height);
+	}
 	public static FrameLayout.LayoutParams CreateFrameLayoutParams(int marginLeft, int marginTop, int width, int height) {
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
 		params.leftMargin = marginLeft;
@@ -264,6 +280,27 @@ public class V {
 			result = KeepXBetween(result, 0, 1);
 		return result;
 	}
+
+	/*public static List<Double> GetXToY(double minX, double maxOutY) {
+		return GetXToY(minX, maxOutY, 1);
+	}
+	public static List<Double> GetXToY(double minX, double maxOutY, double interval) {
+		List<Double> result = new ArrayList<>();
+		for (double val = minX; val <= maxOutY; val += interval) {
+			result.add(val);
+		}
+		return result;
+	}
+	public static List<Double> GetXToYOut(double minX, double maxOutY) {
+		return GetXToYOut(minX, maxOutY, 1);
+	}
+	public static List<Double> GetXToYOut(double minX, double maxOutY, double interval) {
+		List<Double> result = new ArrayList<>();
+		for (double val = minX; val < maxOutY; val += interval) {
+			result.add(val);
+		}
+		return result;
+	}*/
 
 	public static double KeepXBetween(double val, double min, double max) {
 		if (val < min) return min;

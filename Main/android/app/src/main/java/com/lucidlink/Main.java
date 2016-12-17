@@ -156,44 +156,35 @@ public class Main extends ReactContextBaseJavaModule {
 		mainChartManager.OnReceiveMuseDataPacket(type, columnFinal);
 	}*/
 
-	Timer chartAttachTimer;
+
 	@ReactMethod public void OnTabSelected(int tab) {
-		MainActivity.main.runOnUiThread(()-> {
-			if (tab == 0) {
-				if (chartAttachTimer == null) {
-					chartAttachTimer = new Timer();
-					chartAttachTimer.scheduleAtFixedRate(new TimerTask() {
-						@Override
-						public void run() {
-							MainActivity.main.runOnUiThread(()-> {
-								//if (!mainChartManager.initialized)
-								mainChartManager.TryToInit();
-
-								// if we just succeeded, disable timer and run post-init code
-								if (mainChartManager.initialized) {
-									chartAttachTimer.cancel();
-									mainChartManager.SetChartVisible(true);
-								}
-							});
-						}
-					}, 1000, 1000);
-				}
-
-				if (mainChartManager.initialized)
-					mainChartManager.SetChartVisible(true);
-			}
-			else {
-				if (mainChartManager.initialized)
-					mainChartManager.SetChartVisible(false);
-			}
-		});
 	}
 
-	@ReactMethod public void UpdateChartBounds() {
+	/*@ReactMethod public void UpdateChartBounds() {
 		if (!mainChartManager.initialized) return;
 		//V.WaitXThenRun(500, ()-> {
 			mainChartManager.UpdateChartBounds();
 		//});
+	}*/
+	@ReactMethod public void AddChart() {
+		Timer chartAttachTimer = new Timer();
+		chartAttachTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				MainActivity.main.runOnUiThread(()-> {
+					//if (!mainChartManager.initialized)
+					mainChartManager.TryToInit();
+
+					// if we just succeeded, disable timer and run post-init code
+					if (mainChartManager.initialized) {
+						chartAttachTimer.cancel();
+
+						//mainChartManager.SetChartVisible(true);
+						//SendEvent("PostAddChart");
+					}
+				});
+			}
+		}, 1000, 1000);
 	}
 
 	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {
