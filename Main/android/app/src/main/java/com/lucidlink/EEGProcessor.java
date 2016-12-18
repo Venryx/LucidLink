@@ -111,6 +111,8 @@ class EEGProcessor {
 		chartManager.OnReceiveMusePacket(packet);
 
 		WritableMap packetMap = packet.ToMap();
+		packetMap.putDouble("viewDirection", GetXPosForDisplay());
+		packetMap.putDouble("viewDistance", viewDistanceY);
 		packetBuffer.pushMap(packetMap);
 
 		// send buffer to js, if ready
@@ -134,7 +136,7 @@ class EEGProcessor {
 	}
 
 	public double eyePosX = .5;
-	public double eyePosY = .5;
+	public double viewDistanceY = .5;
 
 	public double channel1VSChannel2Strength_averageOfLastX = 1;
 	//public double upVSDownAmount_averageOfLastX = 0;
@@ -234,7 +236,7 @@ class EEGProcessor {
 			eyePosX = eyePosX + rightMovement;
 			//eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
 			//eyePosY = eyePosY + upMovement;
-			eyePosY = V.KeepXBetween(eyePosY + upMovement, 0, 1);
+			viewDistanceY = V.KeepXBetween(viewDistanceY + upMovement, 0, 1);
 
 			//if (Double.isNaN(eyePosX_atStartOfCurrentSegment)) eyePosX_atStartOfCurrentSegment = eyePosX;
 			//if (Double.isNaN(xTravelAverageOfLastNSegments)) xTravelAverageOfLastNSegments = eyePosX;
@@ -297,7 +299,7 @@ class EEGProcessor {
 	double GetYPosForDisplay() {
 		/*double result = V.KeepXBetween(eyePosY, 0, 1);
 		return result;*/
-		return eyePosY;
+		return viewDistanceY;
 	}
 
 	void UpdateMatchProbabilities(int currentX) {

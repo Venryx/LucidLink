@@ -1,25 +1,12 @@
 package com.lucidlink;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.JavaScriptModule;
-import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
@@ -29,13 +16,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
-import com.v.LibMuse.LibMuse;
-import com.v.LibMuse.MainModule;
 
-import java.io.File;
-import java.io.FileDescriptor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,7 +228,7 @@ public class Main extends ReactContextBaseJavaModule {
 
 	@ReactMethod public void CenterEyeTracker() {
 		eegProcessor.eyePosX = .5;
-		eegProcessor.eyePosY = .5;
+		eegProcessor.viewDistanceY = .5;
 		eegProcessor.ResetLastNPositions();
 	}
 

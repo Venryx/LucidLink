@@ -321,6 +321,9 @@ Number.prototype._AddFunction_Inline = function KeepAtMost(step) {
 Number.prototype._AddFunction_Inline = function KeepBetween(min, max) {
 	return Math.min(max, Math.max(min, this));
 };
+Number.prototype._AddFunction_Inline = function Distance(other) {
+	return Math.abs(this - other);
+};
 
 // String
 // ==========

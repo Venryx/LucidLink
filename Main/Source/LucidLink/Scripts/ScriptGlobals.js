@@ -17,14 +17,21 @@ g.AddEvent = function(type, ...args) {
 	LL.tracker.currentSession.events.push(event);
 }
 
-g.EveryXSecondsRun = function(seconds, func, maxCallCount = -1) {
-	var timer = new Timer(seconds, func, rightMovement);
+g.EveryXSecondsDo = function(seconds, func, maxCallCount = -1) {
+	var timer = new Timer(seconds, func, maxCallCount);
 	timer.Start();
+	LL.scripts.scriptRunner.timers.push(timer);
 	return timer;
 };
 
 g.WhenMusePacketReceived = function(func) {
 	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
+}
+g.WhenViewDirectionUpdated = function(func) {
+	LL.scripts.scriptRunner.listeners_whenViewDirectionUpdated.push(func);
+}
+g.WhenViewDistanceUpdated = function(func) {
+	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
 }
 
 // input

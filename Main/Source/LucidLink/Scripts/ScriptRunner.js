@@ -3,7 +3,10 @@ require("./ScriptGlobals");
 export default g.ScriptRunner = class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
 
+	timers = [];
 	listeners_whenMusePacketReceived = [];
+	/*listeners_whenViewDirectionUpdated = [];
+	listeners_whenViewDistanceUpdated = [];*/
 	listeners_onUpdatePatternMatchProbabilities = [];
 
 	keyDownListeners = [];
@@ -23,6 +26,9 @@ export default g.ScriptRunner = class ScriptRunner {
 	}
 
 	Reset() {
+		for (let timer of this.timers)
+			timer.Stop();
+		this.timers = [];
 		this.listeners_whenMusePacketReceived = [];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];
