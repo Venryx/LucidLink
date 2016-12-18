@@ -13,7 +13,10 @@ AddPattern({
 		new Gap({min: 30, max: 60}),
 		new Matcher(x=>GetViewDistance(x) > 10), // eye looking at something farther than 10 meters
 	],
-	onMatched: ()=> {
-		Speak({text: "Pattern matched!"});
+	onPartialMatch: segmentsMatched=> {
+		Speak({text: "Pattern partially (" + segmentsMatched + "/11) matched."});
+	}
+	onMatch: ()=> {
+		Speak({text: "Pattern fully matched."});
 	}
 });
