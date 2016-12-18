@@ -227,7 +227,8 @@ public class Main extends ReactContextBaseJavaModule {
 	}*/
 
 	@ReactMethod public void CenterEyeTracker() {
-		eegProcessor.eyePosX = .5;
+		//eegProcessor.eyePosX = .5;
+		eegProcessor.eyePosX = (int)(.5 * eegProcessor.fakeDoubleIntRange);
 		eegProcessor.viewDistanceY = .5;
 		eegProcessor.ResetLastNPositions();
 	}
