@@ -407,7 +407,7 @@ class ChartManager {
 			debugText.setText(
 				"1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX + "\n"
 				+ "EyePos: " + eegProcessor.eyePosX + "\n"
-				+ "EyePosRel: " + eegProcessor.GetCenterPoint()
+				+ "CenterPos: " + eegProcessor.GetCenterPoint()
 			);
 		});
 	}

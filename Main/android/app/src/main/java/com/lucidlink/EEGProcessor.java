@@ -191,7 +191,7 @@ class EEGProcessor {
 				channelValDifs.get(1) < 0 ? (channelValDifs.get(1) / Main.main.eyeTracker_relaxVSTenseIntensity) + channelValDifs.get(2) :
 				channelValDifs.get(2) < 0 ? channelValDifs.get(1) + (channelValDifs.get(2) / Main.main.eyeTracker_relaxVSTenseIntensity) :
 				channelValDifs.get(1) + channelValDifs.get(2);
-			double rangeStart = 30000;
+			double rangeStart = 50000;
 			double rangeEnd = 1000;
 
 			/*if (Math.abs(rightness) > Math.abs(upness))
@@ -385,7 +385,8 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
 	}
 
-	int GetChannelBaseline(int channel) {
+	// use compromise between median-approach and average-approach (get "median" 40%, then average those)
+	double GetChannelBaseline(int channel) {
 		/*List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		List<Vector2i> channelPoints_ordered = V.List(Stream.of(channelPoints).sortBy(a->a.y));
 		int result = channelPoints_ordered.get(channelPoints_ordered.size() / 2).y;
@@ -402,12 +403,20 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		Vector2i[] channelPoints_clone = channelPoints.clone();
 		Arrays.sort(channelPoints_clone);
 
-		int median;
+		/*int median;
 		if (channelPoints_clone.length % 2 == 0)
 			median = (channelPoints_clone[channelPoints_clone.length / 2].y + channelPoints_clone[channelPoints_clone.length / 2 - 1].y) / 2;
 		else
 			median = channelPoints_clone[channelPoints_clone.length / 2].y;
-		return median;
+		return median;*/
+
+		double subsetTotal = 0;
+		int cutOffCount = (int)(channelPoints_clone.length * .3);
+		for (int i = cutOffCount; i < channelPoints_clone.length - cutOffCount; i++) {
+			subsetTotal += channelPoints_clone[i].y;
+		}
+		int subsetCount = channelPoints_clone.length - (cutOffCount * 2);
+		return subsetTotal / subsetCount;
 	}
 
 	/*static ConvertPoints(points) {
