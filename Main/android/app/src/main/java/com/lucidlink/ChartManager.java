@@ -23,6 +23,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.v.LibMuse.MainModule;
+import com.v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,9 +75,10 @@ class RelativeLayout_NonReactRoot extends RelativeLayout {
 }*/
 
 class ChartManager {
-	public ChartManager() {
-		processor = new EEGProcessor(this);
+	public ChartManager(EEGProcessor eegProcessor) {
+		this.eegProcessor = eegProcessor;
 	}
+	EEGProcessor eegProcessor;
 
 	public boolean initialized;
 	public void TryToInit() {
@@ -160,7 +162,7 @@ class ChartManager {
 		for (int i = 0; i < eegCount; i++) {
 			// start channels as flat
 			ArrayList<Entry> thisChannelPoints = new ArrayList<>();
-			for (int i2 = 0; i2 <= maxX; i2++)
+			for (int i2 = 0; i2 <= eegProcessor.maxX; i2++)
 				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, i == 0 ? 0 : maxY_fullChart));
 			channelPoints.add(thisChannelPoints);
 			LineDataSet line = new LineDataSet(thisChannelPoints, "Channel " + i);
@@ -239,40 +241,6 @@ class ChartManager {
 		//debugText.setBackgroundColor(Color.parseColor("#0000FF"));
 		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
 		newChartHolder.addView(debugText);
-
-		// set up listeners
-		// ==========
-
-		MainModule.main.extraListener = new MuseDataListener() {
-			@Override
-			public void receiveMuseDataPacket(final MuseDataPacket packet, final Muse muse) {
-				try {
-					MainModule.main.dataListenerEnabled = Main.main.monitor;
-					MainModule.main.packetSetSize = Main.main.museEEGPacketBufferSize;
-					//MainModule.main.dataListenerEnabled = false;
-					if (!Main.main.monitor) return;
-
-					MuseDataPacketType packetType = packet.packetType();
-					String type;
-					if (packetType == MuseDataPacketType.EEG)
-						type = "eeg";
-					else if (packetType == MuseDataPacketType.ACCELEROMETER)
-						type = "accelerometer";
-					else if (packetType == MuseDataPacketType.ALPHA_RELATIVE)
-						type = "alpha";
-					else // currently we just ignore other packet types
-						return;
-					ArrayList<Double> channelValues = packet.values();
-
-					ChartManager.this.OnReceiveMuseDataPacket(type, channelValues);
-				} catch(Throwable ex) {
-					V.Log("Error in ChartManager.receiveMuseDataPacket) " + V.GetStackTrace(ex));
-				}
-			}
-
-			@Override
-			public void receiveMuseArtifactPacket(final MuseArtifactPacket p, final Muse muse) {}
-		};
 	}
 
 	public void UpdateChartBounds() {
@@ -299,8 +267,6 @@ class ChartManager {
 			newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
 		});
 	}
-
-	EEGProcessor processor;
 
 	/*public void SetChartVisible(boolean visible) {
 		if (visible) {
@@ -335,52 +301,44 @@ class ChartManager {
 	LineData data;
 	List<ILineDataSet> lines;
 
-	int lastX = -1;
-	int maxX = 1000;
+
 	int heightPerChannel = 500;
 	int maxY_fullChart = 3000;
 
-	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> channelValues) {
-		if (!type.equals("eeg")) return;
+	public void OnReceiveMusePacket(VMuseDataPacket packet) {
+		if (packet.Type().equals("eeg")) {
+			// add points
+			for (int channel = 0; channel < eegCount; channel++) {
+				/*Entry entry = data.getDataSetByIndex(channel).getEntryForIndex(currentX);
+				entry.setX(currentX * stepSizeInPixels);
+				entry.setY((float)(double)column.get(channel));*/
 
-		// add points
-		int currentX = lastX < maxX ? lastX + 1 : 0;
-		for (int channel = 0; channel < eegCount; channel++) {
-			/*Entry entry = data.getDataSetByIndex(channel).getEntryForIndex(currentX);
-			entry.setX(currentX * stepSizeInPixels);
-			entry.setY((float)(double)column.get(channel));*/
+				DataSet dataSet = (DataSet) data.getDataSetByIndex(channel);
 
-			DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
+				if (channel == 0) dataSet.setVisible(Main.main.channel1);
+				else if (channel == 1) dataSet.setVisible(Main.main.channel2);
+				else if (channel == 2) dataSet.setVisible(Main.main.channel3);
+				else if (channel == 3) dataSet.setVisible(Main.main.channel4);
 
-			if (channel == 0) dataSet.setVisible(Main.main.channel1);
-			else if (channel == 1) dataSet.setVisible(Main.main.channel2);
-			else if (channel == 2) dataSet.setVisible(Main.main.channel3);
-			else if (channel == 3) dataSet.setVisible(Main.main.channel4);
+				float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
+				float yValue = (float)packet.eegValues[channel];
 
-			float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
-			float yValue = (float)(double)channelValues.get(channel);
+				float finalY = yBase + (yValue - 500);
+				dataSet.getValues().set(eegProcessor.currentX, new Entry(eegProcessor.currentX, finalY));
+			}
 
-			float finalY = yBase + (yValue - 500);
-			dataSet.getValues().set(currentX, new Entry(currentX, finalY));
+			if (eegProcessor.currentIndex == 0) // init stuff that nonetheless needs real data
+				chart.setVisibleXRange(0, eegProcessor.maxX);
+			if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
+				UpdateChart();
+
+			UpdateEyeTrackerUI(); // update eye-tracker ui to match processor's changes
+			UpdateDebugUI();
+		} else if (packet.Type().equals("accel")) {
+			// todo: add data-set for this
 		}
-		lastX = currentX;
-
-		if (count == 0) // init stuff that nonetheless needs real data
-			chart.setVisibleXRange(0, maxX);
-
-		if (count % Main.main.updateInterval == 0)
-			UpdateChart();
-
-		// send data to eeg-processor
-		processor.OnReceiveMuseDataPacket(type, channelValues);
-
-		// update eye-tracker ui to match processor's changes
-		UpdateEyeTrackerUI();
-
-		UpdateDebugUI();
-
-		count++;
 	}
+
 
 	int lastSetPatternMatchProbability_x = -1;
 	public void OnSetPatternMatchProbabilities(int currentX, HashMap<String, Double> probabilities) {
@@ -388,7 +346,7 @@ class ChartManager {
 
 		// if we went back to start of chart, clear end of chart's last filling
 		if (currentX < lastSetPatternMatchProbability_x) {
-			for (int x = lastSetPatternMatchProbability_x + 1; x <= maxX; x++) {
+			for (int x = lastSetPatternMatchProbability_x + 1; x <= eegProcessor.maxX; x++) {
 				List entriesToRemove = dataSet.getEntriesForXValue(x);
 				for (Object entry : entriesToRemove)
 					dataSet.removeEntry((Entry)entry);
@@ -408,19 +366,18 @@ class ChartManager {
 
 		lastSetPatternMatchProbability_x = currentX;
 
-		chart.setVisibleXRange(0, maxX);
+		chart.setVisibleXRange(0, eegProcessor.maxX);
 
-		if (count % Main.main.updateInterval == 0)
+		if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
 			UpdateChart();
 	}
 
-	int count = 0;
 	//void UpdateChart(int currentX) {
 	void UpdateChart() {
 		MainActivity.main.runOnUiThread(() -> {
 			chart.invalidate(); // redraw
 
-			int xPos = (int)((lastX / (double)maxX) * newChartHolder.getWidth());
+			int xPos = (int)((eegProcessor.currentX / (double)eegProcessor.maxX) * newChartHolder.getWidth());
 			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, V.MATCH_PARENT));
 		});
 	}
@@ -429,15 +386,15 @@ class ChartManager {
 		MainActivity.main.runOnUiThread(() -> {
 			int margin = 10;
 			int size = 30;
-			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, processor.GetXPosForDisplay());
+			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, eegProcessor.GetXPosForDisplay());
 			/*int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.GetYPosForDisplay());
 			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), yPos - (size / 2), size, size));*/
 			eyePosMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos - (size / 2), newChartHolder.getHeight() / 2, size, size));
 
-			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - processor.GetYPosForDisplay());
+			int yPos = (int)V.Lerp(0 + margin, newChartHolder.getHeight() - margin, 1 - eegProcessor.GetYPosForDisplay());
 			//viewDistanceForeground.setLayoutParams(V.CreateLinearLayoutParams(0, yPos, V.MATCH_PARENT, 30, 0));
 			viewDistanceForeground.setLayoutParams(V.CreateRelativeLayoutParams(0, yPos, V.MATCH_PARENT, 30));
-			viewDistanceForeground.setBackgroundColor(Color.parseColor("#00000FF"));
+			viewDistanceForeground.setBackgroundColor(Color.parseColor("#0000FF"));
 			/*viewDistanceForeground.invalidate();
 			viewDistanceForeground.requestLayout();
 			viewDistanceForeground.forceLayout();*/
@@ -447,9 +404,9 @@ class ChartManager {
 	void UpdateDebugUI() {
 		MainActivity.main.runOnUiThread(() -> {
 			debugText.setText(
-				"1VS2: " + processor.channel1VSChannel2Strength_averageOfLastX + "\n"
-				+ "EyePos: " + processor.eyePosX + "\n"
-				+ "EyePosRel: " + processor.GetCenterPoint()
+				"1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX + "\n"
+				+ "EyePos: " + eegProcessor.eyePosX + "\n"
+				+ "EyePosRel: " + eegProcessor.GetCenterPoint()
 			);
 		});
 	}

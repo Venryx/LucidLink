@@ -3,6 +3,9 @@ require("./ScriptGlobals");
 export default g.ScriptRunner = class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
 
+	listeners_whenMusePacketReceived = [];
+	listeners_onUpdatePatternMatchProbabilities = [];
+
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {
 		for (let listener of this.keyDownListeners) {
@@ -19,12 +22,11 @@ export default g.ScriptRunner = class ScriptRunner {
 		}
 	}
 
-	listeners_onUpdatePatternMatchProbabilities = [];
-
 	Reset() {
+		this.listeners_whenMusePacketReceived = [];
+		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
-		this.listeners_onUpdatePatternMatchProbabilities = [];
 	}
 	Init(scripts) {
 		var finalScriptsText = "";

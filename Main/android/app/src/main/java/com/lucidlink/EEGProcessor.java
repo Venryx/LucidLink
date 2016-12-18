@@ -1,17 +1,45 @@
 package com.lucidlink;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
+import com.v.LibMuse.MainModule;
+import com.v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 class EEGProcessor {
-	public EEGProcessor(ChartManager chartManager) {
-		this.chartManager = chartManager;
+	public EEGProcessor() {
+		chartManager = new ChartManager(this);
+
+		// set up listeners
+		// ==========
+
+		MainModule.onInit = ()-> {
+			MainModule.main.customHandler = new VMuseDataPacket.Listener() {
+				@Override
+				public boolean OnReceivePacket(final VMuseDataPacket packet) {
+					try {
+						/*MainModule.main.dataListenerEnabled = Main.main.monitor;
+						MainModule.main.packetSetSize = Main.main.museEEGPacketBufferSize;*/
+						if (Main.main.monitor) {
+							EEGProcessor.this.OnReceiveMuseDataPacket(packet);
+						}
+
+						return true;
+					} catch(Throwable ex) {
+						V.Log("Error in EEGProcessor.OnReceivePacket) " + V.GetStackTrace(ex));
+						return true;
+					}
+				}
+			};
+		};
 	}
+
 	ChartManager chartManager;
 
 	// for the moment, assume X packets per second (get the actual number at some point)
@@ -25,36 +53,35 @@ class EEGProcessor {
 	double[] channelBaselines = new double[4];
 
 	HashMap<String, HashMap<Integer, Double>> patternMatchProbabilities = new HashMap<>();
-	int lastX = -1;
+
+	int currentIndex = -1;
+	int currentX = -1;
 	int maxX = 1000;
 
-	public void OnReceiveMuseDataPacket(String type, ArrayList<Double> channelValues) {
-		if (!type.equals("eeg")) return;
+	public void OnReceiveMuseDataPacket(VMuseDataPacket packet) {
+		if (packet.Type().equals("eeg")) {
+			packet.LoadEEGValues();
 
-		int currentX = lastX + 1;
-		if (currentX > maxX)
-			currentX = 0;
+			currentIndex++;
+			currentX = currentX < maxX ? currentX + 1 : 0;
 
-		//for (var channel = 0; channel < 6; channel++)
-		for (int channel = 0; channel < 4; channel++) {
-			if (channelPoints.size() <= channel) {
-				channelPoints.add(new Vector2i[maxX + 1]);
-				for (int x = 0; x <= maxX; x++)
-					channelPoints.get(channel)[x] = new Vector2i(x, 0);
+			//for (var channel = 0; channel < 6; channel++)
+			for (int channel = 0; channel < 4; channel++) {
+				if (channelPoints.size() <= channel) {
+					channelPoints.add(new Vector2i[maxX + 1]);
+					for (int x = 0; x <= maxX; x++)
+						channelPoints.get(channel)[x] = new Vector2i(x, 0);
+				}
+				Vector2i point = new Vector2i(currentX, (int)packet.eegValues[channel]);
+				channelPoints.get(channel)[currentX] = point;
 			}
-			Vector2i point = new Vector2i(currentX, (int)(double)channelValues.get(channel));
-			channelPoints.get(channel)[currentX] = point;
-		}
 
-		lastX = currentX;
-		//Log("muse link", `Type: ${type} Data: ${ToJSON(data)}`);
-
-		// only update the baseline once every chart-width
-		//if (currentX == maxX) {
+			// only update the baseline once every chart-width
+			//if (currentX == maxX) {
 			for (int channel = 0; channel < 4; channel++) {
 				double oldBaseline = channelBaselines[channel];
 				//double newBaseline = GetChannelBaseline(channel);
-				double newBaseline = channelValues.get(channel);
+				double newBaseline = packet.eegValues[channel];
 				if (Double.isNaN(newBaseline)) continue;
 				if (oldBaseline == 0)
 					oldBaseline = newBaseline;
@@ -63,22 +90,38 @@ class EEGProcessor {
 				channelBaselines[channel] = ((oldBaseline * 999) + newBaseline) / 1000;
 				//channelBaselines[channel] = (oldBaseline + newBaseline) / 2;
 			}
-		//}
+			//}
 
-		UpdateEyeTracking(currentX, channelValues);
+			UpdateEyeTracking(currentX, packet.eegValues);
 
-		int patternMatchInterval_inPackets = (int)(Main.main.patternMatchInterval * packetsPerSecond);
-		if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
-			UpdateMatchProbabilities(currentX);
+			int patternMatchInterval_inPackets = (int) (Main.main.patternMatchInterval * packetsPerSecond);
+			if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
+				UpdateMatchProbabilities(currentX);
+			} else {
+				/*let lastPatternMatchProbability = null;
+				for (let x = currentX; x >= 0 && lastPatternMatchProbability == null; x++)
+					lastPatternMatchProbability = patternMatchProbabilities.Props[0].value[x];
+				if (lastPatternMatchProbability != null)
+					JavaBridge.Main.OnSetPatternMatchProbability(lastPatternMatchProbability);*/
+			}
+		} else if (packet.Type().equals("accel")) {
+			packet.LoadAccelValues();
 		}
-		else {
-			/*let lastPatternMatchProbability = null;
-			for (let x = currentX; x >= 0 && lastPatternMatchProbability == null; x++)
-				lastPatternMatchProbability = patternMatchProbabilities.Props[0].value[x];
-			if (lastPatternMatchProbability != null)
-				JavaBridge.Main.OnSetPatternMatchProbability(lastPatternMatchProbability);*/
+
+		chartManager.OnReceiveMusePacket(packet);
+
+		WritableMap packetMap = packet.ToMap();
+		packetBuffer.pushMap(packetMap);
+
+		// send buffer to js, if ready
+		if (packetBuffer.size() == packetSetSize) {
+			Main.main.SendEvent("OnReceiveMuseDataPacketSet", packetBuffer);
+			packetBuffer = Arguments.createArray(); // create new set
 		}
 	}
+	public int packetSetSize = 10;
+	WritableArray packetBuffer = Arguments.createArray();
+
 	List<Vector2i> GetPointsForScanRange(int channel, int scanLeft, int scanRight) {
 		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
 
@@ -96,8 +139,8 @@ class EEGProcessor {
 	public double channel1VSChannel2Strength_averageOfLastX = 1;
 	//public double upVSDownAmount_averageOfLastX = 0;
 
-	ArrayList<Double> lastChannelValues;
-	void UpdateEyeTracking(int currentX, ArrayList<Double> channelValues) {
+	double[] lastChannelValues;
+	void UpdateEyeTracking(int currentX, double[] channelValues) {
 		try {
 			if (channelBaselines[0] == 0) return; // if baselines aren't calculated yet, return now
 
@@ -108,7 +151,7 @@ class EEGProcessor {
 			ArrayList<Double> channelValDifs = new ArrayList<>();
 			//for (int i = 0; i < channelValues.size(); i++)
 			for (int i = 0; i < 4; i++)
-				channelValDifs.add(channelValues.get(i) - channelBaselines[i]);
+				channelValDifs.add(channelValues[i] - channelBaselines[i]);
 
 			/*for (int i = 0; i < 4; i++) {
 				// if we're e.g. above line, but delta says we're moving down, ignore delta (set it to 0)

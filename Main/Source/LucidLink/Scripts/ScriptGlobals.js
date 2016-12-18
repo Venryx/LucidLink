@@ -23,6 +23,10 @@ g.EveryXSecondsRun = function(seconds, func, maxCallCount = -1) {
 	return timer;
 };
 
+g.WhenMusePacketReceived = function(func) {
+	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
+}
+
 // input
 // ==========
 

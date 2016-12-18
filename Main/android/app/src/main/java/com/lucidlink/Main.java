@@ -155,7 +155,7 @@ public class Main extends ReactContextBaseJavaModule {
 		}
 	}
 
-	ChartManager mainChartManager = new ChartManager();
+	EEGProcessor eegProcessor = new EEGProcessor();
 
 	/*@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
 		String type = args.getString(0);
@@ -163,7 +163,7 @@ public class Main extends ReactContextBaseJavaModule {
 		ArrayList<Double> columnFinal = new ArrayList<>(column.size());
 		for (int i = 0; i < column.size(); i++)
 			columnFinal.set(i, column.getDouble(i));
-		mainChartManager.OnReceiveMuseDataPacket(type, columnFinal);
+		mainChartManager.OnReceiveMusePacket(type, columnFinal);
 	}*/
 
 
@@ -177,10 +177,10 @@ public class Main extends ReactContextBaseJavaModule {
 			public void run() {
 				MainActivity.main.runOnUiThread(()-> {
 					//if (!mainChartManager.initialized)
-					mainChartManager.TryToInit();
+					eegProcessor.chartManager.TryToInit();
 
 					// if we just succeeded, disable timer and run post-init code
-					if (mainChartManager.initialized) {
+					if (eegProcessor.chartManager.initialized) {
 						chartAttachTimer.cancel();
 
 						//mainChartManager.SetChartVisible(true);
@@ -191,9 +191,9 @@ public class Main extends ReactContextBaseJavaModule {
 		}, 1000, 1000);
 	}
 	@ReactMethod public void UpdateChartBounds() {
-		if (!mainChartManager.initialized) return;
+		if (!eegProcessor.chartManager.initialized) return;
 		//V.WaitXThenRun(500, ()-> {
-		mainChartManager.UpdateChartBounds();
+		eegProcessor.chartManager.UpdateChartBounds();
 		//});
 	}
 
@@ -218,7 +218,7 @@ public class Main extends ReactContextBaseJavaModule {
 	@ReactMethod public void StartPatternGrab(int minX, int maxX, Promise promise) {
 		WritableArray channelPointsGrabbed = Arguments.createArray();
 		for (int ch = 0; ch < 4; ch++) {
-			Vector2i[] channelPoints = this.mainChartManager.processor.channelPoints.get(ch);
+			Vector2i[] channelPoints = eegProcessor.channelPoints.get(ch);
 
 			WritableArray thisChannelPointsGrabbed = Arguments.createArray();
 			for (int x = minX; x <= maxX; x++)
@@ -228,7 +228,7 @@ public class Main extends ReactContextBaseJavaModule {
 
 		WritableMap result = Arguments.createMap();
 		result.putArray("channelPointsGrabbed", channelPointsGrabbed);
-		result.putArray("channelBaselines", V.ToWritableArray(V.ToObjectArray(this.mainChartManager.processor.channelBaselines)));
+		result.putArray("channelBaselines", V.ToWritableArray(V.ToObjectArray(eegProcessor.channelBaselines)));
 		promise.resolve(result);
 	}
 	/*@ReactMethod public void GetChannelPoints(Promise promise) {
@@ -245,14 +245,14 @@ public class Main extends ReactContextBaseJavaModule {
 	}*/
 
 	@ReactMethod public void CenterEyeTracker() {
-		mainChartManager.processor.eyePosX = .5;
-		mainChartManager.processor.eyePosY = .5;
-		mainChartManager.processor.ResetLastNPositions();
+		eegProcessor.eyePosX = .5;
+		eegProcessor.eyePosY = .5;
+		eegProcessor.ResetLastNPositions();
 	}
 
 	void Shutdown() {
 		V.Log("Shutting down...");
 
-		mainChartManager.Shutdown();
+		eegProcessor.chartManager.Shutdown();
 	}
 }

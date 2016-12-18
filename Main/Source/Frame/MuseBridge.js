@@ -66,8 +66,10 @@ import LibMuse from "react-native-libmuse";
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
 	}
 
-	static OnReceiveMuseDataPacket(type, channelValues) {
+	static OnReceiveMuseDataPacket(packet) {
 		//Log(`Type: ${type} ChannelValues: ${ToJSON(channelValues)}`);
+		for (let listener of LL.scripts.scriptRunner.listeners_whenMusePacketReceived)
+			listener(packet);
 	}
 }
 g.MuseBridge = MuseBridge;
