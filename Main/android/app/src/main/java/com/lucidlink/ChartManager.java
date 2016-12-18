@@ -239,6 +239,7 @@ class ChartManager {
 
 		debugText = new TextView(MainActivity.main);
 		//debugText.setBackgroundColor(Color.parseColor("#0000FF"));
+		debugText.setTextColor(Color.parseColor("#FFFFFF"));
 		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
 		newChartHolder.addView(debugText);
 	}
@@ -405,7 +406,7 @@ class ChartManager {
 		MainActivity.main.runOnUiThread(() -> {
 			debugText.setText(
 				"1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX + "\n"
-				+ "EyePos: " + eegProcessor.EyePosX() + "\n"
+				+ "EyePos: " + eegProcessor.eyePosX.doubleValue() + "\n"
 				+ "EyePosRel: " + eegProcessor.GetCenterPoint()
 			);
 		});
