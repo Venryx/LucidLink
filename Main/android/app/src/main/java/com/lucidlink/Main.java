@@ -17,7 +17,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -228,8 +227,7 @@ public class Main extends ReactContextBaseJavaModule {
 	}*/
 
 	@ReactMethod public void CenterEyeTracker() {
-		//eegProcessor.eyePosX = .5;
-		eegProcessor.eyePosX = new BigDecimal(.5);
+		eegProcessor.eyePosX = .5;
 		eegProcessor.viewDistanceY = .5;
 		eegProcessor.ResetLastNPositions();
 	}

@@ -8,8 +8,8 @@ import com.lucidlink.Frame.Vector2i;
 import com.v.LibMuse.MainModule;
 import com.v.LibMuse.VMuseDataPacket;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,20 +78,29 @@ class EEGProcessor {
 			}
 
 			// only update the baseline once every chart-width
-			//if (currentX == maxX) {
-			for (int channel = 0; channel < 4; channel++) {
+			if (currentX == maxX) {
+				for (int channel = 0; channel < 4; channel++) {
+					double oldBaseline = channelBaselines[channel];
+					double newBaseline = GetChannelBaseline(channel);
+					if (oldBaseline == 0)
+						oldBaseline = newBaseline;
+
+					// have new-baseline only slightly affect long-term baseline
+					channelBaselines[channel] = ((oldBaseline * 2) + newBaseline) / 3;
+					//channelBaselines[channel] = (oldBaseline + newBaseline) / 2;
+				}
+			}
+
+			/*for (int channel = 0; channel < 4; channel++) {
 				double oldBaseline = channelBaselines[channel];
-				//double newBaseline = GetChannelBaseline(channel);
 				double newBaseline = packet.eegValues[channel];
 				if (Double.isNaN(newBaseline)) continue;
 				if (oldBaseline == 0)
 					oldBaseline = newBaseline;
-
 				// have new-baseline only slightly affect long-term baseline
 				channelBaselines[channel] = ((oldBaseline * 999) + newBaseline) / 1000;
 				//channelBaselines[channel] = (oldBaseline + newBaseline) / 2;
-			}
-			//}
+			}*/
 
 			UpdateEyeTracking(currentX, packet.eegValues);
 
@@ -112,8 +121,9 @@ class EEGProcessor {
 		chartManager.OnReceiveMusePacket(packet);
 
 		WritableMap packetMap = packet.ToMap();
-		packetMap.putDouble("viewDirection", GetXPosForDisplay());
-		packetMap.putDouble("viewDistance", viewDistanceY);
+		double viewDir = GetXPosForDisplay();
+		packetMap.putDouble("viewDirection", Double.isNaN(viewDir) ? .5 : viewDir);
+		packetMap.putDouble("viewDistance", Double.isNaN(viewDistanceY) ? 0 : viewDistanceY);
 		packetBuffer.pushMap(packetMap);
 
 		// send buffer to js, if ready
@@ -136,9 +146,7 @@ class EEGProcessor {
 		return result;
 	}
 
-	// store eye-pos-x as int, so rounding errors don't occur as much
-	//public double eyePosX = .5;
-	public BigDecimal eyePosX = new BigDecimal(.5);
+	public double eyePosX = .5;
 	public double viewDistanceY = .5;
 
 	public double channel1VSChannel2Strength_averageOfLastX = 1;
@@ -177,7 +185,7 @@ class EEGProcessor {
 
 			// approach 1
 			//double leftness = channelValDifs.get(1) + -channelValDifs.get(2);
-			BigDecimal rightness = new BigDecimal(channelValDifs.get(2)).subtract(new BigDecimal(channelValDifs.get(1)));
+			double rightness = channelValDifs.get(2) + -channelValDifs.get(1);
 			//double downness = -channelValDifs.get(1) + -channelValDifs.get(2);
 			double upness =
 				channelValDifs.get(1) < 0 ? (channelValDifs.get(1) / Main.main.eyeTracker_relaxVSTenseIntensity) + channelValDifs.get(2) :
@@ -217,16 +225,16 @@ class EEGProcessor {
 			double upnessNeededToGoFromBottomToTop = Main.main.eyeTracker_verticalSensitivity == 0 ? Double.POSITIVE_INFINITY
 				: V.Lerp(rangeStart, rangeEnd, Main.main.eyeTracker_verticalSensitivity);
 
-			BigDecimal rightMovement = rightness.divide(new BigDecimal(rightnessNeededToGoFromLeftToRight), 10, BigDecimal.ROUND_HALF_UP);
-			double upMovement = upness / upnessNeededToGoFromBottomToTop;
+			double rightMovement = (rightness / rightnessNeededToGoFromLeftToRight);
+			double upMovement = (upness / upnessNeededToGoFromBottomToTop);
 
 			/*if (Math.abs(rightMovement) < Main.main.eyeTracker_ignoreXMovementUnder)
 				rightMovement = 0;
 			if (Math.abs(upMovement) < Main.main.eyeTracker_ignoreYMovementUnder)
 				upMovement = 0;*/
 
-			if (Double.isNaN(rightMovement.doubleValue()) || Double.isNaN(upMovement)) return;
-			if (Double.isInfinite(rightMovement.doubleValue()) || Double.isInfinite(upMovement)) return;
+			if (Double.isNaN(rightMovement) || Double.isNaN(upMovement)) return;
+			if (Double.isInfinite(rightMovement) || Double.isInfinite(upMovement)) return;
 
 			double distanceFromBaseline = V.Average(Math.abs(channelValDifs.get(1)), Math.abs(channelValDifs.get(2)));
 			if (distanceFromBaseline < Main.main.eyeTracker_ignoreXMovementUnder * 1000) return;
@@ -236,7 +244,7 @@ class EEGProcessor {
 				+ channelValDeltas.get(1) + ";" + channelValDeltas.get(2) + "\n"
 				+ rightMovement + ";" + upMovement);*/
 
-			eyePosX = eyePosX.add(rightMovement);
+			eyePosX = eyePosX + rightMovement;
 			//eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);
 			//eyePosY = eyePosY + upMovement;
 			viewDistanceY = V.KeepXBetween(viewDistanceY + upMovement, 0, 1);
@@ -246,12 +254,12 @@ class EEGProcessor {
 			if (lastNPositions.length != Main.main.eyeTraceSegmentCount)
 				ResetLastNPositions();
 
-			while (V.Distance(eyePosX.doubleValue(), lastProcessedEyePosX.doubleValue()) > Main.main.eyeTraceSegmentSize) {
+			while (V.Distance(eyePosX, lastProcessedEyePosX) > Main.main.eyeTraceSegmentSize) {
 				int currentIndex = lastNPositions_lastSetIndex < lastNPositions.length - 1 ? lastNPositions_lastSetIndex + 1 : 0;
-				double currentOffset = eyePosX.doubleValue() > lastProcessedEyePosX.doubleValue() ? Main.main.eyeTraceSegmentSize : -Main.main.eyeTraceSegmentSize;
-				lastNPositions[currentIndex] = lastProcessedEyePosX.doubleValue() + currentOffset;
+				double currentOffset = eyePosX > lastProcessedEyePosX ? Main.main.eyeTraceSegmentSize : -Main.main.eyeTraceSegmentSize;
+				lastNPositions[currentIndex] = lastProcessedEyePosX + currentOffset;
 				lastNPositions_lastSetIndex = currentIndex;
-				lastProcessedEyePosX = lastProcessedEyePosX.add(new BigDecimal(currentOffset)); // var could also be named "xTravelForAllSegments"
+				lastProcessedEyePosX += currentOffset; // var could also be named "xTravelForAllSegments"
 			}
 
 			// do some slight resetting to center each frame
@@ -279,8 +287,7 @@ class EEGProcessor {
 
 	double[] lastNPositions = new double[0];
 	int lastNPositions_lastSetIndex = -1;
-	BigDecimal lastProcessedEyePosX = new BigDecimal(.5);
-
+	double lastProcessedEyePosX = .5;
 	public double GetCenterPoint() {
 		//double centerPoint = xTravelAverageOfLastNSegments;
 		/*double[] lastNSegments_offsetsFromCurrent = new double[lastNSegmentValues.length];
@@ -296,7 +303,7 @@ class EEGProcessor {
 		return result;
 	}
 	public double GetXPosForDisplay() {
-		double result = .5 + (eyePosX.doubleValue() - GetCenterPoint());
+		double result = .5 + (eyePosX - GetCenterPoint());
 		result = V.KeepXBetween(result, 0, 1);
 		return result;
 	}
@@ -374,7 +381,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		Main.main.SendEvent("OnSetPatternMatchProbabilities", currentX, V.ToWritableMap(patternMatchProbabilitiesForFrame));
 	}
 
-	/*int GetChannelBaseline(int channel) {
+	int GetChannelBaseline(int channel) {
 		/*List<Vector2i> channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		List<Vector2i> channelPoints_ordered = V.List(Stream.of(channelPoints).sortBy(a->a.y));
 		int result = channelPoints_ordered.get(channelPoints_ordered.size() / 2).y;
@@ -385,7 +392,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		int[] channelPoints_array = new int[channelPoints.length];
 		for (int i = 0; i < channelPoints.length; i++)
 			channelPoints_array[i] = channelPoints[i].y;
-		Arrays.sort(channelPoints_array);*#/
+		Arrays.sort(channelPoints_array);*/
 
 		Vector2i[] channelPoints = EEGProcessor.this.channelPoints.get(channel);
 		Vector2i[] channelPoints_clone = channelPoints.clone();
@@ -397,7 +404,7 @@ ChannelPoints_Final: ${ToVDF(channelPoints_final, false)}`);*/
 		else
 			median = channelPoints_clone[channelPoints_clone.length / 2].y;
 		return median;
-	}*/
+	}
 
 	/*static ConvertPoints(points) {
 		var result = [];
