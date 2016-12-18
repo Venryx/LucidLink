@@ -96,10 +96,11 @@ public class Main extends ReactContextBaseJavaModule {
 	public double patternMatchInterval;
 	public double patternMatchOffset;
 	public int museEEGPacketBufferSize;
+
 	public double eyeTracker_horizontalSensitivity;
 	public double eyeTracker_verticalSensitivity;
-	public double eyeTracker_ignoreXMovementUnder;
-	public double eyeTracker_ignoreYMovementUnder;
+	public double eyeTracker_offScreenGravity;
+
 	public double eyeTracker_relaxVSTenseIntensity;
 	public double eyeTraceSegmentSize;
 	public int eyeTraceSegmentCount;
@@ -121,8 +122,7 @@ public class Main extends ReactContextBaseJavaModule {
 		this.museEEGPacketBufferSize = data.getInt("museEEGPacketBufferSize");
 		this.eyeTracker_horizontalSensitivity = data.getDouble("eyeTracker_horizontalSensitivity");
 		this.eyeTracker_verticalSensitivity = data.getDouble("eyeTracker_verticalSensitivity");
-		this.eyeTracker_ignoreXMovementUnder = data.getDouble("eyeTracker_ignoreXMovementUnder");
-		this.eyeTracker_ignoreYMovementUnder = data.getDouble("eyeTracker_ignoreYMovementUnder");
+		this.eyeTracker_offScreenGravity = data.getDouble("eyeTracker_offScreenGravity");
 		this.eyeTracker_relaxVSTenseIntensity = data.getDouble("eyeTracker_relaxVSTenseIntensity");
 		this.eyeTraceSegmentSize = data.getDouble("eyeTraceSegmentSize");
 		this.eyeTraceSegmentCount = data.getInt("eyeTraceSegmentCount");

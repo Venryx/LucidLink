@@ -236,13 +236,17 @@ class EEGProcessor {
 			if (Double.isNaN(rightMovement) || Double.isNaN(upMovement)) return;
 			if (Double.isInfinite(rightMovement) || Double.isInfinite(upMovement)) return;
 
-			double distanceFromBaseline = V.Average(Math.abs(channelValDifs.get(1)), Math.abs(channelValDifs.get(2)));
-			if (distanceFromBaseline < Main.main.eyeTracker_ignoreXMovementUnder * 1000) return;
+			/*double distanceFromBaseline = V.Average(Math.abs(channelValDifs.get(1)), Math.abs(channelValDifs.get(2)));
+			if (distanceFromBaseline < Main.main.eyeTracker_ignoreXMovementUnder * 1000) return;*/
 
 			/*V.JavaLog(currentX + ";" + channelValues.get(1) + ";" + channelValues.get(2) + "\n"
 				+ channelValDifs.get(1) + ";" + channelValDifs.get(2) + "\n"
 				+ channelValDeltas.get(1) + ";" + channelValDeltas.get(2) + "\n"
 				+ rightMovement + ";" + upMovement);*/
+
+			double oldEyePosX_difFromCenter = eyePosX - GetCenterPoint();
+			if ((oldEyePosX_difFromCenter < -.5 && rightMovement < 0) || (oldEyePosX_difFromCenter > .5 && rightMovement > 0))
+				rightMovement = rightMovement * (1 - Main.main.eyeTracker_offScreenGravity);
 
 			eyePosX = eyePosX + rightMovement;
 			//eyePosX = V.KeepXBetween(eyePosX + rightMovement, 0, 1);

@@ -126,69 +126,26 @@ export default class GeneralUI extends BaseComponent {
 								node.eyeTracker_verticalSensitivity = val;
 							}}/>
 					</Row>
-					{/*<Row>
-						<VText ml10 mt5 mr10>Eye-tracker ignore-x-movement-under</VText>
-						<VButton text={node.eyeTracker_ignoreXMovementUnder.toFixed(3)} style={{width: 100, height: 32}}
+					<Row>
+						<VText ml10 mt5 mr10>Eye-tracker off-screen gravity</VText>
+						<VButton text={node.eyeTracker_offScreenGravity.toFixed(2)} style={{width: 100, height: 32}}
 							onPress={async ()=> {
 								var values = [];
-								for (let val = 0; val < 1; val += .001)
+								for (let val = 0; val <= 1; val += .01)
 									values.push(val);
 								var id = await NumberPickerDialog.show({
-									title: "Eye-tracker ignore-x-movement-under",
+									title: "Eye-tracker off-screen gravity",
 									message: "",
-									values: values.Select(a=>a.toFixed(3)),
-									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreXMovementUnder),
+									values: values.Select(a=>a.toFixed(2)),
+									selectedValueIndex: values.indexOf(node.eyeTracker_offScreenGravity),
 									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 								});
 
 								if (id == -1) return;
 								let val = values[id];
-								node.eyeTracker_ignoreXMovementUnder = val;
+								node.eyeTracker_offScreenGravity = val;
 							}}/>
 					</Row>
-					<Row>
-						<VText ml10 mt5 mr10>Eye-tracker ignore-y-movement-under</VText>
-						<VButton text={node.eyeTracker_ignoreYMovementUnder.toFixed(3)} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = 0; val < 1; val += .001)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Eye-tracker ignore-y-movement-under",
-									message: "",
-									values: values.Select(a=>a.toFixed(3)),
-									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreYMovementUnder),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-
-								if (id == -1) return;
-								let val = values[id];
-								node.eyeTracker_ignoreYMovementUnder = val;
-							}}/>
-					</Row>*/}
-
-					{/* probably temp */}
-					<Row>
-						<VText ml10 mt5 mr10>Eye-tracker ignore values within X of baseline</VText>
-						<VButton text={(node.eyeTracker_ignoreXMovementUnder * 1000).toFixed(3)} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = 0; val < 1; val += .001)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Eye-tracker ignore values within X of baseline",
-									message: "",
-									values: values.Select(a=>(a * 1000).toFixed(3)),
-									selectedValueIndex: values.indexOf(node.eyeTracker_ignoreXMovementUnder),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-
-								if (id == -1) return;
-								let val = values[id];
-								node.eyeTracker_ignoreXMovementUnder = val;
-							}}/>
-					</Row>
-
 					<Row>
 						<VText ml10 mt5 mr10>Relax vs tense intensity</VText>
 						<VButton text={node.eyeTracker_relaxVSTenseIntensity.toFixed(2)} style={{width: 100, height: 32}}
@@ -250,28 +207,6 @@ export default class GeneralUI extends BaseComponent {
 								node.eyeTraceSegmentCount = val;
 							}}/>
 					</Row>
-
-
-					{/*<Row>
-						<Text ml10 mt5 mr10>Eye-tracker vertical-sensitivity</Text>
-						<VButton text={node.eyeTracker_verticalSensitivity.toFixed(2)} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = 0; val < 100; val++)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Eye-tracker vertical-sensitivity",
-									//message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
-									values: values.Select(a=>a.toFixed(2)),
-									selectedValueIndex: values.indexOf(node.eyeTracker_verticalSensitivity),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-
-								if (id == -1) return;
-								let val = values[id];
-								node.eyeTracker_verticalSensitivity = val;
-							}}/>
-					</Row>*/}
 				</Row>
             </Panel>
 		);

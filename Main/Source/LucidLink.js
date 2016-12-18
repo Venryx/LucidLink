@@ -120,8 +120,7 @@ class LucidLink extends Node {
 			basicData[prop] = LL.monitor[prop];
 		// settings
 		for (let prop of ["blockUnusedKeys", "patternMatchInterval", "patternMatchOffset", "museEEGPacketBufferSize",
-				"eyeTracker_horizontalSensitivity", "eyeTracker_verticalSensitivity",
-				"eyeTracker_ignoreXMovementUnder", "eyeTracker_ignoreYMovementUnder",
+				"eyeTracker_horizontalSensitivity", "eyeTracker_verticalSensitivity", "eyeTracker_offScreenGravity",
 				"eyeTracker_relaxVSTenseIntensity", "eyeTraceSegmentSize", "eyeTraceSegmentCount"])
 			basicData[prop] = LL.settings[prop];
 		JavaBridge.Main.SetBasicData(basicData);
