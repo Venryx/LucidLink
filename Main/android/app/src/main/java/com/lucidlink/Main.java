@@ -101,9 +101,14 @@ public class Main extends ReactContextBaseJavaModule {
 	}
 
 	// monitor
-	public int updateInterval = 1;
-	public boolean monitor = true;
+	public int updateInterval;
+	public boolean channel1;
+	public boolean channel2;
+	public boolean channel3;
+	public boolean channel4;
+	public boolean monitor;
 	public boolean patternMatch;
+
 	// settings
 	public boolean blockUnusedKeys;
 	public double patternMatchInterval;
@@ -116,9 +121,14 @@ public class Main extends ReactContextBaseJavaModule {
 	public double eyeTracker_relaxVSTenseIntensity;
 	public double eyeTraceSegmentSize;
 	public int eyeTraceSegmentCount;
+
 	@ReactMethod public void SetBasicData(ReadableMap data) {
 		// monitor
 		this.updateInterval = data.getInt("updateInterval");
+		this.channel1 = data.getBoolean("channel1");
+		this.channel2 = data.getBoolean("channel2");
+		this.channel3 = data.getBoolean("channel3");
+		this.channel4 = data.getBoolean("channel4");
 		this.monitor = data.getBoolean("monitor");
 		this.patternMatch = data.getBoolean("patternMatch");
 		// settings

@@ -6,6 +6,11 @@ import MuseBridge from "../Frame/MuseBridge";
 
 g.Monitor = class Monitor extends Node {
 	@O @P() updateInterval = 3;
+	@O @P() channel1 = true;
+	@O @P() channel2 = true;
+	@O @P() channel3 = true;
+	@O @P() channel4 = true;
+
 	@O @P() patternGrabber = false;
 
 	@O @P() connect = true;

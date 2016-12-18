@@ -114,24 +114,17 @@ class LucidLink extends Node {
 	@T("More") @P(true, true) more = new More();
 
 	PushBasicDataToJava() {
-		JavaBridge.Main.SetBasicData({
-			// monitor
-			updateInterval: LL.monitor.updateInterval,
-			monitor: LL.monitor.monitor,
-			patternMatch: LL.monitor.patternMatch,
-			// settings
-			blockUnusedKeys: LL.settings.blockUnusedKeys,
-			patternMatchInterval: LL.settings.patternMatchInterval,
-			patternMatchOffset: LL.settings.patternMatchOffset,
-			museEEGPacketBufferSize: LL.settings.museEEGPacketBufferSize,
-			eyeTracker_horizontalSensitivity: LL.settings.eyeTracker_horizontalSensitivity,
-			eyeTracker_verticalSensitivity: LL.settings.eyeTracker_verticalSensitivity,
-			eyeTracker_ignoreXMovementUnder: LL.settings.eyeTracker_ignoreXMovementUnder,
-			eyeTracker_ignoreYMovementUnder: LL.settings.eyeTracker_ignoreYMovementUnder,
-			eyeTracker_relaxVSTenseIntensity: LL.settings.eyeTracker_relaxVSTenseIntensity,
-			eyeTraceSegmentSize: LL.settings.eyeTraceSegmentSize,
-			eyeTraceSegmentCount: LL.settings.eyeTraceSegmentCount,
-		});
+		var basicData = {};
+		// monitor
+		for (let prop of ["updateInterval", "channel1", "channel2", "channel3", "channel4", "monitor", "patternMatch"])
+			basicData[prop] = LL.monitor[prop];
+		// settings
+		for (let prop of ["blockUnusedKeys", "patternMatchInterval", "patternMatchOffset", "museEEGPacketBufferSize",
+				"eyeTracker_horizontalSensitivity", "eyeTracker_verticalSensitivity",
+				"eyeTracker_ignoreXMovementUnder", "eyeTracker_ignoreYMovementUnder",
+				"eyeTracker_relaxVSTenseIntensity", "eyeTraceSegmentSize", "eyeTraceSegmentCount"])
+			basicData[prop] = LL.settings[prop];
+		JavaBridge.Main.SetBasicData(basicData);
 	}
 	PushPatternsToJava() {
 		Assert(this.settings.patterns.All(a=>a instanceof Pattern),

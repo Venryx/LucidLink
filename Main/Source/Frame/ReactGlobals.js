@@ -239,14 +239,21 @@ g.VButton = class VButton extends BaseComponent {
 	}
 }
 
-g.VSwitch = class VSwitch extends BaseComponent {
+@Observer
+class VSwitch extends BaseComponent {
 	render() {
-		var {text, style} = this.props;
+		var {text, value, onValueChange, valuePath, style} = this.props;
 		var restProps = this.props.Excluding("text", "style");
+		if (valuePath) {
+			let obj = valuePath[0];
+			let prop = valuePath[1];
+			value = obj[prop];
+			onValueChange = newVal=>obj[prop] = newVal;
+		}
 		return (
 			<View style={E({flexDirection: "row"}, BasicStyles(this.props))}>
 				<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>{text}</Text>
-				<Switch {...restProps}
+				<Switch {...restProps} {...{value, onValueChange}}
 					style={E(
 						{height: 50, top: 0, transform: [{translateY: -3}]},
 						style
@@ -255,6 +262,7 @@ g.VSwitch = class VSwitch extends BaseComponent {
 		);
 	}
 }
+g.VSwitch = VSwitch;
 
 g.AutoExpandingTextInput = class AutoExpandingTextInput extends BaseComponent {
 	constructor(props) {

@@ -15,6 +15,13 @@ export default class OptionsPanel extends BaseComponent {
 							node.updateInterval = value;
 						}}/>
 				</Row>
+				<Row>
+					<VText mt12>Channels: </VText>
+					<VSwitch text="1" valuePath={[node, "channel1"]}/>
+					<VSwitch text="2" valuePath={[node, "channel2"]}/>
+					<VSwitch text="3" valuePath={[node, "channel3"]}/>
+					<VSwitch text="4" valuePath={[node, "channel4"]}/>
+				</Row>
 			</Column>
 		)
 	}

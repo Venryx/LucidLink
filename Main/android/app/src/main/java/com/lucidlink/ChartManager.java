@@ -352,6 +352,11 @@ class ChartManager {
 
 			DataSet dataSet = (DataSet)data.getDataSetByIndex(channel);
 
+			if (channel == 0) dataSet.setVisible(Main.main.channel1);
+			else if (channel == 1) dataSet.setVisible(Main.main.channel2);
+			else if (channel == 2) dataSet.setVisible(Main.main.channel3);
+			else if (channel == 3) dataSet.setVisible(Main.main.channel4);
+
 			float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
 			float yValue = (float)(double)channelValues.get(channel);
 
