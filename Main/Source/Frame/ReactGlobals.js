@@ -286,3 +286,13 @@ g.AutoExpandingTextInput = class AutoExpandingTextInput extends BaseComponent {
 		);
 	}
 }
+
+g.VTextInput = class VTextInput extends BaseComponent {
+	static defaultProps = {editable: true};
+	render() {
+		var {text} = this.props;
+		return <TextInput {...this.props}
+			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
+			multiline={true} value={text} autoCapitalize="none" autoCorrect={false}/>;
+	}
+}

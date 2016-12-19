@@ -1,9 +1,19 @@
 package com.lucidlink;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.TextWatcher;
+import android.text.style.ReplacementSpan;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.annimon.stream.Stream;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -14,6 +24,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.views.textinput.ReactEditText;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 
@@ -21,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -171,7 +183,80 @@ public class Main extends ReactContextBaseJavaModule {
 				});
 			}
 		}, 1000, 1000);
+
+		SetUpUITimer();
 	}
+	void SetUpUITimer() {
+		Timer uiModifierTimer = new Timer();
+		uiModifierTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				MainActivity.main.runOnUiThread(()-> {
+					List<View> textInputs = V.FindViews(V.GetRootView(),
+							view->view.getContentDescription() != null && view.getContentDescription().toString().equals("script text input"));
+					for (ReactEditText input : Stream.of(textInputs).toArray(ReactEditText[]::new)) {
+						if (Objects.equals(input.getTag(), "modified")) continue;
+
+						input.addTextChangedListener(new TextWatcher() {
+							int insertPos = 0, insertCount = 0;
+							public void beforeTextChanged(CharSequence s, int editStart, int count, int after) {}
+							public void onTextChanged(CharSequence s, int insertPos, int removeCount, int insertCount) {
+								this.insertPos = insertPos;
+								this.insertCount = insertCount;
+
+								//V.Toast("Adding: " + (s != null ? s.toString() : "[null]") + ";" + insertPos + ";" + removeCount + ";" + insertCount);
+
+								if (removeCount == 0 && insertCount == 1) { // if added one character
+									boolean addedSpace = input.getSelectionStart() > 0 && s.charAt(input.getSelectionStart() - 1) == ' ';
+									boolean hasOnlySpacesBefore = true;
+									for (int i = insertPos; i >= 0; i--) {
+										if (s.charAt(i) == '\r' || s.charAt(i) == '\n') break;
+										if (s.charAt(i) != ' ' && s.charAt(i) != '\t')
+											hasOnlySpacesBefore = false;
+									}
+
+									if (addedSpace && hasOnlySpacesBefore) {
+										String textToInsert = "\t";
+										input.getText().replace(insertPos, insertPos + 1, textToInsert, 0, textToInsert.length());
+									}
+								}
+							}
+							public void afterTextChanged(Editable view) {
+								applyTabWidth(view, this.insertPos, this.insertPos + this.insertCount);
+							}
+
+							static final String INDEX_CHAR = " ";
+							static final int TAB_NUMBER = 4;
+							public void applyTabWidth(Editable text, int start, int end) {
+								String str = text.toString();
+								float tabWidth = input.getPaint().measureText(INDEX_CHAR) * TAB_NUMBER;
+								while (start < end)     {
+									int index = str.indexOf("\t", start);
+									if (index < 0) break;
+									text.setSpan(new CustomTabWidthSpan(Float.valueOf(tabWidth).intValue()), index, index + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+									start = index + 1;
+								}
+							}
+						});
+
+						input.setTag("modified");
+					}
+				});
+			}
+		}, 1000, 1000);
+	}
+	class CustomTabWidthSpan extends ReplacementSpan {
+		CustomTabWidthSpan(int tabWidth){
+			this.tabWidth = tabWidth;
+		}
+		int tabWidth = 0;
+		@Override public int getSize(Paint p1, CharSequence p2, int p3, int p4, Paint.FontMetricsInt p5) {
+			return tabWidth;
+		}
+		@Override public void draw(Canvas p1, CharSequence p2, int p3, int p4, float p5, int p6, int p7, int p8, Paint p9) {}
+	}
+
+
 	@ReactMethod public void UpdateChartBounds() {
 		if (!eegProcessor.chartManager.initialized) return;
 		//V.WaitXThenRun(500, ()-> {

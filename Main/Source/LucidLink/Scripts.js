@@ -198,10 +198,13 @@ export class ScriptsUI extends BaseComponent {
 						</Panel>
 					</Panel>
 					<Panel style={{marginTop: -7, flex: 1}}>
-						<ScriptTextUI parent={this} text={selectedScript ? selectedScript.text : ""}
+						<VTextInput text={selectedScript ? selectedScript.text : ""}
+							accessible={true} accessibilityLabel="script text input"
 							//editable={selectedScript ? selectedScript.editable : false}
 							editable={selectedScript != null}
 							onChangeText={text=> {
+								LL.scripts.selectedScript.fileOutdated = true;
+								this.setState({scriptLastRunsOutdated: true});
 								if (!selectedScript.editable) return;
 								selectedScript.text = text;
 								selectedScript.fileOutdated = true;
@@ -216,19 +219,4 @@ export class ScriptsUI extends BaseComponent {
 	/*componentWillUnmount() {
 		this.SaveScripts();
 	}*/
-}
-
-class ScriptTextUI extends BaseComponent {
-	static defaultProps = {editable: true};
-	render() {
-		var {parent, editable, onChangeText, text} = this.props;
-		return <TextInput {...{editable}}
-			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
-			multiline={true} editable={editable} value={text} autoCapitalize="none" autoCorrect={false}
-			onChangeText={text=> {
-				LL.scripts.selectedScript.fileOutdated = true;
-				parent.setState({scriptLastRunsOutdated: true});
-				onChangeText(text);
-			}}/>;
-	}
 }

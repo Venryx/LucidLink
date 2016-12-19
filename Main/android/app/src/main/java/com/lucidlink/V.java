@@ -234,7 +234,7 @@ public class V {
 		return visited;
 	}*/
 
-	public static View FindViewByContentDescription(View root, String contentDescription) {
+	/*public static View FindViewByContentDescription(View root, String contentDescription) {
 		List<View> visited = new ArrayList<View>();
 		List<View> unvisited = new ArrayList<View>();
 		unvisited.add(root);
@@ -255,6 +255,47 @@ public class V {
 
 		//return visited;
 		return null;
+	}*/
+	public static View FindViewByContentDescription(View root, String contentDescription) {
+		return FindView(root, view->view.getContentDescription() != null && view.getContentDescription().toString().equals(contentDescription));
+	}
+
+	public interface Action {
+		void Run();
+	}
+	public interface Func<A1, R> {
+		R Run(A1 arg1);
+	}
+	public static View FindView(View root, Func<View, Boolean> matchFunc) {
+		return FindViews(root, matchFunc, 1).get(0);
+	}
+	public static List<View> FindViews(View root, Func<View, Boolean> matchFunc) {
+		return FindViews(root, matchFunc, -1);
+	}
+	public static List<View> FindViews(View root, Func<View, Boolean> matchFunc, int maxCount) {
+		List<View> result = new ArrayList<>();
+
+		List<View> visited = new ArrayList<>();
+		List<View> unvisited = new ArrayList<>();
+		unvisited.add(root);
+
+		while (!unvisited.isEmpty()) {
+			View child = unvisited.remove(0);
+			visited.add(child);
+
+			if (matchFunc.Run(child)) {
+				result.add(child);
+				if (maxCount != -1 && result.size() >= maxCount) break;
+			}
+
+			if (!(child instanceof ViewGroup)) continue;
+			ViewGroup group = (ViewGroup) child;
+			final int childCount = group.getChildCount();
+			for (int i=0; i<childCount; i++)
+				unvisited.add(group.getChildAt(i));
+		}
+
+		return result;
 	}
 
 	public static int Distance(int a, int b) {
