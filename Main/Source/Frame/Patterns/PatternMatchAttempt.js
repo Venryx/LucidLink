@@ -11,7 +11,8 @@ g.PatternMatchAttempt = class PatternMatchAttempt {
 	ProcessPacket(x, packet) {
 		var lastSegment = this.pattern.segments[this.segmentsMatched - 1];
 		var lastSegment_matchX = this.segmentMatchXs[this.segmentsMatched - 1];
-		var nextSegment = this.pattern.segments[this.segmentsMatched];
+		var nextSegmentIndex = this.segmentsMatched;
+		var nextSegment = this.pattern.segments[nextSegmentIndex];
 		//if (nextSegment == null) return;
 
 		let distFromLastMatch = x - lastSegment_matchX;
@@ -19,13 +20,13 @@ g.PatternMatchAttempt = class PatternMatchAttempt {
 			let minDist = nextSegment.min + 1;
 			let matched = distFromLastMatch >= minDist;
 			if (matched)
-				this.MatchSegment(nextSegment, x);
+				this.MatchSegment(nextSegmentIndex, x);
 		} else if (nextSegment instanceof Matcher) {
 			let maxDist = lastSegment instanceof Gap ? lastSegment.max - lastSegment.min : 0;
 
 			let matched = nextSegment.matchFunc(packet);
 			if (matched)
-				this.MatchSegment(nextSegment, x);
+				this.MatchSegment(nextSegmentIndex, x);
 			else if (distFromLastMatch > maxDist)
 				this.Cancel();
 		}
@@ -40,10 +41,12 @@ g.PatternMatchAttempt = class PatternMatchAttempt {
 	}
 
 	Complete() {
-		LL.scripts.scriptRunner.CancelPatternMatchAttempt(this);
+		LL.scripts.scriptRunner.EndPatternMatchAttempt(this);
 		if (this.pattern.onMatch) this.pattern.onMatch(this);
+		if (this.pattern.onEnd) this.pattern.onEnd(true);
 	}
 	Cancel() {
-		LL.scripts.scriptRunner.CancelPatternMatchAttempt(this);
+		LL.scripts.scriptRunner.EndPatternMatchAttempt(this);
+		if (this.pattern.onEnd) this.pattern.onEnd(false);
 	}
 }

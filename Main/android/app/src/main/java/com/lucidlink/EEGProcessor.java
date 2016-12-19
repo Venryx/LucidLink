@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.lucidlink.V.ToWritableArray;
+
 class EEGProcessor {
 	public EEGProcessor() {
 		chartManager = new ChartManager(this);
@@ -126,6 +128,13 @@ class EEGProcessor {
 			double viewDir = GetXPosForDisplay();
 			packetMap.putDouble("viewDirection", Double.isNaN(viewDir) ? .5 : viewDir);
 			packetMap.putDouble("viewDistance", Double.isNaN(viewDistanceY) ? 0 : viewDistanceY);
+
+			// if we just updated the baselines, include those as well
+			if (currentX == maxX) {
+				WritableArray baselinesArray = ToWritableArray(channelBaselines);
+				packetMap.putArray("channelBaselines", baselinesArray);	
+			}
+
 			packetBuffer.pushMap(packetMap);
 		}
 

@@ -19,5 +19,8 @@ AddPattern({
 	}
 	onMatch: matchAttempt=> {
 		Speak({text: "Pattern fully matched."});
-	}
+	},
+	onEnd: success=> {
+		Speak({text: "Pattern matching ended with " + (success ? "success" : "failure")});
+	},
 });

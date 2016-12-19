@@ -15,6 +15,11 @@ export default g.ScriptRunner = class ScriptRunner {
 	// raw
 	// ==========
 
+	channelBaselines = [];
+
+	//channelPoints = [];
+	packets = [];
+
 	currentIndex = -1;
 	currentX = -1;
 	maxX = 1000;
@@ -22,14 +27,21 @@ export default g.ScriptRunner = class ScriptRunner {
 		this.currentIndex++;
 		this.currentX = this.currentX < this.maxX ? this.currentX + 1 : 0;
 
+		if (packet.channelBaselines)
+			this.channelBaselines = packet.channelBaselines;
+
 		packet.x = this.currentX;
 		var self = this;
 		packet.GetPeer = function(offset) {
 			self.packets[(this.x + offset).WrapToRange(0, this.maxX)];
 		};
-		packet.GetChannelValDif = function(channel) {
+		packet.GetChannelVal = function(channel) {
 			var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
 			return this.eegValues[channelIndex];
+		};
+		packet.GetChannelValDif = function(channel) {
+			var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
+			return this.eegValues[channelIndex] - self.channelBaselines[channelIndex];
 		};
 
 		/*for (let ch = 0; ch < 4; ch++)
@@ -60,12 +72,9 @@ export default g.ScriptRunner = class ScriptRunner {
 	// general
 	// ==========
 
-	//channelPoints = [];
-	packets = [];
-
 	patterns = []; // func-based patterns
 	patternMatchAttempts = {};
-	CancelPatternMatchAttempt(matchAttempt) {
+	EndPatternMatchAttempt(matchAttempt) {
 		delete this.patternMatchAttempts[matchAttempt.key];
 	}
 

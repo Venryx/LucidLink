@@ -148,6 +148,7 @@ class ChartManager {
 		chart.getAxisRight().setEnabled(false);
 		chart.getXAxis().setDrawGridLines(true);
 		chart.getXAxis().setDrawAxisLine(false);
+		chart.getXAxis().setLabelCount(50);
 
 		/*chart.setVisibleXRange(0, maxX); // << WARNING: THIS CAUSES A FREEZE
 		chart.setVisibleYRange(-10, 10, YAxis.AxisDependency.LEFT);
@@ -404,10 +405,14 @@ class ChartManager {
 
 	void UpdateDebugUI() {
 		MainActivity.main.runOnUiThread(() -> {
-			debugText.setText(
-				"1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX + "\n"
-				+ "EyePos: " + eegProcessor.eyePosX + "\n"
-				+ "CenterPos: " + eegProcessor.GetCenterPoint()
+			debugText.setText(""
+				//+ "1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX
+				+ "\nEyePos: " + eegProcessor.eyePosX
+				+ "\nCenterPos: " + eegProcessor.GetCenterPoint()
+				+ "\nBL: " + eegProcessor.channelPoints.get(0)[eegProcessor.currentX].y
+				+ "\nFL: " + eegProcessor.channelPoints.get(1)[eegProcessor.currentX].y
+				+ "\nFR: " + eegProcessor.channelPoints.get(2)[eegProcessor.currentX].y
+				+ "\nBR: " + eegProcessor.channelPoints.get(3)[eegProcessor.currentX].y
 			);
 		});
 	}

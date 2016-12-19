@@ -120,7 +120,7 @@ public class Main extends ReactContextBaseJavaModule {
 			|| Build.MANUFACTURER.contains("Genymotion")
 			|| (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
 			|| "google_sdk".equals(Build.PRODUCT);
-			promise.resolve(result);
+		promise.resolve(result);
 	}
 
 	// monitor

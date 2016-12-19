@@ -107,6 +107,17 @@ public class V {
 		return outputArray;
 	}
 
+	static final double fakeNaN = -1000000000;
+	public static WritableArray ToWritableArray(double[] array) {
+		WritableArray result = Arguments.createArray();
+		for (double val : array) {
+			if (Double.isNaN(val))
+				result.pushDouble(fakeNaN);
+			else
+				result.pushDouble(val);
+		}
+		return result;
+	}
 	public static <T> WritableArray ToWritableArray(T[] array) {
 		WritableArray result = Arguments.createArray();
 		for (T item : array)
