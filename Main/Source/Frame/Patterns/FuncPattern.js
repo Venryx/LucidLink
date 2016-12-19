@@ -1,12 +1,14 @@
 g.FuncPattern = class FuncPattern {
 	constructor(info) {
+		if (info.minStartInterval) this.minStartInterval = info.minStartInterval;
 		if (info.gapTraverse) this.gapTraverse = info.gapTraverse;
 		if (info.segments) this.segments = info.segments;
 		this.onPartialMatch = onPartialMatch;
 		this.onMatch = onMatch;
 	}
 
-	gapTraverse = {system: "binary search", minInterval: 5};
+	minStartInterval = 10;
+	gapTraverse = {system: "binary search", minInterval: 5}; // todo: make this work
 	segments = [];
 	onPartialMatch = null; // matchAttempt=>{}
 	onMatch = null; // matchAttempt=>{}

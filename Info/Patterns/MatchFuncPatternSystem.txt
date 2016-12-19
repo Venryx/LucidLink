@@ -1,4 +1,5 @@
 AddPattern({
+	minStartInterval: 30,
 	gapTraverse: {system: "binary search", minInterval: 5},
 	segments: [
 		new Matcher(packet=>packet.GetChannelValDif("fl") > 30), // left eye tensing by 30 (probably looking left)

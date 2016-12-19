@@ -33,6 +33,16 @@ export default g.ScriptRunner = class ScriptRunner {
 		this.packets[this.currentX] = packet;
 
 		for (let [index, pattern] of this.patterns.entries()) {
+			let tooCloseToOtherMatchAttempt = false;
+			for (let x = this.currentX - 1; x > this.currentX - pattern.minStartInterval; x--) {
+				let key = `pattern${index}_x${x}`;
+				if (this.patternMatchAttempts[x]) {
+					tooCloseToOtherMatchAttempt = true;
+					break;
+				}
+			}
+			if (tooCloseToOtherMatchAttempt) continue;
+
 			let key = `pattern${index}_x${this.currentX}`;
 			let matchAttempt = new PatternMatchAttempt(key, pattern);
 			this.patternMatchAttempts[key] = matchAttempt;
