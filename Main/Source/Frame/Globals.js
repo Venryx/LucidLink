@@ -64,6 +64,12 @@ g.Toast = function(text, duration = 0) {
 	JavaBridge.Main.ShowToast(text, duration);
 }
 
+g.Notify = function(text) {
+	if (!IsString(text))
+		text = text != null ? text.toString() : "";
+	JavaBridge.Main.Notify(text);
+}
+
 g.Assert = function(condition, messageOrMessageFunc) {
 	if (condition) return;
 

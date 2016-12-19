@@ -200,13 +200,14 @@ dependencies {
     compile project(':react-native-fs')
     compile project(':RNSound')
     compile project(':react-native-dialogs')
+    compile project(':react-native-android-speech')
+    compile project(':react-native-android-snackbar')
+    compile 'com.annimon:stream:1.1.4'
+
     if (userConfig.contains("reactNativeLibMuse_external: true"))
         compile project(':react-native-libmuse')
-    compile project(':react-native-android-speech')
-
     if (userConfig.contains("mpChartLib_external: true"))
         compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
-    compile 'com.annimon:stream:1.1.4'
 }
 
 /*dependencies {

@@ -17,6 +17,7 @@
     "react-autobind": "^1.0.6",
     "react-native": "0.37.0",
     "react-native-action-bar": "^1.0.8",
+    "react-native-android-snackbar": "^0.1.0",
     "react-native-android-speech": "0.0.6",
     "react-native-chart": "^1.0.8-beta",
     "react-native-dialogs": "0.0.19",

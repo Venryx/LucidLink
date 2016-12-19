@@ -17,6 +17,10 @@ include ":react-native-dialogs"
 project(":react-native-dialogs").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-dialogs/android")
 include ':RNMaterialKit'
 project(':RNMaterialKit').projectDir = file('../node_modules/react-native-material-kit/android')
+include ':react-native-android-speech'
+project(':react-native-android-speech').projectDir = new File(settingsDir, '../node_modules/react-native-android-speech')
+include ':react-native-android-snackbar'
+project(':react-native-android-snackbar').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-snackbar/android')
 
 String userConfig = new File('../UserConfig.json').text
 
@@ -30,6 +34,3 @@ if (userConfig.contains("mpChartLib_external: true")) {
     include ":MPChartLib"
     project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")
 }
-
-include ':react-native-android-speech'
-project(':react-native-android-speech').projectDir = new File(settingsDir, '../node_modules/react-native-android-speech')

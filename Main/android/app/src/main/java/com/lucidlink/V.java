@@ -175,10 +175,14 @@ public class V {
 	}
 
 	public static void Toast(String message) {
-		Main.main.ShowToast(message, 3);
+		Main.main.ShowToast(message, 0);
 	}
 	public static void Toast(String message, int duration) {
 		Main.main.ShowToast(message, duration);
+	}
+
+	public static void Notify(String message) {
+		Main.main.Notify(message);
 	}
 
 	public static void WaitXThenRun(int waitMS, Runnable runnable) {

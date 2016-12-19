@@ -39,7 +39,7 @@ g.AddEvent = function(type, ...args) {
 
 g.AddPattern = function(info) {
 	var pattern = new FuncPattern(info);
-	LL.tracker.currentSession.patterns.push(pattern);
+	LL.scripts.scriptRunner.patterns.push(pattern);
 }
 
 // input

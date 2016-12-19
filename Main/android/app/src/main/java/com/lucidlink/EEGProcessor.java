@@ -1,5 +1,6 @@
 package com.lucidlink;
 
+import com.choosemuse.libmuse.MuseDataPacketType;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -120,11 +121,13 @@ class EEGProcessor {
 
 		chartManager.OnReceiveMusePacket(packet);
 
-		WritableMap packetMap = packet.ToMap();
-		double viewDir = GetXPosForDisplay();
-		packetMap.putDouble("viewDirection", Double.isNaN(viewDir) ? .5 : viewDir);
-		packetMap.putDouble("viewDistance", Double.isNaN(viewDistanceY) ? 0 : viewDistanceY);
-		packetBuffer.pushMap(packetMap);
+		if (packet.type == MuseDataPacketType.EEG) { // maybe temp; only send eeg packets
+			WritableMap packetMap = packet.ToMap();
+			double viewDir = GetXPosForDisplay();
+			packetMap.putDouble("viewDirection", Double.isNaN(viewDir) ? .5 : viewDir);
+			packetMap.putDouble("viewDistance", Double.isNaN(viewDistanceY) ? 0 : viewDistanceY);
+			packetBuffer.pushMap(packetMap);
+		}
 
 		// send buffer to js, if ready
 		if (packetBuffer.size() == packetSetSize) {

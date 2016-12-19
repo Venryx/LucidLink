@@ -3,6 +3,7 @@ package com.lucidlink;
 import android.app.Application;
 import android.util.Log;
 
+import com.annimon.stream.Stream;
 import com.facebook.react.ReactApplication;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
@@ -18,6 +19,7 @@ import com.github.yamill.orientation.OrientationPackage;
 import com.v.LibMuse.LibMuse;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
+import com.lugg.ReactSnackbar.ReactSnackbarPackage;
 
 import android.content.Intent; // <--- import
 import android.content.res.Configuration; // <--- import
@@ -26,6 +28,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
+	/*public static List<ReactPackage> packages;
+	public static <T> T GetPackageOfType(Class<T> class1) {
+		return (T)Stream.of(packages).filter(a->a.getClass() == class1).toArray()[0];
+	}*/
+
 	private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 		@Override
 		protected boolean getUseDeveloperSupport() {
@@ -34,6 +41,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 		@Override
 		protected List<ReactPackage> getPackages() {
+			//packages = Arrays.asList(
 			return Arrays.asList(
 				new MainReactPackage(),
             	new ReactMaterialKitPackage(),
@@ -45,8 +53,10 @@ public class MainApplication extends Application implements ReactApplication {
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
 				new LibMuse(),
-				new RCTTextToSpeechModule()
+				new RCTTextToSpeechModule(),
+				new ReactSnackbarPackage()
 			);
+			//return packages;
 		}
 	};
 

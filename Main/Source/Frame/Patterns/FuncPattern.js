@@ -3,8 +3,8 @@ g.FuncPattern = class FuncPattern {
 		if (info.minStartInterval) this.minStartInterval = info.minStartInterval;
 		if (info.gapTraverse) this.gapTraverse = info.gapTraverse;
 		if (info.segments) this.segments = info.segments;
-		this.onPartialMatch = onPartialMatch;
-		this.onMatch = onMatch;
+		this.onPartialMatch = info.onPartialMatch;
+		this.onMatch = info.onMatch;
 	}
 
 	minStartInterval = 10;

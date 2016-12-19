@@ -1,9 +1,11 @@
 package com.lucidlink;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
@@ -11,10 +13,13 @@ import android.text.style.ReplacementSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.annimon.stream.Stream;
+import com.facebook.quicklog.identifiers.ReactNativeBridge;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -27,6 +32,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.textinput.ReactEditText;
 import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
+import com.lugg.ReactSnackbar.ReactSnackbarModule;
+import com.lugg.ReactSnackbar.ReactSnackbarPackage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,10 +84,32 @@ public class Main extends ReactContextBaseJavaModule {
         return constants;
     }
 
+	Toast lastToast;
     @ReactMethod
     public void ShowToast(String message, int duration) {
-        Toast.makeText(getReactApplicationContext(), message, duration).show();
+		if (lastToast != null)
+			lastToast.cancel();
+        Toast toast = Toast.makeText(getReactApplicationContext(), message, duration);
+		toast.show();
+		lastToast = toast;
     }
+	/*TextView toastView;
+	@ReactMethod
+	public void ShowToast(String message, int duration) {
+		if (toastView == null) {
+			toastView = new TextView(MainActivity.main);
+			toastView.setLayoutParams(V.CreateFrameLayoutParams(MainA));
+			V.GetRootView().addView(toastView);
+		}
+		Toast toast = Toast.makeText(getReactApplicationContext(), message, duration);
+		toast.show();
+		lastToast = toast;
+	}*/
+
+	@ReactMethod public void Notify(String message) {
+		//MainApplication.GetPackageOfType(ReactSnackbarPackage.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
+		Main.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
+	}
 
 	@ReactMethod public void IsInEmulator(Promise promise) {
 		boolean result = Build.FINGERPRINT.startsWith("generic")

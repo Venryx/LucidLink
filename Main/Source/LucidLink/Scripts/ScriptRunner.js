@@ -4,16 +4,16 @@ export default g.ScriptRunner = class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
 
 	constructor() {
-		this.listeners_whenMusePacketReceived.push(this.OnReceiveMusePacket);
-
 		/*this.channelPoints = [];
 		for (let i = 0; i < 4; i++)
 			this.channelPoints[i] = Array(1 + this.maxX).fill().map((_, i)=>new Vector2i(i, 0));*/
 		this.packets = Array(1 + this.maxX);
+
+		this.Reset();
 	}
 
-	//channelPoints = [];
-	packets = [];
+	// raw
+	// ==========
 
 	currentIndex = -1;
 	currentX = -1;
@@ -26,6 +26,10 @@ export default g.ScriptRunner = class ScriptRunner {
 		var self = this;
 		packet.GetPeer = function(offset) {
 			self.packets[(this.x + offset).WrapToRange(0, this.maxX)];
+		};
+		packet.GetChannelValDif = function(channel) {
+			var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
+			return this.eegValues[channelIndex];
 		};
 
 		/*for (let ch = 0; ch < 4; ch++)
@@ -52,6 +56,12 @@ export default g.ScriptRunner = class ScriptRunner {
 			matchAttempt.ProcessPacket(this.currentX, packet);
 		}
 	}
+
+	// general
+	// ==========
+
+	//channelPoints = [];
+	packets = [];
 
 	patterns = []; // func-based patterns
 	patternMatchAttempts = {};
@@ -88,7 +98,7 @@ export default g.ScriptRunner = class ScriptRunner {
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
-		this.listeners_whenMusePacketReceived = [];
+		this.listeners_whenMusePacketReceived = [this.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
