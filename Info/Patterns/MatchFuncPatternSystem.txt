@@ -1,22 +1,22 @@
 AddPattern({
 	gapTraverse: {system: "binary search", minInterval: 5},
 	segments: [
-		new Matcher(x=>GetChannelValDif("fl", x) > 30), // left eye tensing by 30 (probably looking left)
+		new Matcher(packet=>packet.GetChannelValDif("fl") > 30), // left eye tensing by 30 (probably looking left)
 		new Gap({min: 30, max: 60}), // wait for 30-60 frames (about 1-2 seconds)
-		new Matcher(x=>GetChannelValDif("fr", x) < -30), // right eye relaxing by 30 (also probably looking left)
+		new Matcher(packet=>packet.GetChannelValDif("fr") < -30), // right eye relaxing by 30 (also probably looking left)
 		new Gap({min: 30, max: 60}),
-		new Matcher(x=>GetViewDirection(x) < .1), // eye at leftmost 10% of visual field
+		new Matcher(packet=>packet.viewDirection < .1), // eye at leftmost 10% of visual field
 		new Gap({min: 30, max: 60}),
-		new Matcher(x=>GetViewDirection(x) > .9), // eye at rightmost 10% of visual field
+		new Matcher(packet=>packet.viewDirection > .9), // eye at rightmost 10% of visual field
 		new Gap({min: 30, max: 60}),
-		new Matcher(x=>GetViewDistance(x) < 1), // eye looking at something within 1 meter
+		new Matcher(packet=>packet.viewDistance < .1), // eye looking at <10% distance
 		new Gap({min: 30, max: 60}),
-		new Matcher(x=>GetViewDistance(x) > 10), // eye looking at something farther than 10 meters
+		new Matcher(packet=>packet.viewDistance > .9), // eye looking at >90% distance
 	],
-	onPartialMatch: segmentsMatched=> {
-		Speak({text: "Pattern partially (" + segmentsMatched + "/11) matched."});
+	onPartialMatch: matchAttempt=> {
+		Speak({text: "Pattern partially (" + matchAttempt.segmentsMatched + "/11) matched."});
 	}
-	onMatch: ()=> {
+	onMatch: matchAttempt=> {
 		Speak({text: "Pattern fully matched."});
 	}
 });

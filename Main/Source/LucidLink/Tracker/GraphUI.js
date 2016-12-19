@@ -71,8 +71,8 @@ class ChartsUI extends BaseComponent {
 	ComponentDidMountOrUpdate() {
 		var node = LL.tracker;
 		var now = Moment();
-		var rangeStart = now.C.startOf("day").subtract(node.rowCount, "day");
-		var rangeEnd = now.C.endOf("day");
+		var rangeStart = now.clone().startOf("day").subtract(node.rowCount, "day");
+		var rangeEnd = now.clone().endOf("day");
 		LL.tracker.LoadSessionsForRange(rangeStart, rangeEnd);
 	}
 	
@@ -82,15 +82,15 @@ class ChartsUI extends BaseComponent {
 		var node = LL.tracker;
 
 		var now = Moment();
-		var dayStart = now.C.startOf("day");
-		//var dayEnd = now.C.endOf("day");
-		var dayEnd = dayStart.C.add(1, "day");
+		var dayStart = now.clone().startOf("day");
+		//var dayEnd = now.clone().endOf("day");
+		var dayEnd = dayStart.clone().add(1, "day");
 
 		var rows = [];
 		if (width != -1) { // if width not obtained from OnLayout yet, don't render children
 			for (let offset = -(node.rowCount - 1); offset <= 0; offset++) {
-				let startTime = dayStart.C.add(offset, "days");
-				let endTime = dayEnd.C.add(offset, "days");
+				let startTime = dayStart.clone().add(offset, "days");
+				let endTime = dayEnd.clone().add(offset, "days");
 				let rowHeight = height / node.rowCount;
 				rows.push(
 					<ChartUI key={startTime} {...{startTime, endTime, width, height: rowHeight}}/>

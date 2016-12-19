@@ -1,7 +1,7 @@
 // Moment
 // ==========
 
-import Moment from "moment";
-Moment.prototype._AddGetter_Inline = function C() {
+/*import Moment from "moment";
+Moment.prototype._AddFunction_Inline = function Clone() {
 	return this.clone();
-}
+}*/

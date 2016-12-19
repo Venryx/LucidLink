@@ -155,7 +155,7 @@ pattern-points that yields a pattern-match certainty of 0.",
 					<VText ml10 style={{marginTop: 5, marginRight: 10}}>Actions: </VText>
 					<VButton text="Offset X" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("x")}/>
 					<VButton text="Offset Y" ml5 style={{height: 30}} onPress={()=>this.OffsetPoints("y")}/>
-					<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.Clone()}/>
+					<VButton text="Clone" ml5 style={{height: 30}} onPress={()=>this.clone()}/>
 					<VButton text="Transform" ml5 style={{height: 30}} onPress={()=>this.Transform()}/>
 				</Row>
 				<Row height={320}>
@@ -211,7 +211,7 @@ pattern-points that yields a pattern-match certainty of 0.",
 	Clone() {
 		var {pattern} = this.props;
 
-		var newPattern = pattern.Clone();
+		var newPattern = pattern.clone();
 		newPattern.name = pattern.name + " - clone";
 		LL.settings.patterns.push(newPattern);
 

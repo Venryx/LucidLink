@@ -17,7 +17,7 @@ export default class DreamUI extends BaseComponent {
 								date: dream.date.toDate()
 							});
 							if (action == DatePickerAndroid.dismissedAction) return;
-							/*dream.date = dream.date.Clone();
+							/*dream.date = dream.date.clone();
 							dream.date.set({year, month: month, day});*/
 							var date = new Date(year, month, day);
 							dream.date = Moment(date);
@@ -30,7 +30,7 @@ export default class DreamUI extends BaseComponent {
 								hour: dream.date.get("hour"), minute: dream.date.get("minute"), is24Hour: true
 							});
 							if (action == DatePickerAndroid.dismissedAction) return;
-							dream.date = dream.date.Clone().set({hour, minute});
+							dream.date = dream.date.clone().set({hour, minute});
 							this.forceUpdate();
 						}}/>
 					<VSwitch text="Lucid" value={dream.lucid} onValueChange={value=>Change(dream.lucid = value)}/>

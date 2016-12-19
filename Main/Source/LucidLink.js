@@ -23,6 +23,8 @@ import "./Frame/Globals";
 import "./Frame/Styles";
 import "./Frame/ReactGlobals";
 require("./Frame/Graphics/VectorStructs");
+import "./Frame/Patterns/FuncPattern";
+import "./Frame/Patterns/PatternMatchAttempt";
 import "./Packages/VTree/Node";
 import "./Packages/V/V";
 import "./Packages/V/VFile";
@@ -192,7 +194,7 @@ async function Init(ui) {
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
 
-	} catch (ex) { alert(ex); }
+	} catch (ex) { alert("Startup error) " + ex.stack); }
 }
 import MuseBridge from "./Frame/MuseBridge";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {

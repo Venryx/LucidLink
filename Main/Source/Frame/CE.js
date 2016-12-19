@@ -321,6 +321,13 @@ Number.prototype._AddFunction_Inline = function KeepAtMost(step) {
 Number.prototype._AddFunction_Inline = function KeepBetween(min, max) {
 	return Math.min(max, Math.max(min, this));
 };
+Number.prototype._AddFunction_Inline = function WrapToRange(min, max, asInt = true) {
+	let val = this;
+	let size = asInt ? 1 + (max - min) : max - min;
+	while (val < min) val += size;
+	while (val > max) val -= size;
+	return val;
+};
 Number.prototype._AddFunction_Inline = function Distance(other) {
 	return Math.abs(this - other);
 };
@@ -779,10 +786,6 @@ Date.prototype.AddMonths = function(value) {
 
 Date.prototype.Clone = function(amount) {
 	return new Date(this.getTime());
-}
-Date.prototype.AddingMonths = function(amount) {
-	var clone = this.Clone();
-	clone.AddMonths(amount);
 }
 
 // [offset construct] (e.g. {left: 10, top: 10})

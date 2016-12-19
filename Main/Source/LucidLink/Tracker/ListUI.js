@@ -9,12 +9,12 @@ export default class ListUI extends BaseComponent {
 
 	ComponentDidMountOrUpdate() {
 		var {month} = this.state;
-		LL.tracker.LoadSessionsForRange(month, month.C.add(1, "month"));
+		LL.tracker.LoadSessionsForRange(month, month.clone().add(1, "month"));
 	}
 
 	ShiftMonth(amount) {
 		var {month} = this.state;
-		this.setState({month: month.C.add(amount, "months")});
+		this.setState({month: month.clone().add(amount, "months")});
 	}
 
 	render() {
@@ -30,7 +30,7 @@ export default class ListUI extends BaseComponent {
 			}}/>
 		}
 
-		var sessions = LL.tracker.GetLoadedSessionsForRange(month, month.C.add(1, "month"));
+		var sessions = LL.tracker.GetLoadedSessionsForRange(month, month.clone().add(1, "month"));
 
 		return (
 			<Column>
@@ -42,7 +42,7 @@ export default class ListUI extends BaseComponent {
 								date: month.toDate()
 							});
 							if (action == DatePickerAndroid.dismissedAction) return;
-							this.setState({month: month.Clone().set({year, month: month2})});
+							this.setState({month: month.clone().set({year, month: month2})});
 						}}/>
 					<VButton text=">" style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
 				</Row>

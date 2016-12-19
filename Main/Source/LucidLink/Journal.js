@@ -65,7 +65,7 @@ g.Journal = class Journal extends Node {
 		var dreamFiles = (await journalFolder.GetFiles()).Where(a=>a.Extension == "vdf");
 		dreamFiles = dreamFiles.Where(a=> {
 			var dreamTime = Moment(a.NameWithoutExtension);
-			var isInMonth = dreamTime >= month && dreamTime < month.C.add(1, "month");
+			var isInMonth = dreamTime >= month && dreamTime < month.clone().add(1, "month");
 			return isInMonth;
 		});
 		for (let file of dreamFiles) {
@@ -75,12 +75,12 @@ g.Journal = class Journal extends Node {
 				this.loadedDreams.push(dream);
 			}
 		}
-		//this.loadedDreams = this.loadedDreams.OrderBy(a=>a.date); // make sure ordered by date
+		this.loadedDreams = this.loadedDreams.OrderBy(a=>a.date); // make sure ordered by date
 		onFinish && onFinish();
 	}
 	GetLoadedDreamsForMonth(month) {
 		return this.loadedDreams.Where(a=> {
-			return a.date >= month && a.date < month.C.add(1, "month");
+			return a.date >= month && a.date < month.clone().add(1, "month");
 		});
 	}
 }
@@ -99,7 +99,7 @@ export class JournalUI extends BaseComponent {
 
 	ShiftMonth(amount) {
 		var {month} = this.state;
-		this.setState({month: month.C.add(amount, "months")});
+		this.setState({month: month.clone().add(amount, "months")});
 	}
 
 	render() {
@@ -126,7 +126,7 @@ export class JournalUI extends BaseComponent {
 								date: month.toDate()
 							});
 							if (action == DatePickerAndroid.dismissedAction) return;
-							this.setState({month: month.Clone().set({year, month: month2})});
+							this.setState({month: month.clone().set({year, month: month2})});
 						}}/>
 					<VButton text=">" style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
 				</Row>

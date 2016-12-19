@@ -1,21 +1,8 @@
 //import Sound from "react-native-sound";
 var Sound = require("react-native-sound");
 
-// general
+// listeners
 // ==========
-
-g.GetRandomNumber = function(options) {
-	var {min, max, mustBeInteger} = options;
-	var range = max - min;
-	if (options.mustBeInteger)
-		return min + Math.floor(Math.random() * (range + 1));
-	return min + (Math.random() * range);
-}
-
-g.AddEvent = function(type, ...args) {
-	var event = new Event(type, args);
-	LL.tracker.currentSession.events.push(event);
-}
 
 g.EveryXSecondsDo = function(seconds, func, maxCallCount = -1) {
 	var timer = new Timer(seconds, func, maxCallCount);
@@ -32,6 +19,27 @@ g.WhenViewDirectionUpdated = function(func) {
 }
 g.WhenViewDistanceUpdated = function(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
+}
+
+// general
+// ==========
+
+g.GetRandomNumber = function(options) {
+	var {min, max, mustBeInteger} = options;
+	var range = max - min;
+	if (options.mustBeInteger)
+		return min + Math.floor(Math.random() * (range + 1));
+	return min + (Math.random() * range);
+}
+
+g.AddEvent = function(type, ...args) {
+	var event = new Event(type, args);
+	LL.tracker.currentSession.events.push(event);
+}
+
+g.AddPattern = function(info) {
+	var pattern = new FuncPattern(info);
+	LL.tracker.currentSession.patterns.push(pattern);
 }
 
 // input
