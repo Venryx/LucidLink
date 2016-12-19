@@ -1,17 +1,18 @@
+var pps = 256; // packets per second
 AddPattern({
 	minStartInterval: 30,
 	gapTraverse: {system: "binary search", minInterval: 5},
 	segments: [
 		new Matcher(packet=>packet.GetChannelValDif("fl") > 30), // left eye tensing by 30 (probably looking left)
-		new Gap({min: 30, max: 60}), // wait for 30-60 frames (about 1-2 seconds)
+		new Gap({min: .1*pps, max: .2*pps}), // wait for .1 to .2 seconds
 		new Matcher(packet=>packet.GetChannelValDif("fr") < -30), // right eye relaxing by 30 (also probably looking left)
-		new Gap({min: 30, max: 60}),
+		new Gap({min: .1*pps, max: .2*pps}),
 		new Matcher(packet=>packet.viewDirection < .1), // eye at leftmost 10% of visual field
-		new Gap({min: 30, max: 60}),
+		new Gap({min: .1*pps, max: .2*pps}),
 		new Matcher(packet=>packet.viewDirection > .9), // eye at rightmost 10% of visual field
-		new Gap({min: 30, max: 60}),
+		new Gap({min: .1*pps, max: .2*pps}),
 		new Matcher(packet=>packet.viewDistance < .1), // eye looking at <10% distance
-		new Gap({min: 30, max: 60}),
+		new Gap({min: .1*pps, max: .2*pps}),
 		new Matcher(packet=>packet.viewDistance > .9), // eye looking at >90% distance
 	],
 	onPartialMatch: matchAttempt=> {
