@@ -1,0 +1,7 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+	"javascript.validate.enable": false,
+	"flow.path_old": "C:\\Users\\Stephen\\AppData\\Roaming\\npm\\node_modules\\flow-bin\\vendor\\flow.exe",
+	"flow.path": "C:\\Program Files\\nodejs\\node_modules\\flow-bin\\flow-win64-v0.37.3\\flow.exe",
+	"flowide.pathToFlow": "C:\\Program Files\\nodejs\\node_modules\\flow-bin\\flow-win64-v0.37.3\\flow.exe"
+}

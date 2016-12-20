@@ -1,3 +1,41 @@
+// @flow
+
+declare var VDF;
+declare var VDFNode;
+declare var VDFTypeInfo;
+declare var VDFTypeMarking;
+declare var VDFLoadOptions;
+declare var VDFSaveOptions;
+declare var VDFDeserializeProp;
+declare var VDFSerializeProp;
+declare var VDFPreSerialize;
+declare var VDFSerialize;
+declare var VDFPostSerialize;
+declare var VDFDeserialize;
+declare var VDFPreDeserialize;
+declare var VDFPostDeserialize;
+declare var VDFProp;
+
+// saving
+declare var VDFSaver;
+
+// loading
+declare var VDFLoader;
+
+declare var ByName;
+declare var ByPathStr;
+declare var ByPath;
+declare var NoAttach;
+declare var DefaultValue;
+declare var IgnoreStartData;
+
+/*declare module "react" {}
+declare module "react-native" {}
+declare module "mobx" {}
+declare module "mobx-react/native" {}
+declare module "moment" {}
+declare module "ErrorUtils" {}*/
+
 import React, {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
 import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
@@ -7,7 +45,7 @@ import Moment from "moment";
 var g = global;
 g.g = g;
 
-var globalComps = {NativeModules, DeviceEventEmitter,
+var globalComps: any = {NativeModules, DeviceEventEmitter,
 	O, Transaction, AutoRun, Observer};
 globalComps.Moment = Moment;
 //globalComps.Extend({Moment});
@@ -25,13 +63,13 @@ ErrorUtils.setGlobalHandler((error, isFatal)=> {
 	HandleError(error, isFatal);
 	ErrorUtils._globalHandler_orig(error, isFatal);
 });
-g.HandleError = function(error, isFatal) {
+var HandleError = g.HandleError = function HandleError(error, isFatal) {
 	Log(`${error}
 Stack) ${error.stack}
 Fatal) ${isFatal}`);
 };
 
-g.Log = function(...args) {
+var Log = g.Log = function(...args) {
 	var type = "general", message, sendToJava = true;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
@@ -48,32 +86,32 @@ g.Log = function(...args) {
 		//} catch (ex) {}
 	}
 };
-g.JavaLog = function(...args) {
+var JavaLog = g.JavaLog = function(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
 	JavaBridge.Main.PostJSLog(type, message);
 }
-g.Trace = function(...args) {
+var Trace = g.Trace = function(...args) {
 	console.trace(...args);
 };
 
-g.Toast = function(text, duration = 0) {
+var Toast = g.Toast = function(text, duration = 0) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.ShowToast(text, duration);
 }
 
-g.Notify = function(text) {
+var Notify = g.Notify = function(text) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.Notify(text);
 }
 
-g.Assert = function(condition, messageOrMessageFunc) {
+var Assert = g.Assert = function(condition, messageOrMessageFunc: any) {
 	if (condition) return;
 
-	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
+	var message: string = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
 
 	Log("Assert failed) " + message);
 	console.error(message);
@@ -99,16 +137,18 @@ g.A = class A {
 	    return new A_OfType_Wrapper(type);
 	}
 } 
-g.A_NotEqualTo_Wrapper = class A_NotEqualTo_Wrapper {
+var A_NotEqualTo_Wrapper = g.A_NotEqualTo_Wrapper = class A_NotEqualTo_Wrapper {
 	constructor(val1) { this.val1 = val1; }
+	val1;
     set a(val2) { Assert(val2 != this.val1); }
 }
-g.A_OfType_Wrapper = class A_OfType_Wrapper {
+var A_OfType_Wrapper = g.A_OfType_Wrapper = class A_OfType_Wrapper {
 	constructor(type) { this.type = type; }
+	type;
     set a(val) { Assert(val != null && val.GetType().IsDerivedFrom(this.type)); }
 }
 
-g.JavaBridge = class JavaBridge {
+var JavaBridge = g.JavaBridge = class JavaBridge {
     static get Main() {
         return NativeModules.Main;
     }
@@ -146,7 +186,7 @@ g.E = function(...objExtends) {
 
 // object-Json
 g.FromJSON = function(json) { return JSON.parse(json); }
-g.ToJSON = function(obj, excludePropNames___) {
+var ToJSON = g.ToJSON = function(obj, excludePropNames___) {
 	try {
 		if (arguments.length > 1) {
 			var excludePropNames = V.Slice(arguments, 1);
@@ -164,7 +204,7 @@ g.ToJSON = function(obj, excludePropNames___) {
 		throw ex;
 	}
 }
-g.ToJSON_Safe = function(obj, excludePropNames___) {
+var ToJSON_Safe = g.ToJSON_Safe = function(obj, excludePropNames___) {
 	var excludePropNames = V.Slice(arguments, 1);
 
 	var cache = [];
@@ -201,12 +241,12 @@ g.ToJSON_Try = function(...args) {
 //Function.prototype._AddGetter_Inline = function VDFSerialize() { return function() { return VDF.CancelSerialize; }; };
 Function.prototype.Serialize = function() { return VDF.CancelSerialize; }.AddTags(new VDFSerialize());
 
-g.FinalizeFromVDFOptions = function(options = null) {
+var FinalizeFromVDFOptions = g.FinalizeFromVDFOptions = function(options = null) {
     options = options || new VDFLoadOptions();
 	options.loadUnknownTypesAsBasicTypes = true;
 	return options;
 }
-g.FromVDF = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
+var FromVDF = g.FromVDF = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
 
@@ -296,7 +336,7 @@ g.T = function(typeOrTypeName) {
         propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
     };
 };
-g.P = function P(...args): PropertyDecorator {
+g.P = function P(...args) {
     return function(target, name) {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new VDFProp(...args));
@@ -373,13 +413,13 @@ g._VDFPostSerialize = function(...args) {
 // ==========
 
 g.IsPrimitive = function(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
-g.IsBool = function(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
+var IsBool = g.IsBool = function(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
 g.ToBool = function(boolStr) { return boolStr == "true" ? true : false; }
-g.IsNumber = function(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
+var IsNumber = g.IsNumber = function(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
 g.IsNumberString = function(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
 g.ToInt = function(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
 g.ToDouble = function(stringOrIntVal) { return parseFloat(stringOrIntVal); }
-g.IsString = function(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
+var IsString = g.IsString = function(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
 g.ToString = function(val) { return "" + val; }
 
 g.IsNaN = function(obj) { return typeof obj == "number" && obj != obj; }
@@ -390,13 +430,13 @@ g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj) !=
 // timer stuff
 // ==========
 
-export function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
-g.Sleep = function(ms) {
-	var startTime = new Date().getTime();
+export function WaitXThenRun(waitTime: number, func: any) { setTimeout(func, waitTime); }
+g.Sleep = function(ms: number) {
+	var startTime: number = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
 	{}
 }
-g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
+g.WaitXThenRun_Multiple = function(waitTime, func, count: number = -1) {
 	var countDone = 0;
 	var timerID = setInterval(function() {
 		func();
@@ -411,13 +451,16 @@ g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
 }
 
 // interval is in seconds (can be decimal)
-g.Timer = class Timer {
+var Timer = g.Timer = class Timer {
 	constructor(interval, func, maxCallCount = -1) {
 	    this.interval = interval;
 	    this.func = func;
 	    this.maxCallCount = maxCallCount;
 	}
 
+	interval = 0;
+	func: Function;
+	maxCallCount = 0;
 	timerID = -1;
 	get IsRunning() { return this.timerID != -1; }
 
@@ -442,16 +485,17 @@ g.TimerMS = class TimerMS extends Timer {
     }
 }
 
-var funcLastScheduledRunTimes = {};
+var funcLastScheduledRunTimes: any = {};
 g.BufferAction = function(...args) {
-	if (args.length == 2) var [minInterval, func] = args, key = null;
-	else if (args.length == 3) var [key, minInterval, func] = args;
+	var minInterval = 0, func = null;
+	if (args.length == 2) var [minInterval: number, func: any] = args, key = null;
+	else if (args.length == 3) var [key: String, minInterval: number, func: any] = args;
 
     var lastScheduledRunTime = funcLastScheduledRunTimes[key] || 0;
     var now = new Date().getTime();
-    var timeSinceLast = now - lastScheduledRunTime;
+    var timeSinceLast: number = now - lastScheduledRunTime;
     if (timeSinceLast >= minInterval) { // if we've waited enough since last run, run right now
-        func();
+        (func: any)();
         funcLastScheduledRunTimes[key] = now;
     } else if (timeSinceLast > 0) { // else, if we don't yet have a future-run scheduled, schedule one now
         var intervalEndTime = lastScheduledRunTime + minInterval;
@@ -464,7 +508,7 @@ g.BufferAction = function(...args) {
 // Random
 // ==========
 
-g.Random = function(seed) {
+var Random = g.Random = function(seed) {
 	seed = seed != null ? seed : new Date().getTime();
 
 	if (seed == 0)
@@ -484,7 +528,7 @@ g.Random = function(seed) {
 		s.seed = randomDouble;
 		return randomDouble_onlyFractionalPart;
 	};
-	s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
+	//s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
 	s.NextColor_ImageStr = function() {
 		var color = s.NextColor();
 		Random.canvasContext.fillStyle = color.ToHexStr();
