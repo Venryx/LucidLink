@@ -246,6 +246,8 @@ class ChartManager {
 		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
 		//debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 1000, 1000));
 		newChartHolder.addView(debugText);
+
+		//handler = new Handler();
 	}
 
 	public void UpdateChartBounds() {
@@ -268,6 +270,7 @@ class ChartManager {
 			return;*/
 
 		MainActivity.main.runOnUiThread(() -> {
+		//handler.post(()-> {
 			//newChartHolder.setLayoutParams(V.CreateFrameLayoutParams(chartHolderPos[0], chartHolderPos[1], chartHolder.getWidth(), chartHolder.getHeight()));
 			newChartHolder.layout(0, 0, chartHolder.getWidth(), chartHolder.getHeight());
 		});
@@ -334,11 +337,14 @@ class ChartManager {
 
 			if (eegProcessor.currentIndex == 0) // init stuff that nonetheless needs real data
 				chart.setVisibleXRange(0, eegProcessor.maxX);
-			if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
-				UpdateChart();
 
-			UpdateEyeTrackerUI(); // update eye-tracker ui to match processor's changes
-			UpdateDebugUI();
+			MainActivity.main.runOnUiThread(() -> {
+				if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
+					UpdateChart();
+				UpdateEyeTrackerUI(); // update eye-tracker ui to match processor's changes
+				UpdateDebugUI();
+			});
+
 		} else if (packet.Type().equals("accel")) {
 			// todo: add data-set for this
 		}
@@ -377,18 +383,21 @@ class ChartManager {
 			UpdateChart();
 	}
 
+	//Handler handler; //= new Handler(); // initialized above, as errors if done here
 	//void UpdateChart(int currentX) {
 	void UpdateChart() {
-		MainActivity.main.runOnUiThread(() -> {
+		//MainActivity.main.runOnUiThread(() -> {
+		//handler.post(()-> {
 			chart.invalidate(); // redraw
 
 			int xPos = (int)((eegProcessor.currentX / (double)eegProcessor.maxX) * newChartHolder.getWidth());
 			currentTimeMarker.setLayoutParams(V.CreateRelativeLayoutParams(xPos, 0, 5, V.MATCH_PARENT));
-		});
+		//});
 	}
 
 	void UpdateEyeTrackerUI() {
-		MainActivity.main.runOnUiThread(() -> {
+		//MainActivity.main.runOnUiThread(() -> {
+		//handler.post(()-> {
 			int margin = 10;
 			int size = 30;
 			int xPos = (int)V.Lerp(0 + margin, newChartHolder.getWidth() - margin, eegProcessor.GetXPosForDisplay());
@@ -403,7 +412,7 @@ class ChartManager {
 			/*viewDistanceForeground.invalidate();
 			viewDistanceForeground.requestLayout();
 			viewDistanceForeground.forceLayout();*/
-		});
+		//});
 	}
 
 	long lastDebugUIUpdateTime = -1;
@@ -414,7 +423,7 @@ class ChartManager {
 		lastDebugUIUpdateTime = now;
 
 		//MainActivity.main.runOnUiThread(() -> {
-		new Handler().post(()-> {
+		//handler.post(()-> {
 			debugText.setText(""
 				//+ "1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX
 				+ "\nEyePos: " + eegProcessor.eyePosX
@@ -424,13 +433,14 @@ class ChartManager {
 				+ "\nFR: " + eegProcessor.channelPoints.get(2)[eegProcessor.currentX].y
 				+ "\nBR: " + eegProcessor.channelPoints.get(3)[eegProcessor.currentX].y
 			);
-		});
+		//});
 	}
 
 	public void Shutdown() {
 		if (!initialized) return;
 
 		MainActivity.main.runOnUiThread(() -> {
+		//handler.post(()-> {
 			((ViewGroup) newChartHolder.getParent()).removeView(newChartHolder);
 		});
 	}

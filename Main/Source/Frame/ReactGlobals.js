@@ -23,13 +23,15 @@ function AddPropModifierFunc(type, modifierFunc) {
 
 	proto.componentWillMount_orig = proto.componentWillMount_orig || proto.componentWillMount;
 	proto.componentWillMount = function(...args) {
-		proto.componentWillMount_orig.apply(this, args);
+		if (proto.componentWillMount_orig) // needed in non-debug mode, fsr
+			proto.componentWillMount_orig.apply(this, args);
 		modifierFunc.call(this, this.props);
 	}
 
 	proto.componentWillReceiveProps_orig = proto.componentWillReceiveProps_orig || proto.componentWillReceiveProps;
 	proto.componentWillReceiveProps = function(...args) {
-		proto.componentWillReceiveProps_orig.apply(this, args);
+		if (proto.componentWillReceiveProps_orig) // needed in non-debug mode, fsr
+			proto.componentWillReceiveProps_orig.apply(this, args);
 		modifierFunc.call(this, args[0]);
 	}
 }

@@ -1,13 +1,19 @@
 package com.lucidlink;
 
 import android.database.Cursor;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,6 +50,32 @@ public class V {
 		for (int i = 0; i < parent.getChildCount(); i++)
 			result.add(parent.getChildAt(i));
 		return result;
+	}
+
+	static final String INDEX_CHAR = " ";
+	static final int TAB_NUMBER = 4;
+	public static void ConvertTextInputTabsToSpans(EditText input) {
+		ConvertTextInputTabsToSpans(input, 0, input.getEditableText().length());
+	}
+	public static void ConvertTextInputTabsToSpans(EditText input, int start, int end) {
+		String str = input.getEditableText().toString();
+		float tabWidth = input.getPaint().measureText(INDEX_CHAR) * TAB_NUMBER;
+		while (start < end)     {
+			int index = str.indexOf("\t", start);
+			if (index < 0) break;
+			input.getEditableText().setSpan(new CustomTabWidthSpan(Float.valueOf(tabWidth).intValue()), index, index + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			start = index + 1;
+		}
+	}
+	static class CustomTabWidthSpan extends ReplacementSpan {
+		CustomTabWidthSpan(int tabWidth){
+			this.tabWidth = tabWidth;
+		}
+		int tabWidth = 0;
+		@Override public int getSize(Paint p1, CharSequence p2, int p3, int p4, Paint.FontMetricsInt p5) {
+			return tabWidth;
+		}
+		@Override public void draw(Canvas p1, CharSequence p2, int p3, int p4, float p5, int p6, int p7, int p8, Paint p9) {}
 	}
 
 	// general

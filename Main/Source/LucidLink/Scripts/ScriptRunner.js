@@ -48,6 +48,10 @@ export default g.ScriptRunner = class ScriptRunner {
 			this.channelPoints[ch][this.currentX] = packet.eegValues[ch];*/
 		this.packets[this.currentX] = packet;
 
+		if (LL.monitor.patternMatch)
+			this.DoPatternMatching(packet);
+	}
+	DoPatternMatching(packet) {
 		for (let [index, pattern] of this.patterns.entries()) {
 			let tooCloseToOtherMatchAttempt = false;
 			for (let x = this.currentX - 1; x > this.currentX - pattern.minStartInterval; x--) {

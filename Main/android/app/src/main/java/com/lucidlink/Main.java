@@ -226,6 +226,8 @@ public class Main extends ReactContextBaseJavaModule {
 					for (ReactEditText input : Stream.of(textInputs).toArray(ReactEditText[]::new)) {
 						if (Objects.equals(input.getTag(), "modified")) continue;
 
+						V.ConvertTextInputTabsToSpans(input);
+
 						input.addTextChangedListener(new TextWatcher() {
 							int insertPos = 0, insertCount = 0;
 							public void beforeTextChanged(CharSequence s, int editStart, int count, int after) {}
@@ -251,20 +253,7 @@ public class Main extends ReactContextBaseJavaModule {
 								}
 							}
 							public void afterTextChanged(Editable view) {
-								applyTabWidth(view, this.insertPos, this.insertPos + this.insertCount);
-							}
-
-							static final String INDEX_CHAR = " ";
-							static final int TAB_NUMBER = 4;
-							public void applyTabWidth(Editable text, int start, int end) {
-								String str = text.toString();
-								float tabWidth = input.getPaint().measureText(INDEX_CHAR) * TAB_NUMBER;
-								while (start < end)     {
-									int index = str.indexOf("\t", start);
-									if (index < 0) break;
-									text.setSpan(new CustomTabWidthSpan(Float.valueOf(tabWidth).intValue()), index, index + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									start = index + 1;
-								}
+								V.ConvertTextInputTabsToSpans(input, this.insertPos, this.insertPos + this.insertCount);
 							}
 						});
 
@@ -273,16 +262,6 @@ public class Main extends ReactContextBaseJavaModule {
 				});
 			}
 		}, 1000, 1000);
-	}
-	class CustomTabWidthSpan extends ReplacementSpan {
-		CustomTabWidthSpan(int tabWidth){
-			this.tabWidth = tabWidth;
-		}
-		int tabWidth = 0;
-		@Override public int getSize(Paint p1, CharSequence p2, int p3, int p4, Paint.FontMetricsInt p5) {
-			return tabWidth;
-		}
-		@Override public void draw(Canvas p1, CharSequence p2, int p3, int p4, float p5, int p6, int p7, int p8, Paint p9) {}
 	}
 
 

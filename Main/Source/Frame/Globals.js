@@ -457,6 +457,11 @@ g.BufferFuncToBeRun = function(key, minInterval, func) {
 		funcLastScheduledRunTimes[key] = intervalEndTime;
     }
 }
+// alias
+g.DoXWithMinInterval = function(options, func) {
+	let {key = func.toString(), minInterval} = options;
+	BufferFuncToBeRun(key, minInterval, func);
+}
 
 // Random
 // ==========
