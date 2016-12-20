@@ -17,6 +17,8 @@ g.Monitor = class Monitor extends Node {
 	@O @P() monitor = true;
 	@O @P() patternMatch = true;
 
+	eegProcessor = new EEGProcessor();
+
 	ui = null;
 }
 

@@ -25,6 +25,7 @@ import "./Frame/ReactGlobals";
 require("./Frame/Graphics/VectorStructs");
 import "./Frame/Patterns/FuncPattern";
 import "./Frame/Patterns/PatternMatchAttempt";
+import "./Frame/Patterns/EEGProcessor";
 import "./Packages/VTree/Node";
 import "./Packages/V/V";
 import "./Packages/V/VFile";
@@ -108,6 +109,11 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 });
 
 class LucidLink extends Node {
+	constructor() {
+		super();
+		g.LL = this; // set early, so LL can be used during initial construction
+	}
+
 	@T("Monitor") @P(true, true) monitor = new Monitor();
 	@T("Tracker") @P(true, true) tracker = new Tracker();
 	@T("Journal") @P(true, true) journal = new Journal();
@@ -176,7 +182,8 @@ async function Init(ui) {
 	await LL.tracker.SetUpCurrentSession();
 
 	LL.mainDataLoaded = true;
-	LL.ui.forceUpdate();
+	//LL.ui.forceUpdate();
+	ui.forceUpdate();
 	Log("Finished loading main-data.");
 	Log("Logging to: " + LL.tracker.currentSession.logFile.path);
 
@@ -194,7 +201,7 @@ async function Init(ui) {
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
 
-	} catch (ex) { alert("Startup error) " + ex.stack); }
+	} catch (ex) { alert("Startup error) " + ex + "\n" + ex.stack); }
 }
 import MuseBridge from "./Frame/MuseBridge";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {

@@ -4,83 +4,14 @@ export default g.ScriptRunner = class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
 
 	constructor() {
-		/*this.channelPoints = [];
-		for (let i = 0; i < 4; i++)
-			this.channelPoints[i] = Array(1 + this.maxX).fill().map((_, i)=>new Vector2i(i, 0));*/
-		this.packets = Array(1 + this.maxX);
-
-		this.Reset();
-	}
-
-	// raw
-	// ==========
-
-	channelBaselines = [];
-
-	//channelPoints = [];
-	packets = [];
-
-	currentIndex = -1;
-	currentX = -1;
-	maxX = 1000;
-	@Bind OnReceiveMusePacket(packet) {
-		this.currentIndex++;
-		this.currentX = this.currentX < this.maxX ? this.currentX + 1 : 0;
-
-		if (packet.channelBaselines)
-			this.channelBaselines = packet.channelBaselines;
-
-		packet.x = this.currentX;
-		var self = this;
-		packet.GetPeer = function(offset) {
-			self.packets[(this.x + offset).WrapToRange(0, this.maxX)];
-		};
-		packet.GetChannelVal = function(channel) {
-			var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
-			return this.eegValues[channelIndex];
-		};
-		packet.GetChannelValDif = function(channel) {
-			var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
-			return this.eegValues[channelIndex] - self.channelBaselines[channelIndex];
-		};
-
-		/*for (let ch = 0; ch < 4; ch++)
-			this.channelPoints[ch][this.currentX] = packet.eegValues[ch];*/
-		this.packets[this.currentX] = packet;
-
-		if (LL.monitor.patternMatch)
-			this.DoPatternMatching(packet);
-	}
-	DoPatternMatching(packet) {
-		for (let [index, pattern] of this.patterns.entries()) {
-			let tooCloseToOtherMatchAttempt = false;
-			for (let x = this.currentX - 1; x > this.currentX - pattern.minStartInterval; x--) {
-				let key = `pattern${index}_x${x}`;
-				if (this.patternMatchAttempts[x]) {
-					tooCloseToOtherMatchAttempt = true;
-					break;
-				}
-			}
-			if (tooCloseToOtherMatchAttempt) continue;
-
-			let key = `pattern${index}_x${this.currentX}`;
-			let matchAttempt = new PatternMatchAttempt(key, pattern);
-			this.patternMatchAttempts[key] = matchAttempt;
-		}
-
-		for (let {name: key, value: matchAttempt} of this.patternMatchAttempts.Props) {
-			matchAttempt.ProcessPacket(this.currentX, packet);
-		}
+		//this.Reset();
+		WaitXThenRun(0, ()=>this.Reset()); // call in a bit, so LL is initialized
 	}
 
 	// general
 	// ==========
 
 	patterns = []; // func-based patterns
-	patternMatchAttempts = {};
-	EndPatternMatchAttempt(matchAttempt) {
-		delete this.patternMatchAttempts[matchAttempt.key];
-	}
 
 	timers = [];
 	listeners_whenMusePacketReceived = [];
@@ -106,12 +37,13 @@ export default g.ScriptRunner = class ScriptRunner {
 
 	Reset() {
 		this.patterns = [];
-		this.patternMatchAttempts = {};
+		//this.patternMatchAttempts = {};
+		LL.monitor.eegProcessor.patternMatchAttempts = {};
 		
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
-		this.listeners_whenMusePacketReceived = [this.OnReceiveMusePacket];
+		this.listeners_whenMusePacketReceived = [LL.monitor.eegProcessor.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
