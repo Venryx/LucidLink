@@ -109,10 +109,10 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 });
 
 class LucidLink extends Node {
-	constructor() {
+	/*constructor() {
 		super();
 		g.LL = this; // set early, so LL can be used during initial construction
-	}
+	}*/
 
 	@T("Monitor") @P(true, true) monitor = new Monitor();
 	@T("Tracker") @P(true, true) tracker = new Tracker();
@@ -182,8 +182,8 @@ async function Init(ui) {
 	await LL.tracker.SetUpCurrentSession();
 
 	LL.mainDataLoaded = true;
-	//LL.ui.forceUpdate();
-	ui.forceUpdate();
+	LL.ui.forceUpdate();
+	//ui.forceUpdate();
 	Log("Finished loading main-data.");
 	Log("Logging to: " + LL.tracker.currentSession.logFile.path);
 

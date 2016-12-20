@@ -107,7 +107,8 @@ class EEGProcessor {
 
 			UpdateEyeTracking(currentX, packet.eegValues);
 
-			int patternMatchInterval_inPackets = (int) (Main.main.patternMatchInterval * packetsPerSecond);
+			// for now, old pattern system is disabled
+			/*int patternMatchInterval_inPackets = (int) (Main.main.patternMatchInterval * packetsPerSecond);
 			if (currentX % patternMatchInterval_inPackets == 0 && Main.main.patternMatch) {
 				UpdateMatchProbabilities(currentX);
 			} else {
@@ -115,8 +116,8 @@ class EEGProcessor {
 				for (let x = currentX; x >= 0 && lastPatternMatchProbability == null; x++)
 					lastPatternMatchProbability = patternMatchProbabilities.Props[0].value[x];
 				if (lastPatternMatchProbability != null)
-					JavaBridge.Main.OnSetPatternMatchProbability(lastPatternMatchProbability);*/
-			}
+					JavaBridge.Main.OnSetPatternMatchProbability(lastPatternMatchProbability);*#/
+			}*/
 		} else if (packet.Type().equals("accel")) {
 			packet.LoadAccelValues();
 		}
