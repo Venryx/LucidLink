@@ -2,6 +2,7 @@ package com.lucidlink;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.v.LibMuse.MainModule;
 import com.v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -242,6 +244,7 @@ class ChartManager {
 		//debugText.setBackgroundColor(Color.parseColor("#0000FF"));
 		debugText.setTextColor(Color.parseColor("#FFFFFF"));
 		debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, V.MATCH_PARENT, V.MATCH_PARENT));
+		//debugText.setLayoutParams(V.CreateRelativeLayoutParams(0, 0, 1000, 1000));
 		newChartHolder.addView(debugText);
 	}
 
@@ -403,8 +406,15 @@ class ChartManager {
 		});
 	}
 
+	long lastDebugUIUpdateTime = -1;
 	void UpdateDebugUI() {
-		MainActivity.main.runOnUiThread(() -> {
+		// only update 10 times per second
+		long now = new Date().getTime();
+		if (now - lastDebugUIUpdateTime < 100) return;
+		lastDebugUIUpdateTime = now;
+
+		//MainActivity.main.runOnUiThread(() -> {
+		new Handler().post(()-> {
 			debugText.setText(""
 				//+ "1VS2: " + eegProcessor.channel1VSChannel2Strength_averageOfLastX
 				+ "\nEyePos: " + eegProcessor.eyePosX

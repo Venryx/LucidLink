@@ -132,7 +132,7 @@ class EEGProcessor {
 			// if we just updated the baselines, include those as well
 			if (currentX == maxX) {
 				WritableArray baselinesArray = ToWritableArray(channelBaselines);
-				packetMap.putArray("channelBaselines", baselinesArray);	
+				packetMap.putArray("channelBaselines", baselinesArray);
 			}
 
 			packetBuffer.pushMap(packetMap);
