@@ -17,7 +17,7 @@ g.EEGProcessor = class EEGProcessor {
 	constructor() {
 		/*this.channelPoints = [];
 		for (let i = 0; i < 4; i++)
-			this.channelPoints[i] = Array(1 + this.maxX).fill().map((_, i)=>new Vector2i(i, 0));*/
+			this.channelPoints[i] = Array(1 + EEGProcessor.maxX).fill().map((_, i)=>new Vector2i(i, 0));*/
 		this.packets = Array(1 + EEGProcessor.maxX);
 	}
 
@@ -29,7 +29,7 @@ g.EEGProcessor = class EEGProcessor {
 	currentX = -1;
 	@Bind OnReceiveMusePacket(packet) {
 		this.currentIndex++;
-		this.currentX = this.currentX < this.maxX ? this.currentX + 1 : 0;
+		this.currentX = this.currentX < EEGProcessor.maxX ? this.currentX + 1 : 0;
 
 		if (packet.channelBaselines)
 			this.channelBaselines = packet.channelBaselines;
@@ -47,15 +47,20 @@ g.EEGProcessor = class EEGProcessor {
 
 	patternMatchAttempts = {};
 	EndPatternMatchAttempt(matchAttempt) {
+		Toast("Ending");
 		delete this.patternMatchAttempts[matchAttempt.key];
 	}
 	
 	DoPatternMatching(packet) {
+		let p = ProfileMethod("DoPatternMatching");
+
+		p.Section("part 1");
 		for (let [index, pattern] of LL.scripts.scriptRunner.patterns.entries()) {
 			let tooCloseToOtherMatchAttempt = false;
 			for (let x = this.currentX - 1; x > this.currentX - pattern.minStartInterval; x--) {
-				let key = `pattern${index}_x${x}`;
-				if (this.patternMatchAttempts[x]) {
+				let realX = x.WrapToRange(0, this.maxX);
+				let key = `pattern${index}_x${realX}`;
+				if (this.patternMatchAttempts[realX]) {
 					tooCloseToOtherMatchAttempt = true;
 					break;
 				}
@@ -67,8 +72,12 @@ g.EEGProcessor = class EEGProcessor {
 			this.patternMatchAttempts[key] = matchAttempt;
 		}
 
+		p.Section("part 2");
+		//BufferAction(1000, ()=>Toast("Count: " + this.patternMatchAttempts.Props.length));
 		for (let {name: key, value: matchAttempt} of this.patternMatchAttempts.Props) {
 			matchAttempt.ProcessPacket(this.currentX, packet);
 		}
+
+		p.End();
 	}
 }

@@ -443,7 +443,10 @@ g.TimerMS = class TimerMS extends Timer {
 }
 
 var funcLastScheduledRunTimes = {};
-g.BufferFuncToBeRun = function(key, minInterval, func) {
+g.BufferAction = function(...args) {
+	if (args.length == 2) var [minInterval, func] = args, key = null;
+	else if (args.length == 3) var [key, minInterval, func] = args;
+
     var lastScheduledRunTime = funcLastScheduledRunTimes[key] || 0;
     var now = new Date().getTime();
     var timeSinceLast = now - lastScheduledRunTime;
@@ -456,11 +459,6 @@ g.BufferFuncToBeRun = function(key, minInterval, func) {
         WaitXThenRun(timeTillIntervalEnd, func);
 		funcLastScheduledRunTimes[key] = intervalEndTime;
     }
-}
-// alias
-g.DoXWithMinInterval = function(options, func) {
-	let {key = func.toString(), minInterval} = options;
-	BufferFuncToBeRun(key, minInterval, func);
 }
 
 // Random

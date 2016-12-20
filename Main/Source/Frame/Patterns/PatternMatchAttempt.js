@@ -19,6 +19,7 @@ g.PatternMatchAttempt = class PatternMatchAttempt {
 		if (nextSegment instanceof Gap) {
 			let minDist = nextSegment.min + 1;
 			let matched = distFromLastMatch >= minDist;
+			Toast("Test1" + minDist + ";" + matched + ";" + distFromLastMatch + ";" + nextSegmentIndex);
 			if (matched)
 				this.MatchSegment(nextSegmentIndex, x);
 		} else if (nextSegment instanceof Matcher) {

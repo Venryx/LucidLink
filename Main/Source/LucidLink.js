@@ -26,6 +26,8 @@ require("./Frame/Graphics/VectorStructs");
 import "./Frame/Patterns/FuncPattern";
 import "./Frame/Patterns/PatternMatchAttempt";
 import "./Frame/Patterns/EEGProcessor";
+import "./Frame/VProfiler/BlockRunInfo";
+import "./Frame/VProfiler";
 import "./Packages/VTree/Node";
 import "./Packages/V/V";
 import "./Packages/V/VFile";

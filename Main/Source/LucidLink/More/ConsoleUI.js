@@ -26,6 +26,7 @@ export default class ConsoleUI extends BaseComponent {
 			eval(this.props.text);
 		} catch(error) {
 			g.HandleError(error);
+			alert(error + "\n" + error.stack);
 		}
 	}
 }
