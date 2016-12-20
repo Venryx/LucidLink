@@ -1,12 +1,12 @@
-// @flow
+import {P, WaitXThenRun} from "Source/Frame/Globals";
 
 export class BlockRunInfo {
 	static fakeBlockRunInfo;
 	static _=WaitXThenRun(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
 
-	constructor(...args: any) {
-		if (args.length == 2) var [parent, depth: Number] = args;
-		else /*if (args.length == 4)*/ var [parent, name, method, depth: Number] = args;
+	constructor(...args) {
+		if (args.length == 2) var [parent, depth] = args;
+		else if (args.length == 4) var [parent, name, method, depth] = args;
 
 		if (depth > 100)
 			throw new Error("Cannot profile call-path with a depth greater than 100.");
@@ -46,7 +46,7 @@ export class BlockRunInfo {
 	}
 
 	// for child methods
-	StartMethod(...args: any) {
+	StartMethod(...args) {
 		if (args[0] instanceof Function) var [method] = args, name = method.GetName();
 		else var [name] = args;
 
@@ -65,7 +65,7 @@ export class BlockRunInfo {
 	}
 
 	// for child sections
-	Section(name: string) {
+	Section(name) {
 		if (this == BlockRunInfo.fakeBlockRunInfo)
 			return BlockRunInfo.fakeBlockRunInfo;
 

@@ -1,53 +1,49 @@
-// @flow
-
-declare var VDF;
+export declare var VDF;
 declare var VDFNode;
 declare var VDFTypeInfo;
 declare var VDFTypeMarking;
-declare var VDFLoadOptions;
-declare var VDFSaveOptions;
-declare var VDFDeserializeProp;
-declare var VDFSerializeProp;
-declare var VDFPreSerialize;
-declare var VDFSerialize;
-declare var VDFPostSerialize;
-declare var VDFDeserialize;
-declare var VDFPreDeserialize;
-declare var VDFPostDeserialize;
 declare var VDFProp;
 
-// saving
-declare var VDFSaver;
-
-// loading
-declare var VDFLoader;
-
+// tags and stuff
 declare var ByName;
 declare var ByPathStr;
 declare var ByPath;
 declare var NoAttach;
 declare var DefaultValue;
 declare var IgnoreStartData;
+declare var Type;
+declare var List;
+declare var Dictionary;
 
-/*declare module "react" {}
-declare module "react-native" {}
-declare module "mobx" {}
-declare module "mobx-react/native" {}
-declare module "moment" {}
-declare module "ErrorUtils" {}*/
+// saving
+declare var VDFSaver;
+declare var VDFSaveOptions;
+declare var VDFSerializeProp;
+declare var VDFPreSerialize;
+declare var VDFSerialize;
+declare var VDFPostSerialize;
 
-import React, {Component} from "react";
+// loading
+declare var VDFLoader;
+declare var VDFLoadOptions;
+declare var VDFDeserializeProp;
+declare var VDFDeserialize;
+declare var VDFPreDeserialize;
+declare var VDFPostDeserialize;
+
+var g: any = global;
+g.g = g;
+
+import {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
 import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
 import {observer as Observer} from "mobx-react/native";
-import Moment from "moment";
+//import Moment from "moment";
+var Moment = require("moment");
 
-var g = global;
-g.g = g;
-
-var globalComps: any = {NativeModules, DeviceEventEmitter,
+var globalComps = {NativeModules, DeviceEventEmitter,
 	O, Transaction, AutoRun, Observer};
-globalComps.Moment = Moment;
+(globalComps as any).Moment = Moment;
 //globalComps.Extend({Moment});
 //g.Extend(globalComps);
 for (let key in globalComps)
@@ -63,19 +59,20 @@ ErrorUtils.setGlobalHandler((error, isFatal)=> {
 	HandleError(error, isFatal);
 	ErrorUtils._globalHandler_orig(error, isFatal);
 });
-var HandleError = g.HandleError = function HandleError(error, isFatal) {
+export var HandleError = (g as any).HandleError = function(error, isFatal) {
 	Log(`${error}
 Stack) ${error.stack}
 Fatal) ${isFatal}`);
 };
 
-var Log = g.Log = function(...args) {
+g.Log = function(...args) {
 	var type = "general", message, sendToJava = true;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
 	else if (args.length == 3) [type, message, sendToJava] = args;
 
-	console.log(...args);
+	//console.log(...args);
+	console.log.apply(this, args);
 
 	try {
 		More.AddLogEntry(new LogEntry(type, message, new Date()));
@@ -86,32 +83,32 @@ var Log = g.Log = function(...args) {
 		//} catch (ex) {}
 	}
 };
-var JavaLog = g.JavaLog = function(...args) {
+g.JavaLog = function(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
 	JavaBridge.Main.PostJSLog(type, message);
 }
 var Trace = g.Trace = function(...args) {
-	console.trace(...args);
+	console.trace.apply(this, args);
 };
 
-var Toast = g.Toast = function(text, duration = 0) {
+export function Toast(text, duration = 0) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.ShowToast(text, duration);
 }
 
-var Notify = g.Notify = function(text) {
+g.Notify = function(text) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.Notify(text);
 }
 
-var Assert = g.Assert = function(condition, messageOrMessageFunc: any) {
+g.Assert = function(condition, messageOrMessageFunc) {
 	if (condition) return;
 
-	var message: string = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
+	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
 
 	Log("Assert failed) " + message);
 	console.error(message);
@@ -158,9 +155,9 @@ var JavaBridge = g.JavaBridge = class JavaBridge {
 // ==========
 
 if (Number.MIN_SAFE_INTEGER == null)
-	Number.MIN_SAFE_INTEGER = -9007199254740991;
+	(Number as any).MIN_SAFE_INTEGER = -9007199254740991;
 if (Number.MAX_SAFE_INTEGER == null)
-	Number.MAX_SAFE_INTEGER = 9007199254740991;
+	(Number as any).MAX_SAFE_INTEGER = 9007199254740991;
 
 //g.Break = function() { debugger; };
 g.Debugger = function() { debugger; }
@@ -185,7 +182,7 @@ g.E = function(...objExtends) {
 // ==========
 
 // object-Json
-g.FromJSON = function(json) { return JSON.parse(json); }
+var FromJSON = g.FromJSON = function(json) { return JSON.parse(json); }
 var ToJSON = g.ToJSON = function(obj, excludePropNames___) {
 	try {
 		if (arguments.length > 1) {
@@ -228,9 +225,9 @@ var ToJSON_Safe = g.ToJSON_Safe = function(obj, excludePropNames___) {
 	return result;
 }
 
-g.ToJSON_Try = function(...args) {
+var ToJSON_Try = g.ToJSON_Try = function(...args) {
 	try {
-		return ToJSON(...args);
+		return ToJSON.apply(this, args);
 	} catch (ex) {}
 	return "[converting to JSON failed]";
 }
@@ -239,7 +236,7 @@ g.ToJSON_Try = function(...args) {
 // ----------
 
 //Function.prototype._AddGetter_Inline = function VDFSerialize() { return function() { return VDF.CancelSerialize; }; };
-Function.prototype.Serialize = function() { return VDF.CancelSerialize; }.AddTags(new VDFSerialize());
+(Function.prototype as any).Serialize = (function() { return VDF.CancelSerialize; } as any).AddTags(new VDFSerialize());
 
 var FinalizeFromVDFOptions = g.FinalizeFromVDFOptions = function(options = null) {
     options = options || new VDFLoadOptions();
@@ -274,7 +271,7 @@ g.FromVDFNode = function(node, declaredTypeName = null) { // alternative to .ToO
 	return node.ToObject(declaredTypeName, FinalizeFromVDFOptions());
 }
 
-g.FinalizeToVDFOptions = function(options = null) {
+var FinalizeToVDFOptions = g.FinalizeToVDFOptions = function(options = null) {
     options = options || new VDFSaveOptions();
 	return options;
 }
@@ -311,23 +308,27 @@ g.GetTypeName = function(obj) {
 // vdf extensions
 // ==========
 
-Moment.prototype.Serialize = function() {
+Moment.prototype.Serialize = (function() {
 	return new VDFNode(this.format("YYYY-MM-DD HH:mm:ss.SSS"));
-}.AddTags(new VDFSerialize());
-Moment.prototype.Deserialize = function(node) {
+} as any).AddTags(new VDFSerialize());
+Moment.prototype.Deserialize = (function(node) {
 	return Moment(node.primitiveValue);
-}.AddTags(new VDFDeserialize(true));
+} as any).AddTags(new VDFDeserialize(true));
 
 // fix for that ObservableArray's would be serialized as objects
 var observableHelper = O({test1: []});
 var ObservableArray = observableHelper.test1.constructor;
-ObservableArray.name_fake = "List(object)";
+(ObservableArray as any).name_fake = "List(object)";
 //alert(ObservableArray + ";" + VDF.GetTypeNameOfObject(observableHelper.test1))
 
 // tags
 // ==========
 
-g.T = function(typeOrTypeName) {
+function G(target, name) {
+	g[target.GetName()] = target;
+}
+
+export function T(typeOrTypeName) {
     return (target, name, descriptor)=> {
         //target.prototype[name].AddTags(new VDFPostDeserialize());
         //Prop(target, name, typeOrTypeName);
@@ -336,20 +337,20 @@ g.T = function(typeOrTypeName) {
         propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
     };
 };
-g.P = function P(...args) {
+export function P(...args): PropertyDecorator {
     return function(target, name) {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new VDFProp(...args));
     };
 };
-g.D = function(...args) {
+export function D(...args) {
     return (target, name, descriptor)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new DefaultValue(...args));
     };
 };
 
-g._VDFTypeInfo = function(...args) {
+export function _VDFTypeInfo(...args) {
     return (target, name, descriptor)=>target[name].AddTags(new VDFTypeInfo(...args));
 };
 
@@ -412,11 +413,11 @@ g._VDFPostSerialize = function(...args) {
 // types stuff
 // ==========
 
-g.IsPrimitive = function(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
+var IsPrimitive = g.IsPrimitive = function(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
 var IsBool = g.IsBool = function(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
 g.ToBool = function(boolStr) { return boolStr == "true" ? true : false; }
 var IsNumber = g.IsNumber = function(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
-g.IsNumberString = function(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
+var IsNumberString = g.IsNumberString = function(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
 g.ToInt = function(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
 g.ToDouble = function(stringOrIntVal) { return parseFloat(stringOrIntVal); }
 var IsString = g.IsString = function(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
@@ -424,19 +425,19 @@ g.ToString = function(val) { return "" + val; }
 
 g.IsNaN = function(obj) { return typeof obj == "number" && obj != obj; }
 
-g.IsInt = function(obj) { return typeof obj == "number" && parseFloat(obj) == parseInt(obj); }
-g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj) != parseInt(obj); }
+g.IsInt = function(obj) { return typeof obj == "number" && parseFloat(obj as any) == parseInt(obj as any); }
+g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj as any) != parseInt(obj as any); }
 
 // timer stuff
 // ==========
 
-export function WaitXThenRun(waitTime: number, func: any) { setTimeout(func, waitTime); }
-g.Sleep = function(ms: number) {
-	var startTime: number = new Date().getTime();
+export function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
+g.Sleep = function Sleep(ms) {
+	var startTime = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
 	{}
 }
-g.WaitXThenRun_Multiple = function(waitTime, func, count: number = -1) {
+g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
 	var countDone = 0;
 	var timerID = setInterval(function() {
 		func();
@@ -445,7 +446,7 @@ g.WaitXThenRun_Multiple = function(waitTime, func, count: number = -1) {
 			clearInterval(timerID);
 	}, waitTime);
 
-	var controller = {};
+	var controller: any = {};
 	controller.Stop = function() { clearInterval(timerID); }
 	return controller;
 }
@@ -458,9 +459,9 @@ var Timer = g.Timer = class Timer {
 	    this.maxCallCount = maxCallCount;
 	}
 
-	interval = 0;
-	func: Function;
-	maxCallCount = 0;
+	interval;
+	func;
+	maxCallCount;
 	timerID = -1;
 	get IsRunning() { return this.timerID != -1; }
 
@@ -485,17 +486,16 @@ g.TimerMS = class TimerMS extends Timer {
     }
 }
 
-var funcLastScheduledRunTimes: any = {};
+var funcLastScheduledRunTimes = {};
 g.BufferAction = function(...args) {
-	var minInterval = 0, func = null;
-	if (args.length == 2) var [minInterval: number, func: any] = args, key = null;
-	else if (args.length == 3) var [key: String, minInterval: number, func: any] = args;
+	if (args.length == 2) var [minInterval, func] = args, key = null;
+	else if (args.length == 3) var [key, minInterval, func] = args;
 
     var lastScheduledRunTime = funcLastScheduledRunTimes[key] || 0;
     var now = new Date().getTime();
-    var timeSinceLast: number = now - lastScheduledRunTime;
+    var timeSinceLast = now - lastScheduledRunTime;
     if (timeSinceLast >= minInterval) { // if we've waited enough since last run, run right now
-        (func: any)();
+        func();
         funcLastScheduledRunTimes[key] = now;
     } else if (timeSinceLast > 0) { // else, if we don't yet have a future-run scheduled, schedule one now
         var intervalEndTime = lastScheduledRunTime + minInterval;
@@ -508,32 +508,35 @@ g.BufferAction = function(...args) {
 // Random
 // ==========
 
-var Random = g.Random = function(seed) {
-	seed = seed != null ? seed : new Date().getTime();
+class Random {
+	static canvasContext;
+	static canvas;
 
-	if (seed == 0)
-		throw new Error("Cannot use 0 as seed. (prng algorithm isn't very good, and doesn't work with seeds that are multiples of PI)");
-
-	var s = this;
-	s.seed = seed;
-	s.NextInt = function() {
-		var randomDouble = Math.sin(s.seed) * 10000;
-		var randomDouble_onlyIntegerPart = Math.floor(s.seed);
-		s.seed = randomDouble;
+	constructor(seed = new Date().getTime()) {
+		if (seed == 0)
+			throw new Error("Cannot use 0 as seed. (prng algorithm isn't very good, and doesn't work with seeds that are multiples of PI)");
+		this.seed = seed;
+	}
+	seed = -1;
+	NextInt() {
+		var randomDouble = Math.sin(this.seed) * 10000;
+		var randomDouble_onlyIntegerPart = Math.floor(this.seed);
+		this.seed = randomDouble;
 		return randomDouble_onlyIntegerPart;
-	};
-	s.NextDouble = function() {
-		var randomDouble = Math.sin(s.seed) * 10000;
-		var randomDouble_onlyFractionalPart = s.seed - Math.floor(s.seed);
-		s.seed = randomDouble;
+	}
+	NextDouble() {
+		var randomDouble = Math.sin(this.seed) * 10000;
+		var randomDouble_onlyFractionalPart = this.seed - Math.floor(this.seed);
+		this.seed = randomDouble;
 		return randomDouble_onlyFractionalPart;
-	};
-	//s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
-	s.NextColor_ImageStr = function() {
-		var color = s.NextColor();
+	}
+	/*s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
+	NextColor_ImageStr() {
+		var color = this.NextColor();
 		Random.canvasContext.fillStyle = color.ToHexStr();
 		Random.canvasContext.fillRect(0, 0, Random.canvas[0].width, Random.canvas[0].height);
 		var imageStr = Random.canvas[0].toDataURL();
 		return imageStr.substr(imageStr.indexOf(",") + 1);
-	};
+	}*/
 }
+g.Random = Random;

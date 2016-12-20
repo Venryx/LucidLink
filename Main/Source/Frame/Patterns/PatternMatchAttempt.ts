@@ -1,4 +1,7 @@
-g.PatternMatchAttempt = class PatternMatchAttempt {
+import {Toast} from "Source/Frame/Globals";
+import {Gap, Matcher} from "./FuncPattern";
+
+export default class PatternMatchAttempt {
 	constructor(key, pattern) {
 		this.key = key;
 		this.pattern = pattern;
@@ -14,6 +17,8 @@ g.PatternMatchAttempt = class PatternMatchAttempt {
 		var nextSegmentIndex = this.segmentsMatched;
 		var nextSegment = this.pattern.segments[nextSegmentIndex];
 		//if (nextSegment == null) return;
+		Trace();
+		sdfd();
 
 		let distFromLastMatch = x - lastSegment_matchX;
 		if (nextSegment instanceof Gap) {

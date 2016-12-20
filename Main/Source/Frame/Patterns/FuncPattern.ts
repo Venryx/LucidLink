@@ -1,4 +1,6 @@
-g.FuncPattern = class FuncPattern {
+//import * as g from "../Globals";
+import {D} from "../Globals";
+export class FuncPattern {
 	constructor(info) {
 		if (info.minStartInterval) this.minStartInterval = info.minStartInterval;
 		if (info.gapTraverse) this.gapTraverse = info.gapTraverse;
@@ -14,10 +16,10 @@ g.FuncPattern = class FuncPattern {
 	onMatch = null; // matchAttempt=>{}
 }
 
-g.Segment = class Segment {
+export class Segment {
 }
 
-g.Gap = class Gap extends Segment {
+export class Gap extends Segment {
 	constructor(info) {
 		super();
 		this.min = info.min;
@@ -26,7 +28,7 @@ g.Gap = class Gap extends Segment {
 	min = 0;
 	max = 0;
 }
-g.Matcher = class Matcher extends Segment {
+export class Matcher extends Segment {
 	constructor(matchFunc) {
 		super();
 		this.matchFunc = matchFunc;

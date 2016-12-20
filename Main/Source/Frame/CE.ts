@@ -1,10 +1,17 @@
-var g = global;
-
 // ClassExtensions.js
 // ==========
 
 // Object: base
 // ==================
+
+interface Object {
+	_AddItem: (name: string, func: Function)=>void;
+	_AddFunction: (name: string, func: Function)=>void;
+	_AddGetterSetter: (name: string, getter: Function, setter: Function)=>void;
+	_AddFunction_Inline: Function;
+	_AddGetter_Inline: Function;
+	_AddSetter_Inline: Function;
+}
 
 // the below lets you do stuff like this: Array.prototype._AddFunction(function AddX(value) { this.push(value); }); []._AddX("newItem");
 Object.defineProperty(Object.prototype, "_AddItem", { // note; these functions should by default add non-enumerable properties/items
@@ -49,6 +56,10 @@ Object.prototype._AddGetterSetter("AddFunc", null, function(func) { this._AddFun
 
 // Function (early)
 // ==========
+
+interface Function {
+	G: ()=>void;
+}
 
 //Function.prototype._AddFunction_Inline = function GetName() { return this.name || this.name_fake || this.toString().match(/^function\s*([^\s(]+)/)[1]; };
 Function.prototype._AddFunction_Inline = function GetName() { return this.name_fake || this.name || this.toString().match(/^function\s*([^\s(]+)/)[1]; };
@@ -181,6 +192,7 @@ g.UnsimplifyType = function(type) {
 //Object.prototype._AddFunction_Inline = function CopyXChildrenAsOwn(x) { $.extend(this, x); };
 //Object.prototype._AddFunction_Inline = function CopyXChildrenToClone(x) { return $.extend($.extend({}, this), x); };
 
+interface Object { Extend: (obj)=>void; }
 Object.prototype._AddFunction_Inline = function Extend(x) {
 	for (var name in x) {
 		var value = x[name];
@@ -305,17 +317,17 @@ Number.prototype._AddFunction_Inline = function IfN1Then(valIfSelfIsNeg1) {
 
 //Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) { return Math.round(new Number(this) / step) * step; }; //return this.lastIndexOf(str, 0) === 0; };
 Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) {
-	var integeredAndRounded = Math.round(new Number(this) / step);
+	var integeredAndRounded = Math.round((new Number(this) as any) / step);
 	var result = (integeredAndRounded * step).toFixed(step.toString().TrimStart("0").length); // - 1);
 	if (result.contains("."))
 		result = result.TrimEnd("0").TrimEnd(".");
 	return result;
 };
 
-Number.prototype._AddFunction_Inline = function KeepAtLeast(step) {
+Number.prototype._AddFunction_Inline = function KeepAtLeast(min) {
 	return Math.max(min, this);
 };
-Number.prototype._AddFunction_Inline = function KeepAtMost(step) {
+Number.prototype._AddFunction_Inline = function KeepAtMost(max) {
 	return Math.min(max, this);
 };
 Number.prototype._AddFunction_Inline = function KeepBetween(min, max) {
@@ -335,7 +347,8 @@ Number.prototype._AddFunction_Inline = function Distance(other) {
 // String
 // ==========
 
-String.prototype._AddFunction_Inline = function TrimEnd(chars___) {
+interface String { TrimEnd: (chars___)=>string; }
+String.prototype.TrimEnd = function(chars___) {
 	var chars = V.Slice(arguments);
 
 	var result = "";
@@ -352,6 +365,7 @@ String.prototype._AddFunction_Inline = function startsWith(str) { return this.in
 String.prototype._AddFunction_Inline = function endsWith(endStr) {
 	return this.indexOf(endStr, this.length - endStr.length) != -1;
 };
+interface String { contains: (str)=>boolean; }
 String.prototype._AddFunction_Inline = function contains(str, /*;optional:*/ startIndex) { return -1 !== String.prototype.indexOf.call(this, str, startIndex); };
 String.prototype._AddFunction_Inline = function hashCode() {
 	var hash = 0;

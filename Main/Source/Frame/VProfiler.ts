@@ -1,5 +1,3 @@
-/* @flow */
-
 import BlockRunInfo from "./VProfiler/BlockRunInfo";
 //import {Timer} from "Source/Globals.js";
 
