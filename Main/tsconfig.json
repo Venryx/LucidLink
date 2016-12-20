@@ -1,13 +1,29 @@
 {
     "compilerOptions": {
+        "target": "es6",
         "allowJs": true,
+        "jsx": "react",
+        "outDir": "artifacts",
+        "rootDir": "Source",
+        "sourceMap": true,
+        "noImplicitAny": false,
+
+		"moduleResolution": "node",
+		"maxNodeModulesJsDepth": 1,
+		"watch": true,
+		
 		"experimentalDecorators": true,
 		"baseUrl": "./",
 		"paths" : {
-		  "Source/*": ["./Source/*"]
+			"Source/*": ["./Source/*"]
 		}
     },
-    "exclude": [
+    "filesGlob_disabled": [
+        "Typings/**/*.d.ts",
+        "Source/**/*.ts",
+        "Source/**/*.tsx"
+    ],
+    "exclude_disabled": [
         "node_modules"
     ]
 }

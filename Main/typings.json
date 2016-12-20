@@ -1,0 +1,8 @@
+{
+  "name": "LucidLink",
+  "dependencies": {},
+  "globalDependencies": {
+    "react": "registry:dt/react#0.14.0+20160817201227",
+    "react-native": "registry:dt/react-native#0.29.0+20160728152643"
+  }
+}

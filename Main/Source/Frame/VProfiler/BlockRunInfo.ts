@@ -1,4 +1,6 @@
-g.BlockRunInfo = class BlockRunInfo {
+import {P, WaitXThenRun} from "Source/Frame/Globals";
+
+export class BlockRunInfo {
 	static fakeBlockRunInfo;
 	static _=WaitXThenRun(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
 
@@ -7,8 +9,8 @@ g.BlockRunInfo = class BlockRunInfo {
 		else if (args.length == 4) var [parent, name, method, depth] = args;
 
 		if (depth > 100)
-			throw new Exception("Cannot profile call-path with a depth greater than 100.");
-		root = parent != null ? parent.root : this;
+			throw new Error("Cannot profile call-path with a depth greater than 100.");
+		this.root = parent != null ? parent.root : this;
 		this.parent = parent;
 		this.depth = depth;
 
@@ -90,7 +92,6 @@ g.BlockRunInfo = class BlockRunInfo {
 		if (this == BlockRunInfo.fakeBlockRunInfo) return;
 		Assert(this.runCount > 0); // confirm that this block we're ending was at some point started
 		if (this.timer_startTime == -1) return; // if already ended, return
-		this.ended = true;
 
 		this.EndLastSection();
 

@@ -296,8 +296,8 @@ g.T = function(typeOrTypeName) {
         propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
     };
 };
-g.P = function(...args) {
-    return function Temp1(target, name, descriptor) {
+g.P = function P(...args): PropertyDecorator {
+    return function(target, name) {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new VDFProp(...args));
     };
@@ -390,7 +390,7 @@ g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj) !=
 // timer stuff
 // ==========
 
-g.WaitXThenRun = function(waitTime, func) { setTimeout(func, waitTime); }
+export function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
 g.Sleep = function(ms) {
 	var startTime = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
