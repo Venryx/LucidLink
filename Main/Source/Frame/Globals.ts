@@ -89,7 +89,7 @@ g.JavaLog = function(...args) {
 	else if (args.length == 2) [type, message] = args;
 	JavaBridge.Main.PostJSLog(type, message);
 }
-var Trace = g.Trace = function(...args) {
+export function Trace(...args) {
 	console.trace.apply(this, args);
 };
 
