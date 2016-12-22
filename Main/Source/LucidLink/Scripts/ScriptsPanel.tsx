@@ -2,7 +2,7 @@ import {colors} from "../../Frame/Styles";
 import {BaseComponent, Panel, VButton} from "../../Frame/ReactGlobals";
 import {Script} from "./Script";
 var SortableListView = require("react-native-sortable-listview");
-import {TouchableHighlight, Text, Switch} from "react";
+import {TouchableHighlight, Text, Switch} from "react-native";
 import {DN} from "../../Frame/Globals";
 import Bind from "autobind-decorator";
 

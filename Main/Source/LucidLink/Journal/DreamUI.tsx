@@ -1,6 +1,6 @@
-import {BaseComponent, Column, Row, VSwitch} from '../../Frame/ReactGlobals';
+import {BaseComponent, Column, Row, VSwitch} from "../../Frame/ReactGlobals";
 import ActionBar from "react-native-action-bar";
-import { TextInput, DatePickerAndroid, TimePickerAndroid } from 'react';
+import {TextInput, DatePickerAndroid, TimePickerAndroid} from "react-native";
 import {DN} from "../../Frame/Globals";
 var Moment = require("moment");
 

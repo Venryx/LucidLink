@@ -1,4 +1,4 @@
-import {Text, TextInput} from "react";
+import {Text, TextInput} from "react-native";
 import {BaseComponent, Panel, VButton} from '../../Frame/ReactGlobals';
 import {colors, styles} from '../../Frame/Styles';
 import {E} from '../../Frame/Globals';

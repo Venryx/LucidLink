@@ -5,7 +5,7 @@ import RNFS from "react-native-fs";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import DialogAndroid from "react-native-dialogs";
 import Drawer from "react-native-drawer";
-import {Text} from "react";
+import {Text} from "react-native";
 
 import ScriptRunner from "./Scripts/ScriptRunner";
 

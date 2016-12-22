@@ -1,4 +1,4 @@
-import {Text, TouchableHighlight} from "react";
+import {Text, TouchableHighlight} from "react-native";
 import {colors} from '../../../Frame/Styles';
 import {BaseComponent, Panel, VButton} from '../../../Frame/ReactGlobals';
 import {observer} from 'mobx-react/native';

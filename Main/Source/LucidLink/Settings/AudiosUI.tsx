@@ -2,10 +2,10 @@ import {BaseComponent, Column, Panel, Row, VButton} from "../../Frame/ReactGloba
 import {colors} from "../../Frame/Styles";
 import {Log, DN} from "../../Frame/Globals";
 import {NativeModules} from "react-native";
-import {TextInput} from "react";
+import {TextInput} from "react-native";
 var FilePickerManager = NativeModules.FilePickerManager;
 
-export default class AudiosUI extends BaseComponent { 
+export default class AudiosUI extends BaseComponent {
 	render() {
 		var node = LL.settings;
 		return (

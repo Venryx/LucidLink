@@ -4,7 +4,7 @@ var Moment = require("moment");
 
 import DreamUI from "./Journal/DreamUI";
 import {Assert, FromVDF, GetTypeName, P, ToVDF, E} from "../Frame/Globals";
-import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react";
+import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
 import Bind from "autobind-decorator";
 import Node from "../Packages/VTree/Node";
 

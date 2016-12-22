@@ -3,7 +3,7 @@ import {Observer, observer} from "mobx-react/native";
 var Moment = require("moment");
 
 import SessionUI from "./List/SessionUI";
-import { DatePickerAndroid, ScrollView, TouchableOpacity, Text } from 'react';
+import { DatePickerAndroid, ScrollView, TouchableOpacity, Text } from 'react-native';
 import { E } from '../../Frame/Globals';
 import Bind from "autobind-decorator";
 

@@ -1,5 +1,5 @@
 import {ToJSON} from '../../../Frame/Globals';
-import {Text, TextInput, ScrollView} from "react"
+import {Text, TextInput, ScrollView} from "react-native"
 import {BaseComponent, Column, Row} from '../../../Frame/ReactGlobals';
 import ActionBar from "react-native-action-bar";
 var Moment = require("moment");

@@ -5,7 +5,6 @@ g.g = g;
 import {LogEntry, More} from '../LucidLink/More';
 import V from '../Packages/V/V';
 
-import {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
 //import {observable as O, autorun} from "mobx";
 import {observable as O} from "mobx";
@@ -180,6 +179,8 @@ export function E(...objExtends: any[]) {
 	return result;
 	//return StyleSheet.create(result);
 }
+// for react-native-chart modifications...
+g.E = E;
 
 // methods: serialization
 // ==========
