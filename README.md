@@ -20,8 +20,8 @@ Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
 1) Start up the virtual Android device. (or connect Android device through usb/wifi)  
 2) Compile the TS (TypeScript) files to JS, either by:
-2.A) Open CMD in "Main" folder, and run ```node ".\node_modules\typescript\bin\tsc.js" -w -p .```
-2.B) Open the project in Visual Studio Code and run the build task. (ctrl+alt+b)
+2.A) Open CMD in "Main" folder, and run ```node ".\node_modules\typescript\bin\tsc.js" -w -p .```  
+2.B) Open the project in Visual Studio Code and run the build task. (ctrl+alt+b)  
 3) Open CMD in "Main" folder, and run "react-native run-android".  
 
 ### Making changes
