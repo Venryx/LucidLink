@@ -1,48 +1,18 @@
-export declare var VDF;
-declare var VDFNode;
-declare var VDFTypeInfo;
-declare var VDFTypeMarking;
-declare var VDFProp;
-
-// tags and stuff
-declare var ByName;
-declare var ByPathStr;
-declare var ByPath;
-declare var NoAttach;
-declare var DefaultValue;
-declare var IgnoreStartData;
-declare var Type;
-declare var List;
-declare var Dictionary;
-
-// saving
-declare var VDFSaver;
-declare var VDFSaveOptions;
-declare var VDFSerializeProp;
-declare var VDFPreSerialize;
-declare var VDFSerialize;
-declare var VDFPostSerialize;
-
-// loading
-declare var VDFLoader;
-declare var VDFLoadOptions;
-declare var VDFDeserializeProp;
-declare var VDFDeserialize;
-declare var VDFPreDeserialize;
-declare var VDFPostDeserialize;
-
 var g: any = global;
 g.g = g;
 
+//import {LogEntry, More} from '../LucidLink/More';
+import {LogEntry, More} from '../LucidLink/More';
+import V from '../Packages/V/V';
+
 import {Component} from "react";
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
-import {observable as O, transaction as Transaction, autorun as AutoRun} from "mobx";
-import {observer as Observer} from "mobx-react/native";
+//import {observable as O, autorun} from "mobx";
+import {observable as O} from "mobx";
 //import Moment from "moment";
 var Moment = require("moment");
 
-var globalComps = {NativeModules, DeviceEventEmitter,
-	O, Transaction, AutoRun, Observer};
+var globalComps = {O};
 (globalComps as any).Moment = Moment;
 //globalComps.Extend({Moment});
 //g.Extend(globalComps);
@@ -59,13 +29,16 @@ ErrorUtils.setGlobalHandler((error, isFatal)=> {
 	HandleError(error, isFatal);
 	ErrorUtils._globalHandler_orig(error, isFatal);
 });
-export var HandleError = (g as any).HandleError = function(error, isFatal) {
+export function HandleError(error, isFatal = false) {
 	Log(`${error}
 Stack) ${error.stack}
 Fatal) ${isFatal}`);
 };
 
-g.Log = function(...args) {
+export function DoNothing(...args) {}
+export function DN(...args) {}
+
+export function Log(...args) {
 	var type = "general", message, sendToJava = true;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
@@ -83,7 +56,7 @@ g.Log = function(...args) {
 		//} catch (ex) {}
 	}
 };
-g.JavaLog = function(...args) {
+export function JavaLog(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
@@ -99,22 +72,22 @@ export function Toast(text, duration = 0) {
 	JavaBridge.Main.ShowToast(text, duration);
 }
 
-g.Notify = function(text) {
+export function Notify(text) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.Notify(text);
 }
 
-g.Assert = function(condition, messageOrMessageFunc) {
+export function Assert(condition, messageOrMessageFunc = "") {
 	if (condition) return;
 
-	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
+	var message = (messageOrMessageFunc as any) instanceof Function ? (messageOrMessageFunc as any)() : messageOrMessageFunc;
 
 	Log("Assert failed) " + message);
 	console.error(message);
 	throw new Error(message);
 };
-g.AssertWarn = function(condition, messageOrMessageFunc) {
+export function AssertWarn(condition, messageOrMessageFunc) {
 	if (condition) return;
 
 	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
@@ -122,7 +95,7 @@ g.AssertWarn = function(condition, messageOrMessageFunc) {
 	console.warn(message);
 };
 
-g.A = class A {
+export class A {
     static set NonNull(value) {
 		Assert(value != null, "Value cannot be null.");
 	}
@@ -134,21 +107,51 @@ g.A = class A {
 	    return new A_OfType_Wrapper(type);
 	}
 } 
-var A_NotEqualTo_Wrapper = g.A_NotEqualTo_Wrapper = class A_NotEqualTo_Wrapper {
+export class A_NotEqualTo_Wrapper {
 	constructor(val1) { this.val1 = val1; }
 	val1;
     set a(val2) { Assert(val2 != this.val1); }
 }
-var A_OfType_Wrapper = g.A_OfType_Wrapper = class A_OfType_Wrapper {
+export class A_OfType_Wrapper {
 	constructor(type) { this.type = type; }
 	type;
     set a(val) { Assert(val != null && val.GetType().IsDerivedFrom(this.type)); }
 }
 
-var JavaBridge = g.JavaBridge = class JavaBridge {
+export class JavaBridge {
     static get Main() {
         return NativeModules.Main;
     }
+}
+
+// type system
+// ==========
+
+function IsType(obj: any) {
+	return obj instanceof Function;
+}
+// probably temp
+/*function SimplifyTypeName(typeName) {
+	var result = typeName;
+	if (result.startsWith("List("))
+		result = "IList";
+	return result;
+}*/
+export function SimplifyType(type) {
+	var typeName = IsType(type) ? type.name : type;
+    if (typeName.startsWith("List("))
+        return Type("IList");
+    if (typeName.startsWith("Dictionary("))
+        return Type("IDictionary");
+    return type;
+}
+export function UnsimplifyType(type) {
+    var typeName = IsType(type) ? type.name : type;
+	if (typeName == "IList")
+        return Type("List");
+    if (typeName == "IDictionary")
+        return Type("Dictionary");
+    return type;
 }
 
 // polyfills for constants
@@ -160,9 +163,9 @@ if (Number.MAX_SAFE_INTEGER == null)
 	(Number as any).MAX_SAFE_INTEGER = 9007199254740991;
 
 //g.Break = function() { debugger; };
-g.Debugger = function() { debugger; }
-g.Debugger_True = function() { debugger; return true; }
-g.Debugger_If = function(condition) {
+export function Debugger() { debugger; }
+export function Debugger_True() { debugger; return true; }
+export function Debugger_If(condition) {
     if (condition)
         debugger;
 }
@@ -170,7 +173,7 @@ g.Debugger_If = function(condition) {
 // general
 // ==========
 
-g.E = function(...objExtends) {
+export function E(...objExtends: any[]) {
     var result = {};
     for (var extend of objExtends)
         result.Extend(extend);
@@ -182,11 +185,10 @@ g.E = function(...objExtends) {
 // ==========
 
 // object-Json
-var FromJSON = g.FromJSON = function(json) { return JSON.parse(json); }
-var ToJSON = g.ToJSON = function(obj, excludePropNames___) {
+export function FromJSON(json) { return JSON.parse(json); }
+export function ToJSON(obj, ...excludePropNames) {
 	try {
 		if (arguments.length > 1) {
-			var excludePropNames = V.Slice(arguments, 1);
 			return JSON.stringify(obj, function(key, value) {
 				if (excludePropNames.Contains(key))
 					return;
@@ -201,7 +203,7 @@ var ToJSON = g.ToJSON = function(obj, excludePropNames___) {
 		throw ex;
 	}
 }
-var ToJSON_Safe = g.ToJSON_Safe = function(obj, excludePropNames___) {
+export function ToJSON_Safe(obj, excludePropNames___) {
 	var excludePropNames = V.Slice(arguments, 1);
 
 	var cache = [];
@@ -225,7 +227,7 @@ var ToJSON_Safe = g.ToJSON_Safe = function(obj, excludePropNames___) {
 	return result;
 }
 
-var ToJSON_Try = g.ToJSON_Try = function(...args) {
+export function ToJSON_Try(...args) {
 	try {
 		return ToJSON.apply(this, args);
 	} catch (ex) {}
@@ -238,12 +240,12 @@ var ToJSON_Try = g.ToJSON_Try = function(...args) {
 //Function.prototype._AddGetter_Inline = function VDFSerialize() { return function() { return VDF.CancelSerialize; }; };
 (Function.prototype as any).Serialize = (function() { return VDF.CancelSerialize; } as any).AddTags(new VDFSerialize());
 
-var FinalizeFromVDFOptions = g.FinalizeFromVDFOptions = function(options = null) {
+export function FinalizeFromVDFOptions(options = null) {
     options = options || new VDFLoadOptions();
 	options.loadUnknownTypesAsBasicTypes = true;
 	return options;
 }
-var FromVDF = g.FromVDF = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
+export function FromVDF(vdf, declaredTypeName_orOptions?, options?) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
 
@@ -252,13 +254,13 @@ var FromVDF = g.FromVDF = function(vdf, /*o:*/ declaredTypeName_orOptions, optio
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf);
 	}/**/ finally {}
 }
-g.FromVDFInto = function(vdf, obj, /*o:*/ options) {
+export function FromVDFInto(vdf, obj, options?) {
 	try { return VDF.DeserializeInto(vdf, obj, FinalizeFromVDFOptions(options)); }
 	/*catch(error) { if (!InUnity()) throw error;
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf); }
 	/**/ finally {}
 }
-g.FromVDFToNode = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
+export function FromVDFToNode(vdf, declaredTypeName_orOptions?, options?) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
 
@@ -267,11 +269,11 @@ g.FromVDFToNode = function(vdf, /*o:*/ declaredTypeName_orOptions, options) {
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf);
 	}/**/ finally {}
 }
-g.FromVDFNode = function(node, declaredTypeName = null) { // alternative to .ToObject(), which applies default (program) settings
+export function FromVDFNode(node, declaredTypeName?) { // alternative to .ToObject(), which applies default (program) settings
 	return node.ToObject(declaredTypeName, FinalizeFromVDFOptions());
 }
 
-var FinalizeToVDFOptions = g.FinalizeToVDFOptions = function(options = null) {
+export function FinalizeToVDFOptions(options?) {
     options = options || new VDFSaveOptions();
 	return options;
 }
@@ -280,7 +282,7 @@ var FinalizeToVDFOptions = g.FinalizeToVDFOptions = function(options = null) {
 	/*catch(error) { if (!InUnity()) throw error; else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
 	//catch(error) { if (!InUnity()) { debugger; throw error; } else LogError("Error) " + error + "Stack)" + error.stack + "\nNewStack) " + new Error().stack + "\nObj) " + obj); }
 }*/
-g.ToVDF = function(obj, markRootType = true, typeMarking = VDFTypeMarking.Internal, options = null) {
+export function ToVDF(obj, markRootType = true, typeMarking = VDFTypeMarking.Internal, options = null) {
 	try {
 		options = FinalizeToVDFOptions(options);
 		options.typeMarking = typeMarking;
@@ -291,7 +293,7 @@ g.ToVDF = function(obj, markRootType = true, typeMarking = VDFTypeMarking.Intern
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nObj) " + obj);
 	}/**/ finally {}
 }
-g.ToVDFNode = function(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing) {
+export function ToVDFNode(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing) {
 	try {
 	    return VDFSaver.ToVDFNode(obj, declaredTypeName_orOptions, options_orNothing);
 	}
@@ -300,7 +302,7 @@ g.ToVDFNode = function(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing
 	}/**/ finally {}
 }
 
-g.GetTypeName = function(obj) {
+export function GetTypeName(obj) {
 	if (obj === null || obj === undefined) return null;
 	return obj.GetTypeName();
 }
@@ -324,12 +326,8 @@ var ObservableArray = observableHelper.test1.constructor;
 // tags
 // ==========
 
-function G(target, name) {
-	g[target.GetName()] = target;
-}
-
-export function T(typeOrTypeName) {
-    return (target, name, descriptor)=> {
+export function T(typeOrTypeName: any) {
+    return (target, name)=> {
         //target.prototype[name].AddTags(new VDFPostDeserialize());
         //Prop(target, name, typeOrTypeName);
         //target.p(name, typeOrTypeName);
@@ -344,100 +342,100 @@ export function P(...args): PropertyDecorator {
     };
 };
 export function D(...args) {
-    return (target, name, descriptor)=> {
+    return (target, name)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new DefaultValue(...args));
     };
 };
 
 export function _VDFTypeInfo(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFTypeInfo(...args));
+    return (target, name)=>target[name].AddTags(new VDFTypeInfo(...args));
 };
 
-g._IgnoreStartData = function() {
-    return (target, name, descriptor)=>target[name].AddTags(new IgnoreStartData());
+export function _IgnoreStartData() {
+    return (target, name)=>target[name].AddTags(new IgnoreStartData());
 };
 
-g._NoAttach = function(...args) {
-    return (target, name, descriptor)=> {
+export function _NoAttach(...args) {
+    return (target, name)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new NoAttach(...args));
     };
 };
-g._ByPath = function(...args) {
-    return (target, name, descriptor)=> {
+export function _ByPath(...args) {
+    return (target, name)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new ByPath(...args));
     };
 };
-g._ByPathStr = function(...args) {
-	return (target, name, descriptor)=> {
+export function _ByPathStr(...args) {
+	return (target, name)=> {
 		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
 	    propInfo.AddTags(new ByPathStr(...args));
 	};
 };
-g._ByName = function(...args) {
-    return (target, name, descriptor)=> {
+export function _ByName(...args) {
+    return (target, name)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new ByName(...args));
     };
 };
 
-g._VDFDeserializeProp = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFDeserializeProp(...args));
+export function _VDFDeserializeProp(...args) {
+    return (target, name)=>target[name].AddTags(new VDFDeserializeProp(...args));
 };
-g._VDFSerializeProp = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFSerializeProp(...args));
-};
-
-g._VDFPreDeserialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFPreDeserialize(...args));
-};
-g._VDFDeserialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFDeserialize(...args));
-};
-g._VDFPostDeserialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFPostDeserialize(...args));
+export function _VDFSerializeProp(...args) {
+    return (target, name)=>target[name].AddTags(new VDFSerializeProp(...args));
 };
 
-g._VDFPreSerialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFPreSerialize(...args));
+export function _VDFPreDeserialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFPreDeserialize(...args));
 };
-g._VDFSerialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFSerialize(...args));
+export function _VDFDeserialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFDeserialize(...args));
 };
-g._VDFPostSerialize = function(...args) {
-    return (target, name, descriptor)=>target[name].AddTags(new VDFPostSerialize(...args));
+export function _VDFPostDeserialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFPostDeserialize(...args));
+};
+
+export function _VDFPreSerialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFPreSerialize(...args));
+};
+export function _VDFSerialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFSerialize(...args));
+};
+export function _VDFPostSerialize(...args) {
+    return (target, name)=>target[name].AddTags(new VDFPostSerialize(...args));
 };
 
 // types stuff
 // ==========
 
-var IsPrimitive = g.IsPrimitive = function(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
-var IsBool = g.IsBool = function(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
-g.ToBool = function(boolStr) { return boolStr == "true" ? true : false; }
-var IsNumber = g.IsNumber = function(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
-var IsNumberString = g.IsNumberString = function(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
-g.ToInt = function(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
-g.ToDouble = function(stringOrIntVal) { return parseFloat(stringOrIntVal); }
-var IsString = g.IsString = function(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
-g.ToString = function(val) { return "" + val; }
+export function IsPrimitive(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
+export function IsBool(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
+export function ToBool(boolStr) { return boolStr == "true" ? true : false; }
+export function IsNumber(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
+export function IsNumberString(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
+export function ToInt(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
+export function ToDouble(stringOrIntVal) { return parseFloat(stringOrIntVal); }
+export function IsString(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
+export function ToString(val) { return "" + val; }
 
-g.IsNaN = function(obj) { return typeof obj == "number" && obj != obj; }
+export function IsNaN(obj) { return typeof obj == "number" && obj != obj; }
 
-g.IsInt = function(obj) { return typeof obj == "number" && parseFloat(obj as any) == parseInt(obj as any); }
-g.IsDouble = function(obj) { return typeof obj == "number" && parseFloat(obj as any) != parseInt(obj as any); }
+export function IsInt(obj) { return typeof obj == "number" && parseFloat(obj as any) == parseInt(obj as any); }
+export function IsDouble(obj) { return typeof obj == "number" && parseFloat(obj as any) != parseInt(obj as any); }
 
 // timer stuff
 // ==========
 
 export function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
-g.Sleep = function Sleep(ms) {
+export function Sleep(ms) {
 	var startTime = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
 	{}
 }
-g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
+export function WaitXThenRun_Multiple(waitTime, func, count = -1) {
 	var countDone = 0;
 	var timerID = setInterval(function() {
 		func();
@@ -452,7 +450,7 @@ g.WaitXThenRun_Multiple = function(waitTime, func, count = -1) {
 }
 
 // interval is in seconds (can be decimal)
-var Timer = g.Timer = class Timer {
+export class Timer {
 	constructor(interval, func, maxCallCount = -1) {
 	    this.interval = interval;
 	    this.func = func;
@@ -480,14 +478,14 @@ var Timer = g.Timer = class Timer {
 		this.timerID = -1;
 	}
 }
-g.TimerMS = class TimerMS extends Timer {
+export class TimerMS extends Timer {
     constructor(interval_decimal, func, maxCallCount = -1) {
         super(interval_decimal / 1000, func, maxCallCount);
     }
 }
 
 var funcLastScheduledRunTimes = {};
-g.BufferAction = function(...args) {
+export function BufferAction(...args) {
 	if (args.length == 2) var [minInterval, func] = args, key = null;
 	else if (args.length == 3) var [key, minInterval, func] = args;
 
@@ -508,7 +506,7 @@ g.BufferAction = function(...args) {
 // Random
 // ==========
 
-class Random {
+export class Random {
 	static canvasContext;
 	static canvas;
 
@@ -539,4 +537,3 @@ class Random {
 		return imageStr.substr(imageStr.indexOf(",") + 1);
 	}*/
 }
-g.Random = Random;

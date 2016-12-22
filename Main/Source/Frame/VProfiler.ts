@@ -1,5 +1,5 @@
 import BlockRunInfo from "./VProfiler/BlockRunInfo";
-//import {Timer} from "Source/Globals.js";
+//import {Timer} from "Frame/Globals.js";
 
 // (data is never cleared from this class, since it's meant to track total run-time of a 'section' of code)
 export class Profiler_AllFrames {
@@ -15,6 +15,6 @@ export class Profiler_AllFrames {
 }
 Profiler_AllFrames.ResetRootBlockRunInfo();
 
-g.ProfileMethod = function(...args) {
+export function ProfileMethod(...args) {
 	return Profiler_AllFrames.CurrentBlock.StartMethod(...args);
 }

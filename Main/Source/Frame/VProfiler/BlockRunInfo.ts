@@ -1,6 +1,6 @@
-import {P, WaitXThenRun} from "Source/Frame/Globals";
+import {P, WaitXThenRun} from "../Globals";
 
-export class BlockRunInfo {
+export default class BlockRunInfo {
 	static fakeBlockRunInfo;
 	static _=WaitXThenRun(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
 

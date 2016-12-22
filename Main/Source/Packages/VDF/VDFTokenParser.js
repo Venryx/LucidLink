@@ -1,4 +1,4 @@
-var g = global;
+var g = eval("global");
 //var VDFTokenType;
 (function (VDFTokenType) {
     //WiderMetadataEndMarker,

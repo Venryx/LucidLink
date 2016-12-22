@@ -1,19 +1,11 @@
-// ClassExtensions.js
+// ClassExtensions.ts
 // ==========
 
 // Object: base
 // ==================
 
-interface Object {
-	_AddItem: (name: string, func: Function)=>void;
-	_AddFunction: (name: string, func: Function)=>void;
-	_AddGetterSetter: (name: string, getter: Function, setter: Function)=>void;
-	_AddFunction_Inline: Function;
-	_AddGetter_Inline: Function;
-	_AddSetter_Inline: Function;
-}
-
 // the below lets you do stuff like this: Array.prototype._AddFunction(function AddX(value) { this.push(value); }); []._AddX("newItem");
+interface Object { _AddItem: (name: string, func: Function)=>void; }
 Object.defineProperty(Object.prototype, "_AddItem", { // note; these functions should by default add non-enumerable properties/items
 	//configurable: true,
 	enumerable: false,
@@ -27,12 +19,14 @@ Object.defineProperty(Object.prototype, "_AddItem", { // note; these functions s
 			});
 	}
 });
+interface Object { _AddFunction: (name: string, func: Function)=>void; }
 Object.prototype._AddItem("_AddFunction", function(name, func) {
 	//this._AddItem(func.name || func.toString().match(/^function\s*([^\s(]+)/)[1], func);
 	this._AddItem(name, func);
 });
 
 // the below lets you do stuff like this: Array.prototype._AddGetterSetter("AddX", null, function(value) { this.push(value); }); [].AddX = "newItem";
+interface Object { _AddGetterSetter: (name: string, getter: Function, setter: Function)=>void; }
 Object.prototype._AddFunction("_AddGetterSetter", function(name, getter, setter) {
 	//var name = (getter || setter).name || (getter || setter).toString().match(/^function\s*([^\s(]+)/)[1];
 	if (this[name])
@@ -47,18 +41,21 @@ Object.prototype._AddFunction("_AddGetterSetter", function(name, getter, setter)
 });
 
 // the below lets you do stuff like this: Array.prototype._AddFunction_Inline = function AddX(value) { this.push(value); }; [].AddX = "newItem";
+interface Object { _AddFunction_Inline: Function; }
 Object.prototype._AddGetterSetter("_AddFunction_Inline", null, function(func) { this._AddFunction(func.name, func); }); // maybe make-so: these use func.GetName()
+interface Object { _AddGetter_Inline: Function; }
 Object.prototype._AddGetterSetter("_AddGetter_Inline", null, function(func) { this._AddGetterSetter(func.name, func, null); });
+interface Object { _AddSetter_Inline: Function; }
 Object.prototype._AddGetterSetter("_AddSetter_Inline", null, function(func) { this._AddGetterSetter(func.name, null, func); });
 
 // alias for _AddFunction_Inline, since now we need to add functions to the "window" object relatively often
-Object.prototype._AddGetterSetter("AddFunc", null, function(func) { this._AddFunction(func.name, func); });
+//Object.prototype._AddGetterSetter("AddFunc", null, function(func) { this._AddFunction(func.name, func); });
 
 // Function (early)
 // ==========
 
-interface Function {
-	G: ()=>void;
+//interface Function {
+interface Object { // add to Object interface, otherwise TS thinks "Function" refers to this interface instead of the Function class
 }
 
 //Function.prototype._AddFunction_Inline = function GetName() { return this.name || this.name_fake || this.toString().match(/^function\s*([^\s(]+)/)[1]; };
@@ -155,29 +152,10 @@ Object.prototype._AddFunction_Inline = function GetType(vdfType = true, simplify
         result = SimplifyType(result);
     return result;
 };
-// probably temp
-/*function SimplifyTypeName(typeName) {
-	var result = typeName;
-	if (result.startsWith("List("))
-		result = "IList";
-	return result;
-}*/
-g.SimplifyType = function(type) {
-	var typeName = IsType(type) ? type.name : type;
-    if (typeName.startsWith("List("))
-        return Type("IList");
-    if (typeName.startsWith("Dictionary("))
-        return Type("IDictionary");
-    return type;
-};
-g.UnsimplifyType = function(type) {
-    var typeName = IsType(type) ? type.name : type;
-	if (typeName == "IList")
-        return Type("List");
-    if (typeName == "IDictionary")
-        return Type("Dictionary");
-    return type;
-};
+
+/*import V from '../Packages/V/V';
+import {GetTypeName, IsNumberString, SimplifyType} from './Globals';
+import {max, min} from 'moment';*/
 
 // Object: normal
 // ==================
@@ -202,8 +180,26 @@ Object.prototype._AddFunction_Inline = function Extend(x) {
 	return this;
 };
 
+// must also do it on window/global, for some reason
+window.Extend = function(x) {
+	for (var name in x) {
+		var value = x[name];
+		//if (value !== undefined)
+        this[name] = value;
+    }
+	return this;
+};
+
+// use "require" instead, so doesn't make TS see this as an external module (and thus disable interface extension)
+var V = require('../Packages/V/V').default;
+var {GetTypeName, IsNumberString, SimplifyType} = require('./Globals');
+var {max, min} = require('moment');
+
 // as replacement for C#'s 'new MyClass() {prop = true}'
+//interface Object { Init: (obj)=>Object; }
+interface Object { Init<T>(obj: any): T; }
 Object.prototype._AddFunction_Inline = function Init(x) { return this.Extend(x); };
+interface Object { Init_VTree: (obj)=>Object; }
 Object.prototype._AddFunction_Inline = function Init_VTree(x) { // by default, uses set_self method
     for (var name in x)
     	this.a(name).set_self = x[name];
@@ -224,6 +220,7 @@ Object.prototype._AddFunction_Inline = function Extended(x) {
 };
 //Object.prototype._AddFunction_Inline = function E(x) { return this.Extended(x); };
 
+interface Object { Excluding(...propNames: string[]): Object; }
 Object.prototype._AddFunction_Inline = function Excluding(...propNames) {
     var result = this.Extended();
     for (let propName of propNames)
@@ -242,6 +239,7 @@ Object.prototype._AddFunction_Inline = function Excluding(...propNames) {
 //Object.prototype._AddGetter_Inline = function VKeys() { return Object.keys(this); }; // 'Keys' is already used for Dictionary prop
 Object.prototype._AddFunction_Inline = function VKeys() { return Object.keys(this); }; // 'Keys' is already used for Dictionary prop
 // like Pairs for Dictionary, except for Object
+interface Object { readonly Props: any[]; }
 Object.prototype._AddGetter_Inline = function Props() {
 	var result = [];
 	var i = 0;
@@ -330,9 +328,11 @@ Number.prototype._AddFunction_Inline = function KeepAtLeast(min) {
 Number.prototype._AddFunction_Inline = function KeepAtMost(max) {
 	return Math.min(max, this);
 };
+interface Number { KeepBetween: (min: number, max: number)=>number; }
 Number.prototype._AddFunction_Inline = function KeepBetween(min, max) {
 	return Math.min(max, Math.max(min, this));
 };
+interface Number { WrapToRange: (min: number, max: number, asInt?: boolean)=>number; }
 Number.prototype._AddFunction_Inline = function WrapToRange(min, max, asInt = true) {
 	let val = this;
 	let size = asInt ? 1 + (max - min) : max - min;
@@ -525,6 +525,7 @@ String.prototype._AddFunction_Inline = function Substring(start, end) {
 // Array
 // ==========
 
+interface Array<T> { Contains(item: T): boolean; }
 //Array.prototype._AddFunction_Inline = function Contains(items) { return this.indexOf(items) != -1; };
 Array.prototype._AddFunction_Inline = function ContainsAny(...items) {
     for (let item of items)
@@ -564,6 +565,7 @@ Array.prototype._AddFunction_Inline = function AddRange(array) {
 	for (var i in array)
 		this.push(array[i]);
 };
+interface Array<T> { Remove(item: T): T; }
 Array.prototype._AddFunction_Inline = function Remove(item) {
 	/*for (var i = 0; i < this.length; i++)
 		if (this[i] === item)
@@ -572,6 +574,7 @@ Array.prototype._AddFunction_Inline = function Remove(item) {
 	var removedItems = this.splice(itemIndex, 1);
 	return removedItems[0];
 };
+interface Array<T> { RemoveAll(items: T[]): void; }
 Array.prototype._AddFunction_Inline = function RemoveAll(items) {
     for (let item of items)
         this.Remove(item);
@@ -585,23 +588,26 @@ Array.prototype._AddFunction_Inline = function Reversed() {
 	return clone;
 }
 
-Object.prototype._AddFunction_Inline = function AsRef() { return new NodeReference_ByPath(this); }
+//Object.prototype._AddFunction_Inline = function AsRef() { return new NodeReference_ByPath(this); }
 
 // Linq replacements
 // ----------
 
+interface Array<T> { Any(matchFunc: (item: T)=>boolean): boolean; }
 Array.prototype._AddFunction_Inline = function Any(matchFunc) {
     for (let [index, item] of this.entries())
         if (matchFunc == null || matchFunc.call(item, item, index))
             return true;
     return false;
 };
+interface Array<T> { All(matchFunc: (item: T)=>boolean): boolean; }
 Array.prototype._AddFunction_Inline = function All(matchFunc) {
     for (let [index, item] of this.entries())
         if (!matchFunc.call(item, item, index))
             return false;
     return true;
 };
+interface Array<T> { Where(matchFunc: (item: T)=>boolean): T[]; }
 Array.prototype._AddFunction_Inline = function Where(matchFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())
@@ -609,12 +615,14 @@ Array.prototype._AddFunction_Inline = function Where(matchFunc) {
 			result.Add(item);
 	return result;
 };
+interface Array<T> { Select<T2>(matchFunc: (item: T)=>T2): T2[]; }
 Array.prototype._AddFunction_Inline = function Select(selectFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())
 		result.Add(selectFunc.call(item, item, index));
 	return result;
 };
+interface Array<T> { SelectMany<T2>(matchFunc: (item: T)=>T2[]): T2[]; }
 Array.prototype._AddFunction_Inline = function SelectMany(selectFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())
@@ -630,6 +638,7 @@ Array.prototype._AddFunction_Inline = function Clear() {
 		this.pop();*/
     this.splice(0, this.length);
 };
+interface Array<T> { First(valFunc?: (item: T)=>boolean): T; }
 Array.prototype._AddFunction_Inline = function First(matchFunc = null) {
     if (matchFunc) {
         for (var item of this)
@@ -707,6 +716,7 @@ Array.prototype._AddFunction_Inline = function FindIndex(matchFunc) {
             return index;
     return -1;
 };*/
+interface Array<T> { OrderBy(valFunc?: (item: T)=>number): T[]; }
 Array.prototype._AddFunction_Inline = function OrderBy(valFunc = a=>a) {
 	/*var temp = this.ToList();
 	temp.sort((a, b)=>V.Compare(valFunc(a), valFunc(b)));
@@ -722,14 +732,16 @@ Array.prototype._AddFunction_Inline = function Distinct() {
 };
 Array.prototype._AddFunction_Inline = function Except(excludeObjOrArray) {
 	if (excludeObjOrArray instanceof Array)
-   		return this.Where(a=>!excludeArray.Contains(a));
+   		return this.Where(a=>!excludeObjOrArray.Contains(a));
 	return this.Where(a=>a !== excludeObjOrArray);
 };
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};
+interface Array<T> { Min(valFunc?: (item: T)=>number): T; }
 Array.prototype._AddFunction_Inline = function Min(valFunc = a=>a) {
     return this.OrderBy(valFunc).First();
 };
+interface Array<T> { Max(valFunc?: (item: T)=>number): T; }
 Array.prototype._AddFunction_Inline = function Max(valFunc = a=>a) {
     return this.OrderBy(valFunc).Last();
 };
@@ -770,26 +782,27 @@ ArrayIterator.prototype._AddFunction_Inline = function ToArray() {
 // Date
 // ==========
 
+interface Date { readonly MonthDate: Date; }
 Date.prototype._AddGetter_Inline = function MonthDate() {
 	return new Date(this.getFullYear(), this.getMonth(), 1);
 };
 
-Date.isLeapYear = function(year) {
+function isLeapYear(year) {
     return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)); 
 };
-
-Date.getDaysInMonth = function(year, month) {
-    return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-};
-
+interface Date { isLeapYear: ()=>boolean; }
 Date.prototype.isLeapYear = function() { 
-    return Date.isLeapYear(this.getFullYear()); 
+    return isLeapYear(this.getFullYear()); 
 };
-
+function getDaysInMonth(year, month) {
+    return [31, (isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+};
+interface Date { getDaysInMonth: ()=>number; }
 Date.prototype.getDaysInMonth = function() { 
-    return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+    return getDaysInMonth(this.getFullYear(), this.getMonth());
 };
 
+interface Date { AddMonths: (value: number)=>void; }
 Date.prototype.AddMonths = function(value) {
     var n = this.getDate();
     this.setDate(1);
@@ -798,7 +811,8 @@ Date.prototype.AddMonths = function(value) {
     return this;
 };
 
-Date.prototype.Clone = function(amount) {
+interface Date { Clone: ()=>Date; }
+Date.prototype.Clone = function() {
 	return new Date(this.getTime());
 }
 

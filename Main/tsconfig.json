@@ -1,29 +1,44 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2015",
         "allowJs": true,
         "jsx": "react",
-        "outDir": "artifacts",
-        "rootDir": "Source",
+        "outDir": "Build",
+        "rootDir": "./",
         "sourceMap": true,
         "noImplicitAny": false,
 
 		"moduleResolution": "node",
-		"maxNodeModulesJsDepth": 1,
+		//"maxNodeModulesJsDepth": 1,
 		"watch": true,
 		
 		"experimentalDecorators": true,
-		"baseUrl": "./",
-		"paths" : {
+		//"baseUrl": "./"
+		"baseUrl": "Source"
+		/*"paths": {
 			"Source/*": ["./Source/*"]
-		}
+		}*/
+
+		/*"module": "es2015",
+		"allowSyntheticDefaultImports": true,
+		"preserveConstEnums": true,*/
     },
-    "filesGlob_disabled": [
+    "include": [
         "Typings/**/*.d.ts",
+		//"Typings/globals/**/*.d.ts",
         "Source/**/*.ts",
-        "Source/**/*.tsx"
+        "Source/**/*.tsx",
+		"Source/**/*.js"
     ],
-    "exclude_disabled": [
-        "node_modules"
-    ]
+    "exclude": [
+        "index.android.js",
+        "index.ios.js",
+        "Build"
+        /*"node_modules"
+		"Typings/main",
+        "Typings/main.d.ts",
+        "Typings/browser",
+        "Typings/browser.d.ts",*/
+    ],
+	"compileOnSave": true
 }

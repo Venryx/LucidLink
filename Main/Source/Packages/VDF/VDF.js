@@ -1,6 +1,6 @@
 // vdf globals
 // ==========
-var g = global;
+var g = eval("global");
 g.Log = g.Log || console.log;
 g.Assert = g.Assert || (function (condition, message) {
     if (condition)

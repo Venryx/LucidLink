@@ -1,4 +1,4 @@
-var g = global;
+var g = eval("global");
 g.VDFNode = (function () {
     function VDFNode(primitiveValue, metadata) {
         this.listChildren = new List("VDFNode");

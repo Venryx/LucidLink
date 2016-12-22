@@ -1,4 +1,4 @@
-var g = global;
+var g = eval("global");
 var Log = g.Log, Assert = g.Assert;
 //var VDFTypeMarking;
 (function (VDFTypeMarking) {
