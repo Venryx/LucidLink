@@ -1,7 +1,7 @@
-import {Text} from "react";
+import {Text} from "react-native";
 import {BaseComponent, Panel} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
-export default class ConsoleUI extends BaseComponent {
+export default class AboutUI extends BaseComponent {
 	render() {
 		return (
 			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>

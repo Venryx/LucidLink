@@ -2,6 +2,8 @@ import {JavaBridge, Log, ToJSON} from './Globals';
 import LibMuse from "react-native-libmuse";
 import Bind from "autobind-decorator";
 
+//declare var LibMuse;
+
 @Bind export default class MuseBridge {
 	static initialized = false;
 	static Init() {
