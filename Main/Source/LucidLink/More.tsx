@@ -10,6 +10,7 @@ import LogsUI from "./More/LogsUI";
 import ConsoleUI from "./More/ConsoleUI";
 import OthersUI from "./More/OthersUI";
 import AboutUI from "./More/AboutUI";
+import {LL} from "../LucidLink";
 
 export class LogEntry {
 	constructor(type, message, time) {

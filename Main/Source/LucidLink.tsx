@@ -101,7 +101,7 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 		LL.ui.forceUpdate();
 });
 
-class LucidLink extends Node {
+export class LucidLink extends Node {
 	/*constructor() {
 		super();
 		g.LL = this; // set early, so LL can be used during initial construction
@@ -141,7 +141,7 @@ class LucidLink extends Node {
 		this.scripts.SaveFileSystemData();
 	}
 	async SaveMainData() {
-		var mainDataVDF = ToVDF(g.LL, false);
+		var mainDataVDF = ToVDF(LL, false);
 		await this.RootFolder.Create();
 		await this.RootFolder.GetFile("MainData.vdf").WriteAllText(mainDataVDF);
 		Log("Finished saving main-data.");
@@ -155,10 +155,13 @@ class LucidLink extends Node {
 (LucidLink as any).typeInfo.typeTag = new VDFType(null, true);
 g.Extend({LucidLink});
 
+export var LL: LucidLink;
+
 async function Init(ui) {
 	try {
 
-	g.LL = new LucidLink();
+	LL = new LucidLink();
+	g.LL = LL; // also make global, for debugging
 	LL.ui = ui;
 	var mainDataVDF = await LL.RootFolder.GetFile("MainData.vdf").ReadAllText();
 	if (mainDataVDF) {

@@ -14,6 +14,7 @@ import scriptDefaultText_BuiltInDisplayers from "./Tracker/UserScriptDefaults/Bu
 import scriptDefaultText_CustomDisplayers from "./Tracker/UserScriptDefaults/CustomDisplayers";
 import {transaction} from "mobx";
 import Node from "../Packages/VTree/Node";
+import {LL} from "../LucidLink";
 
 export class Tracker extends Node {
 	@_VDFPreSerialize() PreSerialize() {
@@ -25,13 +26,13 @@ export class Tracker extends Node {
 	        return new VDFNode(this.selectedDisplayerScript.Name);
 	}*/
 
-	@O displayerScripts = [];
+	@O displayerScripts: Script[] = [];
 	@O displayerScriptFilesOutdated = false;
-	@O selectedDisplayerScript = null;
-	@P() selectedDisplayerScriptName = null; // used only during save-to/load-from disk 
+	@O selectedDisplayerScript: Script;
+	@P() selectedDisplayerScriptName: string; // used only during save-to/load-from disk 
 	scriptRunner = new ScriptRunner();
 
-	LoadFileSystemData(onDone = null) {
+LoadFileSystemData(onDone = null) {
 		this.LoadDisplayerScripts(onDone);
 	}
 	async LoadDisplayerScripts(onDone = null) {
@@ -89,7 +90,7 @@ export class Tracker extends Node {
 			this.ui.setState({scriptLastRunsOutdated: false});*/
 	}
 
-	@O loadedSessions = [];
+	@O loadedSessions: Session[] = [];
 	async LoadSessionsForRange(start, endOut) {
 		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
 		//await sessionsFolder.Create();

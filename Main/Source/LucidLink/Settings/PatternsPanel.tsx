@@ -4,6 +4,7 @@ import {BaseComponent, Panel, VButton} from "../../Frame/ReactGlobals";
 import {Text, TouchableHighlight, Switch} from "react-native";
 import {Pattern} from "../Settings";
 import Bind from "autobind-decorator";
+import {LL} from "../../LucidLink";
 var SortableListView = require("react-native-sortable-listview");
 
 @Bind

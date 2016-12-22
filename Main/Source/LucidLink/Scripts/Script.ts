@@ -1,5 +1,6 @@
 import {A, FromJSON, Log, ToJSON} from "../../Frame/Globals";
 import DialogAndroid from "react-native-dialogs";
+import {LL} from "../../LucidLink";
 
 export class Script {
 	static async Load(file) {

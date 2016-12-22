@@ -3,6 +3,7 @@ import {colors} from "../../Frame/Styles";
 import {Observer, observer} from "mobx-react/native";
 import {Text, Switch} from "react-native";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
+import {LL} from "../../LucidLink";
 
 @observer
 export default class GeneralUI extends BaseComponent { 

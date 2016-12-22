@@ -1,4 +1,5 @@
 import {Log, WaitXThenRun} from "../../Frame/Globals";
+import {LL} from "../../LucidLink";
 require("./ScriptGlobals");
 
 export default class ScriptRunner {

@@ -3,7 +3,7 @@
 //// <reference path="../Source/Frame/Globals.d.ts" />
 
 declare var g;
-declare var LL;
+//declare var LL;
 
 // general
 // ==========

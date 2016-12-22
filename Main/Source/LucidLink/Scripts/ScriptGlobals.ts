@@ -5,6 +5,7 @@ import {FuncPattern} from "../../Frame/Patterns/FuncPattern";
 import V from "../../Packages/V/V";
 //import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
+import {LL} from "../../LucidLink";
 var Sound = require("react-native-sound");
 
 // listeners
@@ -20,12 +21,12 @@ g.EveryXSecondsDo = function(seconds, func, maxCallCount = -1) {
 g.WhenMusePacketReceived = function(func) {
 	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
 }
-g.WhenViewDirectionUpdated = function(func) {
+/*g.WhenViewDirectionUpdated = function(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDirectionUpdated.push(func);
 }
 g.WhenViewDistanceUpdated = function(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
-}
+}*/
 
 // general
 // ==========

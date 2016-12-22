@@ -1,4 +1,5 @@
 import { FromVDF } from './Globals';
+import {LL} from "../LucidLink";
 // #mms: renamed StartData
 export default class TestData {
     static LoadInto(ld) {

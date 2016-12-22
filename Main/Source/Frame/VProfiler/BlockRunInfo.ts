@@ -1,7 +1,7 @@
 import {P, WaitXThenRun} from "../Globals";
 
 export default class BlockRunInfo {
-	static fakeBlockRunInfo;
+	static fakeBlockRunInfo: BlockRunInfo;
 	static _=WaitXThenRun(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
 
 	constructor(...args) {
@@ -26,9 +26,9 @@ export default class BlockRunInfo {
 	timer_startTime = -1;
 	@P() runTime = 0;
 	@P() children = {};
-	currentChild = null;
+	currentChild: BlockRunInfo = null;
 
-	GetCurrentDescendant() {
+	GetCurrentDescendant() : BlockRunInfo {
 		if (this.currentChild != null)
 			return this.currentChild.GetCurrentDescendant();
 		return this;
@@ -46,7 +46,7 @@ export default class BlockRunInfo {
 	}
 
 	// for child methods
-	StartMethod(...args) {
+	StartMethod(...args): BlockRunInfo {
 		if (args[0] instanceof Function) var [method] = args, name = method.GetName();
 		else var [name] = args;
 
@@ -65,7 +65,7 @@ export default class BlockRunInfo {
 	}
 
 	// for child sections
-	Section(name) {
+	Section(name): BlockRunInfo {
 		if (this == BlockRunInfo.fakeBlockRunInfo)
 			return BlockRunInfo.fakeBlockRunInfo;
 
@@ -88,10 +88,10 @@ export default class BlockRunInfo {
 			this.currentChild.End();
 	}
 
-	End() {
-		if (this == BlockRunInfo.fakeBlockRunInfo) return;
+	End<T>(result?: T): T {
+		if (this == BlockRunInfo.fakeBlockRunInfo) return result;
 		Assert(this.runCount > 0); // confirm that this block we're ending was at some point started
-		if (this.timer_startTime == -1) return; // if already ended, return
+		if (this.timer_startTime == -1) return result; // if already ended, return
 
 		this.EndLastSection();
 
@@ -104,5 +104,7 @@ export default class BlockRunInfo {
 		//Profiler_AllRuns.currentCallPath.Count.ShouldBe(depth);
 		if (this.parent != null)
 			this.parent.currentChild = null;
+
+		return result;
 	}
 }

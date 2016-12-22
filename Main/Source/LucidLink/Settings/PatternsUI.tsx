@@ -11,6 +11,7 @@ import Drawer from "react-native-drawer";
 
 import PatternsPanel from "./PatternsPanel";
 import Bind from "autobind-decorator";
+import {LL} from "../../LucidLink";
 
 @observer
 export default class PatternsUI extends BaseComponent {

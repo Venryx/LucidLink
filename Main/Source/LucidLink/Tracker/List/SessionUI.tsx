@@ -2,6 +2,7 @@ import {ToJSON} from '../../../Frame/Globals';
 import {Text, TextInput, ScrollView} from "react-native"
 import {BaseComponent, Column, Row} from '../../../Frame/ReactGlobals';
 import ActionBar from "react-native-action-bar";
+import {LL} from "../../../LucidLink";
 var Moment = require("moment");
 
 export default class SessionUI extends BaseComponent {

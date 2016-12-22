@@ -579,9 +579,12 @@ Array.prototype._AddFunction_Inline = function RemoveAll(items) {
     for (let item of items)
         this.Remove(item);
 };
+interface Array<T> { RemoveAt(index: number): T; }
 Array.prototype._AddFunction_Inline = function RemoveAt(index) { return this.splice(index, 1)[0]; };
+interface Array<T> { Insert(index: number, obj: T): void; }
 Array.prototype._AddFunction_Inline = function Insert(index, obj) { this.splice(index, 0, obj); }
 
+interface Array<T> { Reversed(): T[]; }
 Array.prototype._AddFunction_Inline = function Reversed() { 
 	var clone = this.slice(0);
 	clone.reverse();

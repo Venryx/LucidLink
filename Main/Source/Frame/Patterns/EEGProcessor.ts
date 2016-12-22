@@ -2,6 +2,7 @@ import {ProfileMethod} from '../VProfiler';
 import {IsNumber, Toast} from '../Globals';
 import PatternMatchAttempt from './PatternMatchAttempt';
 import Bind from "autobind-decorator";
+import {LL} from "../../LucidLink";
 class Packet {
 	x;
 	maxX;

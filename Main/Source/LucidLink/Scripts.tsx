@@ -19,6 +19,7 @@ import ScriptsPanel from "./Scripts/ScriptsPanel";
 import {_VDFPreSerialize, Assert, AssertWarn, E, Log, P, ToJSON} from "../Frame/Globals";
 import Bind from "autobind-decorator";
 import Node from "../Packages/VTree/Node";
+import {LL} from "../LucidLink";
 
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {

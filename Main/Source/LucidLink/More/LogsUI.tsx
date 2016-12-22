@@ -3,7 +3,9 @@ import {colors, styles} from "../../Frame/Styles";
 import {Log} from "../../Frame/Globals";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {More} from "../More";
-import {Switch, Text, ScrollView} from "react-native";
+import {Switch, Text, ScrollView as ScrollView0} from "react-native";
+var ScrollView: any = ScrollView0;
+import {LL} from "../../LucidLink";
 
 export default class LogsUI extends BaseComponent {
 	constructor(props) {

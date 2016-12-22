@@ -34,6 +34,7 @@ import OptionsPanel from "./Monitor/OptionsPanel";
 import MuseBridge from "../Frame/MuseBridge";
 import {Pattern} from "./Settings";
 import Bind from "autobind-decorator";
+import {LL} from "../LucidLink";
 
 @observer
 @Bind

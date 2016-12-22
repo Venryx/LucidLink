@@ -1,5 +1,6 @@
 import {Toast, Trace} from '../Globals';
 import {Gap, Matcher} from "./FuncPattern";
+import {LL} from "../../LucidLink";
 
 export default class PatternMatchAttempt {
 	constructor(key, pattern) {
@@ -45,12 +46,12 @@ export default class PatternMatchAttempt {
 	}
 
 	Complete() {
-		LL.scripts.scriptRunner.EndPatternMatchAttempt(this);
+		LL.monitor.eegProcessor.EndPatternMatchAttempt(this);
 		if (this.pattern.onMatch) this.pattern.onMatch(this);
 		if (this.pattern.onEnd) this.pattern.onEnd(true);
 	}
 	Cancel() {
-		LL.scripts.scriptRunner.EndPatternMatchAttempt(this);
+		LL.monitor.eegProcessor.EndPatternMatchAttempt(this);
 		if (this.pattern.onEnd) this.pattern.onEnd(false);
 	}
 }
