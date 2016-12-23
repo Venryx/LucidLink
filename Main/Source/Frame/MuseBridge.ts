@@ -72,13 +72,16 @@ import {ProfileMethod} from "./VProfiler";
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
 	}
 	
+	static count = 0;
 	static OnReceiveMuseDataPacket(packet) {
+		if (++MuseBridge.count > 300) return; // for testing
+
 		let p = ProfileMethod("OnReceiveMuseDataPacket");
 
 		//Log(`Type: ${type} ChannelValues: ${ToJSON(channelValues)}`);
 		for (let listener of LL.scripts.scriptRunner.listeners_whenMusePacketReceived)
 			listener(packet);
-
+		
 		p.End();
 	}
 }

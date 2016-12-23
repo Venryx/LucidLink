@@ -1,6 +1,8 @@
 import {Log, WaitXThenRun} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
-require("./ScriptGlobals");
+
+import * as Globals from "../../Frame/Globals";
+import * as ScriptGlobals from "./ScriptGlobals";
 
 export default class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
@@ -50,21 +52,27 @@ export default class ScriptRunner {
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
 	}
-	Init(scripts) {
-		var finalScriptsText = "";
+	currentExecutionScope = {};
+	Apply(scripts) {
+		var scriptExecutionScope = {};
+		this.currentExecutionScope = scriptExecutionScope;
+		scriptExecutionScope.Extend(Globals);
+		scriptExecutionScope.Extend(ScriptGlobals);
+
 		for (let script of scripts) {
-			finalScriptsText += (finalScriptsText.length ? "\n\n//==========\n\n" : "") + script.text;
-		}
-		try {
-			eval(finalScriptsText);
-		} catch (error) {
-			var stack = error.stack.replace(/\r/g, "")
-			stack = stack.substr(0, stack.indexOf("  at ScriptRunner.Init (")) // remove out-of-user-script stack-entries
-			stack = stack.replace(/eval \([^)]+?\), (<anonymous>:)/g, (match, sub1)=>sub1);
-			var errorStr = `${error}
+			try {
+				eval(`with (scriptExecutionScope) { ${script.text}
+}`);
+			} catch (error) {
+				var stack = error.stack.replace(/\r/g, "")
+				stack = stack.substr(0, stack.indexOf("  at ScriptRunner.Apply (")) // remove out-of-user-script stack-entries
+				// simplify the "eval ([...])" line
+				stack = stack.replace(/eval \([^)]+?\), (<anonymous>:)/g, (match, sub1)=>sub1);
+				var errorStr = `${error}
 Stack) ${stack}`;
-			Log(errorStr)
-			alert(errorStr);
+				Log(errorStr)
+				alert(errorStr);
+			}
 		}
 	}
 }

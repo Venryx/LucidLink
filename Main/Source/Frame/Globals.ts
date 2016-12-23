@@ -342,16 +342,43 @@ export function P(...args): PropertyDecorator {
         propInfo.AddTags(new VDFProp(...args));
     };
 };
-export var D;
-D = function(...args) {
-    return (target, name)=> {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.AddTags(new DefaultValue(...args));
-    };
+//export var D;
+/*export let D = ()=> {
+	let D_ = function(...args) {
+		return (target, name)=> {
+			var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+			propInfo.AddTags(new DefaultValue(...args));
+		};
+	};
+	// copy D.NullOrEmpty and such
+	for (var key in g.D)
+		D_[key] = g.D[key];
+	return D_;
+};*/
+
+export function D(...args) {
+	return (target, name)=> {
+		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+		propInfo.AddTags(new DefaultValue(...args));
+	};
+};
+/*export var DE = {};
+for (var key in g.D)
+	DE[key] = g.D[key];*/
+//export var DE = (global as any).D;
+
+/*var D: any = function D(...args) {
+	return (target, name)=> {
+		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
+		propInfo.AddTags(new DefaultValue(...args));
+	};
 };
 // copy D.NullOrEmpty and such
-for (var key in g.D)
-	D[key] = g.D[key];
+WaitXThenRun(0, ()=> {
+	for (var key in g.D)
+		D[key] = g.D[key];
+});
+export {D};*/
 
 export function _VDFTypeInfo(...args) {
     return (target, name)=>target[name].AddTags(new VDFTypeInfo(...args));

@@ -1,4 +1,4 @@
-import {BaseComponent} from "../ReactGlobals";
+import {BaseComponent, Row} from "../ReactGlobals";
 import {View, TouchableOpacity} from "react-native";
 import {E} from "../Globals";
 
@@ -35,21 +35,21 @@ export default class TreeView extends BaseComponent<
 
 	    var iconSize = 8; // with padding: 12
 		return (
-			<View style={style}>
+			<Row style={style}>
 				<TouchableOpacity onPress={this.OnArrowPress}
 					style={E(
 						{width: iconSize, height: iconSize},
 						!collapsible && {opacity: 0},
 					)}/>
 				<TouchableOpacity onPress={this.OnPress}
-						style={E(titleStyle, {width: "calc(100% - 12px)", backgroundColor: selected ? "rgba(44, 79, 122, .5)" : null} as any)}>
+						style={E(titleStyle, {backgroundColor: selected ? "rgba(44, 79, 122, .5)" : null} as any)}>
 					{titleElement || nodeLabel}
 				</TouchableOpacity>
-				<View style={E(collapsed && {display: "none"})}>
+				{!collapsed && <View>
 					{/*collapsed ? null : children*/}
 					{children}
-				</View>
-			</View>
+				</View>}
+			</Row>
 		);
 	}
 }

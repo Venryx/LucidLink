@@ -55,9 +55,11 @@ import Bind from "autobind-decorator";
 // calculate styles
 EStyleSheet.build();
 
+import autoBind from "react-autobind";
 export class BaseComponent<T, T2> extends Component<T, T2> {
 	constructor(props) {
 		super(props);
+		autoBind(this);
 		this.state = {} as any;
 	}
 

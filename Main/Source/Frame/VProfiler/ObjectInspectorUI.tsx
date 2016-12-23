@@ -3,7 +3,7 @@ import {E, IsBool, IsNumber, IsString, P, D} from "../Globals";
 import {BaseComponent} from "../ReactGlobals";
 //import TreeView from 'react-native-treeview'
 import TreeView from "../../Frame/Components/TreeView";
-import {Component} from "react-native";
+import {Component, View, Text} from "react-native";
 
 export default class ObjectInspectorUI extends BaseComponent<
 		{object, objectKey?: string, style?, textElementStyle?, titleModifierFunc: Function, keyModifierForTreeStateFunc: Function},
@@ -38,17 +38,17 @@ export default class ObjectInspectorUI extends BaseComponent<
 	    var hasExpandForChildren = !isPrimitive && hasContent;
 
 	    var selfUI = (
-		    <span>
+		    <View>
 				{title &&
-					<span style={E({whiteSpace: "pre"}, textElementStyle)}>
+					<Text style={E({whiteSpace: "pre"}, textElementStyle)}>
 						{title + (isPrimitive || obj._title ? ": " : "")}
-					</span>}
+					</Text>}
 				{!hasExpandForChildren && (
 					isPrimitive
-						? <span style={textElementStyle}>{ObjectInspectorUI.LiteralValueToDisplayText(obj)}</span>
-						: <span style={textElementStyle}>{obj instanceof List ? "[]" : "{}"}</span>
+						? <Text style={textElementStyle}>{ObjectInspectorUI.LiteralValueToDisplayText(obj)}</Text>
+						: <Text style={textElementStyle}>{obj instanceof List ? "[]" : "{}"}</Text>
 				)}
-			</span>
+			</View>
 		);
 
 	    this.childUIs = [];
@@ -120,5 +120,5 @@ export default class ObjectInspectorUI extends BaseComponent<
 
 class TreeNodeState {
     @P() @D() expanded = false;
-    @P() @D(D.NullOrEmpty) children = new Dictionary("string", "TreeNodeState");
+    @P() @D((global as any).D.NullOrEmpty) children = new Dictionary("string", "TreeNodeState");
 };

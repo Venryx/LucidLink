@@ -5,6 +5,7 @@ import {Profiler_AllFrames} from "../../Frame/VProfiler";
 import BlockRunInfo from "../../Frame/VProfiler/BlockRunInfo";
 import ObjectInspectorUI from "../../Frame/VProfiler/ObjectInspectorUI";
 import {FromVDF, Toast} from "../../Frame/Globals";
+
 export default class OthersUI extends BaseComponent<any, any> {
 	render() {
 		var {profiler_allFrames_data} = this.state;

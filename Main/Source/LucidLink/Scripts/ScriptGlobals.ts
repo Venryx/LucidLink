@@ -1,37 +1,47 @@
 import {Assert, E, Timer, WaitXThenRun} from "../../Frame/Globals";
 import {max, min} from "moment";
 import {Event} from "../Tracker/Session";
-import {FuncPattern} from "../../Frame/Patterns/FuncPattern";
+import {FuncPattern, Matcher, Gap} from "../../Frame/Patterns/FuncPattern";
 import V from "../../Packages/V/V";
 //import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL} from "../../LucidLink";
 var Sound = require("react-native-sound");
 
+// re-exports
+// ==========
+
+export {
+	// values (ie normal variables)
+	LL,
+	// classes
+	V, FuncPattern, Matcher, Gap
+};
+
 // listeners
 // ==========
 
-g.EveryXSecondsDo = function(seconds, func, maxCallCount = -1) {
+export function EveryXSecondsDo(seconds, func, maxCallCount = -1) {
 	var timer = new Timer(seconds, func, maxCallCount);
 	timer.Start();
 	LL.scripts.scriptRunner.timers.push(timer);
 	return timer;
 };
 
-g.WhenMusePacketReceived = function(func) {
+export function WhenMusePacketReceived(func) {
 	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
 }
-/*g.WhenViewDirectionUpdated = function(func) {
+/*export function WhenViewDirectionUpdated(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDirectionUpdated.push(func);
 }
-g.WhenViewDistanceUpdated = function(func) {
+export function WhenViewDistanceUpdated(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
 }*/
 
 // general
 // ==========
 
-g.GetRandomNumber = function(options) {
+export function GetRandomNumber(options) {
 	var {min, max, mustBeInteger} = options;
 	var range = max - min;
 	if (options.mustBeInteger)
@@ -39,12 +49,12 @@ g.GetRandomNumber = function(options) {
 	return min + (Math.random() * range);
 }
 
-g.AddEvent = function(type, ...args) {
+export function AddEvent(type, ...args) {
 	var event = new Event(type, args);
 	LL.tracker.currentSession.events.push(event);
 }
 
-g.AddPattern = function(info) {
+export function AddPattern(info) {
 	var pattern = new FuncPattern(info);
 	LL.scripts.scriptRunner.patterns.push(pattern);
 }
@@ -54,10 +64,10 @@ g.AddPattern = function(info) {
 
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 // (or by checking the logs for the key-codes of those pressed)
-g.AddKeyDownListener = function(keyCode, func) {
+export function AddKeyDownListener(keyCode, func) {
 	LL.scripts.scriptRunner.keyDownListeners.push({keyCode: keyCode, func: func});
 }
-g.AddKeyUpListener = function(keyCode, func) {
+export function AddKeyUpListener(keyCode, func) {
 	LL.scripts.scriptRunner.keyDownListeners.push({keyCode: keyCode, func: func});
 }
 
@@ -70,15 +80,15 @@ DeviceEventEmitter.addListener("OnSetPatternMatchProbabilities", (args: any)=> {
 	for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
 		listener(probabilities, x);
 });
-g.AddListener_OnUpdatePatternMatchProbabilities = function(func) {
+export function AddListener_OnUpdatePatternMatchProbabilities(func) {
 	LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities.push(func);
 };
 
 // audio playback
 // ==========
 
-var audioFiles = audioFiles || {};
-class AudioFile {
+export var audioFiles = audioFiles || {};
+export class AudioFile {
 	constructor(baseFile) {
 		this.baseFile = baseFile;
 		//this.SetLoopCount(-1);
@@ -158,7 +168,7 @@ class AudioFile {
 	//GetPan() { return this.baseFile.getPan(pan); } // ios only
 	//SetPan(pan) { this.baseFile.setPan(pan); } // ios only
 }
-g.GetAudioFile = function(name) {
+export function GetAudioFile(name) {
 	if (audioFiles[name] == null) {
 		var audioFileEntry = LL.settings.audioFiles.First(a=>a.name == name);
 		if (audioFileEntry == null)
@@ -178,7 +188,7 @@ g.GetAudioFile = function(name) {
 
 var Speech = require("react-native-android-speech");
 
-g.Speak = function(options) {
+export function Speak(options) {
 	options = E({forceStop: true}, options);
 	return new Promise((resolve, reject)=> {
 		Speech.speak(options).then(resolve).catch(ex=> {

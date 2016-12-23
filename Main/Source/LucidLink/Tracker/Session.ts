@@ -91,3 +91,4 @@ export class Event {
 	@P() type = null;
 	@P() args = [];
 }
+global.Extend({Event});

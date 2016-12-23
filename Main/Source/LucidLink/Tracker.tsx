@@ -85,7 +85,7 @@ LoadFileSystemData(onDone = null) {
 			AssertWarn(a.index != -1000, `Script-order not found in meta file for: ${a.file.Name}`);
 			return a.index;
 		});
-		this.scriptRunner.Init(scripts_ordered);
+		this.scriptRunner.Apply(scripts_ordered);
 		/*if (this.ui)
 			this.ui.setState({scriptLastRunsOutdated: false});*/
 	}
