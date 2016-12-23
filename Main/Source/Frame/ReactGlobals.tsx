@@ -56,11 +56,15 @@ import Bind from "autobind-decorator";
 EStyleSheet.build();
 
 import autoBind from "react-autobind";
-export class BaseComponent<T, T2> extends Component<T, T2> {
+
+/*export class BaseComponent<P, S> extends Component<P, S> {
+}*/
+
+export class BaseComponent<P, S> extends Component<P, S> {
 	constructor(props) {
 		super(props);
 		autoBind(this);
-		this.state = {} as any;
+		this.state = this.state || {} as any;
 	}
 
 	get FlattenedChildren() {
@@ -146,6 +150,7 @@ export class BaseComponent<T, T2> extends Component<T, T2> {
 	    return ReactInstanceMap.get(this) != null;
 	}*/
 }
+//global.Extend({Component2: Component, BaseComponent: Component});
 
 export class Row extends BaseComponent<any, any> {
 	render() {

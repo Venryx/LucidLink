@@ -157,7 +157,7 @@ g.Extend({LucidLink});
 
 export var LL: LucidLink;
 
-async function Init(ui) {
+export async function Init(ui) {
 	try {
 
 	LL = new LucidLink();
@@ -199,6 +199,7 @@ async function Init(ui) {
 
 	} catch (ex) { alert("Startup error) " + ex + "\n" + ex.stack); }
 }
+
 import MuseBridge from "./Frame/MuseBridge";
 import {Folder, VFile} from "./Packages/V/VFile";
 import {autorun} from "mobx";
@@ -212,82 +213,4 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 		if (LL.monitor.connect)
 			MuseBridge.StartSearch(); // start listening for a muse headband
 	}
-}
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: colors.backgroundColor,
-	},
-	welcome: {
-		fontSize: 20,
-		textAlign: "center",
-		margin: 10,
-	},
-	instructions: {
-		textAlign: "center",
-		color: "#333333",
-		marginBottom: 5,
-	},
-});
-
-// note: DO NOT have this inherit from BaseComponent; it breaks react-native's hot-reloading
-export default class LucidLinkUI extends Component<{}, {}> {
-    constructor(props) {
-        super(props);
-		Init(this);
-    }
-
-	state = {activeTab: -1};
-
-    render() {
-		// if main-data not yet loaded, render blank ui
-		if (LL.mainDataLoaded == false) {
-			var marker = null;
-			return (
-				<ScrollableTabView style_disabled={{flex: 1}}
-						onChangeTab={data=>this.setState({activeTab: data.i})}>
-					<Panel tabLabel="Monitor">{marker}</Panel>
-					<Panel tabLabel="Tracker">{marker}</Panel>
-					<Panel tabLabel="Journal">{marker}</Panel>
-					<Panel tabLabel="Scripts">{marker}</Panel>
-					<Panel tabLabel="Settings">{marker}</Panel>
-					<Panel tabLabel="More">{marker}</Panel>
-				</ScrollableTabView>
-			)
-		}
-
-     	var {activeTab} = this.state;
-        return (
-			//<Panel style={{flex: 1}}>
-			<ScrollableTabView style_disabled={{flex: 1}}
-					onChangeTab={data=> {
-						this.setState({activeTab: data.i})
-						JavaBridge.Main.OnTabSelected(data.i);
-					}}>
-				<MonitorUI tabLabel="Monitor" active={activeTab == 0}/>
-				<TrackerUI tabLabel="Tracker" active={activeTab == 1}/>
-				<JournalUI tabLabel="Journal" active={activeTab == 2}/>
-				<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
-				<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
-				<MoreUI tabLabel="More" active={activeTab == 5}/>
-			</ScrollableTabView>
-				/*{keyboardVisible &&
-					<Panel style={{position: "absolute", bottom: 0, height: 30}}>
-						<VButton style={{alignItems: "flex-end", width: 100, height: 30}}
-							textStyle={{margin: 3}} color="#777" text="Copy" onPress={()=>alert("Test1")}/>
-					</Panel>}
-			</Panel>*/
-        );
-    }
-
-	componentDidMount() {
-		JavaBridge.Main.OnTabSelected(0);
-	}
-
-	/*componentWillUnmount() {
-		SaveMainData();
-	}*/
 }

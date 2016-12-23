@@ -1,12 +1,12 @@
 import {JavaBridge, P} from "../Frame/Globals";
 import {EEGProcessor} from "../Frame/Patterns/EEGProcessor";
-import {BaseComponent, Column, Panel, Row, VButton, VSwitch} from "../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, VSwitch} from "../Frame/ReactGlobals";
 import {colors, styles} from "../Frame/Styles";
 import {max, min} from "moment";
 import {Vector2i} from "../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
 import Drawer from "react-native-drawer";
-import {MKRangeSlider} from 'react-native-material-kit';
+import {MKRangeSlider} from "react-native-material-kit";
 var DialogAndroid = require("react-native-dialogs");
 import {Text, Switch, View} from "react-native";
 import Node from "../Packages/VTree/Node";
@@ -33,12 +33,10 @@ g.Extend({Monitor});
 import OptionsPanel from "./Monitor/OptionsPanel";
 import MuseBridge from "../Frame/MuseBridge";
 import {Pattern} from "./Settings";
-import Bind from "autobind-decorator";
 import {LL} from "../LucidLink";
 
 @observer
-@Bind
-export class MonitorUI extends BaseComponent<any, any> {
+export class MonitorUI extends Component<any, any> {
 	constructor(props) {
 		super(props);
 		LL.monitor.ui = this;
@@ -54,7 +52,7 @@ export class MonitorUI extends BaseComponent<any, any> {
 	}*/
 
 	sidePanel = null;
-	@Bind ToggleSidePanelOpen() {
+	ToggleSidePanelOpen() {
 		if (this.sidePanel._open)
 			this.sidePanel.close();
 		else
@@ -188,7 +186,7 @@ export class MonitorUI extends BaseComponent<any, any> {
 }
 
 var didFirstRender = false;
-class ChannelsUI extends BaseComponent<any, any> {
+class ChannelsUI extends Component<any, any> {
     render() {
         return (
             <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">

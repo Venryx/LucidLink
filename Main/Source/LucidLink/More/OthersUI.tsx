@@ -1,16 +1,16 @@
-import {BaseComponent, Panel, Row, VButton} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, Row, VButton, Column} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {LL} from "../../LucidLink";
 import {Profiler_AllFrames} from "../../Frame/VProfiler";
 import BlockRunInfo from "../../Frame/VProfiler/BlockRunInfo";
 import ObjectInspectorUI from "../../Frame/VProfiler/ObjectInspectorUI";
-import {FromVDF, Toast} from "../../Frame/Globals";
+import {FromVDF, Toast, ToJSON} from "../../Frame/Globals";
 
-export default class OthersUI extends BaseComponent<any, any> {
+export default class OthersUI extends Component<any, any> {
 	render() {
 		var {profiler_allFrames_data} = this.state;
 		return (
-			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
+			<Column style={{flex: 1, backgroundColor: colors.background}}>
 				<Row>
 					<VButton text='Reset "built-in script"' style={{width: 300}}
 						onPress={()=>LL.scripts.ResetScript("Built-in script")}/>
@@ -22,12 +22,10 @@ export default class OthersUI extends BaseComponent<any, any> {
 				<Row>
 					<VButton text="Refresh profiler data" style={{width: 300}} onPress={this.AllFrames_Refresh}/>
 				</Row>
-				<Row>
-					<ObjectInspectorUI object={profiler_allFrames_data}
-						titleModifierFunc={this.TitleModifierFunc}
-						keyModifierForTreeStateFunc={this.KeyModifierForTreeStateFunc}/>
-				</Row>
-			</Panel>
+				<ObjectInspectorUI object={profiler_allFrames_data}
+					titleModifierFunc={this.TitleModifierFunc}
+					keyModifierForTreeStateFunc={this.KeyModifierForTreeStateFunc}/>
+			</Column>
 		);
 	}
 

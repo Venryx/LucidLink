@@ -1,11 +1,11 @@
 import V from "../../Packages/V/V";
-import {E, IsBool, IsNumber, IsString, P, D} from "../Globals";
-import {BaseComponent} from "../ReactGlobals";
+import {E, IsBool, IsNumber, IsString, P, D, Toast} from "../Globals";
+import {BaseComponent as Component, Row, Column} from "../ReactGlobals";
 //import TreeView from 'react-native-treeview'
 import TreeView from "../../Frame/Components/TreeView";
-import {Component, View, Text} from "react-native";
+import {View, Text} from "react-native";
 
-export default class ObjectInspectorUI extends BaseComponent<
+export default class ObjectInspectorUI extends Component<
 		{object, objectKey?: string, style?, textElementStyle?, titleModifierFunc: Function, keyModifierForTreeStateFunc: Function},
 		{loadChildren: boolean}> {
 	static LiteralValueToDisplayText(val) {
@@ -37,8 +37,8 @@ export default class ObjectInspectorUI extends BaseComponent<
 		var hasContent = obj && (obj instanceof Array || obj instanceof Dictionary || obj.Props.length);
 	    var hasExpandForChildren = !isPrimitive && hasContent;
 
-	    var selfUI = (
-		    <View>
+	    /*var selfUI = (
+			<View style={{flex: 1, height: 100}}>
 				{title &&
 					<Text style={E({whiteSpace: "pre"}, textElementStyle)}>
 						{title + (isPrimitive || obj._title ? ": " : "")}
@@ -49,15 +49,23 @@ export default class ObjectInspectorUI extends BaseComponent<
 						: <Text style={textElementStyle}>{obj instanceof List ? "[]" : "{}"}</Text>
 				)}
 			</View>
-		);
+		);*/
+		var selfUIText = ">";
+		if (title)
+			selfUIText += title + (isPrimitive || obj._title ? ": " : "");
+		if (!hasExpandForChildren)
+			selfUIText += isPrimitive ? ObjectInspectorUI.LiteralValueToDisplayText(obj) : obj instanceof List ? "[]" : "{}";
+		Toast(selfUIText);
+		var selfUI = <Text>{selfUIText}</Text>;
 
 	    this.childUIs = [];
 		return (
-			<TreeView ref={c=>this.treeView = c} titleElement={selfUI} style={style} titleStyle={textElementStyle}
+			<TreeView ref={c=>this.treeView = c} style={style}
+					titleElement={selfUI} titleStyle={textElementStyle}
 					defaultCollapsed={true} collapsible={hasExpandForChildren}
 					onArrowPress={collapsed=>!collapsed && this.setState({loadChildren: true})}>
 				{loadChildren &&
-					<div>
+					<Column>
 						{obj instanceof Array ? obj.map((item, index)=> {
 					        return <ObjectInspectorUI {...props_subInspectorPassthroughs} ref={c=>this.childUIs[index] = c}
 								key={index} object={item} objectKey={index.toString()}/>;
@@ -70,7 +78,7 @@ export default class ObjectInspectorUI extends BaseComponent<
 						    return <ObjectInspectorUI {...props_subInspectorPassthroughs} ref={c=>this.childUIs[prop.index] = c}
 								key={prop.name} object={prop.value} objectKey={prop.name}/>;
 						})}
-					</div>}
+					</Column>}
 			</TreeView>
 		);
 	}

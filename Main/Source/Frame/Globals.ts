@@ -70,6 +70,7 @@ export function Toast(text, duration = 0) {
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.ShowToast(text, duration);
 }
+(global as any).Toast = Toast;
 
 export function Notify(text) {
 	if (!IsString(text))
