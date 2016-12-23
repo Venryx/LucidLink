@@ -55,7 +55,7 @@ export default class ObjectInspectorUI extends Component<
 			selfUIText += title + (isPrimitive || obj._title ? ": " : "");
 		if (!hasExpandForChildren)
 			selfUIText += isPrimitive ? ObjectInspectorUI.LiteralValueToDisplayText(obj) : obj instanceof List ? "[]" : "{}";
-		Toast(selfUIText);
+		//Toast(selfUIText);
 		var selfUI = <Text>{selfUIText}</Text>;
 
 	    this.childUIs = [];
@@ -65,7 +65,7 @@ export default class ObjectInspectorUI extends Component<
 					defaultCollapsed={true} collapsible={hasExpandForChildren}
 					onArrowPress={collapsed=>!collapsed && this.setState({loadChildren: true})}>
 				{loadChildren &&
-					<Column>
+					<Column ml10>
 						{obj instanceof Array ? obj.map((item, index)=> {
 					        return <ObjectInspectorUI {...props_subInspectorPassthroughs} ref={c=>this.childUIs[index] = c}
 								key={index} object={item} objectKey={index.toString()}/>;

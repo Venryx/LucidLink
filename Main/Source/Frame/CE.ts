@@ -244,6 +244,7 @@ Object.prototype._AddGetter_Inline = function Props() {
 	var result = [];
 	var i = 0;
 	for (var propName in this)
+		//result.push({index: i++, key: propName, name: propName, value: this[propName]});
 		result.push({index: i++, name: propName, value: this[propName]});
 	return result;
 };

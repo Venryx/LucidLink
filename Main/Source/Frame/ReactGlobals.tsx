@@ -152,13 +152,28 @@ export class BaseComponent<P, S> extends Component<P, S> {
 }
 //global.Extend({Component2: Component, BaseComponent: Component});
 
+function BasicStyles(props) {
+	var result: any = {};
+	for (let key in props) {
+		if (key.startsWith("ml"))
+			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("mr"))
+			result.marginRight = (key.startsWith("mrN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("mt"))
+			result.marginTop = (key.startsWith("mtN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("mb"))
+			result.marginBottom = (key.startsWith("mbN") ? -1 : 1) * parseInt(key.substr(2));
+	}
+	return result;
+}
+
 export class Row extends BaseComponent<any, any> {
 	render() {
 		var {style, height, children} = this.props;
 		height = height != null ? height : (style||{}).height;
 		var otherProps = this.props.Excluding(style, height, children);
 		return (
-			<Panel {...otherProps} style={E({flexDirection: "row", padding: 3}, style,
+			<Panel {...otherProps} style={E({flexDirection: "row", padding: 3}, BasicStyles(this.props), style,
 					//height != null ? {height} : {flex: 1})}>
 					height != null && {height})}>
 				{children}
@@ -171,7 +186,7 @@ export class RowLR extends BaseComponent<any, any> {
 		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<Panel style={E({flexDirection: "row", padding: 3}, height != null && {height})}>
+			<Panel style={E({flexDirection: "row", padding: 3}, BasicStyles(this.props), height != null && {height})}>
 				<Panel style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
 				</Panel>
@@ -188,7 +203,7 @@ export class Column extends BaseComponent<any, any> {
 		var {style, width, children} = this.props;
 		var otherProps = this.props.Excluding(style, width, children);
 		return (
-			<Panel {...otherProps} style={E({flexDirection: "column"}, style, width != null ? {width} : {flex: 1})}>
+			<Panel {...otherProps} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</Panel>
 		);
@@ -201,26 +216,11 @@ export class Panel extends View2 {
 		var {children, style} = this.props;
 		var otherProps = this.props.Excluding("style", "children");
 		return (
-			<View {...otherProps} style={E({backgroundColor: "transparent"}, style)}>
+			<View {...otherProps} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
 				{children}
 			</View>
 		);
 	}
-}
-
-function BasicStyles(props) {
-	var result: any = {};
-	for (let key in props) {
-		if (key.startsWith("ml"))
-			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
-		else if (key.startsWith("mr"))
-			result.marginRight = (key.startsWith("mrN") ? -1 : 1) * parseInt(key.substr(2));
-		else if (key.startsWith("mt"))
-			result.marginTop = (key.startsWith("mtN") ? -1 : 1) * parseInt(key.substr(2));
-		else if (key.startsWith("mb"))
-			result.marginBottom = (key.startsWith("mbN") ? -1 : 1) * parseInt(key.substr(2));
-	}
-	return result;
 }
 
 export class VText extends BaseComponent<any, any> {

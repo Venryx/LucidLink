@@ -1,5 +1,5 @@
 import {LL, Init} from "./LucidLink";
-import {Panel} from "./Frame/ReactGlobals";
+import {BaseComponent as Component, Panel} from "./Frame/ReactGlobals";
 import {JavaBridge} from "./Frame/Globals";
 import {MonitorUI} from "./LucidLink/Monitor";
 import {TrackerUI} from "./LucidLink/Tracker";
@@ -7,11 +7,11 @@ import {JournalUI} from "./LucidLink/Journal";
 import {ScriptsUI} from "./LucidLink/Scripts";
 import {SettingsUI} from "./LucidLink/Settings";
 import {MoreUI} from "./LucidLink/More";
-import {Component} from "react";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import {View} from "react-native";
 
-// note: DO NOT have this inherit from BaseComponent; it breaks react-native's hot-reloading
+// note: we have to alias BaseComponent as Component, because otherwise react-native's hot-reloading breaks
+// (see here for some info: https://github.com/gaearon/react-transform-hmr/issues/82)
 export default class LucidLinkUI extends Component<{}, {}> {
     constructor(props) {
         super(props);

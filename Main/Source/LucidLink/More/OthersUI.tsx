@@ -42,11 +42,13 @@ export default class OthersUI extends Component<any, any> {
 `.trim());
 	    return result;
 	}
-	ProcessBlockRunInfo(blockRunInfo, rootBlockRunInfo = true, depth = 0) {
-		if (depth > 10) return Toast(`Profiler data too deep! (${depth})`), {};
+	ProcessBlockRunInfo(blockRunInfo: BlockRunInfo, rootBlockRunInfo = true, depth = 0) {
+		Assert(blockRunInfo != null, "blockRunInfo cannot be null.");
+		//if (depth > 100) return Toast(`Profiler data too deep! (${depth})`), {};
 
 		var result = {};
-		for (let {key, value: child} of blockRunInfo.children.Pairs) {
+		//for (let {key, value: child} of blockRunInfo.children.Pairs) {
+		for (let {name: key, value: child} of blockRunInfo.children.Props) {
 			var newKey = `${child.method ? "@" : ""}${key}   (x${child.runCount})   (${child.runTime}ms)`;
 			result[newKey] = this.ProcessBlockRunInfo(child, false, depth + 1);
 		}
@@ -73,7 +75,7 @@ export default class OthersUI extends Component<any, any> {
 
 	AllFrames_Refresh() {
 		var profilerData = Profiler_AllFrames.rootBlockRunInfo;
-		profilerData = this.GetFakeProfilerData(); // for testing
+		//profilerData = this.GetFakeProfilerData(); // for testing
 		var profilerData_final = this.ProcessBlockRunInfo(profilerData);
 		this.setState({profiler_allFrames_data: profilerData_final});
 	}

@@ -49,6 +49,7 @@ export default class TreeView extends Component<
 						{titleElement || nodeLabel}
 					</TouchableOpacity>
 				</Row>
+				{/*todo: find why of hiding children without removing, so tree-state is preserved*/}
 				{!collapsed && children}
 			</Column>
 		);
