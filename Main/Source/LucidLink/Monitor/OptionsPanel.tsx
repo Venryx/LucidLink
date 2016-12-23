@@ -7,7 +7,7 @@ import {BaseComponent, Column, Row, VSwitch, VText} from "../../Frame/ReactGloba
 import {LL} from "../../LucidLink";
 
 @observer
-export default class OptionsPanel extends BaseComponent {
+export default class OptionsPanel extends BaseComponent<any, any> {
 	render() {
 		var {parent} = this.props;
 		var node = LL.monitor;

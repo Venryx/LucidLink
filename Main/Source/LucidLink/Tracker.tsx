@@ -148,7 +148,7 @@ LoadFileSystemData(onDone = null) {
 }
 g.Extend({Tracker});
 
-export class TrackerUI extends BaseComponent {
+export class TrackerUI extends BaseComponent<any, any> {
 	render() {
 		var node = LL.tracker;
 		return (

@@ -8,7 +8,7 @@ import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
 
 @Bind
-class ScriptEntryUI extends BaseComponent {
+class ScriptEntryUI extends BaseComponent<any, any> {
 	render() {
 		var {script} = this.props;
 		return (
@@ -32,7 +32,7 @@ class ScriptEntryUI extends BaseComponent {
 }
 
 @Bind
-export default class ScriptsPanel extends BaseComponent {
+export default class ScriptsPanel extends BaseComponent<any, any> {
 	render() {
 		var {parent, scripts} = this.props;
 

@@ -38,7 +38,7 @@ import {LL} from "../LucidLink";
 
 @observer
 @Bind
-export class MonitorUI extends BaseComponent {
+export class MonitorUI extends BaseComponent<any, any> {
 	constructor(props) {
 		super(props);
 		LL.monitor.ui = this;
@@ -188,12 +188,11 @@ export class MonitorUI extends BaseComponent {
 }
 
 var didFirstRender = false;
-class ChannelsUI extends BaseComponent {
+class ChannelsUI extends BaseComponent<any, any> {
     render() {
-		var View2: any = View;
         return (
-            <View2 style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
-            </View2>
+            <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
+            </View>
         );
     }
 

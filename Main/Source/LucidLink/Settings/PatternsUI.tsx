@@ -14,7 +14,7 @@ import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
 
 @observer
-export default class PatternsUI extends BaseComponent {
+export default class PatternsUI extends BaseComponent<any, any> {
 	_drawer;
 	@Bind ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -117,7 +117,7 @@ export default class PatternsUI extends BaseComponent {
 
 @observer
 @Bind
-class PatternUI extends BaseComponent {
+class PatternUI extends BaseComponent<any, any> {
 	render() {
 		var {parent, pattern} = this.props;
 		var node = LL.settings;

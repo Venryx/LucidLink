@@ -1,3 +1,4 @@
+import {IsPrimitive} from "../../Frame/Globals";
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;
@@ -96,4 +97,38 @@ export default class V {
 		}
 		return result;
 	}
+
+	static CloneObject(obj, propMatchFunc?: Function, depth = 0) {
+	    Assert(depth < 100, "CloneObject cannot work past depth 100! (probably circular ref)");
+
+		if (obj == null)
+			return null;
+		if (IsPrimitive(obj))
+			return obj;
+		//if (obj.GetType() == Array)
+		if (obj.constructor == Array)
+			return V.CloneArray(obj);
+		if (obj instanceof List)
+			return List.apply(null, [obj.itemType].concat(V.CloneArray(obj)));
+	    if (obj instanceof Dictionary) {
+	        let result = new Dictionary(obj.keyType, obj.valueType);
+	        for (let pair of obj.Pairs)
+	            result.Add(pair.key, pair.value);
+	        return result;
+	    }
+
+	    let result = {};
+		for (let prop of obj.Props)
+			if (!(prop.value instanceof Function) && (propMatchFunc == null || propMatchFunc.call(obj, prop.name, prop.value)))
+				result[prop.name] = V.CloneObject(prop.value, propMatchFunc, depth + 1);
+		return result;
+	};
+	static CloneArray(array) {
+		//array.slice(0); //deep: JSON.parse(JSON.stringify(array));
+		return Array.prototype.slice.call(array, 0);
+	};
+	/*static IsEqual(a, b) {
+		function _equals(a, b) { return JSON.stringify(a) === JSON.stringify($.extend(true, {}, a, b)); }
+		return _equals(a, b) && _equals(b, a);
+	};*/
 }

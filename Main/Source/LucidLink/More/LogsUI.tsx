@@ -7,7 +7,7 @@ import {Switch, Text, ScrollView as ScrollView0} from "react-native";
 var ScrollView: any = ScrollView0;
 import {LL} from "../../LucidLink";
 
-export default class LogsUI extends BaseComponent {
+export default class LogsUI extends BaseComponent<any, any> {
 	constructor(props) {
 		super(props);
 		LL.more.logsUI = this;

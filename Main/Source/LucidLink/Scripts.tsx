@@ -149,7 +149,7 @@ This will permanently remove all custom code from the script.`,
 }
 g.Extend({Scripts});
 
-export class ScriptsUI extends BaseComponent {
+export class ScriptsUI extends BaseComponent<any, any> {
 	constructor(props) {
 		super(props);
 		this.state = {scriptLastRunsOutdated: false};

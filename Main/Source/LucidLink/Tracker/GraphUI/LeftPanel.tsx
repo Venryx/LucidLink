@@ -3,7 +3,7 @@ import {colors} from '../../../Frame/Styles';
 import Spinner from "rn-spinner";
 import {LL} from "../../../LucidLink";
 
-export default class LeftPanel extends BaseComponent {
+export default class LeftPanel extends BaseComponent<any, any> {
 	render() {
 		var {parent} = this.props;
 		var node = LL.monitor;

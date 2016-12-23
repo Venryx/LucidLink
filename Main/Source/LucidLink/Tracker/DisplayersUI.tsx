@@ -11,7 +11,7 @@ import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
 
 @observer
-export default class DisplayersUI extends BaseComponent {
+export default class DisplayersUI extends BaseComponent<any, any> {
 	_drawer = null;
 	@Bind ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -89,7 +89,7 @@ export default class DisplayersUI extends BaseComponent {
 }
 
 // pure
-class ScriptTextUI extends BaseComponent {
+class ScriptTextUI extends BaseComponent<any, any> {
 	static defaultProps = {editable: true};
 	render() {
 		var {parent, editable, onChangeText, text} = this.props;

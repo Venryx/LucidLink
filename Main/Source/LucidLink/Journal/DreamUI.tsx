@@ -4,7 +4,7 @@ import {TextInput, DatePickerAndroid, TimePickerAndroid} from "react-native";
 import {DN} from "../../Frame/Globals";
 var Moment = require("moment");
 
-export default class DreamUI extends BaseComponent {
+export default class DreamUI extends BaseComponent<any, any> {
 	render() {
 		var {onBack, dream} = this.props;
 		return (

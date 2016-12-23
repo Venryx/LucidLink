@@ -6,7 +6,7 @@ import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {LL} from "../../LucidLink";
 
 @observer
-export default class GeneralUI extends BaseComponent { 
+export default class GeneralUI extends BaseComponent<any, any> { 
 	render() {
 		var node = LL.settings;
 		return (

@@ -16,7 +16,7 @@ var Moment = require('moment');
 
 @observer
 @Bind
-export default class GraphUI extends BaseComponent {
+export default class GraphUI extends BaseComponent<any, any> {
 	leftPanel = null;
 	@Bind ToggleLeftPanelOpen() {
 		if (this.leftPanel._open)
@@ -74,7 +74,7 @@ export default class GraphUI extends BaseComponent {
 
 @observer
 @Bind
-class ChartsUI extends BaseComponent {
+class ChartsUI extends BaseComponent<any, any> {
 	state = {width: -1, height: -1};
 
 	ComponentDidMountOrUpdate() {
@@ -107,11 +107,10 @@ class ChartsUI extends BaseComponent {
 			}
 		}
 
-		var View2 = View as any;
         return (
-            <View2 style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
+            <View style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
 				{rows}
-            </View2>
+            </View>
         );
     }
 
@@ -125,7 +124,7 @@ class ChartsUI extends BaseComponent {
 
 @observer
 @Bind
-class ChartUI extends BaseComponent {
+class ChartUI extends BaseComponent<any, any> {
 	/*componentWillReact() {
         Log("Re-rendering ChartUI, because... " + new Error().stack);
     }*/
@@ -141,9 +140,8 @@ class ChartUI extends BaseComponent {
 
 		this.eventBoxes = [];
 		
-		var View2 = View as any;
         return (
-            <View2 style={{width, height, backgroundColor: colors.background}}>
+            <View style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
 					minX={0} maxX={24} legendStepsX={25}
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
@@ -165,7 +163,7 @@ class ChartUI extends BaseComponent {
 						parent={this} rowHeight={height}
 						event={event} x={x}/>;
 				})}
-            </View2>
+            </View>
         );
 	}
 	PostRender() {
@@ -181,7 +179,7 @@ class ChartUI extends BaseComponent {
 }
 
 @Bind
-class EventBox extends BaseComponent {
+class EventBox extends BaseComponent<any, any> {
 	firstRectsReady = false;
 	render() {
 		var {parent, rowHeight, event, x} = this.props;

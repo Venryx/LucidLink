@@ -55,17 +55,17 @@ import Bind from "autobind-decorator";
 // calculate styles
 EStyleSheet.build();
 
-export class BaseComponent extends Component<any, any> {
+export class BaseComponent<T, T2> extends Component<T, T2> {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = {} as any;
 	}
 
 	get FlattenedChildren() {
 	    var children = this.props.children;
 	    if (!(children instanceof Array))
 	        children = [children];
-	    return React.Children.map(children.Where(a=>a), a=>a);
+	    return React.Children.map((children as any).Where(a=>a), a=>a);
 	}
 
 	changeListeners = [];
@@ -145,7 +145,7 @@ export class BaseComponent extends Component<any, any> {
 	}*/
 }
 
-export class Row extends BaseComponent {
+export class Row extends BaseComponent<any, any> {
 	render() {
 		var {style, height, children} = this.props;
 		height = height != null ? height : (style||{}).height;
@@ -159,7 +159,7 @@ export class Row extends BaseComponent {
 		);
 	}
 }
-export class RowLR extends BaseComponent {
+export class RowLR extends BaseComponent<any, any> {
     render() {
 		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
@@ -176,7 +176,7 @@ export class RowLR extends BaseComponent {
     }
 }
 
-export class Column extends BaseComponent {
+export class Column extends BaseComponent<any, any> {
 	render() {
 		var {style, width, children} = this.props;
 		var otherProps = this.props.Excluding(style, width, children);
@@ -216,7 +216,7 @@ function BasicStyles(props) {
 	return result;
 }
 
-export class VText extends BaseComponent {
+export class VText extends BaseComponent<any, any> {
 	render() {
 		var {style, children} = this.props;
 		var otherProps = this.props;
@@ -233,7 +233,7 @@ export class VText extends BaseComponent {
 	}
 }
 
-export class VButton extends BaseComponent {
+export class VButton extends BaseComponent<any, any> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled} = this.props;
@@ -257,7 +257,7 @@ export class VButton extends BaseComponent {
 }
 
 @observer
-export class VSwitch extends BaseComponent {
+export class VSwitch extends BaseComponent<any, any> {
 	render() {
 		var {text, value, onValueChange, valuePath, style} = this.props;
 		var restProps = this.props.Excluding("text", "style");
@@ -281,7 +281,7 @@ export class VSwitch extends BaseComponent {
 	}
 }
 
-export class AutoExpandingTextInput extends BaseComponent {
+export class AutoExpandingTextInput extends BaseComponent<any, any> {
 	constructor(props) {
   		super(props);
 		var {defaultValue, height} = props;
@@ -304,7 +304,7 @@ export class AutoExpandingTextInput extends BaseComponent {
 	}
 }
 
-export class VTextInput extends BaseComponent {
+export class VTextInput extends BaseComponent<any, any> {
 	static defaultProps = {editable: true};
 	render() {
 		var {text} = this.props;

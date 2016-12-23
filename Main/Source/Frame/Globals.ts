@@ -342,12 +342,16 @@ export function P(...args): PropertyDecorator {
         propInfo.AddTags(new VDFProp(...args));
     };
 };
-export function D(...args) {
+export var D;
+D = function(...args) {
     return (target, name)=> {
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
         propInfo.AddTags(new DefaultValue(...args));
     };
 };
+// copy D.NullOrEmpty and such
+for (var key in g.D)
+	D[key] = g.D[key];
 
 export function _VDFTypeInfo(...args) {
     return (target, name)=>target[name].AddTags(new VDFTypeInfo(...args));

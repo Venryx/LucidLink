@@ -10,7 +10,7 @@ import {LL} from "../../LucidLink";
 
 @observer
 @Bind
-export default class ListUI extends BaseComponent {
+export default class ListUI extends BaseComponent<any, any> {
 	state = {month: Moment(new Date().MonthDate), openSession: null};
 
 	ComponentDidMountOrUpdate() {
@@ -64,7 +64,7 @@ export default class ListUI extends BaseComponent {
 }
 
 @observer
-class SessionHeaderUI extends BaseComponent {
+class SessionHeaderUI extends BaseComponent<any, any> {
 	render() {
 		var {parent, session, index, style} = this.props;
 		return (

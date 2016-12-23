@@ -93,7 +93,7 @@ export class Journal extends Node {
 g.Extend({Journal});
 
 @Bind
-export class JournalUI extends BaseComponent {
+export class JournalUI extends BaseComponent<any, any> {
 	state = {month: Moment(new Date().MonthDate), openDream: null};
 
 	loadedMonths = [];
@@ -158,7 +158,7 @@ export class JournalUI extends BaseComponent {
 	}
 }
 
-class DreamHeaderUI extends BaseComponent {
+class DreamHeaderUI extends BaseComponent<any, any> {
 	render() {
 		var {parent, dream, index, style} = this.props;
 		return (

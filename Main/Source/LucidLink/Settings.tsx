@@ -116,7 +116,7 @@ export class AudioFileEntry {
 }
 global.Extend({AudioFileEntry});
 
-export class SettingsUI extends BaseComponent {
+export class SettingsUI extends BaseComponent<any, any> {
 	constructor(props) {
 		super(props);
 		LL.settings.ui = this;

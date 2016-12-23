@@ -8,7 +8,7 @@ import {LL} from "../../../LucidLink";
 var SortableListView = require("react-native-sortable-listview");
 
 @Bind
-class DisplayerScriptUI extends BaseComponent {
+class DisplayerScriptUI extends BaseComponent<any, any> {
 	render() {
 		var {script, onSelect} = this.props;
 		return (
@@ -33,7 +33,7 @@ class DisplayerScriptUI extends BaseComponent {
 
 @observer
 @Bind
-export default class DisplayerScriptsPanel extends BaseComponent {
+export default class DisplayerScriptsPanel extends BaseComponent<any, any> {
 	render() {
 		var {parent, scripts, selectedScript} = this.props;
 

@@ -6,7 +6,7 @@ import {TextInput} from "react-native";
 import {LL} from "../../LucidLink";
 var FilePickerManager = NativeModules.FilePickerManager;
 
-export default class AudiosUI extends BaseComponent {
+export default class AudiosUI extends BaseComponent<any, any> {
 	render() {
 		var node = LL.settings;
 		return (

@@ -2,6 +2,7 @@ import {JavaBridge, Log, ToJSON} from './Globals';
 import LibMuse from "react-native-libmuse";
 import Bind from "autobind-decorator";
 import {LL} from "../LucidLink";
+import {ProfileMethod} from "./VProfiler";
 
 //declare var LibMuse;
 
@@ -72,8 +73,12 @@ import {LL} from "../LucidLink";
 	}
 	
 	static OnReceiveMuseDataPacket(packet) {
+		let p = ProfileMethod("OnReceiveMuseDataPacket");
+
 		//Log(`Type: ${type} ChannelValues: ${ToJSON(channelValues)}`);
 		for (let listener of LL.scripts.scriptRunner.listeners_whenMusePacketReceived)
 			listener(packet);
+
+		p.End();
 	}
 }

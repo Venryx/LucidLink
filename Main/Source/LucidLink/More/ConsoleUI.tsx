@@ -3,7 +3,7 @@ import {colors} from "../../Frame/Styles";
 import {Debugger, E, HandleError} from "../../Frame/Globals";
 import {TextInput} from "react-native";
 
-export default class ConsoleUI extends BaseComponent {
+export default class ConsoleUI extends BaseComponent<any, any> {
 	render() {
 		var {onChangeText, text} = this.props;
 		var buttonStyle = {flex: .2, marginLeft: 5};

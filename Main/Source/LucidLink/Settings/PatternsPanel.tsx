@@ -8,7 +8,7 @@ import {LL} from "../../LucidLink";
 var SortableListView = require("react-native-sortable-listview");
 
 @Bind
-class PatternEntryUI extends BaseComponent {
+class PatternEntryUI extends BaseComponent<any, any> {
 	render() {
 		var {parent, pattern} = this.props;
 		var patternsUI = parent.props.parent;
@@ -31,7 +31,7 @@ class PatternEntryUI extends BaseComponent {
 }
 
 @Bind
-export default class PatternsPanel extends BaseComponent {
+export default class PatternsPanel extends BaseComponent<any, any> {
 	render() {
 		var {parent, patterns} = this.props;
 		

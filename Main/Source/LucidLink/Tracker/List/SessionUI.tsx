@@ -5,7 +5,7 @@ import ActionBar from "react-native-action-bar";
 import {LL} from "../../../LucidLink";
 var Moment = require("moment");
 
-export default class SessionUI extends BaseComponent {
+export default class SessionUI extends BaseComponent<any, any> {
 	render() {
 		var {onBack, session} = this.props;
 
@@ -36,7 +36,7 @@ export default class SessionUI extends BaseComponent {
 	}
 }
 
-class EventUI extends BaseComponent {
+class EventUI extends BaseComponent<any, any> {
 	render() {
 		var {event} = this.props;
 		return (

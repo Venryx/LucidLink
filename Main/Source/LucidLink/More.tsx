@@ -69,7 +69,7 @@ export class More extends Node {
 }
 global.Extend({More});
 
-export class MoreUI extends BaseComponent {
+export class MoreUI extends BaseComponent<any, any> {
 	constructor(props) {
 		super(props);
 		this.state = {activeTab: 0};
