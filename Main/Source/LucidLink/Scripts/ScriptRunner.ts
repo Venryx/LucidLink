@@ -4,8 +4,7 @@ import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
-import {Pattern} from "../Settings";
-import {FuncPattern} from "../../Frame/Patterns/FuncPattern";
+import {Pattern} from "../../Frame/Patterns/Pattern";
 
 export default class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
@@ -18,7 +17,7 @@ export default class ScriptRunner {
 	// general
 	// ==========
 
-	patterns: FuncPattern[] = []; // func-based patterns
+	patterns: Pattern[] = []; // func-based patterns
 
 	timers = [];
 	listeners_whenMusePacketReceived = [];

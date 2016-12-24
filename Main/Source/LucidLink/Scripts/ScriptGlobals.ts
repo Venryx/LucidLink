@@ -1,7 +1,7 @@
 import {Assert, E, Timer, WaitXThenRun, IsString} from "../../Frame/Globals";
 import {max, min} from "moment";
 import {Event} from "../Tracker/Session";
-import {FuncPattern, Matcher, Gap} from "../../Frame/Patterns/FuncPattern";
+import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";
 //import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
@@ -15,7 +15,7 @@ export {
 	// values (ie normal variables)
 	LL,
 	// classes
-	V, FuncPattern, Matcher, Gap
+	V, Pattern, Matcher, Gap
 };
 
 // listeners
@@ -55,7 +55,7 @@ export function AddEvent(type, ...args) {
 }
 
 export function AddPattern(info) {
-	var pattern = new FuncPattern(info);
+	var pattern = new Pattern(info);
 	LL.scripts.scriptRunner.patterns.push(pattern);
 }
 

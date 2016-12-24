@@ -1,8 +1,7 @@
 import {Toast, Trace} from '../Globals';
-import {Gap, Matcher, FuncPattern} from "./FuncPattern";
+import {Gap, Matcher, Pattern} from "./Pattern";
 import {LL} from "../../LucidLink";
 import {ProfileMethod} from "../VProfiler";
-import {Pattern} from "../../LucidLink/Settings";
 import {Packet} from "./Packet";
 
 export default class PatternMatchAttempt {
@@ -11,7 +10,7 @@ export default class PatternMatchAttempt {
 		this.pattern = pattern;
 	}
 	key: string;
-	pattern: FuncPattern;
+	pattern: Pattern;
 	active = true;
 
 	// for scripts

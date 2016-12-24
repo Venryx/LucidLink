@@ -2,7 +2,7 @@
 import {D} from "../Globals";
 import PatternMatchAttempt from "./PatternMatchAttempt";
 import {Packet} from "./Packet";
-export class FuncPattern {
+export class Pattern {
 	constructor(info) {
 		if (info.minStartInterval) this.minStartInterval = info.minStartInterval;
 		if (info.maxOverlappingAttempts) this.maxOverlappingAttempts = info.maxOverlappingAttempts;

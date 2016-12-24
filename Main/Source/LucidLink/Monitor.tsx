@@ -18,8 +18,6 @@ export class Monitor extends Node {
 	@O @P() channel3 = true;
 	@O @P() channel4 = true;
 
-	@O @P() patternGrabber = false;
-
 	@O @P() connect = true;
 	@O @P() monitor = true;
 	@O @P() patternMatch = true;
@@ -32,7 +30,6 @@ g.Extend({Monitor});
 
 import OptionsPanel from "./Monitor/OptionsPanel";
 import MuseBridge from "../Frame/MuseBridge";
-import {Pattern} from "./Settings";
 import {LL} from "../LucidLink";
 
 @observer
@@ -76,14 +73,6 @@ export class MonitorUI extends Component<any, any> {
 				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
-						<VSwitch text="Pattern grabber" ml5 value={node.patternGrabber}
-							onValueChange={value=> {
-								node.patternGrabber = value;
-								this.forceUpdate();
-							}}/>
-						{node.patternGrabber &&
-							<VButton text="Grab" ml10 mt3 style={{width: 100, height: 35}}
-								enabled={MuseBridge.status == "connected"} onPress={this.GrabPattern}/>}
 						{/*temp*/}
 						<VButton text="Center" ml10 mt3 style={{width: 100, height: 35}}
 							enabled={MuseBridge.status == "connected"} onPress={()=>JavaBridge.Main.CenterEyeTracker()}/>
@@ -112,76 +101,12 @@ export class MonitorUI extends Component<any, any> {
 								node.patternMatch = value;
 							}}/>
 					</Row>
-					{node.patternGrabber && 
-						<Row style={{height: 50}}>
-							<MKRangeSlider min={0} max={1000} style={{flex: 1}}
-								minValue={this.patternGrab_minX} maxValue={this.patternGrab_maxX}
-								onChange={val=> {
-									this.patternGrab_minX = parseInt(val.min);
-									this.patternGrab_maxX = parseInt(val.max);
-									//this.forceUpdate();
-								}}/>
-						</Row>}
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<ChannelsUI {...{visible}} parent={this}/>
 					</Panel>
 				</Column>
 			</Drawer>
 		);
-	}
-
-	async GrabPattern() {
-		var {channelPointsGrabbed: channelPointsGrabbed_rawData, channelBaselines} =
-			await JavaBridge.Main.StartPatternGrab(this.patternGrab_minX, this.patternGrab_maxX);
-		var channelPointsGrabbed = channelPointsGrabbed_rawData.Select(rawPoints=> {
-			return rawPoints.Select(rawPoint=>new Vector2i(rawPoint.x, rawPoint.y));
-		})
-
-		var dialog = new DialogAndroid();
-		dialog.set({
-			title: `Grab pattern`,
-			content: `Range is ${this.patternGrab_minX}-${this.patternGrab_maxX}.`,
-			items: ["Channel 1", "Channel 2", "Channel 3", "Channel 4"],
-			itemsCallbackMultiChoice: (ids, texts)=> {
-				if (ids.length == 0) return;
-
-				//Toast(ToJSON(ids) + ";" + ToJSON(texts));
-				for (let channelIndex of ids) {
-					var pattern = new Pattern("new pattern - channel " + (channelIndex + 1));
-					pattern["channel" + (channelIndex + 1)] = true;
-
-					let points = channelPointsGrabbed[channelIndex];
-					let minX = points.Select(a=>a.x).Min();
-					//let medianY = points.Select(a=>a.y).Median();
-					points = points.Select(a=>a.NewX(x=>x - minX).NewY(y=>y - channelBaselines[channelIndex]));
-					pattern.points = points;
-
-					LL.settings.patterns.push(pattern);
-				}
-				
-				this.forceUpdate();
-
-				var dialog = new DialogAndroid();
-				dialog.set({
-					"title": `Choose pattern name`,
-					"input": {
-						prefill: pattern.name,
-						callback: newName=> {
-							pattern.name = newName;
-							
-							if (LL.scripts.ui)
-								LL.scripts.ui.forceUpdate();
-						}
-					},
-					"positiveText": "OK",
-					//"negativeText": "Cancel"
-				});
-				dialog.show();
-			},
-			"positiveText": "OK",
-			"negativeText": "Cancel"
-		});
-		dialog.show();
 	}
 }
 

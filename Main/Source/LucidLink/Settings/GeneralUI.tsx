@@ -27,51 +27,6 @@ export default class GeneralUI extends BaseComponent<any, any> {
 							}}/>
 					</RowLR>
 					<Row>
-						<VText ml10 mt5 mr10>Pattern match interval</VText>
-						<VButton text={node.patternMatchInterval.toFixed(1)} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = .1; val < 1; val += .1)
-									values.push(val);
-								for (let val = 1; val <= 10; val += .5)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Pattern match interval",
-									message: "Select interval/repeat-time (in seconds) at which to check for eeg-pattern matches.",
-									values: values.Select(a=>a.toFixed(1)),
-									selectedValueIndex: values.indexOf(node.patternMatchInterval),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-								if (id == -1) return;
-								let val = values[id];
-								node.patternMatchInterval = val;
-							}}/>
-					</Row>
-					<Row>
-						<VText ml10 mt5 mr10>Pattern match offset</VText>
-						<VButton text={node.patternMatchOffset.toFixed(2)} style={{width: 100, height: 32}}
-							onPress={async ()=> {
-								var values = [];
-								for (let val = .01; val < .1; val += .01)
-									values.push(val);
-								for (let val = .1; val < 1; val += .1)
-									values.push(val);
-								for (let val = 1; val <= 10; val += .5)
-									values.push(val);
-								var id = await NumberPickerDialog.show({
-									title: "Pattern match offset",
-									message: "Select the offset/range-interval to use, on the x-axis, at which to test for eeg-pattern matches.",
-									values: values.Select(a=>a.toFixed(2)),
-									selectedValueIndex: values.indexOf(node.patternMatchOffset),
-									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
-								});
-
-								if (id == -1) return;
-								let val = values[id];
-								node.patternMatchOffset = val;
-							}}/>
-					</Row>
-					<Row>
 						<VText ml10 mt5 mr10>Muse EEG-packet buffer size</VText>
 						<VButton text={node.museEEGPacketBufferSize.toString()} style={{width: 100, height: 32}}
 							onPress={async ()=> {

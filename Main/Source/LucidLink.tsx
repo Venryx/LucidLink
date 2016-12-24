@@ -33,7 +33,7 @@ import {MonitorUI, Monitor} from "./LucidLink/Monitor";
 import {TrackerUI, Tracker} from "./LucidLink/Tracker";
 import {JournalUI, Journal} from "./LucidLink/Journal";
 import {ScriptsUI, Scripts} from "./LucidLink/Scripts";
-import {SettingsUI, Settings, Pattern} from "./LucidLink/Settings";
+import {SettingsUI, Settings} from "./LucidLink/Settings";
 import {MoreUI, More} from "./LucidLink/More";
 
 //var ScrollableTabView = require("react-native-scrollable-tab-view");
@@ -126,11 +126,6 @@ export class LucidLink extends Node {
 			basicData[prop] = LL.settings[prop];
 		JavaBridge.Main.SetBasicData(basicData);
 	}
-	PushPatternsToJava() {
-		Assert(this.settings.patterns.All(a=>a instanceof Pattern),
-			`Not all entries are Patterns! Types: ${this.settings.patterns.Select(a=>a.GetTypeName()).join(",")}`);
-		JavaBridge.Main.SetPatterns(this.settings.patterns);
-	}
 
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 
@@ -189,10 +184,6 @@ export async function Init(ui) {
 	// whenever the basic-data changes, push it to Java
 	autorun(()=> {
 		LL.PushBasicDataToJava();
-	});
-	// whenever a pattern changes, push the patterns to Java
-	autorun(()=> {
-		LL.PushPatternsToJava();
 	});
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();

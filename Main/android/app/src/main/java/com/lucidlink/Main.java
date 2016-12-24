@@ -1,41 +1,28 @@
 package com.lucidlink;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
-import android.text.Spannable;
 import android.text.TextWatcher;
-import android.text.style.ReplacementSpan;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.annimon.stream.Stream;
-import com.facebook.quicklog.identifiers.ReactNativeBridge;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.textinput.ReactEditText;
-import com.lucidlink.Frame.Pattern;
 import com.lucidlink.Frame.Vector2i;
 import com.lugg.ReactSnackbar.ReactSnackbarModule;
-import com.lugg.ReactSnackbar.ReactSnackbarPackage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,8 +121,6 @@ public class Main extends ReactContextBaseJavaModule {
 
 	// settings
 	public boolean blockUnusedKeys;
-	public double patternMatchInterval;
-	public double patternMatchOffset;
 	public int museEEGPacketBufferSize;
 
 	public double eyeTracker_horizontalSensitivity;
@@ -157,9 +142,6 @@ public class Main extends ReactContextBaseJavaModule {
 		this.patternMatch = data.getBoolean("patternMatch");
 		// settings
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
-		this.patternMatchInterval = data.getDouble("patternMatchInterval");
-		V.Assert(this.patternMatchInterval > 0, "Pattern-match-interval must be greater than 0.");
-		this.patternMatchOffset = data.getDouble("patternMatchOffset");
 		this.museEEGPacketBufferSize = data.getInt("museEEGPacketBufferSize");
 		this.eyeTracker_horizontalSensitivity = data.getDouble("eyeTracker_horizontalSensitivity");
 		this.eyeTracker_verticalSensitivity = data.getDouble("eyeTracker_verticalSensitivity");
@@ -167,15 +149,6 @@ public class Main extends ReactContextBaseJavaModule {
 		this.eyeTracker_relaxVSTenseIntensity = data.getDouble("eyeTracker_relaxVSTenseIntensity");
 		this.eyeTraceSegmentSize = data.getDouble("eyeTraceSegmentSize");
 		this.eyeTraceSegmentCount = data.getInt("eyeTraceSegmentCount");
-	}
-
-	List<Pattern> patterns;
-	@ReactMethod public void SetPatterns(ReadableArray patternMaps) {
-		patterns = new ArrayList<Pattern>();
-		for (ReadableMap map : V.List_ReadableMaps(patternMaps)) {
-			Pattern pattern = Pattern.FromMap(map);
-			patterns.add(pattern);
-		}
 	}
 
 	EEGProcessor eegProcessor = new EEGProcessor();
