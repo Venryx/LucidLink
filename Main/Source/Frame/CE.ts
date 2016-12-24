@@ -708,6 +708,12 @@ Array.prototype._AddFunction_Inline = function Take(count) {
 		result.push(this[i]);
 	return result;
 };
+Array.prototype._AddFunction_Inline = function TakeLast(count) {
+	var result = [];
+	for (var i = 0; i < count && (this.length - 1) - i >= 0; i++)
+		result.push(this[(this.length - 1) - i]);
+	return result;
+};
 Array.prototype._AddFunction_Inline = function FindIndex(matchFunc) {
 	for (var i in this)
 		if (matchFunc.call(this[i], this[i])) // call, having the item be "this", as well as the first argument

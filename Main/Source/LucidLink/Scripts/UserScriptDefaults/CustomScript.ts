@@ -1,23 +1,25 @@
 export default `
-// Notes
-// ========== 
-
-/*
-* To get the key-code of key (so you can add a keypress-listener), click the "More" tab and
-		press the desired key; you'll see the key-code in the logs
-*/
-
-// Examples
+// startup
 // ==========
 
-// when key "1" is pressed, start the air-raid-siren sound
-AddKeyDownListener(8, function() {
-	GetAudioFile("air raid siren").Play();
-});
-// when key "2" is pressed, stop the air-raid-siren sound
-AddKeyDownListener(9, function() {
-	GetAudioFile("air raid siren").Stop();
+var waker = GetAudioFile("game")
+waker.LoopCount = -1 // loop
+waker.Stop()
+
+AddEvent("SS") // starting scripts
+
+var lastPacket = {}
+WhenMusePacketReceived(function(packet) {
+    lastPacket = packet
 });
 
-GetAudioFile("air raid siren"); // preload
+var lastProcessedPacket = null;
+EveryXSecondsDo(1, function() {
+    if (lastPacket == null || lastPacket == lastProcessedPacket) return
+    lastProcessedPacket = lastPacket
+
+    var distInMeters = parseInt(V.Lerp(0, 10, lastPacket.viewDistance))
+    var text = (lastPacket.viewDirection * 100).toFixed(0) //+ " " + distInMeters
+    //Speak({text: text, pitch: 1})
+})
 `.trim();

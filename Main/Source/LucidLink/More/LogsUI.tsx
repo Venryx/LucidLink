@@ -31,7 +31,7 @@ export default class LogsUI extends BaseComponent<any, any> {
 		}
 		logEntriesToShow.reverse();
 
-		function Change(_: any) { this.forceUpdate(); }
+		var Change = (_: any)=> { this.forceUpdate(); }
 
 		return (
 			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>

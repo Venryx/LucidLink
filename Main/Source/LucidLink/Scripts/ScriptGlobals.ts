@@ -1,4 +1,4 @@
-import {Assert, E, Timer, WaitXThenRun} from "../../Frame/Globals";
+import {Assert, E, Timer, WaitXThenRun, IsString} from "../../Frame/Globals";
 import {max, min} from "moment";
 import {Event} from "../Tracker/Session";
 import {FuncPattern, Matcher, Gap} from "../../Frame/Patterns/FuncPattern";
@@ -190,6 +190,7 @@ var Speech = require("react-native-android-speech");
 
 export function Speak(options) {
 	options = E({forceStop: true}, options);
+	options.text = options.text.toString();
 	return new Promise((resolve, reject)=> {
 		Speech.speak(options).then(resolve).catch(ex=> {
 			if (ex.toString().contains("TTS is already speaking something")) return;

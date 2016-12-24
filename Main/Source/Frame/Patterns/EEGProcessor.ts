@@ -3,28 +3,7 @@ import {IsNumber, Toast} from '../Globals';
 import PatternMatchAttempt from './PatternMatchAttempt';
 import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
-
-export class Packet {
-	x;
-	maxX;
-	eegValues;
-
-	viewDirection: number;
-	viewDistance: number;
-	channelBaselines: any[];
-
-	GetPeer(offset) {
-		LL.monitor.eegProcessor.packets[(this.x + offset).WrapToRange(0, this.maxX)];
-	}
-	GetChannelVal(channel) {
-		var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
-		return this.eegValues[channelIndex];
-	}
-	GetChannelValDif(channel) {
-		var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
-		return this.eegValues[channelIndex] - LL.monitor.eegProcessor.channelBaselines[channelIndex];
-	}
-}
+import {Packet} from "./Packet";
 
 export class EEGProcessor {
 	static maxX = 1000;
@@ -39,12 +18,12 @@ export class EEGProcessor {
 	//channelPoints = [];
 	packets = [];
 
-	currentIndex = -1;
+	currentFrame = -1;
 	currentX = -1;
 	@Bind OnReceiveMusePacket(packet: Packet) {
 		(packet as any).__proto__ = Packet.prototype; // make-so packet is actually of type Packet
 
-		this.currentIndex++;
+		this.currentFrame++;
 		this.currentX = this.currentX < EEGProcessor.maxX ? this.currentX + 1 : 0;
 
 		if (packet.channelBaselines)
@@ -83,7 +62,7 @@ export class EEGProcessor {
 		p.Section("checking for pattern continuations");
 		//BufferAction(1000, ()=>Toast("Count: " + this.patternMatchAttempts.Props.length));
 		for (let {value: matchAttempt} of this.patternMatchAttempts.Props as {value: PatternMatchAttempt}[]) {
-			matchAttempt.ProcessPacket(this.currentIndex, packet);
+			matchAttempt.ProcessPacket(this.currentFrame, packet);
 		}
 
 		var p1 = p.Section("checking for pattern starts");
@@ -91,18 +70,18 @@ export class EEGProcessor {
 			// if already at max overlapping attempts, don't try to start another
 			if (this.patternIndex_liveMatchAttemptCount[index] >= pattern.maxOverlappingAttempts) continue;
 			// if we're too close to last pattern-match 
-			let packetsSinceStartOfLastPatternMatchAttempt = this.currentIndex - this.patternIndex_lastMatchStart[index];
+			let packetsSinceStartOfLastPatternMatchAttempt = this.currentFrame - this.patternIndex_lastMatchStart[index];
 			if (packetsSinceStartOfLastPatternMatchAttempt < pattern.minStartInterval) continue;
 
 			let key = `pattern${index}_x${this.currentX}`;
 			let matchAttempt = new PatternMatchAttempt(key, pattern);
 
 			// try to match first segment
-			matchAttempt.ProcessPacket(this.currentIndex, packet);
+			matchAttempt.ProcessPacket(this.currentFrame, packet);
 			// if first segment matched, this is valid start of pattern, so add it to collection
-			if (matchAttempt.segmentsMatched > 0) {
+			if (matchAttempt.SegmentsMatched > 0) {
 				this.patternMatchAttempts[key] = matchAttempt;
-				this.patternIndex_lastMatchStart[index] = this.currentIndex;
+				this.patternIndex_lastMatchStart[index] = this.currentFrame;
 
 				if (this.patternIndex_liveMatchAttemptCount[index] == null)
 					this.patternIndex_liveMatchAttemptCount[index] = 0;

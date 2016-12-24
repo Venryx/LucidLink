@@ -1,7 +1,7 @@
-import {Packet} from "./EEGProcessor";
 //import * as g from "../Globals";
 import {D} from "../Globals";
 import PatternMatchAttempt from "./PatternMatchAttempt";
+import {Packet} from "./Packet";
 export class FuncPattern {
 	constructor(info) {
 		if (info.minStartInterval) this.minStartInterval = info.minStartInterval;
