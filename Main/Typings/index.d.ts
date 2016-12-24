@@ -33,7 +33,7 @@ declare var Dictionary;
 
 // saving
 declare var VDFSaver;
-declare var VDFSaveOptions;
+declare class VDFSaveOptions {}
 declare var VDFSerializeProp;
 declare var VDFPreSerialize;
 declare var VDFSerialize;
@@ -41,7 +41,7 @@ declare var VDFPostSerialize;
 
 // loading
 declare var VDFLoader;
-declare var VDFLoadOptions;
+declare class VDFLoadOptions {}
 declare var VDFDeserializeProp;
 declare var VDFDeserialize;
 declare var VDFPreDeserialize;

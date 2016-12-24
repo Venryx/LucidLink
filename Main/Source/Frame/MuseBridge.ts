@@ -74,7 +74,8 @@ import {ProfileMethod} from "./VProfiler";
 	
 	static count = 0;
 	static OnReceiveMuseDataPacket(packet) {
-		if (++MuseBridge.count > 300) return; // for testing
+		//if (++MuseBridge.count > 300) return; // for testing
+		if (!LL.monitor.monitor) return; // quick return, for when "stop sending" update to Java is delayed
 
 		let p = ProfileMethod("OnReceiveMuseDataPacket");
 

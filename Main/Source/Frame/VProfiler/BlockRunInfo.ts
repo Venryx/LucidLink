@@ -1,4 +1,4 @@
-import {P, WaitXThenRun} from "../Globals";
+import {P, WaitXThenRun, T} from "../Globals";
 
 export default class BlockRunInfo {
 	static fakeBlockRunInfo: BlockRunInfo;
@@ -25,7 +25,8 @@ export default class BlockRunInfo {
 	@P() name = null;
 	timer_startTime = -1;
 	@P() runTime = 0;
-	@P() children = {};
+	//@T("Dictionary(string BlockRunInfo)") @P() children = {};
+	@T("Dictionary(string BlockRunInfo)") @P() children = new Dictionary("string", "BlockRunInfo");
 	currentChild: BlockRunInfo = null;
 
 	GetCurrentDescendant() : BlockRunInfo {
@@ -55,13 +56,13 @@ export default class BlockRunInfo {
 		if (this == BlockRunInfo.fakeBlockRunInfo)
 			return BlockRunInfo.fakeBlockRunInfo;
 		
-		while (this.children[name])
-			name += "_";
+		/*while (this.children[name])
+			name += "_";*/
 
-		if (this.children[name] == null)
-			this.children[name] = new BlockRunInfo(this, name, true, this.depth + 1);
-		this.children[name].Start();
-		return this.children[name];
+		if (!this.children.ContainsKey(name))
+			this.children.Add(name, new BlockRunInfo(this, name, true, this.depth + 1));
+		this.children.Get(name).Start();
+		return this.children.Get(name);
 	}
 
 	// for child sections
@@ -75,10 +76,10 @@ export default class BlockRunInfo {
 		}*/
 
 		this.EndLastSection();
-		if (this.children[name] == null)
-			this.children[name] = new BlockRunInfo(this, name, false, this.depth + 1);
-		this.children[name].Start();
-		return this.children[name];
+		if (!this.children.ContainsKey(name))
+			this.children.Add(name, new BlockRunInfo(this, name, false, this.depth + 1));
+		this.children.Get(name).Start();
+		return this.children.Get(name);
 	}
 	EndLastSection() {
 		/*var lastRunningSection = children.LastOrDefault(a=>!a.Value.method && a.Value.timer.IsRunning);
@@ -108,3 +109,4 @@ export default class BlockRunInfo {
 		return result;
 	}
 }
+global.Extend({BlockRunInfo});

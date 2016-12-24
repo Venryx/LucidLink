@@ -5,6 +5,7 @@ import {Profiler_AllFrames} from "../../Frame/VProfiler";
 import BlockRunInfo from "../../Frame/VProfiler/BlockRunInfo";
 import ObjectInspectorUI from "../../Frame/VProfiler/ObjectInspectorUI";
 import {FromVDF, Toast, ToJSON} from "../../Frame/Globals";
+import {ScrollView} from "react-native";
 
 export default class OthersUI extends Component<any, any> {
 	render() {
@@ -14,17 +15,22 @@ export default class OthersUI extends Component<any, any> {
 				<Row>
 					<VButton text='Reset "built-in script"' style={{width: 300}}
 						onPress={()=>LL.scripts.ResetScript("Built-in script")}/>
-					<VButton text='Reset "fake-data provider"' style={{marginLeft: 5, width: 300}}
+					<VButton text='Reset "fake-data provider"' ml5 style={{width: 300}}
 						onPress={()=>LL.scripts.ResetScript("Fake-data provider")}/>
-					<VButton text='Reset "custom script"' style={{marginLeft: 5, width: 300}}
+					<VButton text='Reset "custom script"' ml5 style={{width: 300}}
 						onPress={()=>LL.scripts.ResetScript("Custom script")}/>
 				</Row>
 				<Row>
 					<VButton text="Refresh profiler data" style={{width: 300}} onPress={this.AllFrames_Refresh}/>
+					<VButton text="Clear" ml5 style={{width: 300}} onPress={this.AllFrames_Clear}/>
 				</Row>
-				<ObjectInspectorUI object={profiler_allFrames_data}
-					titleModifierFunc={this.TitleModifierFunc}
-					keyModifierForTreeStateFunc={this.KeyModifierForTreeStateFunc}/>
+				<ScrollView style={{flex: 1, flexDirection: "column"}}
+						automaticallyAdjustContentInsets={false}>
+					<ObjectInspectorUI
+						object={profiler_allFrames_data}
+						titleModifierFunc={this.TitleModifierFunc}
+						keyModifierForTreeStateFunc={this.KeyModifierForTreeStateFunc}/>
+				</ScrollView>
 			</Column>
 		);
 	}
@@ -36,19 +42,20 @@ export default class OthersUI extends Component<any, any> {
 		work toward tasks:{name:"work toward tasks" method:false runCount:10 runTime:300 children:{}}
 		A:{name:"A" runCount:10 runTime:100.5 children:{}}
 		other stuff:{name:"other stuff" method:false runCount:10 runTime:200 children:{}}
-		B:{name:"B" runCount:10 runTime:100 children:{^}}
+		B:{name:"B" runCount:10 runTime:100 children:{}}
 		C:{name:"C" runCount:10 runTime:100 children:{}}
 	Test2:{name:"Test2" runCount:10 runTime:100 children:{}}
-`.trim());
+`.trim(), "BlockRunInfo");
+		Assert(result instanceof BlockRunInfo, "Fake-profiler-data must be of type BlockRunInfo.");
 	    return result;
 	}
 	ProcessBlockRunInfo(blockRunInfo: BlockRunInfo, rootBlockRunInfo = true, depth = 0) {
-		Assert(blockRunInfo != null, "blockRunInfo cannot be null.");
+		Assert(blockRunInfo instanceof BlockRunInfo, "blockRunInfo must be of type BlockRunInfo.");
 		//if (depth > 100) return Toast(`Profiler data too deep! (${depth})`), {};
 
 		var result = {};
-		//for (let {key, value: child} of blockRunInfo.children.Pairs) {
-		for (let {name: key, value: child} of blockRunInfo.children.Props) {
+		for (let {key, value: child} of blockRunInfo.children.Pairs) {
+		//for (let {name: key, value: child} of blockRunInfo.children.Props) {
 			var newKey = `${child.method ? "@" : ""}${key}   (x${child.runCount})   (${child.runTime}ms)`;
 			result[newKey] = this.ProcessBlockRunInfo(child, false, depth + 1);
 		}

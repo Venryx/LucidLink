@@ -247,6 +247,8 @@ export function FinalizeFromVDFOptions(options = null) {
 	options.loadUnknownTypesAsBasicTypes = true;
 	return options;
 }
+export function FromVDF(vdf: string, options?: VDFLoadOptions);
+export function FromVDF(vdf: string, declaredTypeName: string, options?: VDFLoadOptions);
 export function FromVDF(vdf, declaredTypeName_orOptions?, options?) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
@@ -262,6 +264,8 @@ export function FromVDFInto(vdf, obj, options?) {
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf); }
 	/**/ finally {}
 }
+export function FromVDFToNode(vdf: string, options: VDFLoadOptions);
+export function FromVDFToNode(vdf: string, declaredTypeName: string, options: VDFLoadOptions);
 export function FromVDFToNode(vdf, declaredTypeName_orOptions?, options?) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
@@ -295,7 +299,9 @@ export function ToVDF(obj, markRootType = true, typeMarking = VDFTypeMarking.Int
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nObj) " + obj);
 	}/**/ finally {}
 }
-export function ToVDFNode(obj, /*o:*/ declaredTypeName_orOptions, options_orNothing) {
+export function ToVDFNode(vdf: string, options?: VDFSaveOptions);
+export function ToVDFNode(vdf: string, declaredTypeName: string, options?: VDFSaveOptions);
+export function ToVDFNode(obj, declaredTypeName_orOptions?, options_orNothing?) {
 	try {
 	    return VDFSaver.ToVDFNode(obj, declaredTypeName_orOptions, options_orNothing);
 	}
