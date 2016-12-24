@@ -3,10 +3,15 @@ import {IsNumber, Toast} from '../Globals';
 import PatternMatchAttempt from './PatternMatchAttempt';
 import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
-class Packet {
+
+export class Packet {
 	x;
 	maxX;
 	eegValues;
+
+	viewDirection: number;
+	viewDistance: number;
+	channelBaselines: any[];
 
 	GetPeer(offset) {
 		LL.monitor.eegProcessor.packets[(this.x + offset).WrapToRange(0, this.maxX)];
@@ -36,15 +41,17 @@ export class EEGProcessor {
 
 	currentIndex = -1;
 	currentX = -1;
-	@Bind OnReceiveMusePacket(packet) {
+	@Bind OnReceiveMusePacket(packet: Packet) {
+		(packet as any).__proto__ = Packet.prototype; // make-so packet is actually of type Packet
+
 		this.currentIndex++;
 		this.currentX = this.currentX < EEGProcessor.maxX ? this.currentX + 1 : 0;
 
 		if (packet.channelBaselines)
 			this.channelBaselines = packet.channelBaselines;
-
 		packet.x = this.currentX;
-		packet.__proto__ = Packet.prototype; // make-so packet is of type Packet
+		// maybe temp; extract the only 2 channels actually sent
+		packet.eegValues = [0, packet.eegValues[0], packet.eegValues[1], 0];
 
 		/*for (let ch = 0; ch < 4; ch++)
 			this.channelPoints[ch][this.currentX] = packet.eegValues[ch];*/
@@ -54,37 +61,54 @@ export class EEGProcessor {
 			this.DoPatternMatching(packet);
 	}
 
+	ResetScriptsRelatedStuff() {
+		this.patternMatchAttempts = {};
+		this.patternIndex_lastMatchStart = {};
+		this.patternIndex_liveMatchAttemptCount = {};
+	}
+
 	patternMatchAttempts = {};
-	EndPatternMatchAttempt(matchAttempt) {
-		Toast("Ending");
+	patternIndex_lastMatchStart = {};
+	patternIndex_liveMatchAttemptCount = {};
+
+	EndPatternMatchAttempt(matchAttempt: PatternMatchAttempt) {
+		var patternIndex = LL.scripts.scriptRunner.patterns.indexOf(matchAttempt.pattern);
 		delete this.patternMatchAttempts[matchAttempt.key];
+		this.patternIndex_liveMatchAttemptCount[patternIndex]--;
 	}
 	
 	DoPatternMatching(packet) {
 		let p = ProfileMethod("DoPatternMatching");
 
-		p.Section("part 1");
+		p.Section("checking for pattern continuations");
+		//BufferAction(1000, ()=>Toast("Count: " + this.patternMatchAttempts.Props.length));
+		for (let {value: matchAttempt} of this.patternMatchAttempts.Props as {value: PatternMatchAttempt}[]) {
+			matchAttempt.ProcessPacket(this.currentIndex, packet);
+		}
+
+		var p1 = p.Section("checking for pattern starts");
 		for (let [index, pattern] of LL.scripts.scriptRunner.patterns.entries()) {
-			let tooCloseToOtherMatchAttempt = false;
-			for (let x = this.currentX - 1; x > this.currentX - pattern.minStartInterval; x--) {
-				let realX = x.WrapToRange(0, EEGProcessor.maxX);
-				let key = `pattern${index}_x${realX}`;
-				if (this.patternMatchAttempts[realX]) {
-					tooCloseToOtherMatchAttempt = true;
-					break;
-				}
-			}
-			if (tooCloseToOtherMatchAttempt) continue;
+			// if already at max overlapping attempts, don't try to start another
+			if (this.patternIndex_liveMatchAttemptCount[index] >= pattern.maxOverlappingAttempts) continue;
+			// if we're too close to last pattern-match 
+			let packetsSinceStartOfLastPatternMatchAttempt = this.currentIndex - this.patternIndex_lastMatchStart[index];
+			if (packetsSinceStartOfLastPatternMatchAttempt < pattern.minStartInterval) continue;
 
 			let key = `pattern${index}_x${this.currentX}`;
 			let matchAttempt = new PatternMatchAttempt(key, pattern);
-			this.patternMatchAttempts[key] = matchAttempt;
-		}
 
-		p.Section("part 2");
-		//BufferAction(1000, ()=>Toast("Count: " + this.patternMatchAttempts.Props.length));
-		for (let {name: key, value: matchAttempt} of this.patternMatchAttempts.Props) {
-			matchAttempt.ProcessPacket(this.currentX, packet);
+			// try to match first segment
+			matchAttempt.ProcessPacket(this.currentIndex, packet);
+			// if first segment matched, this is valid start of pattern, so add it to collection
+			if (matchAttempt.segmentsMatched > 0) {
+				this.patternMatchAttempts[key] = matchAttempt;
+				this.patternIndex_lastMatchStart[index] = this.currentIndex;
+
+				if (this.patternIndex_liveMatchAttemptCount[index] == null)
+					this.patternIndex_liveMatchAttemptCount[index] = 0;
+				this.patternIndex_liveMatchAttemptCount[index]++;
+				//matchAttempt.onEnd = ()=>this.patternIndex_liveMatchAttemptCount[index]--;
+			}
 		}
 
 		p.End();

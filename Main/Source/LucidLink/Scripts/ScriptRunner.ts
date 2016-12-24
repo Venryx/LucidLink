@@ -1,8 +1,11 @@
+import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {Log, WaitXThenRun} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
+import {Pattern} from "../Settings";
+import {FuncPattern} from "../../Frame/Patterns/FuncPattern";
 
 export default class ScriptRunner {
 	//get Main() { return LL.scripts.scriptRunner; }
@@ -15,7 +18,7 @@ export default class ScriptRunner {
 	// general
 	// ==========
 
-	patterns = []; // func-based patterns
+	patterns: FuncPattern[] = []; // func-based patterns
 
 	timers = [];
 	listeners_whenMusePacketReceived = [];
@@ -42,7 +45,9 @@ export default class ScriptRunner {
 	Reset() {
 		this.patterns = [];
 		//this.patternMatchAttempts = {};
-		LL.monitor.eegProcessor.patternMatchAttempts = {};
+		//LL.monitor.eegProcessor.patternMatchAttempts = {};
+		//LL.monitor.eegProcessor = new EEGProcessor();
+		LL.monitor.eegProcessor.ResetScriptsRelatedStuff();
 		
 		for (let timer of this.timers)
 			timer.Stop();

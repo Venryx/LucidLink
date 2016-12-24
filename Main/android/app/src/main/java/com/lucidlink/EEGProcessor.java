@@ -127,8 +127,8 @@ class EEGProcessor {
 		if (packet.type == MuseDataPacketType.EEG) { // maybe temp; only send eeg packets
 			WritableMap packetMap = packet.ToMap();
 			double viewDir = GetXPosForDisplay();
-			packetMap.putDouble("viewDirection", Double.isNaN(viewDir) ? .5 : viewDir);
-			packetMap.putDouble("viewDistance", Double.isNaN(viewDistanceY) ? 0 : viewDistanceY);
+			packetMap.putDouble("viewDirection", V.EnsureNormalDouble(viewDir, .5));
+			packetMap.putDouble("viewDistance", V.EnsureNormalDouble(viewDistanceY, 0));
 
 			// if we just updated the baselines, include those as well
 			if (currentX == maxX) {

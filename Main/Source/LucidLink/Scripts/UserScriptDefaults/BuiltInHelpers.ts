@@ -6,7 +6,8 @@ export default `
 
 alert("This text is displayed in a popup-dialog.");
 Log("This text is added to the program log, visible in the More>Logs panel, and also saved to the session's log file.");
-Toast("This text is displayed at the bottom of the screen as a 'toast' message.");
+Toast("This text is displayed at the bottom of the screen as a 'toast' message. (closes automatically)");
+Notify("This text is displayed at the bottom of the screen as a persistent 'snackbar' message. (closes by pressing Dismiss)");
 AddEvent("special event", "First piece of extra data (argument).", "Second piece/argument.");
 
 // general

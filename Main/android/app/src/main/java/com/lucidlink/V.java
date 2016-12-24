@@ -118,6 +118,12 @@ public class V {
 		return index >= 0 && index < list.size();
 	}
 
+	public static double EnsureNormalDouble(double value, double fallback) {
+		if (Double.isNaN(value) || Double.isInfinite(value))
+			return fallback;
+		return value;
+	}
+
 	public static <T extends Object> List<T> List(Stream<T> stream) {
 		List<T> result = new ArrayList<>();
 		for (Object item : stream.toArray())

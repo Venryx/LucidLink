@@ -14,6 +14,7 @@ import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltI
 import scriptDefaultText_FakeDataProvider from "./Scripts/UserScriptDefaults/FakeDataProvider";
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
+import scriptDefaultText_CustomPatterns from "./Scripts/UserScriptDefaults/CustomPatterns";
 
 import ScriptsPanel from "./Scripts/ScriptsPanel";
 import {_VDFPreSerialize, Assert, AssertWarn, E, Log, P, ToJSON} from "../Frame/Globals";
@@ -61,6 +62,8 @@ export class Scripts extends Node {
 			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText(ToJSON({index: 4, editable: true, enabled: true}));
 			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
 			await scriptsFolder.GetFile("Custom script.meta").WriteAllText(ToJSON({index: 5, editable: true, enabled: true}));
+			await scriptsFolder.GetFile("Custom patterns.js").WriteAllText(scriptDefaultText_CustomPatterns);
+			await scriptsFolder.GetFile("Custom patterns.meta").WriteAllText(ToJSON({index: 6, editable: true, enabled: true}));
 		}
 		
 		var scriptFiles = (await scriptsFolder.GetFiles()).Where(a=>a.Extension == "js");
@@ -124,6 +127,7 @@ This will permanently remove all custom code from the script.`,
 					"Built-in script": scriptDefaultText_BuiltInScript,
 					"Fake-data provider": scriptDefaultText_FakeDataProvider,
 					"Custom script": scriptDefaultText_CustomScript,
+					"Custom patterns": scriptDefaultText_CustomPatterns,
 				};
 				Assert(nameToTextMap[scriptName]);
 				script.text = nameToTextMap[scriptName];

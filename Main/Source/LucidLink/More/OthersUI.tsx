@@ -13,12 +13,14 @@ export default class OthersUI extends Component<any, any> {
 		return (
 			<Column style={{flex: 1, backgroundColor: colors.background}}>
 				<Row>
-					<VButton text='Reset "built-in script"' style={{width: 300}}
+					<VButton text='Reset "built-in script"' style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Built-in script")}/>
-					<VButton text='Reset "fake-data provider"' ml5 style={{width: 300}}
+					<VButton text='Reset "fake-data provider"' ml5 style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Fake-data provider")}/>
-					<VButton text='Reset "custom script"' ml5 style={{width: 300}}
+					<VButton text='Reset "custom script"' ml5 style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Custom script")}/>
+					<VButton text='Reset "custom patterns"' ml5 style={{flex: 1}}
+						onPress={()=>LL.scripts.ResetScript("Custom patterns")}/>
 				</Row>
 				<Row>
 					<VButton text="Refresh profiler data" style={{width: 300}} onPress={this.AllFrames_Refresh}/>
