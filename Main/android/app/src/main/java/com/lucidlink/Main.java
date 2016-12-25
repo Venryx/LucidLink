@@ -199,7 +199,7 @@ public class Main extends ReactContextBaseJavaModule {
 					for (ReactEditText input : Stream.of(textInputs).toArray(ReactEditText[]::new)) {
 						if (Objects.equals(input.getTag(), "modified")) continue;
 
-						V.ConvertTextInputTabsToSpans(input);
+						//V.ConvertTextInputTabsToSpans(input);
 
 						input.addTextChangedListener(new TextWatcher() {
 							int insertPos = 0, insertCount = 0;
@@ -226,7 +226,7 @@ public class Main extends ReactContextBaseJavaModule {
 								}
 							}
 							public void afterTextChanged(Editable view) {
-								V.ConvertTextInputTabsToSpans(input, this.insertPos, this.insertPos + this.insertCount);
+								//V.ConvertTextInputTabsToSpans(input, this.insertPos, this.insertPos + this.insertCount);
 							}
 						});
 

@@ -52,7 +52,7 @@ public class V {
 		return result;
 	}
 
-	static final String INDEX_CHAR = " ";
+	/*static final String INDEX_CHAR = " ";
 	static final int TAB_NUMBER = 4;
 	public static void ConvertTextInputTabsToSpans(EditText input) {
 		ConvertTextInputTabsToSpans(input, 0, input.getEditableText().length());
@@ -66,7 +66,7 @@ public class V {
 			input.getEditableText().setSpan(new CustomTabWidthSpan(Float.valueOf(tabWidth).intValue()), index, index + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			start = index + 1;
 		}
-	}
+	}*/
 	static class CustomTabWidthSpan extends ReplacementSpan {
 		CustomTabWidthSpan(int tabWidth){
 			this.tabWidth = tabWidth;
