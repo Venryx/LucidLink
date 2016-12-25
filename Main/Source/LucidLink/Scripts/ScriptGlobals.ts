@@ -111,6 +111,7 @@ export class AudioFile {
 		WaitXThenRun(1000, ()=> {
 			this.baseFile.stop();
 		});
+		return this;
 	}
 	Release() { this.baseFile.release(); }
 

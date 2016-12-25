@@ -23,6 +23,10 @@ public class MainActivity extends ReactActivity {
         return "LucidLink";
     }
 
+	@Override
+	public void onBackPressed() {
+	}
+
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
 		Main.main.SendEvent("OnKeyDown", keyCode);
 		if (Main.main.blockUnusedKeys)
