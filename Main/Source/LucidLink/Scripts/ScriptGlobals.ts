@@ -132,7 +132,8 @@ export class AudioFile {
 
 	// volume range is 0-1
 	GetVolume() { return this.baseFile.getVolume(); }
-	SetVolume(volume) { return this.baseFile.setVolume(volume); }
+	SetVolume(volume) {return this.baseFile.setVolume(volume); }
+	AddVolume(amount) {return this.SetVolume(this.GetVolume() + amount); }
 	FadeVolume(options) {
 		var {from, to, over} = options;
 		var startTime = new Date().getTime();
