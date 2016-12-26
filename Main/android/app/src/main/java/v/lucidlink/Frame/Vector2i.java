@@ -1,4 +1,4 @@
-package com.lucidlink.Frame;
+package v.lucidlink.Frame;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;

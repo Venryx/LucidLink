@@ -167,6 +167,26 @@ export default class GeneralUI extends BaseComponent<any, any> {
 								node.eyeTraceSegmentCount = val;
 							}}/>
 					</Row>
+					<Row>
+						<VText ml10 mt5 mr10>Log stats every X minutes</VText>
+						<VButton text={node.logStatsEveryXMinutes.toString()} style={{width: 100, height: 32}}
+							onPress={async ()=> {
+								var values = [];
+								for (let val = 1; val <= 100; val++)
+									values.push(val);
+								var id = await NumberPickerDialog.show({
+									title: "Log stats every X minutes",
+									message: "",
+									values: values.Select(a=>a.toString()),
+									selectedValueIndex: values.indexOf(node.logStatsEveryXMinutes),
+									positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+								});
+
+								if (id == -1) return;
+								let val = values[id];
+								node.logStatsEveryXMinutes = val;
+							}}/>
+					</Row>
 				</Row>
             </Panel>
 		);

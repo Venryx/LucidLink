@@ -1,4 +1,4 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -23,8 +23,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.v.LibMuse.MainModule;
-import com.v.LibMuse.VMuseDataPacket;
+import v.LibMuse.MainModule;
+import v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
 import java.util.Date;

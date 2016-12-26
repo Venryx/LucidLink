@@ -73,16 +73,23 @@ import {ProfileMethod} from "./VProfiler";
 	}
 	
 	static count = 0;
+	static lastLogStatsTime = -1;
 	static OnReceiveMuseDataPacket(packet) {
 		//if (++MuseBridge.count > 300) return; // for testing
 		if (!LL.monitor.monitor) return; // quick return, for when "stop sending" update to Java is delayed
 
-		let p = ProfileMethod("OnReceiveMuseDataPacket");
+		//let p = ProfileMethod("OnReceiveMuseDataPacket");
 
 		//Log(`Type: ${type} ChannelValues: ${ToJSON(channelValues)}`);
 		for (let listener of LL.scripts.scriptRunner.listeners_whenMusePacketReceived)
 			listener(packet);
+
+		var now = new Date().getTime();
+		if (now - MuseBridge.lastLogStatsTime > LL.settings.logStatsEveryXMinutes * 60 * 1000) {
+			//Log("Memory usage: ")
+			MuseBridge.lastLogStatsTime = now;
+		}
 		
-		p.End();
+		//p.End();
 	}
 }

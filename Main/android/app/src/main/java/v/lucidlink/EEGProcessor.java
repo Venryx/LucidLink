@@ -1,18 +1,18 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import com.choosemuse.libmuse.MuseDataPacketType;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.lucidlink.Frame.Vector2i;
-import com.v.LibMuse.MainModule;
-import com.v.LibMuse.VMuseDataPacket;
+import v.lucidlink.Frame.Vector2i;
+import v.LibMuse.MainModule;
+import v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.lucidlink.V.ToWritableArray;
+import static v.lucidlink.V.ToWritableArray;
 
 class EEGProcessor {
 	public EEGProcessor() {

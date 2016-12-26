@@ -1,10 +1,10 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import android.os.Build;
 import android.view.KeyEvent;
 
 import com.facebook.react.ReactActivity;
-import com.v.LibMuse.LibMuse;
+import v.LibMuse.LibMuse;
 
 public class MainActivity extends ReactActivity {
 	public static MainActivity main;

@@ -57,15 +57,15 @@ export class EEGProcessor {
 	}
 	
 	DoPatternMatching(packet) {
-		let p = ProfileMethod("DoPatternMatching");
+		//let p = ProfileMethod("DoPatternMatching");
 
-		p.Section("checking for pattern continuations");
+		//p.Section("checking for pattern continuations");
 		//BufferAction(1000, ()=>Toast("Count: " + this.patternMatchAttempts.Props.length));
 		for (let {value: matchAttempt} of this.patternMatchAttempts.Props as {value: PatternMatchAttempt}[]) {
 			matchAttempt.ProcessPacket(this.currentFrame, packet);
 		}
 
-		var p1 = p.Section("checking for pattern starts");
+		//var p1 = p.Section("checking for pattern starts");
 		for (let [index, pattern] of LL.scripts.scriptRunner.patterns.entries()) {
 			// if already at max overlapping attempts, don't try to start another
 			if (this.patternIndex_liveMatchAttemptCount[index] >= pattern.maxOverlappingAttempts) continue;
@@ -90,6 +90,6 @@ export class EEGProcessor {
 			}
 		}
 
-		p.End();
+		//p.End();
 	}
 }

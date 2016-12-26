@@ -1,4 +1,4 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import android.database.Cursor;
 import android.graphics.Canvas;

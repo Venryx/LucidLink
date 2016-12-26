@@ -1,4 +1,4 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -20,7 +20,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.textinput.ReactEditText;
-import com.lucidlink.Frame.Vector2i;
+import v.lucidlink.Frame.Vector2i;
 import com.lugg.ReactSnackbar.ReactSnackbarModule;
 
 import java.util.HashMap;

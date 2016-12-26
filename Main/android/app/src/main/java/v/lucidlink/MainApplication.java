@@ -1,4 +1,4 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import android.app.Application;
 import android.util.Log;
@@ -8,6 +8,7 @@ import com.facebook.react.ReactApplication;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
 
+import v.lucidlink.BuildConfig;
 import com.mihir.react.tts.RCTTextToSpeechModule;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactInstanceManager;
@@ -16,7 +17,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.filepicker.FilePickerPackage;
 import com.github.yamill.orientation.OrientationPackage;
-import com.v.LibMuse.LibMuse;
+import v.LibMuse.LibMuse;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
 import com.lugg.ReactSnackbar.ReactSnackbarPackage;

@@ -1,4 +1,4 @@
-package com.lucidlink;
+package v.lucidlink;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

@@ -20,6 +20,7 @@ export class Settings extends Node {
 	@O @P() eyeTracker_relaxVSTenseIntensity = .85;
 	@O @P() eyeTraceSegmentSize = .05;
 	@O @P() eyeTraceSegmentCount = 100;
+	@O @P() logStatsEveryXMinutes = 5;
 
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 

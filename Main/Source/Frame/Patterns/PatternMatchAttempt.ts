@@ -35,9 +35,9 @@ export default class PatternMatchAttempt {
 	segmentMatchPackets: Packet[] = [];
 	segmentMatchPacketFrames: number[] = [];
 	ProcessPacket(frame, packet) {
-		let p = ProfileMethod("ProcessPacket");
+		//let p = ProfileMethod("ProcessPacket");
 
-		p.Section("part 1");
+		//p.Section("part 1");
 		var lastSegment = this.pattern.segments[this.SegmentsMatched - 1];
 		var lastSegment_matchPacketFrame = this.segmentMatchPacketFrames[this.SegmentsMatched - 1];
 		var nextSegmentIndex = this.SegmentsMatched;
@@ -46,14 +46,14 @@ export default class PatternMatchAttempt {
 
 		let distFromLastMatch = frame - lastSegment_matchPacketFrame;
 		if (nextSegment instanceof Gap) {
-			p.Section("part 2");
+			//p.Section("part 2");
 			let minDist = nextSegment.min + 1;
 			let matched = distFromLastMatch >= minDist;
 			//Toast("Test1" + minDist + ";" + matched + ";" + distFromLastMatch + ";" + nextSegmentIndex);
 			if (matched)
 				this.MatchSegment(nextSegmentIndex, frame, packet);
 		} else if (nextSegment instanceof Matcher) {
-			p.Section("part 3");
+			//p.Section("part 3");
 			let maxDist = lastSegment instanceof Gap ? lastSegment.max - lastSegment.min : 0;
 
 			let matched = nextSegment.matchFunc(packet);
@@ -63,7 +63,7 @@ export default class PatternMatchAttempt {
 				this.Cancel();
 		}
 
-		p.End();
+		//p.End();
 	}
 	MatchSegment(segmentIndex, frame, packet) {
 		this.segmentMatchPackets.push(packet);

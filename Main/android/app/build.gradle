@@ -112,7 +112,7 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "com.lucidlink"
+        applicationId "v.lucidlink"
         //minSdkVersion 18
         minSdkVersion 21
         targetSdkVersion 24
