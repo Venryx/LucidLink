@@ -70,6 +70,9 @@ import {ProfileMethod} from "./VProfiler";
 		}
 		MuseBridge.status = status;
 		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
+
+		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus)
+			listener(status);
 	}
 	
 	static count = 0;

@@ -20,6 +20,7 @@ export default class ScriptRunner {
 	patterns: Pattern[] = []; // func-based patterns
 
 	timers = [];
+	listeners_whenChangeMuseConnectStatus = [];
 	listeners_whenMusePacketReceived = [];
 	/*listeners_whenViewDirectionUpdated = [];
 	listeners_whenViewDistanceUpdated = [];*/
@@ -51,6 +52,7 @@ export default class ScriptRunner {
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
+		this.listeners_whenChangeMuseConnectStatus = [];
 		this.listeners_whenMusePacketReceived = [LL.monitor.eegProcessor.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];

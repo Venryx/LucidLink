@@ -31,6 +31,16 @@ AddKeyUpListener(keyCodeForTheLetterA, function() {
 	// this code runs whenever the user releases the letter A
 });
 
+// muse
+// ==========
+
+WhenChangeMuseConnectStatus(function(status) {
+	Log("New status: " + status);
+});
+WhenMusePacketReceived(function(packet) {
+	Log("Received packet: " + ToJSON(packet));
+});
+
 // pattern matching
 // ==========
 

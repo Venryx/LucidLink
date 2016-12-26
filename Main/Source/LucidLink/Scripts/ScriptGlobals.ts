@@ -28,6 +28,9 @@ export function EveryXSecondsDo(seconds, func, maxCallCount = -1) {
 	return timer;
 };
 
+export function WhenChangeMuseConnectStatus(func) {
+	LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus.push(func);
+}
 export function WhenMusePacketReceived(func) {
 	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
 }
