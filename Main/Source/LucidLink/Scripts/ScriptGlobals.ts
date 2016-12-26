@@ -98,11 +98,13 @@ export class AudioFile {
 	Play() {
 		this.SetVolume(1);
 		this.playStartTime = new Date().getTime();
-		return this.baseFile.play();
+		this.baseFile.play();
+		return this;
 	}
 	Pause() {
 		this.baseFile.pause();
 		this.wasPaused = true;
+		return this;
 	}
 	Stop() {
 		this.SetCurrentTime(0);
