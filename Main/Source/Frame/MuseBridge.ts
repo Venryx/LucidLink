@@ -31,11 +31,9 @@ import {ProfileMethod} from "./VProfiler";
 	static StopSearch() {
 		LibMuse.StopSearch();
 	}
-	static StartSearch(stopThenStart = true) {
-		if (stopThenStart)
-			LibMuse.RestartSearch();
-		else
-			LibMuse.StartSearch();
+	static StartSearch() {
+		//LibMuse.StartSearch();
+		LibMuse.RestartSearch();
 	}
 	static OnChangeMuseList(museList) {
 		MuseBridge.museList = museList;

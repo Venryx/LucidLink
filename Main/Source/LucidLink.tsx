@@ -125,6 +125,7 @@ export class LucidLink extends Node {
 				"eyeTracker_relaxVSTenseIntensity", "eyeTraceSegmentSize", "eyeTraceSegmentCount"])
 			basicData[prop] = LL.settings[prop];
 		JavaBridge.Main.SetBasicData(basicData);
+		LibMuse.reconnectAttemptInterval = LL.settings.reconnectAttemptInterval * 1000;
 	}
 
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
@@ -195,6 +196,7 @@ import MuseBridge from "./Frame/MuseBridge";
 import {Folder, VFile} from "./Packages/V/VFile";
 import {autorun} from "mobx";
 import TestData from "./Frame/TestData";
+import LibMuse from "react-native-libmuse";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	var inEmulator = await JavaBridge.Main.IsInEmulator();
 	if (inEmulator)

@@ -576,3 +576,13 @@ export class Random {
 		return imageStr.substr(imageStr.indexOf(",") + 1);
 	}*/
 }
+
+// others
+// ==========
+
+export function Range(min, max, includeMax = true) {
+	var result: number[] = [];
+	for (let i = min; includeMax ? i <= max : i < max; i++)
+		result.push(i);
+	return result;
+}

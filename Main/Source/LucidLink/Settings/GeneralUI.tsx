@@ -1,4 +1,5 @@
-import {BaseComponent, Panel, Row, RowLR, VButton, VText} from "../../Frame/ReactGlobals";
+import {Range} from "../../Frame/Globals";
+import {BaseComponent as Component, Panel, Row, RowLR, VButton, VText} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {Observer, observer} from "mobx-react/native";
 import {Text, Switch} from "react-native";
@@ -6,7 +7,35 @@ import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {LL} from "../../LucidLink";
 
 @observer
-export default class GeneralUI extends BaseComponent<any, any> { 
+class NumberSettingUI extends Component<{propName: string, text: string, description?: string, values: number[]}, any> {
+	static defaultProps = {description: ""};
+	render() {
+		var {propName, text, description, values} = this.props;
+		var node = LL.settings;
+		return (
+			<Row>
+				<VText ml10 mt5 mr10>{text}</VText>
+				<VButton text={node[propName].toString()} style={{width: 100, height: 32}}
+					onPress={async ()=> {
+						var id = await NumberPickerDialog.show({
+							title: text,
+							message: description,
+							values: values.Select(a=>a.toString()),
+							selectedValueIndex: values.indexOf(node[propName]),
+							positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
+						});
+
+						if (id == -1) return;
+						let val = values[id];
+						node[propName] = val;
+					}}/>
+			</Row>
+		)
+	}
+}
+
+@observer
+export default class GeneralUI extends Component<any, any> { 
 	render() {
 		var node = LL.settings;
 		return (
@@ -187,6 +216,7 @@ export default class GeneralUI extends BaseComponent<any, any> {
 								node.logStatsEveryXMinutes = val;
 							}}/>
 					</Row>
+					<NumberSettingUI propName="reconnectAttemptInterval" text="Reconnect attempt interval" values={[-1].concat(Range(1, 100))}/>
 				</Row>
             </Panel>
 		);
