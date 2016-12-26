@@ -320,7 +320,9 @@ public class V {
 		R Run(A1 arg1);
 	}
 	public static View FindView(View root, Func<View, Boolean> matchFunc) {
-		return FindViews(root, matchFunc, 1).get(0);
+		List<View> views = FindViews(root, matchFunc, 1);
+		if (views.size() == 0) return null;
+		return views.get(0);
 	}
 	public static List<View> FindViews(View root, Func<View, Boolean> matchFunc) {
 		return FindViews(root, matchFunc, -1);
