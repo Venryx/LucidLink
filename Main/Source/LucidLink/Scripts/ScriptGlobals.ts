@@ -62,6 +62,12 @@ export function AddPattern(info) {
 	LL.scripts.scriptRunner.patterns.push(pattern);
 }
 
+export function CreateTimer(intervalInSec: number, func: Function, maxCallCount = -1) {
+	var timer = new Timer(intervalInSec, func, maxCallCount);
+	LL.scripts.scriptRunner.timers.push(timer);
+	return timer;
+}
+
 // input
 // ==========
 
@@ -155,6 +161,7 @@ export class AudioFile {
 			if (percentThroughFade >= 1)
 				timer.Stop();
 		});
+		LL.scripts.scriptRunner.timers.push(timer);
 		timer.Start();
 	}
 
