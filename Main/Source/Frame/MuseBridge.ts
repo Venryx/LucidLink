@@ -86,7 +86,13 @@ import {ProfileMethod} from "./VProfiler";
 
 		var now = new Date().getTime();
 		if (now - MuseBridge.lastLogStatsTime > LL.settings.logStatsEveryXMinutes * 60 * 1000) {
-			//Log("Memory usage: ")
+			(async ()=> {
+				let usedMemory = await JavaBridge.Main.GetAppUsedMemory();
+				let totalMemory = await JavaBridge.Main.GetAppTotalMemory();
+				let maxMemory = await JavaBridge.Main.GetAppMaxMemory();
+				let usedNativeMemory = await JavaBridge.Main.GetAppNativeUsedMemory();
+				Log(`App-heap memory-usage (in mb): ${usedMemory}/${totalMemory} (max: ${maxMemory}) (native usage: ${usedNativeMemory})`);
+			})();
 			MuseBridge.lastLogStatsTime = now;
 		}
 		

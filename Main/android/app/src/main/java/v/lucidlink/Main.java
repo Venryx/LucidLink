@@ -3,6 +3,7 @@ package v.lucidlink;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Debug;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -296,6 +297,31 @@ public class Main extends ReactContextBaseJavaModule {
 		eegProcessor.eyePosX = .5;
 		eegProcessor.viewDistanceY = .5;
 		eegProcessor.ResetLastNPositions();
+	}
+
+	@ReactMethod public void GetAppUsedMemory(Promise promise) {
+		final Runtime runtime = Runtime.getRuntime();
+		final int usedMemInMB = (int)((runtime.totalMemory() - runtime.freeMemory()) / 1048576L);
+		promise.resolve(usedMemInMB);
+	}
+	/*@ReactMethod public void GetAppFreeMemory(Promise promise) {
+		final Runtime runtime = Runtime.getRuntime();
+		final int usedMemInMB = (int)((runtime.totalMemory() - runtime.freeMemory()) / 1048576L);
+		final int maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
+		final int appFreeMemory = maxHeapSizeInMB - usedMemInMB;
+		promise.resolve(appFreeMemory);
+	}*/
+	@ReactMethod public void GetAppTotalMemory(Promise promise) {
+		final int maxHeapSizeInMB = (int)(Runtime.getRuntime().maxMemory() / 1048576L);
+		promise.resolve(maxHeapSizeInMB);
+	}
+	@ReactMethod public void GetAppMaxMemory(Promise promise) {
+		final int resultInMB = (int)(Runtime.getRuntime().maxMemory() / 1048576L);
+		promise.resolve(resultInMB);
+	}
+	@ReactMethod public void GetAppNativeUsedMemory(Promise promise) {
+		final int resultInMB = (int)(Debug.getNativeHeapAllocatedSize() / 1048576L);
+		promise.resolve(resultInMB);
 	}
 
 	void Shutdown() {
