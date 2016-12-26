@@ -1,5 +1,5 @@
 # LucidLink
-Monitors Muse headband EEG data, and triggers events (eg audio) when REM sleep is detected.
+Monitors Muse headband EEG data, and triggers user-scripted events (eg audio) when REM sleep is detected.
 
 Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
