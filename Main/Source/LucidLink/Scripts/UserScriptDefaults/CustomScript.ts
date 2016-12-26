@@ -3,7 +3,7 @@ export default `
 // ==========
 
 var waker = GetAudioFile("game")
-waker.LoopCount = -1 // loop
+waker.PlayCount = -1 // loop
 waker.Stop()
 
 AddEvent("SS") // starting scripts

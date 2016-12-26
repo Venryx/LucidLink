@@ -100,12 +100,11 @@ export var audioFiles = audioFiles || {};
 export class AudioFile {
 	constructor(baseFile) {
 		this.baseFile = baseFile;
-		//this.SetLoopCount(-1);
+		//this.PlayCount = -1;
 	}
 	baseFile;
 
 	Play() {
-		this.SetVolume(1);
 		this.playStartTime = new Date().getTime();
 		this.baseFile.play();
 		return this;
@@ -117,11 +116,13 @@ export class AudioFile {
 	}
 	Stop() {
 		this.SetCurrentTime(0);
-		this.SetVolume(0);
-		this.playStartTime = null;
+		this.baseFile.stop();
 		WaitXThenRun(1000, ()=> {
+			this.SetCurrentTime(0);
 			this.baseFile.stop();
 		});
+
+		this.playStartTime = null;
 		return this;
 	}
 	Release() { this.baseFile.release(); }
@@ -132,9 +133,9 @@ export class AudioFile {
 		if (this.playStartTime == null)
 			return false;
 		Assert(!this.wasPaused, "Cannot get IsPlaying state if audio was paused.");
-		var loopCount = this.LoopCount;
-		var playDurationMS = this.Duration * (loopCount != -1 ? loopCount : 111222333) * 1000;
-		//Log(this.Duration + ";" + loopCount + ";" + this.playStartTime + ";" + playDurationMS);
+		var playCount = this.PlayCount;
+		var playDurationMS = this.Duration * (playCount != -1 ? playCount : 111222333) * 1000;
+		//Log(this.Duration + ";" + playCount + ";" + this.playStartTime + ";" + playDurationMS);
 		return this.playStartTime + playDurationMS > new Date().getTime();
 	}
 
@@ -167,15 +168,18 @@ export class AudioFile {
 
 	GetCurrentTime(callback) { this.baseFile.getCurrentTime(callback); }
 	SetCurrentTime(newTime) { this.baseFile.setCurrentTime(newTime); }
-	get LoopCount() { 
+	get PlayCount() { 
 		var result = this.baseFile.getNumberOfLoops();
-		// library "loop count" is apparently *extra* times to play audio; so add one for first play
-		if (result != -1) result++;
+		// library "loop count" is apparently *extra* times to play audio
+		//		since base-file's "loop count" didn't include 1 for the first-play, we add it ourselves
+		if (result != -1) result--;
 		return result;
 	}
 	// set to -1 for endless loop
-	set LoopCount(count) {
-		if (count != -1) count++;
+	set PlayCount(count) {
+		// library "loop count" is apparently *extra* times to play audio
+		//		since first-play is outside that, remove it's 1 from the base-file's "loop count" we're sending
+		if (count != -1) count--;
 		this.baseFile.setNumberOfLoops(count);
 	}
 
