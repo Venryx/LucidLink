@@ -62,15 +62,17 @@ export default class GraphUI extends Component<any, any> {
 								});
 							}}/>
 						<Panel style={{flex: 1}}/>
-						<VButton text="Refresh" ml3 mt5 style={{width: 100, height: 32}} onPress={()=>this.forceUpdate()}/>
+						<VButton text="Refresh" ml3 mt5 style={{width: 100, height: 32}} onPress={()=>this.chart.Refresh()}/>
 					</Row>
 					<Row style={{marginTop: -7, flex: 1}}>
-						<ChartsUI session={session}/>
+					<ChartsUI ref={c=>this.chart = c} session={session}/>
 					</Row>
 				</Column>
 			</Drawer>
 		);
 	}
+
+	chart: ChartsUI;
 }
 
 @observer
@@ -119,6 +121,11 @@ class ChartsUI extends Component<any, any> {
 		var {x, y, width, height} = e.nativeEvent.layout;
 		if (width != this.state.width || height != this.state.height)
 			this.setState({width, height});
+	}
+
+	Refresh() {
+		var {height} = this.state;
+		this.setState({height: height - 1}, ()=>this.setState({height}));
 	}
 }
 
