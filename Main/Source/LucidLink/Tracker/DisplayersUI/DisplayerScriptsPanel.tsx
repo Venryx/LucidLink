@@ -1,18 +1,17 @@
 import {Text, TouchableHighlight} from "react-native";
-import {colors} from '../../../Frame/Styles';
-import {BaseComponent, Panel, VButton} from '../../../Frame/ReactGlobals';
-import {observer} from 'mobx-react/native';
+import {colors} from "../../../Frame/Styles";
+import {BaseComponent as Component, Panel, VButton, Column} from "../../../Frame/ReactGlobals";
+import {observer} from "mobx-react/native";
 import {Script} from "../../Scripts/Script";
-import Bind from "autobind-decorator";
 import {LL} from "../../../LucidLink";
 var SortableListView = require("react-native-sortable-listview");
 
-@Bind
-class DisplayerScriptUI extends BaseComponent<any, any> {
+@observer
+class DisplayerScriptUI extends Component<{parent: DisplayerScriptsPanel, script: Script, onSelect: ()=>void}, {}> {
 	render() {
 		var {script, onSelect} = this.props;
 		return (
-			<TouchableHighlight {...this.props.sortHandlers} underlayColor="#EEE" delayLongPress={300}
+			<TouchableHighlight underlayColor="#EEE" delayLongPress={300}
 					style={{backgroundColor: colors.background_lighter, borderBottomWidth: 1, borderColor: colors.background_light}}
 					onPress={onSelect}>
 				<Panel style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
@@ -32,22 +31,21 @@ class DisplayerScriptUI extends BaseComponent<any, any> {
 }
 
 @observer
-@Bind
-export default class DisplayerScriptsPanel extends BaseComponent<any, any> {
+export default class DisplayerScriptsPanel extends Component<{scripts: Script[], selectedScript: Script}, {}> {
 	render() {
-		var {parent, scripts, selectedScript} = this.props;
+		var {scripts, selectedScript} = this.props;
 
 		var scripts_map = scripts.ToMap(a=>a.file.Name, a=>a);
 		var scriptNames_ordered = scripts.OrderBy(a=>a.index).Select(a=>a.file.Name);
 
 		return (
-			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
+			<Column style={{flex: 1, backgroundColor: colors.background_light}}>
 				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder)</Text>
 				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
 						renderRow={script=> {
 							return <DisplayerScriptUI parent={this} script={script}
-								onSelect={()=>parent.SelectScript(script)}/>;
+								onSelect={()=>LL.tracker.selectedDisplayerScript = script}/>;
 						}}
 						onRowMoved={e=> {
 							var movedEntryName = scriptNames_ordered.splice(e.from, 1)[0];
@@ -62,7 +60,7 @@ export default class DisplayerScriptsPanel extends BaseComponent<any, any> {
 					<VButton text="Add" style={{position: "absolute", top: (scripts.length * (40 + 1)) + 5, width: 100}}
 						onPress={this.AddScript}/>
 				</Panel>
-			</Panel>
+			</Column>
 		)
 	}
 	async AddScript() {

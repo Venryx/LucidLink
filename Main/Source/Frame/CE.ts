@@ -690,6 +690,7 @@ Array.prototype._AddFunction_Inline = function ToDictionary(keyFunc, valFunc) {
 		result.Add(keyFunc(this[i]), valFunc(this[i]));
 	return result;
 }
+interface Array<T> { ToMap(keyFunc: (item: T)=>string, valFunc: (item: T)=>any): any; }
 Array.prototype._AddFunction_Inline = function ToMap(keyFunc, valFunc) {
 	var result = {};
 	for (let item of this)
@@ -740,10 +741,17 @@ Array.prototype._AddFunction_Inline = function Distinct() {
 			result.push(this[i]);
 	return result;
 };
-Array.prototype._AddFunction_Inline = function Except(excludeObjOrArray) {
-	if (excludeObjOrArray instanceof Array)
-   		return this.Where(a=>!excludeObjOrArray.Contains(a));
-	return this.Where(a=>a !== excludeObjOrArray);
+interface Array<T> {
+	Except(item: T): T[];
+	Except(array: T[]): T[];
+}
+Array.prototype._AddFunction_Inline = function Except(...args) {
+	if (!(args[0] instanceof Array)) var [item] = args;
+	else var [array] = args;
+
+	if (item !== undefined)
+		return this.Where(a=>a !== item);
+	return this.Where(a=>!array.Contains(a));
 };
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};

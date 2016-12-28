@@ -1,5 +1,5 @@
 import {Script} from "./Scripts/Script";
-import {BaseComponent, Panel, VButton, VTextInput} from "../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, VButton, VTextInput} from "../Frame/ReactGlobals";
 import {colors, styles} from "../Frame/Styles";
 import RNFS from "react-native-fs";
 import ScrollableTabView from "react-native-scrollable-tab-view";
@@ -18,9 +18,10 @@ import scriptDefaultText_CustomPatterns from "./Scripts/UserScriptDefaults/Custo
 
 import ScriptsPanel from "./Scripts/ScriptsPanel";
 import {_VDFPreSerialize, Assert, AssertWarn, E, Log, P, ToJSON} from "../Frame/Globals";
-import Bind from "autobind-decorator";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
+import {observer} from "mobx-react/native";
+import {autorun} from "mobx";
 
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {
@@ -32,11 +33,10 @@ export class Scripts extends Node {
 	        return new VDFNode(this.selectedScript.Name);
 	}*/
 
-	ui = null;
-
-	scripts = [];
-	selectedScript = null;
-	@P() selectedScriptName = null; // used only during save-to/load-from disk 
+	@O scripts: Script[] = [];
+	@O selectedScript: Script = null;
+	@P() selectedScriptName = null; // used only during save-to/load-from disk
+	@O scriptLastRunsOutdated
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData() {
@@ -78,8 +78,6 @@ export class Scripts extends Node {
 		if (LL.settings.applyScriptsOnLaunch)
 			this.ApplyScripts();
 		
-		if (this.ui)
-			this.ui.forceUpdate();
 		Log("Finished loading scripts.");
 	}
 
@@ -133,8 +131,6 @@ This will permanently remove all custom code from the script.`,
 				script.text = nameToTextMap[scriptName];
 
 				script.Save();
-				if (this.ui)
-					this.ui.forceUpdate();
 			},
 		});
 		dialog.show();
@@ -147,37 +143,31 @@ This will permanently remove all custom code from the script.`,
 			return a.index;
 		});
 		this.scriptRunner.Apply(scripts_ordered);
-		if (this.ui)
-			this.ui.setState({scriptLastRunsOutdated: false});
+		this.scriptLastRunsOutdated = false;
 	}
 }
 g.Extend({Scripts});
 
-export class ScriptsUI extends BaseComponent<any, any> {
-	constructor(props) {
-		super(props);
-		this.state = {scriptLastRunsOutdated: false};
-		LL.scripts.ui = this;
-	}
-
+@observer
+export class ScriptsUI extends Component<any, any> {
 	_drawer;
-	@Bind ToggleSidePanelOpen() {
+	ToggleSidePanelOpen() {
 		if (this._drawer._open)
 			this._drawer.close();
 		else
 			this._drawer.open();
 	}
 
-	SelectScript(script) {
-		LL.scripts.selectedScript = script;
-		this.forceUpdate();
-		this._drawer.close();
+	componentDidMount() {
+		autorun(()=> {
+			LL.scripts.selectedScript; // listen for changes
+			this._drawer.close();
+		});
 	}
 
 	render() {
 		var node = LL.scripts;
 		var {selectedScript} = node;
-		var {scriptLastRunsOutdated} = this.state;
 		
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
@@ -198,7 +188,7 @@ export class ScriptsUI extends BaseComponent<any, any> {
 						</Text>
 						{selectedScript && selectedScript.editable &&
 							<VButton text="Rename" style={{marginLeft: 10, width: 100}}
-								onPress={()=>selectedScript.Rename(()=>this.forceUpdate())}/>}
+								onPress={()=>selectedScript.Rename()}/>}
 						<Panel style={{flex: 1}}/>
 						<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
 							<VButton color="#777" text="Save" enabled={selectedScript != null && selectedScript.fileOutdated}
@@ -218,7 +208,7 @@ export class ScriptsUI extends BaseComponent<any, any> {
 							editable={selectedScript != null}
 							onChangeText={text=> {
 								LL.scripts.selectedScript.fileOutdated = true;
-								this.setState({scriptLastRunsOutdated: true});
+								LL.scripts.scriptLastRunsOutdated = true;
 								if (!selectedScript.editable) return;
 								selectedScript.text = text;
 								selectedScript.fileOutdated = true;

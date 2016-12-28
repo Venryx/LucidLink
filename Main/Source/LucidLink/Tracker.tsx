@@ -32,7 +32,7 @@ export class Tracker extends Node {
 	@P() selectedDisplayerScriptName: string; // used only during save-to/load-from disk 
 	scriptRunner = new ScriptRunner();
 
-LoadFileSystemData(onDone = null) {
+	LoadFileSystemData(onDone = null) {
 		this.LoadDisplayerScripts(onDone);
 	}
 	async LoadDisplayerScripts(onDone = null) {
@@ -136,7 +136,7 @@ LoadFileSystemData(onDone = null) {
 		});
 	}
 	
-	currentSession = null;
+	currentSession: Session = null;
 	async SetUpCurrentSession() {
 		var session = new Session(Moment());
 		await session.Save();

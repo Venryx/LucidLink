@@ -24,19 +24,26 @@ export class Session {
 		await this.folder.Create();
 		this.file.WriteAllText(vdf);
 	}
-	Delete(onDone = null) {
-		var dialog = new DialogAndroid();
-		dialog.set({
-			"title": `Delete session for "${this.date.format("YYYY-MM-DD HH:mm:ss")}"`,
-			"content": `Permanently delete session?`,
-			"positiveText": "OK", "negativeText": "Cancel",
-			"onPositive": ()=> {
-				LL.tracker.loadedSessions.Remove(this);
-				this.folder.Delete();
-				onDone && onDone();
-			},
-		});
-		dialog.show();
+	Delete(askForConfirmation = true, onDone = null) {
+		Assert(this != LL.tracker.currentSession, "Cannot delete the current session.");
+		var proceed = ()=> {
+			LL.tracker.loadedSessions.Remove(this);
+			this.folder.Delete();
+			if (onDone) onDone();
+		};
+		
+		if (askForConfirmation) {
+			var dialog = new DialogAndroid();
+			dialog.set({
+				"title": `Delete session for "${this.date.format("YYYY-MM-DD HH:mm:ss")}"`,
+				"content": `Permanently delete session?`,
+				"positiveText": "OK", "negativeText": "Cancel",
+				"onPositive": proceed,
+			});
+			dialog.show();
+		} else {
+			proceed();
+		}
 	}
 
 	constructor(date) {

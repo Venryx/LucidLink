@@ -59,7 +59,7 @@ Error: ${ex.stack}`);
 		});
 		dialog.show();
 	}
-	Rename(onRename = null) {
+	Rename() {
 		var dialog = new DialogAndroid();
 		dialog.set({
 			"title": `Rename script "${this.file.NameWithoutExtension}"`,
@@ -69,7 +69,6 @@ Error: ${ex.stack}`);
 					this.file.Delete();
 					this.file = this.file.Folder.GetFile(newName + ".js");
 					this.Save();
-					onRename && onRename();
 				}
 			},
 			"positiveText": "OK",
@@ -83,7 +82,7 @@ Error: ${ex.stack}`);
 		this.text = text;
 	}
 
-	file = null;
+	@O file = null;
 	get DisplayerScript() { return this.file.Folder.Name == "Displayer scripts"; }
 	fileOutdated = false;
 	get Name() { return this.file.NameWithoutExtension; }

@@ -1,25 +1,24 @@
 import {colors} from "../../Frame/Styles";
-import {BaseComponent, Panel, VButton} from "../../Frame/ReactGlobals";
+import {BaseComponent, Panel, VButton, Column} from "../../Frame/ReactGlobals";
 import {Script} from "./Script";
 var SortableListView = require("react-native-sortable-listview");
 import {TouchableHighlight, Text, Switch} from "react-native";
-import {DN} from "../../Frame/Globals";
 import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
 
 @Bind
-class ScriptEntryUI extends BaseComponent<any, any> {
+class ScriptEntryUI extends BaseComponent<{parent: ScriptsPanel, script: Script}, {}> {
 	render() {
 		var {script} = this.props;
 		return (
-			<TouchableHighlight {...this.props.sortHandlers} underlayColor="#EEE" delayLongPress={300}
+			<TouchableHighlight underlayColor="#EEE" delayLongPress={300}
 					style={{backgroundColor: colors.background_lighter, borderBottomWidth: 1, borderColor: colors.background_light}}
-					onPress={()=>LL.scripts.ui.SelectScript(script)}>
+					onPress={()=>LL.scripts.selectedScript = script}>
 				<Panel style={{height: 40, paddingLeft: 10, paddingRight: 10, flexDirection: "row"}}>
 					<Text style={{paddingTop: 10}}>{script.file.Name}</Text>
 					<Panel style={{flex: 1}}/>
 					<Switch value={script.enabled}
-						onValueChange={value=>DN(script.enabled = value, this.forceUpdate())}/>
+						onValueChange={value=>(script.enabled = value, this.forceUpdate())}/>
 					{script.editable
 						? <VButton text="X"
 							style={{alignItems: "flex-end", marginLeft: 5, marginTop: 6, width: 28, height: 28}}
@@ -40,7 +39,7 @@ export default class ScriptsPanel extends BaseComponent<any, any> {
 		var scriptNames_ordered = scripts.OrderBy(a=>a.index).Select(a=>a.file.Name);
 
 		return (
-			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background_light}}>
+			<Column style={{flex: 1, backgroundColor: colors.background_light}}>
 				<Text style={{padding: 5, fontSize: 15}}>Scripts (drag to reorder; place dependencies first)</Text>
 				<Panel style={{flex: 1}}>
 					<SortableListView data={scripts_map} order={scriptNames_ordered}
@@ -58,7 +57,7 @@ export default class ScriptsPanel extends BaseComponent<any, any> {
 					<VButton text="Add" style={{position: "absolute", top: (scripts.length * (40 + 1)) + 5, width: 100}}
 						onPress={this.AddScript}/>
 				</Panel>
-			</Panel>
+			</Column>
 		)
 	}
 	async AddScript() {
@@ -75,7 +74,5 @@ export default class ScriptsPanel extends BaseComponent<any, any> {
 		LL.scripts.scripts.push(script);
 
 		script.Save();
-
-		this.forceUpdate();
 	}
 }

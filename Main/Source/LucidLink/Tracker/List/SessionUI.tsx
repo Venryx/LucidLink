@@ -3,9 +3,10 @@ import {Text, TextInput, ScrollView} from "react-native"
 import {BaseComponent, Column, Row} from '../../../Frame/ReactGlobals';
 import ActionBar from "react-native-action-bar";
 import {LL} from "../../../LucidLink";
+import {Session} from "../Session";
 var Moment = require("moment");
 
-export default class SessionUI extends BaseComponent<any, any> {
+export default class SessionUI extends BaseComponent<{onBack: Function, session: Session}, any> {
 	render() {
 		var {onBack, session} = this.props;
 
@@ -18,7 +19,7 @@ export default class SessionUI extends BaseComponent<any, any> {
 							//alert("Cannot delete the current session. (restart app first)");
 							return;
 						}
-						session.Delete(()=>onBack(false));
+						session.Delete(true, ()=>onBack(false));
 					}}/>
 				<Row>
 					<TextInput ref="dateInput" editable={false} style={{flex: .8}} value={session.date.format("YYYY-MM-DD (MMMM Do)")}/>

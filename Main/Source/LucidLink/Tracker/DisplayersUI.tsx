@@ -3,26 +3,27 @@ import {BaseComponent, Panel, VButton} from '../../Frame/ReactGlobals';
 import {colors, styles} from '../../Frame/Styles';
 import {E} from '../../Frame/Globals';
 import {Observer, observer} from "mobx-react/native";
-import {transaction} from "mobx";
+import {transaction, autorun} from "mobx";
 import Drawer from "react-native-drawer";
 
 import DisplayerScriptsPanel from "./DisplayersUI/DisplayerScriptsPanel";
-import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
 
 @observer
 export default class DisplayersUI extends BaseComponent<any, any> {
 	_drawer = null;
-	@Bind ToggleSidePanelOpen() {
+	ToggleSidePanelOpen() {
 		if (this._drawer._open)
 			this._drawer.close();
 		else
 			this._drawer.open();
 	}
 
-	SelectScript(script) {
-		LL.tracker.selectedDisplayerScript = script;
-		this._drawer.close();
+	componentDidMount() {
+		autorun(()=> {
+			LL.tracker.selectedDisplayerScript; // listen for changes
+			this._drawer.close();
+		});
 	}
 
 	render() {
@@ -38,7 +39,7 @@ export default class DisplayersUI extends BaseComponent<any, any> {
 		return (
 			<Drawer ref={comp=>this._drawer = comp}
 					content={
-						<DisplayerScriptsPanel parent={this} scripts={node.displayerScripts} selectedScript={node.selectedDisplayerScript}/>
+						<DisplayerScriptsPanel scripts={node.displayerScripts} selectedScript={node.selectedDisplayerScript}/>
 					}
 					type="overlay" openDrawerOffset={0.5} panCloseMask={0.5} tapToClose={true}
 					closedDrawerOffset={-3} styles={drawerStyles}>

@@ -1,16 +1,16 @@
-import {BaseComponent, Column, Row, VButton} from '../../Frame/ReactGlobals';
+import {BaseComponent as Component, Column, Row, VButton} from '../../Frame/ReactGlobals';
 import {Observer, observer} from "mobx-react/native";
 var Moment = require("moment");
 
 import SessionUI from "./List/SessionUI";
-import { DatePickerAndroid, ScrollView, TouchableOpacity, Text } from 'react-native';
-import { E } from '../../Frame/Globals';
-import Bind from "autobind-decorator";
+import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
+import {E} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
+import DialogAndroid from "react-native-dialogs";
+import {transaction} from "mobx";
 
 @observer
-@Bind
-export default class ListUI extends BaseComponent<any, any> {
+export default class ListUI extends Component<any, any> {
 	state = {month: Moment(new Date().MonthDate), openSession: null};
 
 	ComponentDidMountOrUpdate() {
@@ -42,7 +42,7 @@ export default class ListUI extends BaseComponent<any, any> {
 			<Column>
 				<Row>
 					<VButton text="<" style={{width: 100}} onPress={()=>this.ShiftMonth(-1)}/>
-					<VButton text={Moment(month).format("MMMM, YYYY")} style={{flex: 1, marginLeft: 5, marginRight: 5}}
+					<VButton text={Moment(month).format("MMMM, YYYY")} ml5 style={{flex: 1}}
 						onPress={async ()=> {
 							const {action, year, month: month2, day} = await DatePickerAndroid.open({
 								date: month.toDate()
@@ -50,7 +50,8 @@ export default class ListUI extends BaseComponent<any, any> {
 							if (action == DatePickerAndroid.dismissedAction) return;
 							this.setState({month: month.clone().set({year, month: month2})});
 						}}/>
-					<VButton text=">" style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
+					<VButton text=">" ml5 style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
+					<VButton text="Trim sessions" ml5 style={{width: 200}} onPress={this.TrimSessions}/>
 				</Row>
 				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}>
@@ -61,10 +62,30 @@ export default class ListUI extends BaseComponent<any, any> {
 			</Column>
 		);
 	}
+
+	TrimSessions() {
+		var sessionsToRemove = LL.tracker.loadedSessions.Except(LL.tracker.currentSession).Where(a=>a.events.length == 0);
+		
+		var dialog = new DialogAndroid();
+		dialog.set({
+			"title": `Trim/delete empty sessions`,
+			"content": `Permanently delete all (loaded) sessions containing no events?
+			
+Doing so will remove ${sessionsToRemove.length} sessions, with ${LL.tracker.loadedSessions.length - sessionsToRemove.length} remaining.`,
+			"positiveText": "OK", "negativeText": "Cancel",
+			"onPositive": ()=> {
+				transaction(()=> {
+					for (let session of sessionsToRemove)
+						session.Delete(false);
+				});
+			},
+		});
+		dialog.show();
+	}
 }
 
 @observer
-class SessionHeaderUI extends BaseComponent<any, any> {
+class SessionHeaderUI extends Component<any, any> {
 	render() {
 		var {parent, session, index, style} = this.props;
 		return (
