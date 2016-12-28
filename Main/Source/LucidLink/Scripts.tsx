@@ -21,7 +21,7 @@ import {_VDFPreSerialize, Assert, AssertWarn, E, Log, P, ToJSON} from "../Frame/
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import {observer} from "mobx-react/native";
-import {autorun} from "mobx";
+import {autorun, transaction} from "mobx";
 
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {
@@ -36,7 +36,7 @@ export class Scripts extends Node {
 	@O scripts: Script[] = [];
 	@O selectedScript: Script = null;
 	@P() selectedScriptName = null; // used only during save-to/load-from disk
-	@O scriptLastRunsOutdated
+	@O scriptLastRunsOutdated = false;
 	scriptRunner = new ScriptRunner();
 
 	LoadFileSystemData() {
@@ -203,16 +203,16 @@ export class ScriptsUI extends Component<any, any> {
 					</Panel>
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<VTextInput text={selectedScript ? selectedScript.text : ""}
-							accessible={true} accessibilityLabel="script text input"
+							accessible={true} accessibilityLabel="@ConvertStartSpacesToTabs"
 							//editable={selectedScript ? selectedScript.editable : false}
 							editable={selectedScript != null}
 							onChangeText={text=> {
-								LL.scripts.selectedScript.fileOutdated = true;
-								LL.scripts.scriptLastRunsOutdated = true;
 								if (!selectedScript.editable) return;
-								selectedScript.text = text;
-								selectedScript.fileOutdated = true;
-								this.forceUpdate();
+								transaction(()=> {
+									selectedScript.text = text;
+									selectedScript.fileOutdated = true;
+									LL.scripts.scriptLastRunsOutdated = true;
+								})
 							}}/>
 					</Panel>
 				</Panel>

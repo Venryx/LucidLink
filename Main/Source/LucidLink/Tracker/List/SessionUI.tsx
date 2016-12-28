@@ -1,12 +1,12 @@
-import {ToJSON} from '../../../Frame/Globals';
+import {ToJSON} from "../../../Frame/Globals";
 import {Text, TextInput, ScrollView} from "react-native"
-import {BaseComponent, Column, Row} from '../../../Frame/ReactGlobals';
+import {BaseComponent as Component, Column, Row} from "../../../Frame/ReactGlobals";
 import ActionBar from "react-native-action-bar";
 import {LL} from "../../../LucidLink";
-import {Session} from "../Session";
+import {Session, Event} from "../Session";
 var Moment = require("moment");
 
-export default class SessionUI extends BaseComponent<{onBack: Function, session: Session}, any> {
+export default class SessionUI extends Component<{onBack: Function, session: Session}, any> {
 	render() {
 		var {onBack, session} = this.props;
 
@@ -29,7 +29,7 @@ export default class SessionUI extends BaseComponent<{onBack: Function, session:
 				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}>
 					{session.events.map((event, index)=> {
-						return <EventUI key={index} parent={this} event={event} index={index}/>;
+						return <EventUI key={index} event={event}/>;
 					})}
 				</ScrollView>
 			</Column>
@@ -37,7 +37,7 @@ export default class SessionUI extends BaseComponent<{onBack: Function, session:
 	}
 }
 
-class EventUI extends BaseComponent<any, any> {
+class EventUI extends Component<{event: Event}, {}> {
 	render() {
 		var {event} = this.props;
 		return (

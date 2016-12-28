@@ -12,7 +12,7 @@ import ScrollableTabView from "react-native-scrollable-tab-view";
 
 import scriptDefaultText_BuiltInDisplayers from "./Tracker/UserScriptDefaults/BuiltInDisplayers";
 import scriptDefaultText_CustomDisplayers from "./Tracker/UserScriptDefaults/CustomDisplayers";
-import {transaction} from "mobx";
+import {transaction, computed} from "mobx";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 
@@ -27,7 +27,9 @@ export class Tracker extends Node {
 	}*/
 
 	@O displayerScripts: Script[] = [];
-	@O displayerScriptFilesOutdated = false;
+	@computed get DisplayerScriptFilesOutdated() {
+		return this.displayerScripts.Any(a=>a.fileOutdated);
+	}
 	@O selectedDisplayerScript: Script;
 	@P() selectedDisplayerScriptName: string; // used only during save-to/load-from disk 
 	scriptRunner = new ScriptRunner();

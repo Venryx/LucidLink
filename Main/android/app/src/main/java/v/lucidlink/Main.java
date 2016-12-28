@@ -196,7 +196,7 @@ public class Main extends ReactContextBaseJavaModule {
 			public void run() {
 				MainActivity.main.runOnUiThread(()-> {
 					List<View> textInputs = V.FindViews(V.GetRootView(),
-							view->view.getContentDescription() != null && view.getContentDescription().toString().equals("script text input"));
+							view->view.getContentDescription() != null && view.getContentDescription().toString().contains("@ConvertStartSpacesToTabs"));
 					for (ReactEditText input : Stream.of(textInputs).toArray(ReactEditText[]::new)) {
 						if (Objects.equals(input.getTag(), "modified")) continue;
 

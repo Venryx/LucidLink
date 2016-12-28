@@ -84,7 +84,7 @@ Error: ${ex.stack}`);
 
 	@O file = null;
 	get DisplayerScript() { return this.file.Folder.Name == "Displayer scripts"; }
-	fileOutdated = false;
+	@O fileOutdated = false;
 	get Name() { return this.file.NameWithoutExtension; }
 	get MetaFile() { return this.file.Folder.GetFile(this.file.NameWithoutExtension + ".meta"); }
 

@@ -1,5 +1,5 @@
 import {Text, TextInput} from "react-native";
-import {BaseComponent, Panel, VButton} from '../../Frame/ReactGlobals';
+import {BaseComponent as Component, Panel, VButton, VTextInput} from "../../Frame/ReactGlobals";
 import {colors, styles} from '../../Frame/Styles';
 import {E} from '../../Frame/Globals';
 import {Observer, observer} from "mobx-react/native";
@@ -10,7 +10,7 @@ import DisplayerScriptsPanel from "./DisplayersUI/DisplayerScriptsPanel";
 import {LL} from "../../LucidLink";
 
 @observer
-export default class DisplayersUI extends BaseComponent<any, any> {
+export default class DisplayersUI extends Component<any, any> {
 	_drawer = null;
 	ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -55,27 +55,29 @@ export default class DisplayersUI extends BaseComponent<any, any> {
 								onPress={()=>selectedScript.Rename()}/>}
 						<Panel style={{flex: 1}}/>
 						<Panel style={{flexDirection: "row", alignItems: "flex-end"}}>
-							<VButton color="#777" text="Save and apply all" enabled={LL.tracker.displayerScriptFilesOutdated}
+							<VButton color="#777" text="Save and apply all" enabled={LL.tracker.DisplayerScriptFilesOutdated}
 								style={{width: 200, marginLeft: 5}}
 								onPress={()=> {
 									transaction(()=> {
-										selectedScript.Save();
-										LL.tracker.displayerScriptFilesOutdated = false;
+										//selectedScript.Save();
+										for (let script of LL.tracker.displayerScripts) {
+											if (script.fileOutdated)
+												script.Save();
+										}
 									});
 									LL.tracker.ApplyDisplayerScripts();
 								}}/>
 						</Panel>
 					</Panel>
 					<Panel style={{marginTop: -7, flex: 1}}>
-						<ScriptTextUI parent={this} text={selectedScript ? selectedScript.text : ""}
-							//editable={selectedScript ? selectedScript.editable : false}
+						<VTextInput text={selectedScript ? selectedScript.text : ""}
+							accessible={true} accessibilityLabel="@ConvertStartSpacesToTabs"
 							editable={selectedScript != null}
 							onChangeText={text=> {
 								if (!selectedScript.editable) return;
 								transaction(()=> {
 									selectedScript.text = text;
-									//selectedScript.fileOutdated = true;
-									LL.tracker.displayerScriptFilesOutdated = true;
+									selectedScript.fileOutdated = true;
 								});
 							}}/>
 					</Panel>
@@ -90,7 +92,7 @@ export default class DisplayersUI extends BaseComponent<any, any> {
 }
 
 // pure
-class ScriptTextUI extends BaseComponent<any, any> {
+class ScriptTextUI extends Component<any, any> {
 	static defaultProps = {editable: true};
 	render() {
 		var {parent, editable, onChangeText, text} = this.props;
