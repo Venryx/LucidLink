@@ -1,8 +1,8 @@
-import {P, WaitXThenRun, T} from "../Globals";
+import {P, WaitXThenRun_BuiltIn, T} from "../Globals";
 
 export default class BlockRunInfo {
 	static fakeBlockRunInfo: BlockRunInfo;
-	static _=WaitXThenRun(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
+	static _=WaitXThenRun_BuiltIn(0, ()=>BlockRunInfo.fakeBlockRunInfo = new BlockRunInfo(null, "fakeBlockRunInfo", true, -1));
 
 	constructor(...args) {
 		if (args.length == 2) var [parent, depth] = args;

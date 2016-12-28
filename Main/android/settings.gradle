@@ -21,6 +21,8 @@ include ':react-native-android-speech'
 project(':react-native-android-speech').projectDir = new File(settingsDir, '../node_modules/react-native-android-speech')
 include ':react-native-android-snackbar'
 project(':react-native-android-snackbar').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-snackbar/android')
+include ':react-native-background-timer'
+project(':react-native-background-timer').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-timer/android')
 
 String userConfig = new File('../UserConfig.json').text
 

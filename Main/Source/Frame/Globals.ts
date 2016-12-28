@@ -468,24 +468,14 @@ export function IsDouble(obj) { return typeof obj == "number" && parseFloat(obj 
 // timer stuff
 // ==========
 
-export function WaitXThenRun(waitTime, func) { setTimeout(func, waitTime); }
+import BackgroundTimer from "react-native-background-timer";
+
+export function WaitXThenRun(waitTime, func): number { return BackgroundTimer.setTimeout(func, waitTime); }
+export function WaitXThenRun_BuiltIn(waitTime, func): number { return setTimeout(func, waitTime); }
 export function Sleep(ms) {
 	var startTime = new Date().getTime();
 	while (new Date().getTime() - startTime < ms)
 	{}
-}
-export function WaitXThenRun_Multiple(waitTime, func, count = -1) {
-	var countDone = 0;
-	var timerID = setInterval(function() {
-		func();
-		countDone++;
-		if (count != -1 && countDone >= count)
-			clearInterval(timerID);
-	}, waitTime);
-
-	var controller: any = {};
-	controller.Stop = function() { clearInterval(timerID); }
-	return controller;
 }
 
 // interval is in seconds (can be decimal)
@@ -504,7 +494,7 @@ export class Timer {
 
 	callCount = 0;
 	Start() {
-		this.timerID = setInterval(()=> {
+		this.timerID = BackgroundTimer.setInterval(()=> {
 			this.func();
 			this.callCount++;
 			if (this.maxCallCount != -1 && this.callCount >= this.maxCallCount)
@@ -513,7 +503,7 @@ export class Timer {
 		return this;
 	}
 	Stop() {
-		clearInterval(this.timerID);
+		BackgroundTimer.clearInterval(this.timerID);
 		this.timerID = -1;
 	}
 }

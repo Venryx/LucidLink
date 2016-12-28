@@ -155,14 +155,13 @@ export class AudioFile {
 		if (from)
 			this.SetVolume(startVolume);
 
-		var timer = new Timer(.1, ()=> {
+		var timer = CreateTimer(.1, ()=> {
 			var time = new Date().getTime();
 			var percentThroughFade = V.GetPercentFromXToY(startTime, endTime, time);
 			this.SetVolume(V.Lerp(startVolume, to, percentThroughFade));
 			if (percentThroughFade >= 1)
 				timer.Stop();
 		});
-		LL.scripts.scriptRunner.timers.push(timer);
 		timer.Start();
 	}
 

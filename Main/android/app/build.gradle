@@ -202,6 +202,7 @@ dependencies {
     compile project(':react-native-dialogs')
     compile project(':react-native-android-speech')
     compile project(':react-native-android-snackbar')
+    compile project(':react-native-background-timer')
     compile 'com.annimon:stream:1.1.4'
 
     if (userConfig.contains("reactNativeLibMuse_external: true"))

@@ -1,30 +1,23 @@
 package v.lucidlink;
 
 import android.app.Application;
-import android.util.Log;
-
-import com.annimon.stream.Stream;
 import com.facebook.react.ReactApplication;
-import com.github.xinthink.rnmk.ReactMaterialKitPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.github.yamill.orientation.OrientationPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
-
-import v.lucidlink.BuildConfig;
-import com.mihir.react.tts.RCTTextToSpeechModule;
+import com.github.xinthink.rnmk.ReactMaterialKitPackage;
+import v.LibMuse.LibMuse;
 import com.rnfs.RNFSPackage;
-import com.facebook.react.ReactInstanceManager;
+import com.filepicker.FilePickerPackage;
+import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
+import com.ocetnik.timer.BackgroundTimerPackage;
+import com.lugg.ReactSnackbar.ReactSnackbarPackage;
+import com.mihir.react.tts.RCTTextToSpeechModule;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.filepicker.FilePickerPackage;
-import com.github.yamill.orientation.OrientationPackage;
-import v.LibMuse.LibMuse;
-import com.zmxv.RNSound.RNSoundPackage;
-import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
-import com.lugg.ReactSnackbar.ReactSnackbarPackage;
-
-import android.content.Intent; // <--- import
-import android.content.res.Configuration; // <--- import
-
+import android.content.Intent;
+import android.content.res.Configuration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +48,8 @@ public class MainApplication extends Application implements ReactApplication {
 				new ReactNativeDialogsPackage(),
 				new LibMuse(),
 				new RCTTextToSpeechModule(),
-				new ReactSnackbarPackage()
+				new ReactSnackbarPackage(),
+				new BackgroundTimerPackage()
 			);
 			//return packages;
 		}
