@@ -217,6 +217,7 @@ export default class GeneralUI extends Component<any, any> {
 							}}/>
 					</Row>
 					<NumberSettingUI propName="reconnectAttemptInterval" text="Reconnect attempt interval" values={[-1].concat(Range(1, 100))}/>
+					<NumberSettingUI propName="sessionSaveInterval" text="Session save interval" values={Range(1, 100)}/>
 				</Row>
             </Panel>
 		);

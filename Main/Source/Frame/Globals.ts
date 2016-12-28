@@ -516,6 +516,12 @@ export class TimerMS extends Timer {
 }
 
 var funcLastScheduledRunTimes = {};
+/** If time-since-last-run is above minInterval, run func right away.
+ * Else, schedule next-run to occur as soon as the minInterval is passed. */
+export function BufferAction(minInterval: number, func: Function);
+/** If time-since-last-run is above minInterval, run func right away.
+ * Else, schedule next-run to occur as soon as the minInterval is passed. */
+export function BufferAction(key: string, minInterval: number, func: Function);
 export function BufferAction(...args) {
 	if (args.length == 2) var [minInterval, func] = args, key = null;
 	else if (args.length == 3) var [key, minInterval, func] = args;
@@ -526,12 +532,15 @@ export function BufferAction(...args) {
     if (timeSinceLast >= minInterval) { // if we've waited enough since last run, run right now
         func();
         funcLastScheduledRunTimes[key] = now;
-    } else if (timeSinceLast > 0) { // else, if we don't yet have a future-run scheduled, schedule one now
-        var intervalEndTime = lastScheduledRunTime + minInterval;
-        var timeTillIntervalEnd = intervalEndTime - now;
-        WaitXThenRun(timeTillIntervalEnd, func);
-		funcLastScheduledRunTimes[key] = intervalEndTime;
-    }
+    } else {
+		let waitingForNextRunAlready = lastScheduledRunTime > now;
+		if (!waitingForNextRunAlready) { // else, if we're not already waiting for next-run, schedule next-run
+			var nextRunTime = lastScheduledRunTime + minInterval;
+			var timeTillNextRun = nextRunTime - now;
+			WaitXThenRun(timeTillNextRun, func);
+			funcLastScheduledRunTimes[key] = nextRunTime;
+		}
+	}
 }
 
 // Random

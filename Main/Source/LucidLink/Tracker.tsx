@@ -74,12 +74,17 @@ export class Tracker extends Node {
 	SaveFileSystemData() {
 		//this.SaveScripts();
 		this.SaveScriptMetas();
+		this.SaveCurrentSession();
 	}
 	async SaveScriptMetas() {
 		var {displayerScripts} = this;
 		for (let script of displayerScripts)
-			script.SaveMeta();
+			await script.SaveMeta();
 		Log("Finished saving displayer script metas.");
+	}
+	async SaveCurrentSession() {
+		await this.currentSession.Save();
+		Log("Finished saving current session.");
 	}
 
 	ApplyDisplayerScripts() {

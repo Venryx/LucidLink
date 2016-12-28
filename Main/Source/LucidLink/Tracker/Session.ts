@@ -1,9 +1,8 @@
-import {Assert, FromVDF, GetTypeName, P, ToVDF} from "../../Frame/Globals";
+import {Assert, BufferAction, FromVDF, GetTypeName, P, ToVDF} from "../../Frame/Globals";
 import { autorun } from 'mobx';
 import {LL} from "../../LucidLink";
 import moment from "moment";
 var DialogAndroid = require("react-native-dialogs");
-var Moment = require("moment");
 
 export class Session {
 	static async Load(folder) {
@@ -13,7 +12,7 @@ export class Session {
 		var result = FromVDF(vdf, "Session");
 		result.folder = folder;
 		result.file = mainFile;
-		result.date = Moment(folder.Name);
+		result.date = moment(folder.Name);
 
 		result.logFile = folder.GetFile("Log.txt");
 
@@ -51,7 +50,7 @@ export class Session {
 		// if called by VDF, do nothing
 		if (date == null) return;
 
-		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
+		Assert(date instanceof moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
 		this.date = date;
 		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
 		this.folder = sessionsFolder.GetFolder(this.date.format("YYYY-MM-DD HH:mm:ss"));
@@ -60,10 +59,10 @@ export class Session {
 		this.logFile = this.folder.GetFile("Log.txt");
 
 		// add listener, so that whenever data that's supposed to get saved by Save() is changed, Save() gets called
-		autorun(()=> {
+		/*autorun(()=> {
 			//alert("Auto-running");
 			this.Save();
-		});
+		});*/
 	}
 
 	folder = null;
@@ -85,13 +84,18 @@ export class Session {
 
 	logFile = null;
 	@P() events: Event[] = [];
+
+	AddEvent(event) {
+		this.events.push(event);
+		BufferAction(LL.settings.sessionSaveInterval, ()=>this.Save());
+	}
 }
 global.Extend({Session});
 
 export class Event {
 	constructor(type, args) {
 		if (type == null) return; // if called by VDF, don't do anything
-		this.date = Moment();
+		this.date = moment();
 		this.type = type;
 		this.args = args;
 	}

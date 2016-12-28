@@ -53,7 +53,7 @@ export function GetRandomNumber(options) {
 
 export function AddEvent(type, ...args) {
 	var event = new Event(type, args);
-	LL.tracker.currentSession.events.push(event);
+	LL.tracker.currentSession.AddEvent(event);
 }
 
 export function AddPattern(info) {

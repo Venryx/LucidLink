@@ -21,6 +21,7 @@ export class Settings extends Node {
 	@O @P() eyeTraceSegmentCount = 100;
 	@O @P() logStatsEveryXMinutes = 5;
 	@O @P() reconnectAttemptInterval = 10;
+	@O @P() sessionSaveInterval = 5;
 
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 
