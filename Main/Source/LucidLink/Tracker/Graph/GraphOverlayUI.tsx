@@ -5,7 +5,7 @@ import moment from "moment";
 import {View, Text} from "react-native";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import {GraphOverlay, EventRenderInfo} from "./GraphOverlay";
-import {Notify} from "../../../Frame/Globals";
+import {Notify, WaitXThenRun} from "../../../Frame/Globals";
 
 export default class GraphOverlayUI extends Component<
 		{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number, events: Event[], overlay: GraphOverlay}, {}> {
@@ -41,7 +41,12 @@ export default class GraphOverlayUI extends Component<
 	eventBoxes: EventBox[] = [];
 	PostRender() {
 	//OnLayout() {
+		// if some of the event-boxes aren't ready, wait 1 second then retry
+		if (this.eventBoxes.length != this.props.events.length || this.eventBoxes.Any(a=>a.firstRect == null))
+			return WaitXThenRun(1000, this.PostRender);
+		
 		//Log("Starting position-fix phase.");
+		//for (let eventBox of this.eventBoxes.OrderBy(a=>a.props.x)) {
 		for (let eventBox of this.eventBoxes) {
 			// if first-rects were already ready, cancel since event-boxes were already repositioned
 			//if (eventBox.firstRectsReady) break;
@@ -53,36 +58,48 @@ export default class GraphOverlayUI extends Component<
 
 class EventBox extends Component<{parent: GraphOverlayUI, rowHeight: number, event: Event, x: number, renderInfo: EventRenderInfo}, any> {
 	firstRectsReady = false;
+	root: View;
 	render() {
 		var {parent, rowHeight, event, x, renderInfo} = this.props;
 
 		var textHeight = 15;
-		var rect = new VRect(x, (rowHeight - 25) - textHeight, 1, textHeight);
+		var rect = new VRect(x, (rowHeight - 25) - textHeight, this.firstRect ? this.firstRect.width : 1, textHeight);
 		if (this.firstRectsReady) {
-			var otherBoxes = parent.eventBoxes.Except(this).Where(a=>a.firstRect);
-			while (otherBoxes.Any(a=>a.firstRect.Intersects(rect)) && rect.y > 0)
+			//var otherBoxes = parent.eventBoxes.Except(this); //.Where(a=>a.firstRect);
+			var earlierBoxes = parent.eventBoxes.Where(a=>a.props.x < x);
+			while (earlierBoxes.Any(a=>a.firstRect.Intersects(rect)) && rect.y > 0)
 				rect = rect.NewY(y=>y - textHeight);
 
 			/*Log(`Rendering with first-rects ready.
 Other-box first-rects: ${otherBoxes.Select(a=>a.firstRect)}
 Our fixed rect: ${rect}`);*/
 
+			Assert(rect.width > 1);
 			this.firstRect = rect; // update rect immediately, so other ones know to avoid our new-rect too
 		}
 
 		return (
-			<Text style={{position: "absolute", left: rect.x, top: rect.y, height: rect.height, color: renderInfo.color || "#ffffff"}}
-					onLayout={this.OnLayout}>
+			<Text ref={c=>this.root = c} //onLayout={this.OnLayout}
+				style={{position: "absolute", left: rect.x, top: rect.y, height: rect.height, color: renderInfo.color || "#ffffff"}}>
 				{renderInfo.text}
 			</Text>
 		);
 	}
 
-	firstRect = null;
-	OnLayout(e) {
+	firstRect: VRect = null;
+	/*OnLayout(e) {
 		if (this.firstRect) return;
 		var {x, y, width, height} = e.nativeEvent.layout;
 		this.firstRect = new VRect(x, y, width, height);
 		//Log("Getting first-render rect:" + this.firstRect);
+	}*/
+	PostRender() {
+		if (this.firstRect) return;
+		this.root.measure((ox, oy, width, height, x, y) => {
+			//Notify("Hi" + ox + ";" + oy + ";" + width + ";" + height + ";" + px + ";" + py);
+			if (width > 1)
+				this.firstRect = new VRect(x, y, width, height);
+			//Log("Getting first-render rect:" + this.firstRect);
+		});
 	}
 }

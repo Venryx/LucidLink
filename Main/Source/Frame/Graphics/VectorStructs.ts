@@ -252,12 +252,12 @@ export class VRect {
 	Grow(amountOnEachSide) {
 	    return new VRect(this.x - amountOnEachSide, this.y - amountOnEachSide, this.width + (amountOnEachSide * 2), this.height + (amountOnEachSide * 2));
 	}
-	Encapsulating(rect) {
+	Encapsulating(rect: VRect) {
 		var posX = Math.min(this.x, rect.x);
 		var posY = Math.min(this.y, rect.y);
 		return new VRect(posX, posY, Math.max(this.x + this.width, rect.x + rect.width) - posX, Math.max(this.y + this.height, rect.y + rect.height) - posY);
 	}
-	Encapsulate(rect) {
+	Encapsulate(rect: VRect) {
 	    var oldRight = this.x + this.width;
 	    var oldBottom = this.y + this.height;
 		this.x = Math.min(this.x, rect.x);
@@ -266,8 +266,8 @@ export class VRect {
 	    this.height = Math.max(oldBottom, rect.y + rect.height) - this.y;
 	}
 
-	Intersects(other) {
-	    return this.Right > other.x && this.x < other.Right && this.Top > other.y && this.y < other.Top;
+	Intersects(other: VRect) {
+	    return this.Right > other.x && this.x < other.Right && this.Top > other.Bottom && this.Bottom < other.Top;
 	}
 
 	Clone() {
