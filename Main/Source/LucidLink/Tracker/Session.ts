@@ -1,6 +1,7 @@
 import {Assert, FromVDF, GetTypeName, P, ToVDF} from "../../Frame/Globals";
 import { autorun } from 'mobx';
 import {LL} from "../../LucidLink";
+import moment from "moment";
 var DialogAndroid = require("react-native-dialogs");
 var Moment = require("moment");
 
@@ -83,7 +84,7 @@ export class Session {
 	}*/
 
 	logFile = null;
-	@O @P() events = [];
+	@P() events: Event[] = [];
 }
 global.Extend({Session});
 
@@ -94,8 +95,8 @@ export class Event {
 		this.type = type;
 		this.args = args;
 	}
-	@P() date = null;
-	@P() type = null;
+	@P() date: moment.Moment = null;
+	@P() type: string = null;
 	@P() args = [];
 }
 global.Extend({Event});

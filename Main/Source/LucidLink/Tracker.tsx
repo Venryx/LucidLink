@@ -5,7 +5,7 @@ import ScriptRunner from "./Scripts/ScriptRunner";
 import {BaseComponent} from "../Frame/ReactGlobals";
 var Moment = require("moment");
 
-import GraphUI from "./Tracker/GraphUI";
+import GraphUI from "./Tracker/Graph/GraphUI";
 import ListUI from "./Tracker/ListUI";
 import DisplayersUI from "./Tracker/DisplayersUI";
 import ScrollableTabView from "react-native-scrollable-tab-view";
@@ -15,6 +15,7 @@ import scriptDefaultText_CustomDisplayers from "./Tracker/UserScriptDefaults/Cus
 import {transaction, computed} from "mobx";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
+import DisplayerScriptRunner from "./Tracker/DisplayerScriptRunner";
 
 export class Tracker extends Node {
 	@_VDFPreSerialize() PreSerialize() {
@@ -32,7 +33,7 @@ export class Tracker extends Node {
 	}
 	@O selectedDisplayerScript: Script;
 	@P() selectedDisplayerScriptName: string; // used only during save-to/load-from disk 
-	scriptRunner = new ScriptRunner();
+	scriptRunner = new DisplayerScriptRunner();
 
 	LoadFileSystemData(onDone = null) {
 		this.LoadDisplayerScripts(onDone);
@@ -88,8 +89,6 @@ export class Tracker extends Node {
 			return a.index;
 		});
 		this.scriptRunner.Apply(scripts_ordered);
-		/*if (this.ui)
-			this.ui.setState({scriptLastRunsOutdated: false});*/
 	}
 
 	@O loadedSessions: Session[] = [];

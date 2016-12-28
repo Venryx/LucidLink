@@ -1,5 +1,4 @@
 import {_VDFPostDeserialize, _VDFSerializeProp, FromVDF, IsString, P, T, ToVDF} from "../Frame/Globals";
-import {max, min} from "moment";
 import {BaseComponent} from "../Frame/ReactGlobals";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 var DialogAndroid = require("react-native-dialogs");

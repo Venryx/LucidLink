@@ -1,24 +1,24 @@
-import {BaseComponent, Column, Panel, Row, VButton, VText} from "../../Frame/ReactGlobals";
-import {colors, styles} from "../../Frame/Styles";
-import {now} from "moment";
-import {VRect} from "../../Frame/Graphics/VectorStructs";
+import {BaseComponent as Component, Column, Panel, Row, VButton, VText} from "../../../Frame/ReactGlobals";
+import {colors, styles} from "../../../Frame/Styles";
+import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import Drawer from "react-native-drawer";
 import Chart from "react-native-chart";
-import {MKRangeSlider} from 'react-native-material-kit';
+import {MKRangeSlider} from "react-native-material-kit";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 
-import LeftPanel from "./GraphUI/LeftPanel";
-import {observer, Observer} from "mobx-react/native";
-import { View } from 'react-native';
-import Bind from "autobind-decorator";
-import {LL} from "../../LucidLink";
-var Moment = require('moment');
+import LeftPanel from "./LeftPanel";
+import {observer} from "mobx-react/native";
+import {View, Text} from "react-native";
+import {LL} from "../../../LucidLink";
+import GraphRowUI from "./GraphRowUI";
+import moment from "moment";
+import GraphOverlayUI from "./GraphOverlayUI";
+import {Notify} from "../../../Frame/Globals";
 
 @observer
-@Bind
-export default class GraphUI extends BaseComponent<any, any> {
+export default class GraphUI extends Component<any, any> {
 	leftPanel = null;
-	@Bind ToggleLeftPanelOpen() {
+	ToggleLeftPanelOpen() {
 		if (this.leftPanel._open)
 			this.leftPanel.close();
 		else
@@ -62,6 +62,7 @@ export default class GraphUI extends BaseComponent<any, any> {
 								});
 							}}/>
 						<Panel style={{flex: 1}}/>
+						<VButton text="Refresh" ml3 mt5 style={{width: 100, height: 32}} onPress={()=>this.forceUpdate()}/>
 					</Row>
 					<Row style={{marginTop: -7, flex: 1}}>
 						<ChartsUI session={session}/>
@@ -73,13 +74,12 @@ export default class GraphUI extends BaseComponent<any, any> {
 }
 
 @observer
-@Bind
-class ChartsUI extends BaseComponent<any, any> {
+class ChartsUI extends Component<any, any> {
 	state = {width: -1, height: -1};
 
 	ComponentDidMountOrUpdate() {
 		var node = LL.tracker;
-		var now = Moment();
+		var now = moment();
 		var rangeStart = now.clone().startOf("day").subtract(node.rowCount, "day");
 		var rangeEnd = now.clone().endOf("day");
 		LL.tracker.LoadSessionsForRange(rangeStart, rangeEnd);
@@ -90,7 +90,7 @@ class ChartsUI extends BaseComponent<any, any> {
 		var {width, height} = this.state;
 		var node = LL.tracker;
 
-		var now = Moment();
+		var now = moment();
 		var dayStart = now.clone().startOf("day");
 		//var dayEnd = now.clone().endOf("day");
 		var dayEnd = dayStart.clone().add(1, "day");
@@ -102,7 +102,7 @@ class ChartsUI extends BaseComponent<any, any> {
 				let endTime = dayEnd.clone().add(offset, "days");
 				let rowHeight = height / node.rowCount;
 				rows.push(
-					<ChartUI key={startTime} {...{startTime, endTime, width, height: rowHeight}}/>
+					<ChartUI key={startTime.toString()} {...{startTime, endTime, width, height: rowHeight}}/>
 				);
 			}
 		}
@@ -123,13 +123,11 @@ class ChartsUI extends BaseComponent<any, any> {
 }
 
 @observer
-@Bind
-class ChartUI extends BaseComponent<any, any> {
+class ChartUI extends Component<{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number}, {}> {
 	/*componentWillReact() {
         Log("Re-rendering ChartUI, because... " + new Error().stack);
     }*/
 	
-	eventBoxes = [];
 	render() {
 		var {startTime, endTime, width, height} = this.props;
 		var node = LL.tracker;
@@ -138,7 +136,22 @@ class ChartUI extends BaseComponent<any, any> {
 		var mainLineColor = "#e1cd00";
 		var mainLinePoints = [[0, 0]]; // placeholder
 
-		this.eventBoxes = [];
+		var currentOffset = 0;
+		var rowUIs = LL.tracker.scriptRunner.graphRows.map((row, index)=> {
+			var result = <GraphRowUI {...{startTime, endTime, events, row, width, height}} key={index}
+				style={{top: height * currentOffset}}/>;
+			currentOffset += row.height;
+			return result;
+		});
+
+		var overlay = LL. tracker.scriptRunner.graphOverlay;
+		var overlayUI = null;
+		if (overlay) {
+			let overlayEvents = events.Where(a=>overlay.events.Contains(a.type));
+			overlayUI = (
+				<GraphOverlayUI {...{startTime, endTime, width, height, overlay}} events={overlayEvents}/>
+			);
+		}
 		
         return (
             <View style={{width, height, backgroundColor: colors.background}}>
@@ -147,70 +160,9 @@ class ChartUI extends BaseComponent<any, any> {
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
 					axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
 					type="line" color={[mainLineColor]} data={[mainLinePoints]}/>
-				{events.map((event, index)=> {
-					var percentFromLeftToRight = event.date.diff(startTime) / endTime.diff(startTime);
-					var x = percentFromLeftToRight * width;
-
-					var compCache = null;
-					return <EventBox key={index}
-						ref={comp=> {
-							if (comp)
-								this.eventBoxes.push(comp)
-							else
-								this.eventBoxes.Remove(compCache);
-							compCache = comp;
-						}}
-						parent={this} rowHeight={height}
-						event={event} x={x}/>;
-				})}
+				{rowUIs}
+				{overlayUI}
             </View>
         );
-	}
-	PostRender() {
-	//OnLayout() {
-		//Log("Starting position-fix phase.");
-		for (let eventBox of this.eventBoxes) {
-			// if first-rects were already ready, cancel since event-boxes were already repositioned
-			//if (eventBox.firstRectsReady) break;
-			eventBox.firstRectsReady = true;
-			eventBox.forceUpdate();
-		}
-	}
-}
-
-@Bind
-class EventBox extends BaseComponent<any, any> {
-	firstRectsReady = false;
-	render() {
-		var {parent, rowHeight, event, x} = this.props;
-
-		var textHeight = 15;
-		var rect = new VRect(x, (rowHeight - 25) - textHeight, 1, textHeight);
-		if (this.firstRectsReady) {
-			var otherBoxes = parent.eventBoxes.Except(this).Where(a=>a.firstRect);
-			while (otherBoxes.Any(a=>a.firstRect.Intersects(rect)) && rect.y > 0)
-				rect = rect.NewY(y=>y - textHeight);
-
-			/*Log(`Rendering with first-rects ready.
-Other-box first-rects: ${otherBoxes.Select(a=>a.firstRect)}
-Our fixed rect: ${rect}`);*/
-
-			this.firstRect = rect; // update rect immediately, so other ones know to avoid our new-rect too
-		}
-
-		var Text2 = Text as any;
-		return (
-			<Text2 style={{position: "absolute", left: rect.x, top: rect.y, height: rect.height}} onLayout={this.OnLayout}>
-				{"|" + event.type}
-			</Text2>
-		);
-	}
-
-	firstRect = null;
-	OnLayout(e) {
-		if (this.firstRect) return;
-		var {x, y, width, height} = e.nativeEvent.layout;
-		this.firstRect = new VRect(x, y, width, height);
-		//Log("Getting first-render rect:" + this.firstRect);
 	}
 }

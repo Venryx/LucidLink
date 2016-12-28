@@ -72,10 +72,12 @@ export function Toast(text, duration = 0) {
 }
 (global as any).Toast = Toast;
 
-export function Notify(text) {
+enum NotifyLength { Short, Long, Persistent }
+export function Notify(text: string, length = NotifyLength.Persistent) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
-	JavaBridge.Main.Notify(text);
+	let lengthStr = NotifyLength[length];
+	JavaBridge.Main.Notify(text, lengthStr);
 }
 
 export function Assert(condition, messageOrMessageFunc = "") {
@@ -97,7 +99,7 @@ export function AssertWarn(condition, messageOrMessageFunc) {
 
 export class A {
     static set NonNull(value) {
-		Assert(value != null, "Value cannot be null.");
+		Assert(value != null, `Value cannot be null. (provided value: ${value})`);
 	}
 	static NotEqualTo(val1) {
 	    return new A_NotEqualTo_Wrapper(val1);

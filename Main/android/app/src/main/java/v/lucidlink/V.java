@@ -231,7 +231,10 @@ public class V {
 	}
 
 	public static void Notify(String message) {
-		Main.main.Notify(message);
+		Main.main.Notify(message, "Long");
+	}
+	public static void Notify(String message, String lengthStr) {
+		Main.main.Notify(message, lengthStr);
 	}
 
 	public static void WaitXThenRun(int waitMS, Runnable runnable) {

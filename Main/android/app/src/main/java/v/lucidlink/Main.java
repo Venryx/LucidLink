@@ -94,9 +94,19 @@ public class Main extends ReactContextBaseJavaModule {
 		lastToast = toast;
 	}*/
 
-	@ReactMethod public void Notify(String message) {
+	@ReactMethod public void Notify(String message, String lengthStr) {
+		int length = -1;
+		if (lengthStr.equals("Short"))
+			length = Snackbar.LENGTH_SHORT;
+		else if (lengthStr.equals("Long"))
+			length = Snackbar.LENGTH_LONG;
+		else if (lengthStr.equals("Persistent"))
+			length = Snackbar.LENGTH_INDEFINITE;
+		else
+			V.Assert(false, "Length-string is invalid. (" + lengthStr + ")");
+
 		//MainApplication.GetPackageOfType(ReactSnackbarPackage.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
-		Main.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
+		Main.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, length, true, Color.parseColor("#FFFFFF"), "HI", null);
 	}
 
 	@ReactMethod public void IsInEmulator(Promise promise) {

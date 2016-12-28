@@ -2,7 +2,6 @@ import {JavaBridge, P} from "../Frame/Globals";
 import {EEGProcessor} from "../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, VSwitch} from "../Frame/ReactGlobals";
 import {colors, styles} from "../Frame/Styles";
-import {max, min} from "moment";
 import {Vector2i} from "../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
 import Drawer from "react-native-drawer";

@@ -90,15 +90,3 @@ export default class DisplayersUI extends Component<any, any> {
 		this.SaveScripts();
 	}*/
 }
-
-// pure
-class ScriptTextUI extends Component<any, any> {
-	static defaultProps = {editable: true};
-	render() {
-		var {parent, editable, onChangeText, text} = this.props;
-		return <TextInput {...{editable}}
-			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
-			multiline={true} editable={editable} value={text} autoCapitalize="none" autoCorrect={false}
-			onChangeText={onChangeText}/>;
-	}
-}

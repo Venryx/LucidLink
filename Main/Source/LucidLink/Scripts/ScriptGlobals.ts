@@ -1,5 +1,4 @@
 import {Assert, E, Timer, WaitXThenRun, IsString} from "../../Frame/Globals";
-import {max, min} from "moment";
 import {Event} from "../Tracker/Session";
 import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";

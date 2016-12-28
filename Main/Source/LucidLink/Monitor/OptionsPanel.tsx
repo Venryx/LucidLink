@@ -1,6 +1,5 @@
 import {observer} from "mobx-react/native";
 import {colors} from "../../Frame/Styles";
-import {max, min} from "moment";
 import {Text} from "react-native";
 import Spinner from "rn-spinner";
 import {BaseComponent, Column, Row, VSwitch, VText} from "../../Frame/ReactGlobals";

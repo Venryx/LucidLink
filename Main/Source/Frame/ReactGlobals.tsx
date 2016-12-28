@@ -1,9 +1,8 @@
 import * as React from "react";
 import {Component} from "react";
-import {Assert, E, WaitXThenRun} from './Globals';
-import {colors, styles} from './Styles';
-import {max} from 'moment';
-import {Observer, observer} from 'mobx-react/native';
+import {Assert, E, WaitXThenRun} from "./Globals";
+import {colors, styles} from "./Styles";
+import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
 import {Dimensions, StyleSheet,
 	View, Text, Switch, TextInput, ScrollView, TouchableOpacity, TouchableHighlight,
@@ -11,7 +10,7 @@ import {Dimensions, StyleSheet,
 import RNFS from "react-native-fs";
 //import autobind from "react-autobind"; // caused error in Babel transpiler
 
-import Button from 'apsl-react-native-button'
+import Button from "apsl-react-native-button"
 
 var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
 	DatePickerAndroid, TimePickerAndroid};

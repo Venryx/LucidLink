@@ -7,8 +7,6 @@ import * as ScriptGlobals from "./ScriptGlobals";
 import {Pattern} from "../../Frame/Patterns/Pattern";
 
 export default class ScriptRunner {
-	//get Main() { return LL.scripts.scriptRunner; }
-
 	constructor() {
 		//this.Reset();
 		WaitXThenRun(0, ()=>this.Reset()); // call in a bit, so LL is initialized
