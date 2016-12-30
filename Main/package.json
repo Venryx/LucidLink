@@ -26,6 +26,7 @@
     "react-native-extended-stylesheet": "^0.3.0",
     "react-native-file-picker": "git+https://github.com/Lichwa/react-native-file-picker.git",
     "react-native-fs": "^2.0.1-rc.2",
+    "react-native-keep-awake": "^1.0.7",
     "react-native-libmuse": "^1.0.2",
     "react-native-material-kit": "^0.3.3",
     "react-native-numberpicker-dialog": "0.0.1",

@@ -153,6 +153,8 @@ g.Extend({LucidLink});
 
 export var LL: LucidLink;
 
+import KeepAwake from "react-native-keep-awake";
+
 export async function Init(ui) {
 	try {
 
@@ -185,6 +187,14 @@ export async function Init(ui) {
 	// whenever the basic-data changes, push it to Java
 	autorun(()=> {
 		LL.PushBasicDataToJava();
+	});
+
+	// whenever keep-device-awake setting changes, update the keep-awake library's state
+	autorun(()=> {
+		if (LL.settings.keepDeviceAwake)
+			KeepAwake.activate();
+		else
+			KeepAwake.deactivate();
 	});
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();

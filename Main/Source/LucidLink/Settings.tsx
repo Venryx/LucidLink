@@ -12,6 +12,7 @@ export class Settings extends Node {
 	@O @P() applyScriptsOnLaunch = false;
 	@O @P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
+	@O @P() keepDeviceAwake = true;
 	@O @P() museEEGPacketBufferSize = 30;
 	@O @P() eyeTracker_horizontalSensitivity = .5;
 	@O @P() eyeTracker_verticalSensitivity = .3;

@@ -26,6 +26,7 @@
 		DEE0FDAA1F2740F2AFFCECE9 /* libRCTOrientation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B2605A7F1FA840F38B60816E /* libRCTOrientation.a */; };
 		F433F7C34FFB41548270F4D7 /* libRNFilePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E5AD07A56F42A89169733D /* libRNFilePicker.a */; };
 		6B4516B9F9C9439086F8C7D3 /* libRCTMaterialKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D25E4EEC4A5D47E9896ACB9D /* libRCTMaterialKit.a */; };
+		0A438BB32BDC4E12910E7C81 /* libKCKeepAwake.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CBE8E81278A4AD58013683E /* libKCKeepAwake.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +139,8 @@
 		00E5AD07A56F42A89169733D /* libRNFilePicker.a */ = {isa = PBXFileReference; name = "libRNFilePicker.a"; path = "libRNFilePicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		008F6322276246BBAD8856F2 /* RCTMaterialKit.xcodeproj */ = {isa = PBXFileReference; name = "RCTMaterialKit.xcodeproj"; path = "../node_modules/react-native-material-kit/iOS/RCTMaterialKit.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		D25E4EEC4A5D47E9896ACB9D /* libRCTMaterialKit.a */ = {isa = PBXFileReference; name = "libRCTMaterialKit.a"; path = "libRCTMaterialKit.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		C75577B50B4447889D4737FB /* KCKeepAwake.xcodeproj */ = {isa = PBXFileReference; name = "KCKeepAwake.xcodeproj"; path = "../node_modules/react-native-keep-awake/ios/KCKeepAwake.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		1CBE8E81278A4AD58013683E /* libKCKeepAwake.a */ = {isa = PBXFileReference; name = "libKCKeepAwake.a"; path = "libKCKeepAwake.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +170,7 @@
 				DEE0FDAA1F2740F2AFFCECE9 /* libRCTOrientation.a in Frameworks */,
 				F433F7C34FFB41548270F4D7 /* libRNFilePicker.a in Frameworks */,
 				6B4516B9F9C9439086F8C7D3 /* libRCTMaterialKit.a in Frameworks */,
+				0A438BB32BDC4E12910E7C81 /* libKCKeepAwake.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,6 +297,7 @@
 				78D328EBA852456B8A339BF4 /* RCTOrientation.xcodeproj */,
 				81E20AB5983F4B8694B79214 /* RNFilePicker.xcodeproj */,
 				008F6322276246BBAD8856F2 /* RCTMaterialKit.xcodeproj */,
+				C75577B50B4447889D4737FB /* KCKeepAwake.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -611,6 +616,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 			};
 			name = Debug;
@@ -627,6 +633,7 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LucidLink.app/LucidLink";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -649,6 +656,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-orientation\iOS\RCTOrientation/**",
 					"$(SRCROOT)\..\node_modules\react-native-file-picker\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-material-kit\iOS\RCTMaterialKit",
+					"$(SRCROOT)\..\node_modules\react-native-keep-awake\ios",
 				);
 				INFOPLIST_FILE = "LucidLink/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -675,6 +683,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-orientation\iOS\RCTOrientation/**",
 					"$(SRCROOT)\..\node_modules\react-native-file-picker\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-material-kit\iOS\RCTMaterialKit",
+					"$(SRCROOT)\..\node_modules\react-native-keep-awake\ios",
 				);
 				INFOPLIST_FILE = "LucidLink/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -730,6 +739,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-orientation\iOS\RCTOrientation/**",
 					"$(SRCROOT)\..\node_modules\react-native-file-picker\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-material-kit\iOS\RCTMaterialKit",
+					"$(SRCROOT)\..\node_modules\react-native-keep-awake\ios",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -774,6 +784,7 @@
 					"$(SRCROOT)\..\node_modules\react-native-orientation\iOS\RCTOrientation/**",
 					"$(SRCROOT)\..\node_modules\react-native-file-picker\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-material-kit\iOS\RCTMaterialKit",
+					"$(SRCROOT)\..\node_modules\react-native-keep-awake\ios",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;

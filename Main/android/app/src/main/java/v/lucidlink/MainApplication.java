@@ -2,6 +2,7 @@ package v.lucidlink;
 
 import android.app.Application;
 import com.facebook.react.ReactApplication;
+import com.corbt.keepawake.KCKeepAwakePackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
@@ -49,7 +50,8 @@ public class MainApplication extends Application implements ReactApplication {
 				new LibMuse(),
 				new RCTTextToSpeechModule(),
 				new ReactSnackbarPackage(),
-				new BackgroundTimerPackage()
+				new BackgroundTimerPackage(),
+				new KCKeepAwakePackage()
 			);
 			//return packages;
 		}

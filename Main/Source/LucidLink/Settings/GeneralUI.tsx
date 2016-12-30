@@ -41,19 +41,17 @@ export default class GeneralUI extends Component<any, any> {
 		return (
 			<Panel style={{flex: 1, backgroundColor: colors.background}}>
 				<Row style={{flex: 1, flexDirection: "column"}}>
-					<RowLR height={25}>
+					<RowLR pl10 height={30}>
 						<Text>Apply scripts on launch</Text>
-						<Switch value={node.applyScriptsOnLaunch}
-							onValueChange={value=>{
-								node.applyScriptsOnLaunch = value;
-							}}/>
+						<Switch value={node.applyScriptsOnLaunch} onValueChange={value=>node.applyScriptsOnLaunch = value}/>
 					</RowLR>
-					<RowLR height={25}>
+					<RowLR pl10 height={30}>
 						<Text>Block unused keys</Text>
-						<Switch value={node.blockUnusedKeys}
-							onValueChange={value=>{
-								node.blockUnusedKeys = value;
-							}}/>
+						<Switch value={node.blockUnusedKeys} onValueChange={value=>node.blockUnusedKeys = value}/>
+					</RowLR>
+					<RowLR pl10 height={30}>
+						<Text>Keep device awake</Text>
+						<Switch value={node.keepDeviceAwake} onValueChange={value=>node.keepDeviceAwake = value}/>
 					</RowLR>
 					<Row>
 						<VText ml10 mt5 mr10>Muse EEG-packet buffer size</VText>

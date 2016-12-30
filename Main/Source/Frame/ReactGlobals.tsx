@@ -162,6 +162,14 @@ function BasicStyles(props) {
 			result.marginTop = (key.startsWith("mtN") ? -1 : 1) * parseInt(key.substr(2));
 		else if (key.startsWith("mb"))
 			result.marginBottom = (key.startsWith("mbN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("pl"))
+			result.paddingLeft = (key.startsWith("plN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("pr"))
+			result.paddingRight = (key.startsWith("prN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("pt"))
+			result.paddingTop = (key.startsWith("ptN") ? -1 : 1) * parseInt(key.substr(2));
+		else if (key.startsWith("pb"))
+			result.paddingBottom = (key.startsWith("pbN") ? -1 : 1) * parseInt(key.substr(2));
 	}
 	return result;
 }
