@@ -55,7 +55,6 @@ export default class DisplayerScriptsPanel extends Component<{scripts: Script[],
 								let script = scripts.First(a=>a.file.Name == scriptAtIndex_name);
 								script.index = i;
 							}
-							//this.forceUpdate();
 						}}/>
 					<VButton text="Add" style={{position: "absolute", top: (scripts.length * (40 + 1)) + 5, width: 100}}
 						onPress={this.AddScript}/>

@@ -174,6 +174,8 @@ export class ScriptsUI extends Component<any, any> {
 			main: {paddingLeft: 3},
 		};
 
+		node.scripts; // access here, so mobx knows we use it
+
 		return (
 			<Drawer ref={comp=>this._drawer = comp}
 					content={<ScriptsPanel parent={this} scripts={node.scripts}/>}

@@ -93,5 +93,5 @@ Error: ${ex.stack}`);
 	// stored in meta file
 	index = -1000;
 	editable = true;
-	enabled = true;
+	@O enabled = true;
 }
