@@ -28,7 +28,8 @@
 		//"Typings/globals/**/*.d.ts",
         "Source/**/*.ts",
         "Source/**/*.tsx",
-		"Source/**/*.js"
+		"Source/**/*.js",
+		"Source/**/*.jsx"
     ],
     "exclude": [
         "index.android.js",
