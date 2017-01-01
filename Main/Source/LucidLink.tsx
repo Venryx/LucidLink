@@ -15,7 +15,7 @@ import "./Packages/VDF/VDFTypeInfo";
 // special, early imports (eg type extensions)
 import "./Frame/CE";
 
-import {Assert, E, FromVDFNode, FromVDFToNode, JavaBridge, Log, P, T, ToVDF} from './Frame/Globals';
+import {Assert, E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';
 import {Panel} from "./Frame/ReactGlobals";
 import Node from "./Packages/VTree/Node";
 import {colors} from './Frame/Styles';
@@ -207,6 +207,7 @@ import {Folder, VFile} from "./Packages/V/VFile";
 import {autorun} from "mobx";
 import TestData from "./Frame/TestData";
 import LibMuse from "react-native-libmuse";
+import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	var inEmulator = await JavaBridge.Main.IsInEmulator();
 	if (inEmulator)

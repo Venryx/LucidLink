@@ -1,4 +1,5 @@
-import {IsPrimitive} from "../../Frame/Globals";
+import {Assert, IsPrimitive} from "../../Frame/Globals";
+import {Dictionary, List} from "../VDF/VDFExtras";
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;

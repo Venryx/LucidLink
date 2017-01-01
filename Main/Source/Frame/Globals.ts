@@ -104,10 +104,10 @@ export class A {
 	static NotEqualTo(val1) {
 	    return new A_NotEqualTo_Wrapper(val1);
 	}
-	static OfType(typeNameOrType) {
+	/*static OfType(typeNameOrType) {
 	    var type = Type(typeNameOrType);
 	    return new A_OfType_Wrapper(type);
-	}
+	}*/
 } 
 export class A_NotEqualTo_Wrapper {
 	constructor(val1) { this.val1 = val1; }
@@ -129,7 +129,7 @@ export class JavaBridge {
 // type system
 // ==========
 
-function IsType(obj: any) {
+/*function IsType(obj: any) {
 	return obj instanceof Function;
 }
 // probably temp
@@ -138,7 +138,7 @@ function IsType(obj: any) {
 	if (result.startsWith("List("))
 		result = "IList";
 	return result;
-}*/
+}*#/
 export function SimplifyType(type) {
 	var typeName = IsType(type) ? type.name : type;
     if (typeName.startsWith("List("))
@@ -154,7 +154,7 @@ export function UnsimplifyType(type) {
     if (typeName == "IDictionary")
         return Type("Dictionary");
     return type;
-}
+}*/
 
 // polyfills for constants
 // ==========
@@ -266,8 +266,8 @@ export function FromVDFInto(vdf, obj, options?) {
 		LogError("Error) " + error + "Stack)" + error.Stack + "\nNewStack) " + new Error().Stack + "\nVDF) " + vdf); }
 	/**/ finally {}
 }
-export function FromVDFToNode(vdf: string, options: VDFLoadOptions);
-export function FromVDFToNode(vdf: string, declaredTypeName: string, options: VDFLoadOptions);
+export function FromVDFToNode(vdf: string, options?: VDFLoadOptions);
+export function FromVDFToNode(vdf: string, declaredTypeName: string, options?: VDFLoadOptions);
 export function FromVDFToNode(vdf, declaredTypeName_orOptions?, options?) {
 	if (declaredTypeName_orOptions instanceof VDFLoadOptions)
 		return FromVDF(vdf, null, declaredTypeName_orOptions);
@@ -333,122 +333,6 @@ var ObservableArray = observableHelper.test1.constructor;
 (ObservableArray as any).name_fake = "List(object)";
 //alert(ObservableArray + ";" + VDF.GetTypeNameOfObject(observableHelper.test1))
 
-// tags
-// ==========
-
-export function T(typeOrTypeName: any) {
-    return (target, name)=> {
-        //target.prototype[name].AddTags(new VDFPostDeserialize());
-        //Prop(target, name, typeOrTypeName);
-        //target.p(name, typeOrTypeName);
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
-    };
-};
-export function P(...args): PropertyDecorator {
-    return function(target, name) {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.AddTags(new VDFProp(...args));
-    };
-};
-//export var D;
-/*export let D = ()=> {
-	let D_ = function(...args) {
-		return (target, name)=> {
-			var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-			propInfo.AddTags(new DefaultValue(...args));
-		};
-	};
-	// copy D.NullOrEmpty and such
-	for (var key in g.D)
-		D_[key] = g.D[key];
-	return D_;
-};*/
-
-export function D(...args) {
-	return (target, name)=> {
-		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-		propInfo.AddTags(new DefaultValue(...args));
-	};
-};
-/*export var DE = {};
-for (var key in g.D)
-	DE[key] = g.D[key];*/
-//export var DE = (global as any).D;
-
-/*var D: any = function D(...args) {
-	return (target, name)=> {
-		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-		propInfo.AddTags(new DefaultValue(...args));
-	};
-};
-// copy D.NullOrEmpty and such
-WaitXThenRun(0, ()=> {
-	for (var key in g.D)
-		D[key] = g.D[key];
-});
-export {D};*/
-
-export function _VDFTypeInfo(...args) {
-    return (target, name)=>target[name].AddTags(new VDFTypeInfo(...args));
-};
-
-export function _IgnoreStartData() {
-    return (target, name)=>target[name].AddTags(new IgnoreStartData());
-};
-
-export function _NoAttach(...args) {
-    return (target, name)=> {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.AddTags(new NoAttach(...args));
-    };
-};
-export function _ByPath(...args) {
-    return (target, name)=> {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.AddTags(new ByPath(...args));
-    };
-};
-export function _ByPathStr(...args) {
-	return (target, name)=> {
-		var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-	    propInfo.AddTags(new ByPathStr(...args));
-	};
-};
-export function _ByName(...args) {
-    return (target, name)=> {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.AddTags(new ByName(...args));
-    };
-};
-
-export function _VDFDeserializeProp(...args) {
-    return (target, name)=>target[name].AddTags(new VDFDeserializeProp(...args));
-};
-export function _VDFSerializeProp(...args) {
-    return (target, name)=>target[name].AddTags(new VDFSerializeProp(...args));
-};
-
-export function _VDFPreDeserialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFPreDeserialize(...args));
-};
-export function _VDFDeserialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFDeserialize(...args));
-};
-export function _VDFPostDeserialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFPostDeserialize(...args));
-};
-
-export function _VDFPreSerialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFPreSerialize(...args));
-};
-export function _VDFSerialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFSerialize(...args));
-};
-export function _VDFPostSerialize(...args) {
-    return (target, name)=>target[name].AddTags(new VDFPostSerialize(...args));
-};
-
 // types stuff
 // ==========
 
@@ -471,6 +355,11 @@ export function IsDouble(obj) { return typeof obj == "number" && parseFloat(obj 
 // ==========
 
 import BackgroundTimer from "react-native-background-timer";
+import {VDF} from "../Packages/VDF/VDF";
+import {VDFLoadOptions, VDFLoader} from "../Packages/VDF/VDFLoader";
+import {VDFTypeInfo, VDFProp, VDFDeserialize, VDFSerialize} from "../Packages/VDF/VDFTypeInfo";
+import {VDFNode} from "../Packages/VDF/VDFNode";
+import {VDFSaveOptions, VDFSaver, VDFTypeMarking} from "../Packages/VDF/VDFSaver";
 
 export function WaitXThenRun(waitTime, func): number { return BackgroundTimer.setTimeout(func, waitTime); }
 export function WaitXThenRun_BuiltIn(waitTime, func): number { return setTimeout(func, waitTime); }

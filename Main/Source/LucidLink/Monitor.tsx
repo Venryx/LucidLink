@@ -1,4 +1,4 @@
-import {JavaBridge, P} from "../Frame/Globals";
+import {JavaBridge,} from "../Frame/Globals";
 import {EEGProcessor} from "../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, VSwitch} from "../Frame/ReactGlobals";
 import {colors, styles} from "../Frame/Styles";
@@ -30,6 +30,7 @@ g.Extend({Monitor});
 import OptionsPanel from "./Monitor/OptionsPanel";
 import MuseBridge from "../Frame/MuseBridge";
 import {LL} from "../LucidLink";
+import {P} from "../Packages/VDF/VDFTypeInfo";
 
 @observer
 export class MonitorUI extends Component<any, any> {

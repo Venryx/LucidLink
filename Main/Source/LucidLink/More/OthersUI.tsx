@@ -4,7 +4,7 @@ import {LL} from "../../LucidLink";
 import {Profiler_AllFrames} from "../../Frame/VProfiler";
 import BlockRunInfo from "../../Frame/VProfiler/BlockRunInfo";
 import ObjectInspectorUI from "../../Frame/VProfiler/ObjectInspectorUI";
-import {FromVDF, Toast, ToJSON} from "../../Frame/Globals";
+import {Assert, FromVDF, Toast, ToJSON} from "../../Frame/Globals";
 import {ScrollView} from "react-native";
 
 export default class OthersUI extends Component<any, any> {

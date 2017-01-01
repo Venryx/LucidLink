@@ -1,6 +1,10 @@
 // ClassExtensions.ts
 // ==========
 
+var {VDF} = require("../Packages/VDF/VDF");
+var {List, Dictionary} = require("../Packages/VDF/VDFExtras");
+var {VDFTypeInfo} = require("../Packages/VDF/VDFTypeInfo");
+
 // Object: base
 // ==================
 
@@ -146,12 +150,12 @@ Object.prototype._AddFunction_Inline = function GetTypeName(vdfType = true) { //
 	}
 	return this.constructor.name;
 };
-Object.prototype._AddFunction_Inline = function GetType(vdfType = true, simplifyForVScriptSystem = false) {
+/*Object.prototype._AddFunction_Inline = function GetType(vdfType = true, simplifyForVScriptSystem = false) {
     var result = Type(this.GetTypeName(vdfType));
     if (simplifyForVScriptSystem)
         result = SimplifyType(result);
     return result;
-};
+};*/
 
 /*import V from '../Packages/V/V';
 import {GetTypeName, IsNumberString, SimplifyType} from './Globals';
@@ -195,9 +199,11 @@ var V = require('../Packages/V/V').default;
 var {GetTypeName, IsNumberString, SimplifyType} = require('./Globals');
 var {max, min} = require('moment');
 
-// as replacement for C#'s 'new MyClass() {prop = true}'
+// as replacement for C#'s "new MyClass() {prop = true}"
 //interface Object { Init: (obj)=>Object; }
-interface Object { Init<T>(obj: any): T; }
+// seems this should work, to be consistent with in-class usage, but whatever; below it's an alternative that works for interfaces
+//interface Object { Init(obj: any): this; }
+interface Object { Init<T>(this: T, obj: any): T; }
 Object.prototype._AddFunction_Inline = function Init(x) { return this.Extend(x); };
 interface Object { Init_VTree: (obj)=>Object; }
 Object.prototype._AddFunction_Inline = function Init_VTree(x) { // by default, uses set_self method
@@ -566,14 +572,14 @@ Array.prototype._AddFunction_Inline = function AddRange(array) {
 	for (var i in array)
 		this.push(array[i]);
 };
-interface Array<T> { Remove(item: T): T; }
+interface Array<T> { Remove(item: T): boolean; }
 Array.prototype._AddFunction_Inline = function Remove(item) {
 	/*for (var i = 0; i < this.length; i++)
 		if (this[i] === item)
 			return this.splice(i, 1);*/
 	var itemIndex = this.indexOf(item);
 	var removedItems = this.splice(itemIndex, 1);
-	return removedItems[0];
+	return removedItems.length > 0;
 };
 interface Array<T> { RemoveAll(items: T[]): void; }
 Array.prototype._AddFunction_Inline = function RemoveAll(items) {
@@ -597,21 +603,21 @@ Array.prototype._AddFunction_Inline = function Reversed() {
 // Linq replacements
 // ----------
 
-interface Array<T> { Any(matchFunc: (item: T)=>boolean): boolean; }
+interface Array<T> { Any(matchFunc: (item: T, index?: number)=>boolean): boolean; }
 Array.prototype._AddFunction_Inline = function Any(matchFunc) {
     for (let [index, item] of this.entries())
         if (matchFunc == null || matchFunc.call(item, item, index))
             return true;
     return false;
 };
-interface Array<T> { All(matchFunc: (item: T)=>boolean): boolean; }
+interface Array<T> { All(matchFunc: (item: T, index?: number)=>boolean): boolean; }
 Array.prototype._AddFunction_Inline = function All(matchFunc) {
     for (let [index, item] of this.entries())
         if (!matchFunc.call(item, item, index))
             return false;
     return true;
 };
-interface Array<T> { Where(matchFunc: (item: T)=>boolean): T[]; }
+interface Array<T> { Where(matchFunc: (item: T, index?: number)=>boolean): T[]; }
 Array.prototype._AddFunction_Inline = function Where(matchFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())
@@ -619,14 +625,14 @@ Array.prototype._AddFunction_Inline = function Where(matchFunc) {
 			result.Add(item);
 	return result;
 };
-interface Array<T> { Select<T2>(matchFunc: (item: T)=>T2): T2[]; }
+interface Array<T> { Select<T2>(matchFunc: (item: T, index?: number)=>T2): T2[]; }
 Array.prototype._AddFunction_Inline = function Select(selectFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())
 		result.Add(selectFunc.call(item, item, index));
 	return result;
 };
-interface Array<T> { SelectMany<T2>(matchFunc: (item: T)=>T2[]): T2[]; }
+interface Array<T> { SelectMany<T2>(matchFunc: (item: T, index?: number)=>T2[]): T2[]; }
 Array.prototype._AddFunction_Inline = function SelectMany(selectFunc) {
 	var result = this instanceof List ? new List(this.itemType) : [];
 	for (let [index, item] of this.entries())

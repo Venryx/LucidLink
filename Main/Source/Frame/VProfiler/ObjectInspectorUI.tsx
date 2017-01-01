@@ -1,9 +1,11 @@
 import V from "../../Packages/V/V";
-import {E, IsBool, IsNumber, IsString, P, D, Toast} from "../Globals";
+import {E, IsBool, IsNumber, IsString, Toast} from "../Globals";
 import {BaseComponent as Component, Row, Column} from "../ReactGlobals";
 //import TreeView from 'react-native-treeview'
 import TreeView from "../../Frame/Components/TreeView";
 import {View, Text} from "react-native";
+import {Dictionary, List} from "../../Packages/VDF/VDFExtras";
+import {D, P} from "../../Packages/VDF/VDFTypeInfo";
 
 export default class ObjectInspectorUI extends Component<
 		{object, objectKey?: string, style?, textElementStyle?, titleModifierFunc: Function, keyModifierForTreeStateFunc: Function},
@@ -128,5 +130,5 @@ export default class ObjectInspectorUI extends Component<
 
 class TreeNodeState {
     @P() @D() expanded = false;
-    @P() @D((global as any).D.NullOrEmpty) children = new Dictionary("string", "TreeNodeState");
+    @P() @D(D.NullOrEmpty) children = new Dictionary("string", "TreeNodeState");
 };

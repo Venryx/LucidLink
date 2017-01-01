@@ -1,7 +1,8 @@
-import {Assert, BufferAction, FromVDF, GetTypeName, P, ToVDF} from "../../Frame/Globals";
-import { autorun } from 'mobx';
+import {Assert, BufferAction, FromVDF, GetTypeName, ToVDF} from "../../Frame/Globals";
+import {autorun} from 'mobx';
 import {LL} from "../../LucidLink";
 import moment from "moment";
+import {P} from "../../Packages/VDF/VDFTypeInfo";
 var DialogAndroid = require("react-native-dialogs");
 
 export class Session {

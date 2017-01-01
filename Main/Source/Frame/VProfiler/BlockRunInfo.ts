@@ -1,4 +1,6 @@
-import {P, WaitXThenRun_BuiltIn, T} from "../Globals";
+import {Assert, WaitXThenRun_BuiltIn} from "../Globals";
+import {Dictionary} from "../../Packages/VDF/VDFExtras";
+import {P, T} from "../../Packages/VDF/VDFTypeInfo";
 
 export default class BlockRunInfo {
 	static fakeBlockRunInfo: BlockRunInfo;
@@ -26,7 +28,7 @@ export default class BlockRunInfo {
 	timer_startTime = -1;
 	@P() runTime = 0;
 	//@T("Dictionary(string BlockRunInfo)") @P() children = {};
-	@T("Dictionary(string BlockRunInfo)") @P() children = new Dictionary("string", "BlockRunInfo");
+	@T("Dictionary(string BlockRunInfo)") @P() children = new Dictionary<string, BlockRunInfo>("string", "BlockRunInfo");
 	currentChild: BlockRunInfo = null;
 
 	GetCurrentDescendant() : BlockRunInfo {

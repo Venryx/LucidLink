@@ -3,11 +3,12 @@ var DialogAndroid = require("react-native-dialogs");
 var Moment = require("moment");
 
 import DreamUI from "./Journal/DreamUI";
-import {Assert, FromVDF, GetTypeName, P, ToVDF, E} from "../Frame/Globals";
+import {Assert, FromVDF, GetTypeName, ToVDF, E} from "../Frame/Globals";
 import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
 import Bind from "autobind-decorator";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
+import {P} from "../Packages/VDF/VDFTypeInfo";
 
 @Bind
 export class Dream {

@@ -1,5 +1,4 @@
 //import * as g from "../Globals";
-import {D} from "../Globals";
 import PatternMatchAttempt from "./PatternMatchAttempt";
 import {Packet} from "./Packet";
 export class Pattern {

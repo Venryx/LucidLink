@@ -1,5 +1,5 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {Log, WaitXThenRun} from "../../Frame/Globals";
+import {Assert, Log, WaitXThenRun} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";

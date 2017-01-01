@@ -17,11 +17,12 @@ import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomS
 import scriptDefaultText_CustomPatterns from "./Scripts/UserScriptDefaults/CustomPatterns";
 
 import ScriptsPanel from "./Scripts/ScriptsPanel";
-import {_VDFPreSerialize, Assert, AssertWarn, E, Log, P, ToJSON} from "../Frame/Globals";
+import {Assert, AssertWarn, E, Log, ToJSON} from "../Frame/Globals";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import {observer} from "mobx-react/native";
 import {autorun, transaction} from "mobx";
+import {P, _VDFPreSerialize} from "../Packages/VDF/VDFTypeInfo";
 
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {

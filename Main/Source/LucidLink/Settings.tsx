@@ -1,4 +1,4 @@
-import {_VDFPostDeserialize, _VDFSerializeProp, FromVDF, IsString, P, T, ToVDF} from "../Frame/Globals";
+import {FromVDF, IsString, ToVDF} from "../Frame/Globals";
 import {BaseComponent} from "../Frame/ReactGlobals";
 var ScrollableTabView = require("react-native-scrollable-tab-view");
 var DialogAndroid = require("react-native-dialogs");
@@ -7,6 +7,7 @@ import Node from "../Packages/VTree/Node";
 import GeneralUI from "./Settings/GeneralUI";
 import AudiosUI from "./Settings/AudiosUI";
 import {LL} from "../LucidLink";
+import {P, T} from "../Packages/VDF/VDFTypeInfo";
 
 export class Settings extends Node {	
 	@O @P() applyScriptsOnLaunch = false;

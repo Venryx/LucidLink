@@ -1,5 +1,5 @@
 import {BaseComponent} from '../Frame/ReactGlobals';
-import {P, DN} from "../Frame/Globals";
+import {DN} from "../Frame/Globals";
 import RNFS from "react-native-fs";
 var Moment = require("moment");
 var ScrollableTabView = require("react-native-scrollable-tab-view");
@@ -11,6 +11,7 @@ import ConsoleUI from "./More/ConsoleUI";
 import OthersUI from "./More/OthersUI";
 import AboutUI from "./More/AboutUI";
 import {LL} from "../LucidLink";
+import {P} from "../Packages/VDF/VDFTypeInfo";
 
 export class LogEntry {
 	constructor(type, message, time) {
