@@ -23,7 +23,7 @@ export default class GraphRowUI extends Component<
 			var segmentStart_percentFromLeftToRight = segmentStartTime.diff(startTime) / endTime.diff(startTime);
 			var segmentWidth_percentOfChartWidth = segmentEndTime.diff(segmentStartTime) / endTime.diff(startTime);
 			segmentUIs.push(
-				<Panel key={segmentStartTime} style={E({position: "absolute", height: row.height * height,
+				<Panel key={segmentStartTime.valueOf()} style={E({position: "absolute", height: row.height * height,
 					left: segmentStart_percentFromLeftToRight * width, width: segmentWidth_percentOfChartWidth * width,
 					backgroundColor: renderInfo.color})}/>
 			);

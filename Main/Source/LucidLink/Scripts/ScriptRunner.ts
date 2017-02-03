@@ -45,13 +45,13 @@ export default class ScriptRunner {
 		//this.patternMatchAttempts = {};
 		//LL.monitor.eegProcessor.patternMatchAttempts = {};
 		//LL.monitor.eegProcessor = new EEGProcessor();
-		LL.monitor.eegProcessor.ResetScriptsRelatedStuff();
+		LL.tools.monitor.eegProcessor.ResetScriptsRelatedStuff();
 		
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
 		this.listeners_whenChangeMuseConnectStatus = [];
-		this.listeners_whenMusePacketReceived = [LL.monitor.eegProcessor.OnReceiveMusePacket];
+		this.listeners_whenMusePacketReceived = [LL.tools.monitor.eegProcessor.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];

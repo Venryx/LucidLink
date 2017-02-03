@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Component} from "react";
-import {Assert, E, WaitXThenRun} from "./Globals";
+import {Assert, E, WaitXThenRun, IsString} from "./Globals";
 import {colors, styles} from "./Styles";
 import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
@@ -73,15 +73,46 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	    return React.Children.map((children as any).Where(a=>a), a=>a);
 	}
 
+	/** safe force-update;*/
+	Update() {
+		//if (!this.Mounted) return;
+		this.forceUpdate();
+	}
+	ClearThenUpdate() {
+		var oldRender = this.render;
+		this.render = function() {
+			this.render = oldRender;
+			WaitXThenRun(0, this.Update);
+			return <div/>;
+		};
+		this.forceUpdate();
+	}
+	/** Shortcut for "()=>(this.forceUpdate(), this.ComponentWillMountOrReceiveProps(props))". */
+	UpdateAndReceive(props) {
+		return ()=> {
+			//if (!this.Mounted) return;
+			this.forceUpdate();
+			if (this.autoRemoveChangeListeners)
+				this.RemoveChangeListeners();
+			this.ComponentWillMountOrReceiveProps(props)
+		};
+	}
+
 	changeListeners = [];
 	AddChangeListeners(host, ...funcs) {
+		if (host == null) return; // maybe temp
 	    /*host.extraMethods = funcs;
 	    for (let func of funcs)
 			this.changeListeners.push({host: host, func: func});*/
 	    for (let func of funcs) {
-			//if (!host.HasExtraMethod(func)) {
-			host.extraMethod = func;
-			this.changeListeners.push({host: host, func: func});
+			if (IsString(func))
+				func = func.Func(this.Update);
+			// if actual function, add it (else, ignore entry--it must have been a failed conditional)
+			if (func instanceof Function) {
+				//if (!host.HasExtraMethod(func)) {
+				host.extraMethod = func;
+				this.changeListeners.push({host: host, func: func});
+			}
 		}
 	}
 	RemoveChangeListeners() {
@@ -98,7 +129,7 @@ export class BaseComponent<P, S> extends Component<P, S> {
 
 	autoRemoveChangeListeners = true;
 	ComponentWillMount(): void {};
-	ComponentWillMountOrReceiveProps(props: any, forMount: boolean): void {};
+	ComponentWillMountOrReceiveProps(props: any, forMount?: boolean): void {};
 	componentWillMount() {
 		if (this.autoRemoveChangeListeners)
 			this.RemoveChangeListeners();
@@ -145,13 +176,13 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	PostRender(initialMount: boolean): void {};
 
 	// maybe temp
-	/*IsMounted() {
+	/*get Mounted() {
 	    return ReactInstanceMap.get(this) != null;
 	}*/
 }
 //global.Extend({Component2: Component, BaseComponent: Component});
 
-function BasicStyles(props) {
+export function BasicStyles(props) {
 	var result: any = {};
 	for (let key in props) {
 		if (key.startsWith("ml"))
@@ -207,18 +238,18 @@ export class RowLR extends BaseComponent<any, any> {
 
 export class Column extends BaseComponent<any, any> {
 	render() {
-		var {style, width, children} = this.props;
-		var otherProps = this.props.Excluding(style, width, children);
+		var {style, width, children, ...rest} = this.props;
 		return (
-			<Panel {...otherProps} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
+			<Panel {...rest} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</Panel>
 		);
 	}
 }
 
-var View2: React.ComponentClass<any> = View;
-export class Panel extends View2 {
+//var View2: React.ComponentClass<any> = View;
+//export class Panel extends View {
+export class Panel extends BaseComponent<any, any> {
 	render() {
 		var {children, style} = this.props;
 		var otherProps = this.props.Excluding("style", "children");
@@ -266,31 +297,6 @@ export class VButton extends BaseComponent<any, any> {
 					textStyle={E({color: "#FFF", fontWeight: "bold", fontSize: 15}, textStyle)}>
 				{text}
 			</Button>
-		);
-	}
-}
-
-@observer
-export class VSwitch extends BaseComponent<any, any> {
-	render() {
-		var {text, value, onValueChange, valuePath, style} = this.props;
-		var restProps = this.props.Excluding("text", "style");
-		if (valuePath) {
-			let obj = valuePath[0];
-			let prop = valuePath[1];
-			value = obj[prop];
-			onValueChange = newVal=>obj[prop] = newVal;
-		}
-		var View2: any = View; // fix for issue in VSwitch
-		return (
-			<View2 style={E({flexDirection: "row"}, BasicStyles(this.props))}>
-				<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>{text}</Text>
-				<Switch {...restProps} {...{value, onValueChange}}
-					style={E(
-						{height: 50, top: 0, transform: [{translateY: -3}]},
-						style
-					)}/>
-			</View2>
 		);
 	}
 }

@@ -36,7 +36,7 @@ export class EEGProcessor {
 			this.channelPoints[ch][this.currentX] = packet.eegValues[ch];*/
 		this.packets[this.currentX] = packet;
 
-		if (LL.monitor.patternMatch)
+		if (LL.tools.monitor.patternMatch)
 			this.DoPatternMatching(packet);
 	}
 

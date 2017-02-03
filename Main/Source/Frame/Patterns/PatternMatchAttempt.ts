@@ -79,7 +79,7 @@ export default class PatternMatchAttempt {
 		this.active = false;
 		//Toast("Completed");
 
-		LL.monitor.eegProcessor.EndPatternMatchAttempt(this);
+		LL.tools.monitor.eegProcessor.EndPatternMatchAttempt(this);
 		if (this.pattern.onMatch) this.pattern.onMatch(this);
 		if (this.pattern.onEnd) this.pattern.onEnd(true);
 		//if (this.onEnd) this.onEnd(true);
@@ -89,7 +89,7 @@ export default class PatternMatchAttempt {
 		this.active = false;
 		//Toast("Canceled");
 
-		LL.monitor.eegProcessor.EndPatternMatchAttempt(this);
+		LL.tools.monitor.eegProcessor.EndPatternMatchAttempt(this);
 		if (this.pattern.onEnd) this.pattern.onEnd(false);
 		//if (this.onEnd) this.onEnd(false);
 	}

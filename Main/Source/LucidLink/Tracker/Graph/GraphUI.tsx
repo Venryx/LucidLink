@@ -110,7 +110,7 @@ class ChartsUI extends Component<any, any> {
 		}
 
         return (
-            <View style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
+			<View {...{} as any} style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
 				{rows}
             </View>
         );
@@ -161,7 +161,7 @@ class ChartUI extends Component<{startTime: moment.Moment, endTime: moment.Momen
 		}
 		
         return (
-            <View style={{width, height, backgroundColor: colors.background}}>
+			<View {...{} as any} style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
 					minX={0} maxX={24} legendStepsX={25}
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}

@@ -14,7 +14,7 @@ export class Packet {
 	channelBaselines: any[];
 
 	GetPeer(offset) {
-		LL.monitor.eegProcessor.packets[(this.x + offset).WrapToRange(0, this.maxX)];
+		LL.tools.monitor.eegProcessor.packets[(this.x + offset).WrapToRange(0, this.maxX)];
 	}
 	GetChannelValue(channel) {
 		var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
@@ -22,7 +22,7 @@ export class Packet {
 	}
 	GetChannelOffset(channel) {
 		var channelIndex = IsNumber(channel) ? channel : ["bl", "fl", "fr", "br"].indexOf(channel);
-		return this.eegValues[channelIndex] - LL.monitor.eegProcessor.channelBaselines[channelIndex];
+		return this.eegValues[channelIndex] - LL.tools.monitor.eegProcessor.channelBaselines[channelIndex];
 	}
 	GetChannelDeviation(channel) {
 		return Math.abs(this.GetChannelOffset(channel));

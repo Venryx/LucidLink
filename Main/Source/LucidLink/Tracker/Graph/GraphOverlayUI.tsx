@@ -14,7 +14,7 @@ export default class GraphOverlayUI extends Component<
 		
 		this.eventBoxes = [];
 		return (
-			<View style={{position: "absolute", left: 0, top: 0, width, height}}>
+			<View {...{} as any} style={{position: "absolute", left: 0, top: 0, width, height}}>
 				{events.map((event, index)=> {
 					let renderInfo = overlay.renderEvent(event);
 					if (renderInfo == null) return null;

@@ -1,14 +1,13 @@
-import {JavaBridge,} from "../Frame/Globals";
-import {EEGProcessor} from "../Frame/Patterns/EEGProcessor";
-import {BaseComponent as Component, Column, Panel, Row, VButton, VSwitch} from "../Frame/ReactGlobals";
-import {colors, styles} from "../Frame/Styles";
-import {Vector2i} from "../Frame/Graphics/VectorStructs";
+import {JavaBridge,} from "../../Frame/Globals";
+import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
+import {BaseComponent as Component, Column, Panel, Row, VButton} from "../../Frame/ReactGlobals";
+import {colors, styles} from "../../Frame/Styles";
+import {Vector2i} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
 import Drawer from "react-native-drawer";
 import {MKRangeSlider} from "react-native-material-kit";
-var DialogAndroid = require("react-native-dialogs");
+import DialogAndroid from "react-native-dialogs";
 import {Text, Switch, View} from "react-native";
-import Node from "../Packages/VTree/Node";
 
 export class Monitor extends Node {
 	@O @P() updateInterval = 3;
@@ -28,15 +27,17 @@ export class Monitor extends Node {
 g.Extend({Monitor});
 
 import OptionsPanel from "./Monitor/OptionsPanel";
-import MuseBridge from "../Frame/MuseBridge";
-import {LL} from "../LucidLink";
-import {P} from "../Packages/VDF/VDFTypeInfo";
+import MuseBridge from "../../Frame/MuseBridge";
+import {LL} from "../../LucidLink";
+import {P} from "../../Packages/VDF/VDFTypeInfo";
+import Node from "../../Packages/VTree/Node";
+import {VSwitch} from "../../Packages/ReactNativeComponents/VSwitch";
 
 @observer
 export class MonitorUI extends Component<any, any> {
 	constructor(props) {
 		super(props);
-		LL.monitor.ui = this;
+		LL.tools.monitor.ui = this;
 		this.patternGrab_minX = 0;
 		this.patternGrab_maxX = 1000;
 	}
@@ -58,7 +59,7 @@ export class MonitorUI extends Component<any, any> {
 
 	render() {
 		var {visible} = this.props;
-		var node = LL.monitor;
+		var node = LL.tools.monitor;
 		
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
@@ -114,8 +115,8 @@ var didFirstRender = false;
 class ChannelsUI extends Component<any, any> {
     render() {
         return (
-            <View style={{flex: 1, backgroundColor: colors.background}} accessible={true} accessibilityLabel="chart holder">
-            </View>
+			<View {...{} as any} style={{flex: 1, backgroundColor: colors.background}}
+				accessible={true} accessibilityLabel="chart holder"/>
         );
     }
 

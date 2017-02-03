@@ -39,10 +39,10 @@ import {ProfileMethod} from "./VProfiler";
 		MuseBridge.museList = museList;
 		Log("muse link", `Muse list changed: ${ToJSON(museList)}`);
 
-		if (museList.length && MuseBridge.currentMuse == null && LL.monitor.connect)
+		if (museList.length && MuseBridge.currentMuse == null && LL.tools.monitor.connect)
 			MuseBridge.Connect();
 
-		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
+		if (LL.tools.monitor.ui) LL.tools.monitor.ui.forceUpdate();
 	}
 
 	static currentMuse = null;
@@ -63,11 +63,11 @@ import {ProfileMethod} from "./VProfiler";
 			Log("muse link", "LibMuse disconnected.");
 			MuseBridge.currentMuse = null;
 			// since we're disconnected now, restart listening (assuming "connect" is enabled)
-			if (LL.monitor.connect)
+			if (LL.tools.monitor.connect)
 				MuseBridge.StartSearch();
 		}
 		MuseBridge.status = status;
-		if (LL.monitor.ui) LL.monitor.ui.forceUpdate();
+		if (LL.tools.monitor.ui) LL.tools.monitor.ui.forceUpdate();
 
 		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus)
 			listener(status);
@@ -77,7 +77,7 @@ import {ProfileMethod} from "./VProfiler";
 	static lastLogStatsTime = -1;
 	static OnReceiveMuseDataPacket(packet) {
 		//if (++MuseBridge.count > 300) return; // for testing
-		if (!LL.monitor.monitor) return; // quick return, for when "stop sending" update to Java is delayed
+		if (!LL.tools.monitor.monitor) return; // quick return, for when "stop sending" update to Java is delayed
 
 		//let p = ProfileMethod("OnReceiveMuseDataPacket");
 

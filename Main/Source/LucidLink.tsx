@@ -29,7 +29,7 @@ import Orientation from "react-native-orientation";
 var Moment = require("moment");
 import ScrollableTabView from "react-native-scrollable-tab-view";
 
-import {MonitorUI, Monitor} from "./LucidLink/Monitor";
+import {MonitorUI, Monitor} from "./LucidLink/Tools/Monitor";
 import {TrackerUI, Tracker} from "./LucidLink/Tracker";
 import {JournalUI, Journal} from "./LucidLink/Journal";
 import {ScriptsUI, Scripts} from "./LucidLink/Scripts";
@@ -107,7 +107,7 @@ export class LucidLink extends Node {
 		g.LL = this; // set early, so LL can be used during initial construction
 	}*/
 
-	@T("Monitor") @P(true, true) monitor = new Monitor();
+	@T("Tools") @P(true, true) tools = new Tools();
 	@T("Tracker") @P(true, true) tracker = new Tracker();
 	@T("Journal") @P(true, true) journal = new Journal();
 	@T("Scripts") @P(true, true) scripts = new Scripts();
@@ -118,7 +118,7 @@ export class LucidLink extends Node {
 		var basicData = {};
 		// monitor
 		for (let prop of ["updateInterval", "channel1", "channel2", "channel3", "channel4", "monitor", "patternMatch"])
-			basicData[prop] = LL.monitor[prop];
+			basicData[prop] = LL.tools.monitor[prop];
 		// settings
 		for (let prop of ["blockUnusedKeys", "patternMatchInterval", "patternMatchOffset", "museEEGPacketBufferSize",
 				"eyeTracker_horizontalSensitivity", "eyeTracker_verticalSensitivity", "eyeTracker_offScreenGravity",
@@ -208,13 +208,14 @@ import {autorun} from "mobx";
 import TestData from "./Frame/TestData";
 import LibMuse from "react-native-libmuse";
 import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
+import {Tools} from "./LucidLink/Tools";
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	var inEmulator = await JavaBridge.Main.IsInEmulator();
 	if (inEmulator)
 		Log("general", `In emulator: ${inEmulator}`);
 	if (!inEmulator && !MuseBridge.initialized) {
 		MuseBridge.Init();
-		if (LL.monitor.connect)
+		if (LL.tools.monitor.connect)
 			MuseBridge.StartSearch(); // start listening for a muse headband
 	}
 }
