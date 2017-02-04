@@ -1,5 +1,9 @@
 # LucidLink
-Monitors Muse headband EEG data, and triggers user-scripted events (eg audio) when REM sleep is detected.
+Below is an overview of the tools provided:
+* dream journal
+* random-voice-prompt engine
+* muse eeg monitor
+* user scripts
 
 Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
