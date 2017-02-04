@@ -26,8 +26,7 @@ export default class OthersUI extends Component<any, any> {
 					<VButton text="Refresh profiler data" style={{width: 300}} onPress={this.AllFrames_Refresh}/>
 					<VButton text="Clear" ml5 style={{width: 300}} onPress={this.AllFrames_Clear}/>
 				</Row>
-				<ScrollView style={{flex: 1, flexDirection: "column"}}
-						automaticallyAdjustContentInsets={false}>
+				<ScrollView style={{flex: 1, flexDirection: "column"}}>
 					<ObjectInspectorUI
 						object={profiler_allFrames_data}
 						titleModifierFunc={this.TitleModifierFunc}

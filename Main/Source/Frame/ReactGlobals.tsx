@@ -182,8 +182,25 @@ export class BaseComponent<P, S> extends Component<P, S> {
 }
 //global.Extend({Component2: Component, BaseComponent: Component});
 
+export interface BasicStyles_Props {
+	ml?; mr?; mt?; mb?;
+	pl?; pr?; pt?; pb?;
+}
 export function BasicStyles(props) {
 	var result: any = {};
+
+	var fullKeys = {
+		ml: "marginLeft", mr: "marginRight", mt: "marginTop", mb: "marginBottom",
+		pl: "paddingLeft", pr: "paddingRight", pt: "paddingTop", pb: "paddingBottom",
+	};
+	for (let key in props) {
+		if (key in fullKeys) {
+			let fullKey = fullKeys[key];
+			result[fullKey] = props[key];
+		}
+	}
+
+	// old way
 	for (let key in props) {
 		if (key.startsWith("ml"))
 			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
@@ -202,6 +219,7 @@ export function BasicStyles(props) {
 		else if (key.startsWith("pb"))
 			result.paddingBottom = (key.startsWith("pbN") ? -1 : 1) * parseInt(key.substr(2));
 	}
+
 	return result;
 }
 
@@ -247,14 +265,20 @@ export class Column extends BaseComponent<any, any> {
 	}
 }
 
-//var View2: React.ComponentClass<any> = View;
-//export class Panel extends View {
+// for some reason, errors here if we extend BaseComponent (see: http://stackoverflow.com/questions/31741705)
+// (I guess cause it renders just a View)
+/*var View2: React.ComponentClass<any> = View;
+export class Panel extends View {*/
+
 export class Panel extends BaseComponent<any, any> {
+	setNativeProps (nativeProps) {
+		this.root.setNativeProps(nativeProps);
+	}
+	root;
 	render() {
-		var {children, style} = this.props;
-		var otherProps = this.props.Excluding("style", "children");
+		var {children, style, ...rest} = this.props;
 		return (
-			<View {...otherProps} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
+			<View {...rest as any} ref={c=>this.root = c} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
 				{children}
 			</View>
 		);
@@ -281,14 +305,12 @@ export class VText extends BaseComponent<any, any> {
 export class VButton extends BaseComponent<any, any> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
-		var {text, caps, style, textStyle, enabled} = this.props;
-		var restProps = this.props.Excluding("text", "style");
-
+		var {text, caps, style, textStyle, enabled, ...rest} = this.props;
 		if (caps)
 			text = text.toUpperCase();
 		
 		return (
-			<Button {...restProps} isDisabled={!enabled}
+			<Button {...rest} isDisabled={!enabled}
 					style={E(
 						{borderColor: "#777", backgroundColor: "#777", borderRadius: 3},
 						BasicStyles(this.props),
@@ -324,12 +346,32 @@ export class AutoExpandingTextInput extends BaseComponent<any, any> {
 	}
 }
 
-export class VTextInput extends BaseComponent<any, any> {
+export class VTextInput extends BaseComponent<
+		{value?: string, onChange?: (val: string)=>void,
+			accessible?, accessibilityLabel?, // for "@ConvertStartSpacesToTabs" feature
+			editable?, style?}, {}> {
 	static defaultProps = {editable: true};
 	render() {
-		var {text} = this.props;
-		return <TextInput {...this.props}
-			style={{flex: 1, textAlignVertical: "top", color: colors.text}}
-			multiline={true} value={text} autoCapitalize="none" autoCorrect={false}/>;
+		var {value, onChange, style, ...rest} = this.props;
+		return <TextInput {...rest}
+			style={E({flex: 1, textAlignVertical: "top", color: colors.text}, style)}
+			multiline={true} value={value} onChangeText={onChange}
+			autoCapitalize="none" autoCorrect={false}/>;
+	}
+}
+@observer
+export class VTextInput_Auto extends Component<
+	{value?: string, onChange?: (text: string)=>void,
+		editable?, style?,
+		path: ()=>any}, {}> {
+	render() {
+		var {value, onChange, path, ...rest} = this.props;
+		let {node, key: propName} = path();
+		return (
+			<VTextInput {...rest} value={node[propName]} onChange={val=> {
+				node[propName] = val;
+				if (onChange) onChange(val);
+			}}/>
+		);
 	}
 }

@@ -6,7 +6,7 @@ import {TextInput} from "react-native";
 import {LL} from "../../LucidLink";
 var FilePickerManager = NativeModules.FilePickerManager;
 
-export default class AudiosUI extends BaseComponent<any, any> {
+export default class AudiosUI extends BaseComponent<any, {}> {
 	render() {
 		var node = LL.settings;
 		return (
@@ -30,8 +30,7 @@ export default class AudiosUI extends BaseComponent<any, any> {
 				<Row height={45}>
 					<VButton onPress={()=>this.CreateAudioFile()} text="Create" style={{width: 100, height: 40}}/>
 				</Row>
-				<Panel style={{flex: 111222}}>
-				</Panel>
+				<Panel style={{flex: 111222}}/>
 			</Column>
 		);
 	}

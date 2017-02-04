@@ -6,7 +6,7 @@ import {Text, Switch} from "react-native";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {LL} from "../../LucidLink";
 import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPicker";
-import {VSwitch} from "../../Packages/ReactNativeComponents/VSwitch";
+import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
 
 /*@observer
 class NumberSettingUI extends Component<{propName: string, text: string, description?: string, values: number[]}, any> {
@@ -16,7 +16,7 @@ class NumberSettingUI extends Component<{propName: string, text: string, descrip
 		var node = LL.settings;
 		return (
 			<Row>
-				<VText ml10 mt5 mr10>{text}</VText>
+				<VText mt5 mr10>{text}</VText>
 				<VButton text={node[propName].toString()} style={{width: 100, height: 32}}
 					onPress={async ()=> {
 						var id = await NumberPickerDialog.show({
@@ -37,75 +37,75 @@ class NumberSettingUI extends Component<{propName: string, text: string, descrip
 }*/
 
 @observer
-export default class GeneralUI extends Component<any, any> { 
+export default class GeneralUI extends Component<any, {}> { 
 	render() {
 		var node = LL.settings;
 		return (
 			<Panel style={{flex: 1, backgroundColor: colors.background}}>
-				<Row style={{flex: 1, flexDirection: "column"}}>
-					<RowLR pl10 height={30}>
-						<Text>Apply scripts on launch</Text>
-						<VSwitch value={node.applyScriptsOnLaunch} onValueChange={value=>node.applyScriptsOnLaunch = value}/>
-					</RowLR>
-					<RowLR pl10 height={30}>
-						<Text>Block unused keys</Text>
-						<VSwitch value={node.blockUnusedKeys} onValueChange={value=>node.blockUnusedKeys = value}/>
-					</RowLR>
-					<RowLR pl10 height={30}>
-						<Text>Keep device awake</Text>
-						<VSwitch value={node.keepDeviceAwake} onValueChange={value=>node.keepDeviceAwake = value}/>
-					</RowLR>
+				<Row style={{flex: 1, flexDirection: "column", paddingLeft: 12}}>
+					<Row height={30}>
+						<VText mt2 mr10>Apply scripts on launch</VText>
+						<VSwitch_Auto path={()=>node.p.applyScriptsOnLaunch}/>
+					</Row>
+					<Row height={30}>
+						<VText mt2 mr10>Block unused keys</VText>
+						<VSwitch_Auto path={()=>node.p.blockUnusedKeys}/>
+					</Row>
+					<Row height={30}>
+						<VText mt2 mr10>Keep device awake</VText>
+						<VSwitch_Auto path={()=>node.p.keepDeviceAwake}/>
+					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Muse EEG-packet buffer size</VText>
+						<VText mt5 mr10>Muse EEG-packet buffer size</VText>
 						<NumberPicker_Auto path={()=>node.p.museEEGPacketBufferSize} min={1} max={500}
 							dialogTitle="Muse EEG-packet buffer size"
 							dialogMessage="Select the number of eeg-packets to buffer before they're sent to the JS."/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Eye-tracker horizontal-sensitivity</VText>
+						<VText mt5 mr10>Eye-tracker horizontal-sensitivity</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTracker_horizontalSensitivity} max={1} step={.01}
-							format={val=>(val * 100).toFixed(0)}
+							format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Eye-tracker horizontal-sensitivity"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Eye-tracker vertical-sensitivity</VText>
+						<VText mt5 mr10>Eye-tracker vertical-sensitivity</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTracker_verticalSensitivity} max={1} step={.01}
-							format={val=>(val * 100).toFixed(0)}
+							format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Eye-tracker vertical-sensitivity"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Eye-tracker off-screen gravity</VText>
+						<VText mt5 mr10>Eye-tracker off-screen gravity</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTracker_offScreenGravity} max={1} step={.01} precision={2}
 							dialogTitle="Eye-tracker off-screen gravity"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Relax vs tense intensity</VText>
+						<VText mt5 mr10>Relax vs tense intensity</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTracker_relaxVSTenseIntensity} min={.1} max={1} step={.01} precision={2}
 							dialogTitle="Relax vs tense intensity"/>
 					</Row>
 
 					<Row>
-						<VText ml10 mt5 mr10>Eye-trace segment size</VText>
+						<VText mt5 mr10>Eye-trace segment size</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTraceSegmentSize} min={.01} max={.5} step={.01} precision={2}
 							dialogTitle="Eye-trace segment count"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Eye-trace segment count</VText>
+						<VText mt5 mr10>Eye-trace segment count</VText>
 						<NumberPicker_Auto path={()=>node.p.eyeTraceSegmentCount} min={0} max={100} step={10}
 							dialogTitle="Eye-trace segment count"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Log stats every X minutes</VText>
+						<VText mt5 mr10>Log stats every X minutes</VText>
 						<NumberPicker_Auto path={()=>node.p.logStatsEveryXMinutes} min={1} max={100}
 							dialogTitle="Log stats every X minutes"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Reconnect attempt interval</VText>
+						<VText mt5 mr10>Reconnect attempt interval</VText>
 						<NumberPicker_Auto path={()=>node.p.reconnectAttemptInterval} values={[-1].concat(Range(1, 100))}
 							dialogTitle="Log stats every X minutes"/>
 					</Row>
 					<Row>
-						<VText ml10 mt5 mr10>Log stats every X minutes</VText>
+						<VText mt5 mr10>Log stats every X minutes</VText>
 						<NumberPicker_Auto path={()=>node.p.sessionSaveInterval} min={1} max={100}
 							dialogTitle="Session save interval"/>
 					</Row>

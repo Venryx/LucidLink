@@ -4,7 +4,7 @@ import {Text} from "react-native";
 import Spinner from "rn-spinner";
 import {BaseComponent, Column, Row, VText} from "../../../Frame/ReactGlobals";
 import {LL} from "../../../LucidLink";
-import {VSwitch} from "../../../Packages/ReactNativeComponents/VSwitch";
+import {VSwitch, VSwitch_Auto} from "../../../Packages/ReactNativeComponents/VSwitch";
 
 @observer
 export default class OptionsPanel extends BaseComponent<any, any> {
@@ -23,10 +23,10 @@ export default class OptionsPanel extends BaseComponent<any, any> {
 				</Row>
 				<Row>
 					<VText mt12>Channels: </VText>
-					<VSwitch text="1" valuePath={[node, "channel1"]}/>
-					<VSwitch text="2" valuePath={[node, "channel2"]}/>
-					<VSwitch text="3" valuePath={[node, "channel3"]}/>
-					<VSwitch text="4" valuePath={[node, "channel4"]}/>
+					<VSwitch_Auto text="1" path={()=>node.p.channel1}/>
+					<VSwitch_Auto text="2" path={()=>node.p.channel2}/>
+					<VSwitch_Auto text="3" path={()=>node.p.channel3}/>
+					<VSwitch_Auto text="4" path={()=>node.p.channel4}/>
 				</Row>
 			</Column>
 		)

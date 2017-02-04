@@ -80,25 +80,25 @@ export class MonitorUI extends Component<any, any> {
 						<Panel style={{flex: 1}}/>
 
 						{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
-							<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Searching for muse headband...</Text>}
+							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Searching for muse headband...</Text>}
 						{MuseBridge.status == "connecting" &&
-							<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Connecting...</Text>}
+							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connecting...</Text>}
 						{MuseBridge.status == "connected" &&
-							<Text style={{height: 50, top: 12, textAlignVertical: "top"}}>Connected</Text>}
-						<Switch style={{height: 50, top: 0, transform: [{translateY: -3}]} as any} value={node.connect}
-							onValueChange={value=> {
+							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connected</Text>}
+						<VSwitch mt={8} value={node.connect}
+							onChange={value=> {
 								node.connect = value;
 								if (node.connect)
 									MuseBridge.StartSearch(); // start listening for a muse headband
 								else
 									MuseBridge.Disconnect();
 							}}/>
-						<VSwitch text="Monitor" ml5 value={node.monitor}
-							onValueChange={value=> {
+						<VSwitch text="Monitor" ml={5} mt={8} value={node.monitor}
+							onChange={value=> {
 								node.monitor = value;
 							}}/>
-						<VSwitch text="Pattern match" ml5 value={node.patternMatch}
-							onValueChange={value=> {
+						<VSwitch text="Pattern match" ml={5} mt={8} value={node.patternMatch}
+							onChange={value=> {
 								node.patternMatch = value;
 							}}/>
 					</Row>

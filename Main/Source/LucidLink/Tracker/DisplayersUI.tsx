@@ -70,10 +70,10 @@ export default class DisplayersUI extends Component<any, any> {
 						</Panel>
 					</Panel>
 					<Panel style={{marginTop: -7, flex: 1}}>
-						<VTextInput text={selectedScript ? selectedScript.text : ""}
+						<VTextInput value={selectedScript ? selectedScript.text : ""}
 							accessible={true} accessibilityLabel="@ConvertStartSpacesToTabs"
 							editable={selectedScript != null}
-							onChangeText={text=> {
+							onChange={text=> {
 								if (!selectedScript.editable) return;
 								transaction(()=> {
 									selectedScript.text = text;

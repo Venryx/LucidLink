@@ -1,39 +1,41 @@
-import {BaseComponent as Component, BasicStyles} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, BasicStyles, BasicStyles_Props, Row} from "../../Frame/ReactGlobals";
 import {observer} from "mobx-react/native";
 import {View, Text, Switch} from "react-native";
 import {E} from "../../Frame/Globals";
 import NumberPicker from "../ReactNativeComponents/NumberPicker";
 
 @observer
-export class VSwitch extends Component<any, {}> {
+export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BasicStyles_Props, {}> {
 	render() {
-		var {text, value, onValueChange, valuePath, style, ...rest} = this.props;
-		if (valuePath) {
-			let obj = valuePath[0];
-			let prop = valuePath[1];
-			value = obj[prop];
-			onValueChange = newVal=>obj[prop] = newVal;
-		}
+		var {text, value, onChange, style, containerStyle, ...rest} = this.props;
+
+		// temp fix
+		containerStyle = containerStyle || {};
+		if (this.props.mt)
+			containerStyle.transform = [{translateY: this.props.mt}];
+
 		return (
-			<View {...{} as any} style={E({flexDirection: "row"}, BasicStyles(this.props))}>
-				<Text style={{marginLeft: 5, height: 50, top: 12, textAlignVertical: "top"}}>{text}</Text>
-				<Switch {...rest} {...{value, onValueChange}}
+			<Row style={E(BasicStyles(this.props), containerStyle)}>
+				{text && <Text style={{marginLeft: 5, height: 20}}>{text}</Text>}
+				<Switch {...rest} {...{value, onValueChange: onChange}}
 					style={E(
-						{height: 50, top: 0, transform: [{translateY: -3}]},
+						{height: 20},
 						style
 					)}/>
-			</View>
+			</Row>
 		);
 	}
 }
 
 @observer
-export class VSwitch_Auto extends Component<any, {}> {
+export class VSwitch_Auto extends Component<
+		{text?, value?, onChange?, style?, containerStyle?,
+			path: ()=>any}, {}> {
 	render() {
 		var {onChange, path, ...rest} = this.props;
 		let {node, key: propName} = path();
 		return (
-			<NumberPicker {...rest} value={node[propName]} onChange={val=> {
+			<VSwitch {...rest} value={node[propName]} onChange={val=> {
 				node[propName] = val;
 				if (onChange) onChange(val);
 			}}/>
