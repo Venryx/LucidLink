@@ -115,7 +115,7 @@ var didFirstRender = false;
 class ChannelsUI extends Component<any, any> {
     render() {
         return (
-			<View {...{} as any} style={{flex: 1, backgroundColor: colors.background}}
+			<View style={{flex: 1, backgroundColor: colors.background}}
 				accessible={true} accessibilityLabel="chart holder"/>
         );
     }

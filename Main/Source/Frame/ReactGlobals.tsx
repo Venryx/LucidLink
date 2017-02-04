@@ -101,6 +101,7 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	changeListeners = [];
 	AddChangeListeners(host, ...funcs) {
 		if (host == null) return; // maybe temp
+
 	    /*host.extraMethods = funcs;
 	    for (let func of funcs)
 			this.changeListeners.push({host: host, func: func});*/
@@ -116,6 +117,7 @@ export class BaseComponent<P, S> extends Component<P, S> {
 		}
 	}
 	RemoveChangeListeners() {
+		//this.changeListeners = this.changeListeners || []; // temp fix for odd "is null" issue
 	    for (let changeListener of this.changeListeners)
 	        changeListener.host.removeExtraMethod = changeListener.func;
 	    this.changeListeners = [];

@@ -12,9 +12,11 @@ export default class GraphOverlayUI extends Component<
 	render() {
 		var {startTime, endTime, width, height, events, overlay} = this.props;
 		
-		this.eventBoxes = [];
+		//WaitXThenRun(0, ()=>this.OnLayout());
+
+		//this.eventBoxes = [];
 		return (
-			<View {...{} as any} style={{position: "absolute", left: 0, top: 0, width, height}}>
+			<View style={{position: "absolute", left: 0, top: 0, width, height}}>
 				{events.map((event, index)=> {
 					let renderInfo = overlay.renderEvent(event);
 					if (renderInfo == null) return null;
@@ -43,7 +45,8 @@ export default class GraphOverlayUI extends Component<
 	//OnLayout() {
 		// if some of the event-boxes aren't ready, wait 1 second then retry
 		if (this.eventBoxes.length != this.props.events.length || this.eventBoxes.Any(a=>a.firstRect == null))
-			return WaitXThenRun(1000, this.PostRender);
+			return WaitXThenRun(1000, ()=>this.PostRender());
+			//return WaitXThenRun(1000, ()=>this.OnLayout());
 		
 		//Log("Starting position-fix phase.");
 		//for (let eventBox of this.eventBoxes.OrderBy(a=>a.props.x)) {
@@ -56,7 +59,8 @@ export default class GraphOverlayUI extends Component<
 	}
 }
 
-class EventBox extends Component<{parent: GraphOverlayUI, rowHeight: number, event: Event, x: number, renderInfo: EventRenderInfo}, any> {
+class EventBox extends Component<
+		{parent: GraphOverlayUI, rowHeight: number, event: Event, x: number, renderInfo: EventRenderInfo}, {}> {
 	firstRectsReady = false;
 	root: View;
 	render() {

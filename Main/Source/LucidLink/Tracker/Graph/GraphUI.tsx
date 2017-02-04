@@ -14,9 +14,10 @@ import GraphRowUI from "./GraphRowUI";
 import moment from "moment";
 import GraphOverlayUI from "./GraphOverlayUI";
 import {Notify} from "../../../Frame/Globals";
+import {Session} from "../Session";
 
 @observer
-export default class GraphUI extends Component<any, any> {
+export default class GraphUI extends Component<{session: Session}, {}> {
 	leftPanel = null;
 	ToggleLeftPanelOpen() {
 		if (this.leftPanel._open)
@@ -151,7 +152,7 @@ class ChartUI extends Component<{startTime: moment.Moment, endTime: moment.Momen
 			return result;
 		});
 
-		var overlay = LL. tracker.scriptRunner.graphOverlay;
+		var overlay = LL.tracker.scriptRunner.graphOverlay;
 		var overlayUI = null;
 		if (overlay) {
 			let overlayEvents = events.Where(a=>overlay.events.Contains(a.type));
@@ -161,7 +162,7 @@ class ChartUI extends Component<{startTime: moment.Moment, endTime: moment.Momen
 		}
 		
         return (
-			<View {...{} as any} style={{width, height, backgroundColor: colors.background}}>
+			<View style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
 					minX={0} maxX={24} legendStepsX={25}
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
