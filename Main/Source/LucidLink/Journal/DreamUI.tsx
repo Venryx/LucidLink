@@ -1,11 +1,12 @@
-import {BaseComponent, Column, Row} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Row} from "../../Frame/ReactGlobals";
 import ActionBar from "react-native-action-bar";
 import {TextInput, DatePickerAndroid, TimePickerAndroid} from "react-native";
 import {DN} from "../../Frame/Globals";
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
-var Moment = require("moment");
+import Moment from "moment";
+import {Dream} from "../Journal";
 
-export default class DreamUI extends BaseComponent<any, any> {
+export default class DreamUI extends Component<{onBack: Function, dream: Dream}, {}> {
 	render() {
 		var {onBack, dream} = this.props;
 		return (
@@ -36,7 +37,7 @@ export default class DreamUI extends BaseComponent<any, any> {
 							dream.date = dream.date.clone().set({hour, minute});
 							this.forceUpdate();
 						}}/>
-					<VSwitch_Auto text="Lucid" path={()=>dream.lucid} onChange={this.Update}/>
+					<VSwitch_Auto text="Lucid" path={()=>dream.p.lucid} onChange={this.Update}/>
 				</Row>
 				<Row>
 					<TextInput style={{flex: 1}} editable={true} value={dream.name}

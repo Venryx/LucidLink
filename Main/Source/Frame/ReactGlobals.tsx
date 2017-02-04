@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Component} from "react";
-import {Assert, E, WaitXThenRun, IsString} from "./Globals";
+import {Assert, E, WaitXThenRun, IsString, WaitXThenRun_BuiltIn} from "./Globals";
 import {colors, styles} from "./Styles";
 import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
@@ -74,18 +74,23 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	}
 
 	/** safe force-update;*/
-	Update() {
+	Update(postUpdate?) {
 		//if (!this.Mounted) return;
-		this.forceUpdate();
+		this.forceUpdate(postUpdate);
 	}
-	ClearThenUpdate() {
+	Clear(postClear?) {
 		var oldRender = this.render;
 		this.render = function() {
 			this.render = oldRender;
-			WaitXThenRun(0, this.Update);
+			//WaitXThenRun(0, this.Update);
+			WaitXThenRun(0, ()=>this.Update());
 			return <div/>;
 		};
-		this.forceUpdate();
+		postClear();
+	}
+	ClearThenUpdate() {
+		//this.Clear(this.Update);
+		this.Clear(()=>this.Update());
 	}
 	/** Shortcut for "()=>(this.forceUpdate(), this.ComponentWillMountOrReceiveProps(props))". */
 	UpdateAndReceive(props) {
@@ -140,12 +145,14 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	}
 	ComponentDidMount(...args: any[]): void {};
 	ComponentDidMountOrUpdate(forMount: boolean): void {};
+	mounted = false;
 	componentDidMount(...args) {
 	    this.ComponentDidMount && this.ComponentDidMount(...args);
 		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(true);
+		this.mounted = true;
 		if (this.PostRender) {
-			WaitXThenRun(0, ()=>window.requestAnimationFrame(()=> {
-				//if (!this.IsMounted()) return;
+			WaitXThenRun_BuiltIn(0, ()=>window.requestAnimationFrame(()=> {
+				if (!this.mounted) return;
 			    this.PostRender(true);
 			}));
 			/*WaitXThenRun(0, ()=> {
@@ -165,14 +172,18 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	    this.ComponentDidUpdate && this.ComponentDidUpdate(...args);
 		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(false);
 		if (this.PostRender) {
-			WaitXThenRun(0, ()=>window.requestAnimationFrame(()=> {
-			    //if (!this.IsMounted()) return;
+			WaitXThenRun_BuiltIn(0, ()=>window.requestAnimationFrame(()=> {
+			    if (!this.mounted) return;
 			    this.PostRender(false);
 			}));
 			/*WaitXThenRun(0, ()=> {
 				this.PostRender(false);
 			});*/
 		}
+	}
+
+	componentWillUnmount() {
+		this.mounted = false;
 	}
 
 	PostRender(initialMount: boolean): void {};

@@ -1,17 +1,15 @@
-import {BaseComponent, Column, Row, VButton} from "../Frame/ReactGlobals";
-var DialogAndroid = require("react-native-dialogs");
-var Moment = require("moment");
+import {BaseComponent as Component, Column, Row, VButton} from "../Frame/ReactGlobals";
+import DialogAndroid from "react-native-dialogs";
+import Moment from "moment";
 
 import DreamUI from "./Journal/DreamUI";
 import {Assert, FromVDF, GetTypeName, ToVDF, E} from "../Frame/Globals";
 import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
-import Bind from "autobind-decorator";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import {P} from "../Packages/VDF/VDFTypeInfo";
 
-@Bind
-export class Dream {
+export class Dream extends Node {
 	static async Load(file) {
 		var vdf = await file.ReadAllText();
 
@@ -42,6 +40,7 @@ export class Dream {
 	}
 
 	constructor(date) {
+		super();
 		// if called by VDF, do nothing
 		if (date == null) return;
 
@@ -93,8 +92,7 @@ export class Journal extends Node {
 }
 g.Extend({Journal});
 
-@Bind
-export class JournalUI extends BaseComponent<any, any> {
+export class JournalUI extends Component<{}, {month?, openDream?}> {
 	state = {month: Moment(new Date().MonthDate), openDream: null};
 
 	loadedMonths = [];
@@ -159,7 +157,7 @@ export class JournalUI extends BaseComponent<any, any> {
 	}
 }
 
-class DreamHeaderUI extends BaseComponent<any, any> {
+class DreamHeaderUI extends Component<{parent, dream, index, style?}, {}> {
 	render() {
 		var {parent, dream, index, style} = this.props;
 		return (

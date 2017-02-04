@@ -66,7 +66,7 @@ export default class GraphUI extends Component<{session: Session}, {}> {
 						<VButton text="Refresh" ml3 mt5 style={{width: 100, height: 32}} onPress={()=>this.chart.Refresh()}/>
 					</Row>
 					<Row style={{marginTop: -7, flex: 1}}>
-					<ChartsUI ref={c=>this.chart = c} session={session}/>
+						<ChartsUI ref={c=>this.chart = c} session={session}/>
 					</Row>
 				</Column>
 			</Drawer>
@@ -111,7 +111,7 @@ class ChartsUI extends Component<any, any> {
 		}
 
         return (
-			<View {...{} as any} style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
+			<View style={{flex: 1, backgroundColor: colors.background}} onLayout={this.OnLayout}>
 				{rows}
             </View>
         );

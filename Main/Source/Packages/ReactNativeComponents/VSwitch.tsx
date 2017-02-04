@@ -1,8 +1,9 @@
 import {BaseComponent as Component, BasicStyles, BasicStyles_Props, Row} from "../../Frame/ReactGlobals";
 import {observer} from "mobx-react/native";
 import {View, Text, Switch} from "react-native";
-import {E} from "../../Frame/Globals";
+import {Assert, E} from "../../Frame/Globals";
 import NumberPicker from "../ReactNativeComponents/NumberPicker";
+import Node from "../VTree/Node";
 
 @observer
 export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BasicStyles_Props, {}> {
@@ -34,6 +35,7 @@ export class VSwitch_Auto extends Component<
 	render() {
 		var {onChange, path, ...rest} = this.props;
 		let {node, key: propName} = path();
+		Assert(node instanceof Node, `Prop "node" must be of type Node.`);
 		return (
 			<VSwitch {...rest} value={node[propName]} onChange={val=> {
 				node[propName] = val;

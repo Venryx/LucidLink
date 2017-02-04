@@ -5,16 +5,37 @@ import moment from "moment";
 import {View, Text} from "react-native";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import {GraphOverlay, EventRenderInfo} from "./GraphOverlay";
-import {Assert, Notify, WaitXThenRun} from "../../../Frame/Globals";
+import {Assert, Notify, WaitXThenRun, WaitXThenRun_BuiltIn} from "../../../Frame/Globals";
 
 export default class GraphOverlayUI extends Component<
 		{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number, events: Event[], overlay: GraphOverlay}, {}> {
+	constructor(props) {
+		super(props);
+		// for some absurd reason, this crashes as a class method
+		// (causing bizarre "Attempted to assign to readonly property." error in React.Component constructor)
+		this.PostRender = ()=> {
+			// if some of the event-boxes aren't ready, wait 1 second then retry
+			if (this.eventBoxes.length != this.props.events.length || this.eventBoxes.Any(a=>a == null || a.firstRect == null))
+				return WaitXThenRun_BuiltIn(1000, ()=>(this as any).PostRender());
+				//return WaitXThenRun(1000, ()=>this.OnLayout());*/
+
+			//Log("Starting position-fix phase.");
+			//for (let eventBox of this.eventBoxes.OrderBy(a=>a.props.x)) {
+			for (let eventBox of this.eventBoxes) {
+				if (eventBox == null) continue;
+				// if first-rects were already ready, cancel since event-boxes were already repositioned
+				//if (eventBox.firstRectsReady) break;
+				eventBox.firstRectsReady = true;
+				eventBox.forceUpdate();
+			}
+		};
+	}
+	
 	render() {
 		var {startTime, endTime, width, height, events, overlay} = this.props;
-		
 		//WaitXThenRun(0, ()=>this.OnLayout());
 
-		//this.eventBoxes = [];
+		this.eventBoxes = [];
 		return (
 			<View style={{position: "absolute", left: 0, top: 0, width, height}}>
 				{events.map((event, index)=> {
@@ -24,15 +45,8 @@ export default class GraphOverlayUI extends Component<
 					var percentFromLeftToRight = event.date.diff(startTime) / endTime.diff(startTime);
 					var x = percentFromLeftToRight * width;
 
-					var compCache = null;
 					return <EventBox key={index}
-						ref={comp=> {
-							if (comp)
-								this.eventBoxes.push(comp)
-							else
-								this.eventBoxes.Remove(compCache);
-							compCache = comp;
-						}}
+						ref={comp=>this.eventBoxes[index] = comp}
 						parent={this} rowHeight={height}
 						{...{overlay, event, x, renderInfo}}/>;
 				})}
@@ -41,26 +55,39 @@ export default class GraphOverlayUI extends Component<
 	}
 
 	eventBoxes: EventBox[] = [];
-	PostRender() {
+	/*PostRender() {
 	//OnLayout() {
 		// if some of the event-boxes aren't ready, wait 1 second then retry
-		if (this.eventBoxes.length != this.props.events.length || this.eventBoxes.Any(a=>a.firstRect == null))
+		if (this.eventBoxes.length != this.props.events.length || this.eventBoxes.Any(a=>a && a.firstRect == null))
 			return WaitXThenRun(1000, ()=>this.PostRender());
-			//return WaitXThenRun(1000, ()=>this.OnLayout());
-		
+			//return WaitXThenRun(1000, ()=>this.OnLayout());*/
+
 		//Log("Starting position-fix phase.");
 		//for (let eventBox of this.eventBoxes.OrderBy(a=>a.props.x)) {
-		for (let eventBox of this.eventBoxes) {
+		/*for (let eventBox of this.eventBoxes) {
 			// if first-rects were already ready, cancel since event-boxes were already repositioned
 			//if (eventBox.firstRectsReady) break;
 			eventBox.firstRectsReady = true;
-			eventBox.forceUpdate();
+			//eventBox.forceUpdate();
 		}
-	}
+	}*/
 }
 
 class EventBox extends Component<
 		{parent: GraphOverlayUI, rowHeight: number, event: Event, x: number, renderInfo: EventRenderInfo}, {}> {
+	constructor(props) {
+		super(props);
+		this.PostRender = ()=> {
+			if (this.firstRect) return;
+			this.root.measure((ox, oy, width, height, x, y) => {
+				//Notify("Hi" + ox + ";" + oy + ";" + width + ";" + height + ";" + px + ";" + py);
+				if (width > 1)
+					this.firstRect = new VRect(x, y, width, height);
+				//Log("Getting first-render rect:" + this.firstRect);
+			});
+		};
+	}
+
 	firstRectsReady = false;
 	root: View;
 	render() {
@@ -70,7 +97,7 @@ class EventBox extends Component<
 		var rect = new VRect(x, (rowHeight - 25) - textHeight, this.firstRect ? this.firstRect.width : 1, textHeight);
 		if (this.firstRectsReady) {
 			//var otherBoxes = parent.eventBoxes.Except(this); //.Where(a=>a.firstRect);
-			var earlierBoxes = parent.eventBoxes.Where(a=>a.props.x < x);
+			var earlierBoxes = parent.eventBoxes.Where(a=>a && a.props.x < x);
 			while (earlierBoxes.Any(a=>a.firstRect.Intersects(rect)) && rect.y > 0)
 				rect = rect.NewY(y=>y - textHeight);
 
@@ -97,7 +124,7 @@ Our fixed rect: ${rect}`);*/
 		this.firstRect = new VRect(x, y, width, height);
 		//Log("Getting first-render rect:" + this.firstRect);
 	}*/
-	PostRender() {
+	/*PostRender() {
 		if (this.firstRect) return;
 		this.root.measure((ox, oy, width, height, x, y) => {
 			//Notify("Hi" + ox + ";" + oy + ";" + width + ";" + height + ";" + px + ";" + py);
@@ -105,5 +132,5 @@ Our fixed rect: ${rect}`);*/
 				this.firstRect = new VRect(x, y, width, height);
 			//Log("Getting first-render rect:" + this.firstRect);
 		});
-	}
+	}*/
 }
