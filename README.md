@@ -1,5 +1,5 @@
 # LucidLink
-Below is an overview of the tools provided:
+Features:
 * Dream journal
 * Random-voice-prompt engine
 * Muse eeg monitor

@@ -44,7 +44,7 @@ public class MainApplication extends Application implements ReactApplication {
 				new Main_ReactPackage(),
 				new RNFSPackage(),
 				new FilePickerPackage(),
-				new OrientationPackage(),
+				//new OrientationPackage(),
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
 				new LibMuse(),

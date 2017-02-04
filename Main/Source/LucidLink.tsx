@@ -24,7 +24,6 @@ import {Component} from "react";
 import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter} from "react-native";
 var {Keyboard} = require("react-native");
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
-import Orientation from "react-native-orientation";
 //import Moment from "moment";
 var Moment = require("moment");
 import ScrollableTabView from "react-native-scrollable-tab-view";
@@ -72,12 +71,14 @@ DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
 });
 
 var g: any = global;
+
+/*import Orientation from "react-native-orientation";
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
 	if (LL && LL.ui)
 		LL.ui.forceUpdate();
-});
+});*/
 
 g.appState = AppState.currentState;
 AppState.addEventListener("change", appState=> {
