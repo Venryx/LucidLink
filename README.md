@@ -1,9 +1,9 @@
 # LucidLink
 Below is an overview of the tools provided:
-* dream journal
-* random-voice-prompt engine
-* muse eeg monitor
-* user scripts
+* Dream journal
+* Random-voice-prompt engine
+* Muse eeg monitor
+* User scripts
 
 Task list can be found here: https://trello.com/b/2ZYLJ2l1/lucid-link
 
