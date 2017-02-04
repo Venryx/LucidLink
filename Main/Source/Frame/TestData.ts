@@ -1,5 +1,6 @@
-import { FromVDF } from './Globals';
+import {FromVDF, FromVDFToNode, FromVDFNode} from "./Globals";
 import {LL} from "../LucidLink";
+import {VDFNode} from "../Packages/VDF/VDFNode";
 // #mms: renamed StartData
 export default class TestData {
     static LoadInto(ld) {
@@ -12,8 +13,9 @@ LucidLink>{^}
 	more:More>{^}
 		jsCode:""
 `.trim();
-		var ll = FromVDF(vdf);
-		for (var propName in ll) {
+		var node: VDFNode = FromVDFToNode(vdf);
+		var ll = FromVDFNode(node);
+		for (var propName of node.mapChildren.keys as any[]) {
 			LL[propName] = ll[propName];
 		}
 	}

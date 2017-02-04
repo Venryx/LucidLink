@@ -162,15 +162,16 @@ export async function Init(ui) {
 	LL = new LucidLink();
 	g.LL = LL; // also make global, for debugging
 	LL.ui = ui;
-	var mainDataVDF = await LL.RootFolder.GetFile("MainData.vdf").ReadAllText();
+
+	var mainDataFile = LL.RootFolder.GetFile("MainData.vdf");
+	var mainDataVDF = await mainDataFile.Exists() && await mainDataFile.ReadAllText();
 	if (mainDataVDF) {
 		var node = FromVDFToNode(mainDataVDF, "LucidLink");
 		var data = FromVDFNode(node, "LucidLink");
 		for (var propName of node.mapChildren.keys) {
 			LL[propName] = data[propName];
 		}
-	}
-	else {
+	} else {
 		TestData.LoadInto(LL);
 	}
 

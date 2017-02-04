@@ -16,11 +16,13 @@ Object.defineProperty(Object.prototype, "_AddItem", { // note; these functions s
 	value: function(name, value, forceAdd) {
 		if (this[name])
 			delete this[name];
-		if (!this[name] || forceAdd) // workaround for some properties not being deleted
+		if (!this[name] || forceAdd) { // workaround for some properties not being deleted
 			Object.defineProperty(this, name, {
+				configurable: true, // for some reason, we get an error otherwise in non-dev mode (same for below)
 				enumerable: false,
 				value: value
 			});
+		}
 	}
 });
 interface Object { _AddFunction: (name: string, func: Function)=>void; }
@@ -37,11 +39,11 @@ Object.prototype._AddFunction("_AddGetterSetter", function(name, getter, setter)
 		delete this[name];
 	if (!this[name]) // workaround for some properties not being deleted
 		if (getter && setter)
-			Object.defineProperty(this, name, {enumerable: false, get: getter, set: setter});
+			Object.defineProperty(this, name, {configurable: true, enumerable: false, get: getter, set: setter});
 		else if (getter)
-			Object.defineProperty(this, name, {enumerable: false, get: getter});
+			Object.defineProperty(this, name, {configurable: true, enumerable: false, get: getter});
 		else
-			Object.defineProperty(this, name, {enumerable: false, set: setter});
+			Object.defineProperty(this, name, {configurable: true, enumerable: false, set: setter});
 });
 
 // the below lets you do stuff like this: Array.prototype._AddFunction_Inline = function AddX(value) { this.push(value); }; [].AddX = "newItem";
