@@ -195,9 +195,11 @@ export class BaseComponent<P, S> extends Component<P, S> {
 }
 //global.Extend({Component2: Component, BaseComponent: Component});
 
-export interface BasicStyles_Props {
+export interface BaseProps {
 	ml?; mr?; mt?; mb?;
 	pl?; pr?; pt?; pb?;
+
+	tabLabel?: string; active?: boolean;
 }
 export function BasicStyles(props) {
 	var result: any = {};

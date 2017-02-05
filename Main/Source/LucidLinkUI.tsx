@@ -1,6 +1,6 @@
 import {LL, Init} from "./LucidLink";
 import {BaseComponent as Component, Panel} from "./Frame/ReactGlobals";
-import {JavaBridge} from "./Frame/Globals";
+import {JavaBridge, Log} from "./Frame/Globals";
 import {TrackerUI} from "./LucidLink/Tracker";
 import {JournalUI} from "./LucidLink/Journal";
 import {ScriptsUI} from "./LucidLink/Scripts";
@@ -23,7 +23,7 @@ export default class LucidLinkUI extends Component<{}, {}> {
 
     render() {
 		// if main-data not yet loaded, render blank ui
-		if (LL.mainDataLoaded == false) {
+		if (LL == null || LL.mainDataLoaded == false) {
 			var marker = null;
 			return (
 				<ScrollableTabView style_disabled={{flex: 1}}

@@ -1,4 +1,4 @@
-import {BaseComponent as Component, BasicStyles, BasicStyles_Props, Row} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, BasicStyles, BaseProps, Row} from "../../Frame/ReactGlobals";
 import {observer} from "mobx-react/native";
 import {View, Text, Switch} from "react-native";
 import {Assert, E} from "../../Frame/Globals";
@@ -6,7 +6,7 @@ import NumberPicker from "../ReactNativeComponents/NumberPicker";
 import Node from "../VTree/Node";
 
 @observer
-export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BasicStyles_Props, {}> {
+export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BaseProps, {}> {
 	render() {
 		var {text, value, onChange, style, containerStyle, ...rest} = this.props;
 

@@ -1,10 +1,14 @@
 package v.lucidlink;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Debug;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -46,9 +50,16 @@ public class Main extends ReactContextBaseJavaModule {
 
 		main = this;
 		this.reactContext = reactContext;
+
+		MainActivity.main.EnsurePermissionsGranted();
     }
 	ReactApplicationContext reactContext;
 	public boolean firstLaunch;
+
+	@ReactMethod
+	public void ArePermissionsGranted(Promise promise) {
+		promise.resolve(MainActivity.main.ArePermissionsGranted());
+	}
 
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();

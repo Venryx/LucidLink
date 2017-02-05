@@ -37,7 +37,7 @@ export default class DreamUI extends Component<{onBack: Function, dream: Dream},
 							dream.date = dream.date.clone().set({hour, minute});
 							this.forceUpdate();
 						}}/>
-					<VSwitch_Auto text="Lucid" path={()=>dream.p.lucid} onChange={this.Update}/>
+					<VSwitch_Auto text="Lucid" path={()=>dream.p.lucid} onChange={()=>this.Update()}/>
 				</Row>
 				<Row>
 					<TextInput style={{flex: 1}} editable={true} value={dream.name}

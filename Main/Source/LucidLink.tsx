@@ -159,6 +159,9 @@ import KeepAwake from "react-native-keep-awake";
 export async function Init(ui) {
 	try {
 
+	var permissionsGranted = await JavaBridge.Main.ArePermissionsGranted();
+	if (!permissionsGranted) return;
+
 	LL = new LucidLink();
 	g.LL = LL; // also make global, for debugging
 	LL.ui = ui;

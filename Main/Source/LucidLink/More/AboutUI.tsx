@@ -7,8 +7,6 @@ export default class AboutUI extends Component<any, any> {
 		return (
 			<Panel style={{flex: 1, flexDirection: "column", backgroundColor: colors.background}}>
 				<Text style={styles.text}>{`
-"Monitors Muse headband EEG data, and triggers user-scripted events (eg audio) when REM sleep is detected."
-
 Author: Stephen Wicklund (Venryx)
 License: MIT (open source)
 GitHub repository: https://github.com/Venryx/LucidLink

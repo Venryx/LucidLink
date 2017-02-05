@@ -1,4 +1,4 @@
-import {BaseComponent as Component, Column, Row, VButton} from "../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Row, VButton, BaseProps} from "../Frame/ReactGlobals";
 import DialogAndroid from "react-native-dialogs";
 import Moment from "moment";
 
@@ -92,7 +92,7 @@ export class Journal extends Node {
 }
 g.Extend({Journal});
 
-export class JournalUI extends Component<{}, {month?, openDream?}> {
+export class JournalUI extends Component<{} & BaseProps, {month?, openDream?}> {
 	state = {month: Moment(new Date().MonthDate), openDream: null};
 
 	loadedMonths = [];
