@@ -5,7 +5,7 @@ Features:
 * Muse eeg monitor
 * User scripts
 
-Download page: https://play.google.com/store/apps/details?id=v.lucidlink
+Download page: https://play.google.com/store/apps/details?id=v.lucidlink  
 Task list: https://trello.com/b/2ZYLJ2l1/lucid-link
 
 ### Prepare
