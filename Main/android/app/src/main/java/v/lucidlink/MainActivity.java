@@ -40,34 +40,10 @@ public class MainActivity extends ReactActivity {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		if (requestCode == REQUEST_WRITE_STORAGE) {
 			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				Restart();
+				recreate();
 			} else {
 				V.Toast("The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG);
 			}
-		}
-	}
-
-	public void Restart() {
-		//recreate();
-		/*Intent intent = getIntent();
-		finish();
-		startActivity(intent);*/
-		/*Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(i);*/
-		LoadBundle();
-	}
-	void LoadBundleLegacy() {
-		final Activity currentActivity = this;
-		// The currentActivity can be null if it is backgrounded / destroyed, so we simply no-op to prevent any null pointer exceptions.
-		if (currentActivity == null) return;
-		currentActivity.runOnUiThread(()->currentActivity.recreate());
-	}
-	private void LoadBundle() {
-		try {
-			new Handler(Looper.getMainLooper()).post(()->LoadBundleLegacy());
-		} catch (Exception e) {
-			LoadBundleLegacy();
 		}
 	}
 
