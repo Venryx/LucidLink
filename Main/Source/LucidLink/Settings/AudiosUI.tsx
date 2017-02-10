@@ -10,7 +10,7 @@ export default class AudiosUI extends BaseComponent<any, {}> {
 	render() {
 		var node = LL.settings;
 		return (
-			<Column style={{flex: 1, backgroundColor: colors.background}}>
+			<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
 				{node.audioFiles.map((audioFile, index)=> {
 					return (
 						<Row key={index} height={35}>

@@ -156,7 +156,7 @@ export class RVPUI extends Component<any, any> {
 		var node = LL.tools.rvp;
 		return (
 			<ScrollView style={{flex: 1, flexDirection: "column"}}>
-				<Row style={{flex: 1, flexDirection: "column", paddingLeft: 12}}>
+				<Row style={{flex: 1, flexDirection: "column", padding: 10}}>
 					<Row height={30}>
 						<VText mt2 mr10>Enabled: </VText>
 						<VSwitch_Auto path={()=>node.p.enabled}/>

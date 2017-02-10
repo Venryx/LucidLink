@@ -42,7 +42,7 @@ export default class GeneralUI extends Component<any, {}> {
 		var node = LL.settings;
 		return (
 			<Panel style={{flex: 1, backgroundColor: colors.background}}>
-				<Row style={{flex: 1, flexDirection: "column", paddingLeft: 12}}>
+				<Row style={{flex: 1, flexDirection: "column", padding: 10}}>
 					<Row height={30}>
 						<VText mt2 mr10>Apply scripts on launch</VText>
 						<VSwitch_Auto path={()=>node.p.applyScriptsOnLaunch}/>

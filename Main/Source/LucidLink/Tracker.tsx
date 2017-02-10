@@ -3,7 +3,7 @@ import {Script} from "./Scripts/Script";
 import {Session} from "./Tracker/Session";
 import ScriptRunner from "./Scripts/ScriptRunner";
 import {BaseComponent} from "../Frame/ReactGlobals";
-var Moment = require("moment");
+import Moment from "moment";
 
 import GraphUI from "./Tracker/Graph/GraphUI";
 import ListUI from "./Tracker/ListUI";

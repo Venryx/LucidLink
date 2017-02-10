@@ -61,13 +61,15 @@ public class MainActivity extends ReactActivity {
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
-		Main.main.SendEvent("OnKeyDown", keyCode);
+		char keyChar = (char)event.getUnicodeChar();
+		Main.main.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
 		if (Main.main.blockUnusedKeys)
 			return true;
 		return super.onKeyDown(keyCode, event);
 	}
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		Main.main.SendEvent("OnKeyUp", keyCode);
+		char keyChar = (char)event.getUnicodeChar();
+		Main.main.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
 		if (Main.main.blockUnusedKeys)
 			return true;
 		return super.onKeyUp(keyCode, event);

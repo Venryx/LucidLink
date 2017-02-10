@@ -244,7 +244,7 @@ export class Row extends BaseComponent<any, any> {
 		height = height != null ? height : (style||{}).height;
 		var otherProps = this.props.Excluding(style, height, children);
 		return (
-			<Panel {...otherProps} style={E({flexDirection: "row", padding: 3}, BasicStyles(this.props), style,
+			<Panel {...otherProps} style={E({flexDirection: "row"}, BasicStyles(this.props), style,
 					//height != null ? {height} : {flex: 1})}>
 					height != null && {height})}>
 				{children}
@@ -257,7 +257,7 @@ export class RowLR extends BaseComponent<any, any> {
 		var {height, leftStyle, rightStyle, children} = this.props;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<Panel style={E({flexDirection: "row", padding: 3}, BasicStyles(this.props), height != null && {height})}>
+			<Panel style={E({flexDirection: "row"}, BasicStyles(this.props), height != null && {height})}>
 				<Panel style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
 				</Panel>
@@ -317,7 +317,7 @@ export class VText extends BaseComponent<any, any> {
 	}
 }
 
-export class VButton extends BaseComponent<any, any> {
+export class VButton extends BaseComponent<any, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;

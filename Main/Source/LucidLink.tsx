@@ -57,14 +57,15 @@ DeviceEventEmitter.addListener("PostJavaLog", (args: any)=> {
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", (args: any)=> {
 	try {
-		var [keyCode] = args;
+		var [keyCode, keyChar] = args;
 		Log("keyboard", "KeyDown: " + keyCode);
 		LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
+		LL.journal.OnKeyDown(keyCode, keyChar);
 	} catch (ex) {}
 });
 DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
 	try {
-		var [keyCode] = args;
+		var [keyCode, keyChar] = args;
 		Log("keyboard", "KeyUp: " + keyCode);
 		LL.scripts.scriptRunner.TriggerKeyUp(keyCode);
 	} catch (ex) {}

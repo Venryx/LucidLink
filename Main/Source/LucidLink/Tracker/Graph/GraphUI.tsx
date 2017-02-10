@@ -1,4 +1,4 @@
-import {BaseComponent as Component, Column, Panel, Row, VButton, VText} from "../../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, VText, BaseProps} from "../../../Frame/ReactGlobals";
 import {colors, styles} from "../../../Frame/Styles";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import Drawer from "react-native-drawer";
@@ -17,7 +17,7 @@ import {Notify} from "../../../Frame/Globals";
 import {Session} from "../Session";
 
 @observer
-export default class GraphUI extends Component<{session: Session}, {}> {
+export default class GraphUI extends Component<{} & BaseProps, {}> {
 	leftPanel = null;
 	ToggleLeftPanelOpen() {
 		if (this.leftPanel._open)
@@ -27,7 +27,6 @@ export default class GraphUI extends Component<{session: Session}, {}> {
 	}
 
 	render() {
-		var {session} = this.props;
 		var node = LL.tracker;
 		
 		const drawerStyles = {
@@ -66,7 +65,7 @@ export default class GraphUI extends Component<{session: Session}, {}> {
 						<VButton text="Refresh" ml3 mt5 style={{width: 100, height: 32}} onPress={()=>this.chart.Refresh()}/>
 					</Row>
 					<Row style={{marginTop: -7, flex: 1}}>
-						<ChartsUI ref={c=>this.chart = c} session={session}/>
+						<ChartsUI ref={c=>this.chart = c}/>
 					</Row>
 				</Column>
 			</Drawer>
@@ -77,7 +76,7 @@ export default class GraphUI extends Component<{session: Session}, {}> {
 }
 
 @observer
-class ChartsUI extends Component<any, any> {
+class ChartsUI extends Component<{}, {}> {
 	state = {width: -1, height: -1};
 
 	ComponentDidMountOrUpdate() {
@@ -89,7 +88,6 @@ class ChartsUI extends Component<any, any> {
 	}
 	
     render() {
-		var {session} = this.props;
 		var {width, height} = this.state;
 		var node = LL.tracker;
 
