@@ -90,9 +90,11 @@ export class Journal extends Node {
 	constructor() {
 		super();
 		autorun(()=> {
-			// if we're loading draft-dream from last session, reset date to now (since info lost)
-			if (this.draftDream && this.draftDream.date == null)
+			// if we're loading draft-dream from last session, restore data to correct state (since info lost)
+			if (this.draftDream && this.draftDream.date == null) {
 				this.draftDream.date = Moment();
+				this.draftDream.fileOutdated = true;
+			}
 		});
 	}
 
@@ -192,7 +194,7 @@ export class JournalUI extends Component<{} & BaseProps, {month?, openDream?}> {
 
 		return (
 			<Column>
-				<Row>
+				<Row style={{padding: 3}}>
 					<VButton text="<" style={{width: 100}} onPress={()=>this.ShiftMonth(-1)}/>
 					<VButton text={Moment(month).format("MMMM, YYYY")} style={{flex: 1, marginLeft: 5, marginRight: 5}}
 						onPress={async ()=> {
@@ -234,9 +236,10 @@ class DreamHeaderUI extends Component<{parent, dream: Dream, index, style?}, {}>
 					style={E({backgroundColor: "#555", height: 100, borderRadius: 10, padding: 7}, index != 0 && {marginTop: 5})}
 					onPress={()=>parent.setState({openDream: dream})}>
 				<Row style={{marginTop: -3}}>
-					{dream.name && <Text style={{fontSize: 18, marginRight: 5}}>{dream.name}</Text>}
-					{dream.Draft && <Text style={{fontSize: 18, marginRight: 5}}>(draft)</Text>}
-					{dream.fileOutdated && <Text style={{fontSize: 18, color: "rgb(255,100,100)", marginRight: 5}}>(unsaved changes)</Text>}
+					{dream.name && <Text style={{marginRight: 5, fontSize: 18}}>{dream.name}</Text>}
+					{dream.Draft && <Text style={{marginRight: 5, fontSize: 18, color: "rgb(255,255,100)"}}>(draft)</Text>}
+					{!dream.Draft && dream.fileOutdated &&
+						<Text style={{marginRight: 5, fontSize: 18, color: "rgb(255,100,100)"}}>(unsaved changes)</Text>}
 				</Row>
 				<Text style={{marginTop: dream.name || dream.Draft || dream.fileOutdated ? -25 : 0, fontSize: 18, textAlign: "right"}}>
 					{dream.date.format("YYYY-MM-DD, HH:mm")}

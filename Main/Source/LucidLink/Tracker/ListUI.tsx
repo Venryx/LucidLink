@@ -1,4 +1,4 @@
-import {BaseComponent as Component, Column, Row, VButton} from '../../Frame/ReactGlobals';
+import {BaseComponent as Component, Column, Row, VButton} from "../../Frame/ReactGlobals";
 import {Observer, observer} from "mobx-react/native";
 var Moment = require("moment");
 
@@ -40,7 +40,7 @@ export default class ListUI extends Component<any, any> {
 
 		return (
 			<Column>
-				<Row>
+				<Row style={{padding: 3}}>
 					<VButton text="<" style={{width: 100}} onPress={()=>this.ShiftMonth(-1)}/>
 					<VButton text={Moment(month).format("MMMM, YYYY")} ml5 style={{flex: 1}}
 						onPress={async ()=> {

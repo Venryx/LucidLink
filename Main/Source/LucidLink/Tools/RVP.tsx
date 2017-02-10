@@ -223,7 +223,7 @@ export class RVPUI extends Component<any, any> {
 						<VSwitch_Auto path={()=>node.p.backgroundMusic_enabled}/>
 					</Row>
 					{node.backgroundMusic_enabled &&
-						<Row style={{backgroundColor: colors.background_dark, flexDirection: "column"}}>
+						<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
 							<Row>
 								<VText mt5 mr10>Volume: </VText>
 								<NumberPicker_Auto path={()=>node.p.backgroundMusic_volume}
