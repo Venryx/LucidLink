@@ -15,5 +15,6 @@
             </intent-filter>
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
+        <service android:name="com.resmed.refresh.bluetooth.RefreshBluetoothService" android:process=":RefreshBluetoothService"/>
     </application>
 </manifest>

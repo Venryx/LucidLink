@@ -6,7 +6,7 @@ import java.util.*;
 
 public class RM20DefaultManager implements RM20Manager
 {
-	private RM20JNI rm20Lib;
+	public RM20JNI rm20Lib;
 	private Thread writerThread;
 
 	public RM20DefaultManager(final File file, final RM20Callbacks rm20Callbacks, final Context context) {
@@ -99,9 +99,9 @@ public class RM20DefaultManager implements RM20Manager
 		}
 	}
 
-	public int startupLibrary(final int n, final int n2) {
+	public int startupLibrary(final int age, final int gender) {
 		synchronized (this) {
-			return this.rm20Lib.startupLibrary(n, n2);
+			return this.rm20Lib.startupLibrary(age, gender);
 		}
 	}
 

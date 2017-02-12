@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import v.lucidlink.V;
+
 public class RM20JNI {
 	public static final String rm20JniVer = "1.0.2";
 	private RM20Callbacks callbacks;
@@ -42,57 +44,59 @@ public class RM20JNI {
 	}
 
 	public static void loadLibrary(Context context) {
-		String string;
-		Boolean bl = false;
-		AssetManager assetManager = context.getResources().getAssets();
+		/*String string = null;
 		try {
-			String string2;
-			string = string2 = new BufferedReader(new InputStreamReader(context.openFileInput("libVerRm20.txt"))).readLine();
+			string = new BufferedReader(new InputStreamReader(context.openFileInput("libVerRm20.txt"))).readLine();
 		}
 		catch (IOException var3_5) {
 			var3_5.printStackTrace();
-			string = null;
 		}
+		Boolean libExistsAndUpToDate = false;
 		if (string != null && string.trim().compareTo("1.0.2") == 0) {
-			bl = true;
+			libExistsAndUpToDate = true;
 		}
-		if (!bl.booleanValue()) {
-			byte[] arrby;
-			arrby = new byte[1024];
+
+		if (!libExistsAndUpToDate) {
+			AssetManager assetManager = context.getResources().getAssets();
+
+			byte[] libBytes = new byte[1024];
 			try {
 				InputStream inputStream = assetManager.open(String.valueOf(Build.CPU_ABI) + "/librm20-jni.so", 3);
 				FileOutputStream fileOutputStream = context.openFileOutput("librm20-jni.so", 0);
 				do {
 					int n;
-					if ((n = inputStream.read(arrby)) <= 0) {
+					if ((n = inputStream.read(libBytes)) <= 0) {
 						inputStream.close();
 						fileOutputStream.close();
 						break;
 					}
-					fileOutputStream.write(arrby, 0, n);
+					fileOutputStream.write(libBytes, 0, n);
 				} while (true);
 			}
 			catch (IOException var6_10) {
 				var6_10.printStackTrace();
 			}
+
 			try {
 				InputStream inputStream = assetManager.open("libVerRm20.txt", 3);
 				FileOutputStream fileOutputStream = context.openFileOutput("libVerRm20.txt", 0);
 				do {
 					int n;
-					if ((n = inputStream.read(arrby)) <= 0) {
+					if ((n = inputStream.read(libBytes)) <= 0) {
 						inputStream.close();
 						fileOutputStream.close();
 						break;
 					}
-					fileOutputStream.write(arrby, 0, n);
+					fileOutputStream.write(libBytes, 0, n);
 				} while (true);
 			}
 			catch (IOException var7_14) {
 				var7_14.printStackTrace();
 			}
-		}
-		System.load(context.getFilesDir() + "/librm20-jni.so");
+		}*/
+
+		//System.load(context.getFilesDir() + "/librm20-jni.so");
+		System.load(context.getApplicationInfo().nativeLibraryDir + "/librm20-jni.so");
 	}
 
 	public native int disableSmartAlarm();
@@ -108,9 +112,11 @@ public class RM20JNI {
 	public native UserInfo getUserInfo();
 
 	public void onLibraryStarted(int n) {
+		V.Log("Library started: " + n);
 	}
 
 	public void onRealTimeSleepState(int n, int n2) {
+		V.Log("Test1: " + n);
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20RealTimeSleepState(n, n2);
 	}
@@ -121,11 +127,13 @@ public class RM20JNI {
 	}
 
 	public void onValidBreathingRate(float f, int n) {
+		V.Log("Test2: " + n);
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20ValidBreathingRate(f, n);
 	}
 
 	public void onWroteSample(int n) {
+		V.Log("Test3: " + n);
 	}
 
 	public native SleepParams resultsForSession();
@@ -134,6 +142,7 @@ public class RM20JNI {
 
 	public native int setSmartAlarm(int var1, int var2, boolean var3);
 
+	// starts streaming the raw data over (I think you have to connect through bluetooth first)
 	public native int startupLibrary(int var1, int var2);
 
 	public native int stopAndCalculate();

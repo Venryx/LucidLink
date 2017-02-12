@@ -34,6 +34,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
+import v.lucidlink.LL;
+import v.lucidlink.LucidLinkModule;
+import v.lucidlink.MainActivity;
+import v.lucidlink.MainApplication;
+
 public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks {
 	public static String ParamAlarmFireEpoch = "alarmFireEpoch";
 	public static String ParamNumberOfBioSamples = "nrOfBioSamples";
@@ -50,7 +55,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	private int nrOfEnvSamples = 0;
 	private int rm20AlarmWindow;
 	private Date rm20Alarmtime;
-	private RM20Manager rm20Manager;
+	public RM20DefaultManager rm20Manager;
 	private List<BioSample> sampleBuffer;
 	private RefreshBluetoothServiceClient serviceHandler;
 	private long sessionId;
@@ -546,8 +551,11 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.sessionId = sessionId;
 		this.isActive = true;
 		//this.setRM20AlarmTime(new Date(SmartAlarmDataManager.getInstance().getAlarmDateTime()), SmartAlarmDataManager.getInstance().getWindowValue());
-		(this.rm20Manager = (RM20Manager) new RM20DefaultManager(this.filesFolder, (RM20Callbacks) this, this.serviceHandler.getContext().getApplicationContext())).startupLibrary(n, n2);
+
+		this.rm20Manager = new RM20DefaultManager(this.filesFolder, (RM20Callbacks) this, this.serviceHandler.getContext().getApplicationContext());
+		this.rm20Manager.startupLibrary(n, n2);
 		this.rm20Manager.startRespRateCallbacks(true);
+
 		Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager::recoverSession(" + sessionId + ")");
 		final RstEdfMetaData metaData = new RstEdfMetaData();
 		final File fileByName = RefreshTools.findFileByName(this.filesFolder, "_" + sessionId + ".edf");
@@ -588,10 +596,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public RM20Manager rm20ManagerInstance() {
-		return this.rm20Manager;
-	}
-
 	public String rm20Version() {
 		return "0";
 	}
@@ -627,7 +631,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public void start(final long sessionId, final int n, final int n2) {
+	public void start(final long sessionId, final int age, final int gender) {
 		if (this.isActive) {
 			return;
 		}
@@ -653,7 +657,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, context);
 		//edfManager.openFileForMode("w"); // temp removed
 
-		this.rm20Manager.startupLibrary(n, n2);
+		this.rm20Manager.rm20Lib.loadLibrary(LL.main.reactContext); // custom
+
+		this.rm20Manager.startupLibrary(age, gender);
 		this.rm20Manager.startRespRateCallbacks(true);
 		AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel(context));
 	}

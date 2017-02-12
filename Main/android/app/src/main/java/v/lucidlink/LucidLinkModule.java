@@ -31,9 +31,6 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class LL {
-	public static LucidLinkModule main;
-}
 public class LucidLinkModule extends ReactContextBaseJavaModule {
     private static final String DURATION_SHORT_KEY = "SHORT";
     private static final String DURATION_LONG_KEY = "LONG";
@@ -50,7 +47,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 
 		MainActivity.main.EnsurePermissionsGranted();
     }
-	ReactApplicationContext reactContext;
+	public ReactApplicationContext reactContext;
 	public boolean firstLaunch;
 
 	@ReactMethod

@@ -2,7 +2,13 @@ package SPlus;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Environment;
 import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -18,10 +24,17 @@ import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.sleepsession.SleepSessionManager;
 import com.resmed.refresh.ui.uibase.app.RefreshApplication;
+import com.resmed.rm20.IndexActivity;
+import com.resmed.rm20.RM20Callbacks;
+import com.resmed.rm20.RM20JNI;
+import com.resmed.rm20.SleepParams;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
+import v.lucidlink.MainActivity;
 import v.lucidlink.V;
 
 enum MessageType {
@@ -102,10 +115,13 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
-		RefreshApplication refreshApp = new RefreshApplication();
-		RefreshApplication.instance = refreshApp;
+		/*RefreshApplication refreshApp = new RefreshApplication();
+		RefreshApplication.instance = refreshApp;*/
 
-		RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
+		//RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
+		Intent myIntent = new Intent(reactContext, RefreshBluetoothService.class);
+		reactContext.startService(myIntent);
+
 		V.Log("Test2");
 		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {
 			@Override public Context getContext() {
@@ -113,37 +129,86 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 				return reactContext;
 			}
 			@Override public void handlePacket(VLP.VLPacket vlPacket) {
-				bluetoothService.handlePacket(vlPacket);
+				V.Log("in handlePacket...");
+				//bluetoothService.handlePacket(vlPacket);
 			}
 
 			@Override
 			public void sendConnectionStatus(CONNECTION_STATE paramCONNECTION_STATE) {
-
+				V.Log("in sendConnectionStatus");
 			}
 
 			@Override public void sendMessageToClient(Message message) {
+				V.Toast("Received message!" + message.getData());
 				MessageType type = MessageType.GetEntry(message.what);
 				if (type == MessageType.OnRm20RealTimeSleepState) {
 					V.Toast("Received OnRm20RealTimeSleepState message!" + message.getData());
 				}
 
-				bluetoothService.sendMessageToClient(message);
+				//bluetoothService.sendMessageToClient(message);
 			}
 		});
 		V.Log("Test3");
-	}
 
+		/*this.rm20Lib = new RM20JNI(Environment.getExternalStorageDirectory(), new RM20Callbacks() {
+			@Override
+			public void onRm20RealTimeSleepState(int paramInt1, int paramInt2) {
+				V.Log("Received onRm20RealTimeSleepState data!" + paramInt1 + ";" + paramInt2);
+			}
 
-	@ReactMethod void Connect() {
-		int sessionID = -1;
-		baseManager.start(sessionID, -1, -1);
+			@Override
+			public void onRm20ValidBreathingRate(float paramFloat, int paramInt) {
+				V.Log("Received onRm20ValidBreathingRate data!" + paramFloat + ";" + paramInt);
+			}
+		}, MainActivity.main.getApplicationContext());
+		this.rm20Lib.loadLibrary(MainActivity.main.getApplicationContext());
+		V.Log("Loading...");
+		V.WaitXThenRun(5000, ()-> {
+			V.Log("Starting...");
+			this.rm20Lib.startupLibrary(34, 1);
+			this.rm20Lib.setRespRateCallbacks(true);
+
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					Random var1 = new Random();
+
+					for(int var2 = 0; var2 < 10000; ++var2) {
+						int var3 = var1.nextInt(1000);
+						int var4 = var1.nextInt(1000);
+						SPlusModule.this.rm20Lib.writeSampleData(var3, var4);
+
+						try {
+							Thread.sleep(5L);
+						} catch (InterruptedException var10) {
+							var10.printStackTrace();
+						}
+					}
+
+					SPlusModule.this.rm20Lib.getEpochCount();
+					SPlusModule.this.rm20Lib.stopAndCalculate();
+					SleepParams var9 = SPlusModule.this.rm20Lib.resultsForSession();
+					V.Log(this.getClass().getName(), " results : " + var9);
+				}
+			}).start();
+		});*/
 	}
-	@ReactMethod void Disconnect() {
+	//protected RM20JNI rm20Lib;
+
+	@ReactMethod public void Connect() {
+		V.Log("Connecting...");
+		int sessionID = 70;
+		int age = 20;
+		int gender = 0; // 0: male, 1: female
+		//baseManager.rm20Manager.rm20Lib.loadLibrary(reactContext);
+		baseManager.start(sessionID, age, gender);
+	}
+	@ReactMethod public void Disconnect() {
 		baseManager.stop();
 	}
 
-	@ReactMethod void GetSleepStage(Promise promise) {
-		int stage = baseManager.rm20ManagerInstance().getRealTimeSleepState();
+	@ReactMethod public void GetSleepStage(Promise promise) {
+		int stage = baseManager.rm20Manager.getRealTimeSleepState();
 		promise.resolve(stage);
 	}
 }

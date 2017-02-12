@@ -21,7 +21,7 @@ public interface RM20Manager {
 
 	int startRespRateCallbacks(boolean paramBoolean);
 
-	int startupLibrary(int paramInt1, int paramInt2);
+	int startupLibrary(int age, int gender);
 
 	int stopAndCalculate();
 

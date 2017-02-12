@@ -88,7 +88,8 @@ public class V {
 	public static void Log(String tag, String message, boolean sendToJS) {
 		//Log.i(tag, message);
 		JavaLog(tag, message);
-		if (sendToJS)
+		//if (sendToJS)
+		if (sendToJS && LL.main != null)
 			LL.main.SendEvent("PostJavaLog", tag, message);
 	}
 

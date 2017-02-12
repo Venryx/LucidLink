@@ -23,6 +23,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+
 import com.google.gson.Gson;
 import com.resmed.cobs.COBS;
 import com.resmed.refresh.bed.BedCommandsRPCMapper;
@@ -44,6 +45,7 @@ import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.RefreshUserPreferencesData;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,10 +68,10 @@ class IncomingHandler extends Handler {
 	}
 
 	private void handlePartialStreamPacket(Bundle var1) {
-		if(var1 != null) {
+		if (var1 != null) {
 			byte[] var2 = var1.getByteArray("REFRESH_BED_NEW_DATA");
 
-			for(int var3 = 0; var3 < var2.length; ++var3) {
+			for (int var3 = 0; var3 < var2.length; ++var3) {
 				this.partialMsgBuffer.add(Byte.valueOf(var2[var3]));
 			}
 		}
@@ -80,14 +82,14 @@ class IncomingHandler extends Handler {
 		ByteBuffer var2 = ByteBuffer.allocate(this.partialMsgBuffer.size());
 		Iterator var3 = this.partialMsgBuffer.iterator();
 
-		while(var3.hasNext()) {
-			var2.put(((Byte)var3.next()).byteValue());
+		while (var3.hasNext()) {
+			var2.put(((Byte) var3.next()).byteValue());
 		}
 
 		this.partialMsgBuffer.clear();
 		Bundle var5 = new Bundle();
 		var5.putByteArray("REFRESH_BED_NEW_DATA", var2.array());
-		if(var1 != null) {
+		if (var1 != null) {
 			byte var6 = var1.getByte("REFRESH_BED_NEW_DATA_TYPE");
 			int var7 = var1.getInt("REFRESH_BED_NEW_DATA_SIZE");
 			var5.putByte("REFRESH_BED_NEW_DATA_TYPE", var6);
@@ -98,12 +100,12 @@ class IncomingHandler extends Handler {
 	}
 
 	public void handleMessage(Message var1) {
-		switch(var1.what) {
+		switch (var1.what) {
 			case 5:
 				this.this$0.handleStreamPacket(var1.getData());
 				return;
 			case 6:
-				CONNECTION_STATE var4 = (CONNECTION_STATE)var1.getData().get("REFRESH_BED_NEW_CONN_STATUS");
+				CONNECTION_STATE var4 = (CONNECTION_STATE) var1.getData().get("REFRESH_BED_NEW_CONN_STATUS");
 				Log.d("com.resmed.refresh.pair", "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + CONNECTION_STATE.toString(var4));
 				this.this$0.handleConnectionStatus(var4);
 				return;
@@ -150,7 +152,7 @@ class IncomingHandler extends Handler {
 				return;
 			case 27:
 				Bundle var6 = var1.getData();
-				if(var6 != null) {
+				if (var6 != null) {
 					int var7 = var6.getInt("BUNDLE_BED_AVAILABLE_DATA", -1);
 					this.this$0.updateDataStoredFlag(var7);
 					return;
@@ -171,39 +173,31 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	private static boolean connectingToBeD = false;
 	private static Messenger mService;
 	private static boolean userAllowBluetooth = true;
-	protected BroadcastReceiver awakePowerSaveReconnect = new BroadcastReceiver()
-	{
-		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent)
-		{
+	protected BroadcastReceiver awakePowerSaveReconnect = new BroadcastReceiver() {
+		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
 			Log.d("com.resmed.refresh.bluetooth.alarm", "BaseBluetoothActivity#AlarmReconnectReceiver::onReceive()");
 			BaseBluetoothActivity.this.bindToService();
 		}
 	};
 	private JsonRPC bioSensorSerialNrRPC;
 	protected Intent bluetoothManagerService;
-	protected BroadcastReceiver bluetoothServiceRestartReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent)
-		{
+	protected BroadcastReceiver bluetoothServiceRestartReceiver = new BroadcastReceiver() {
+		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
 			BaseBluetoothActivity.this.registerToService();
 		}
 	};
 	private boolean connectionProgressDisplayed = false;
-	protected BroadcastReceiver connectionStatusReceiver = new BroadcastReceiver()
-	{
-		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent)
-		{
-			CONNECTION_STATE connectionState = (CONNECTION_STATE)paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
+	protected BroadcastReceiver connectionStatusReceiver = new BroadcastReceiver() {
+		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
+			CONNECTION_STATE connectionState = (CONNECTION_STATE) paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
 			BaseBluetoothActivity.this.handleConnectionStatus(connectionState);
 		}
 	};
 	private CONNECTION_STATE currentState;
 	protected Menu mBarMenu;
 	protected boolean mBound;
-	private ServiceConnection mConnection = new ServiceConnection()
-	{
-		public void onServiceConnected(ComponentName paramAnonymousComponentName, IBinder paramAnonymousIBinder)
-		{
+	private ServiceConnection mConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName paramAnonymousComponentName, IBinder paramAnonymousIBinder) {
 			Log.d("com.resmed.refresh.ui", ": bluetooth service bound! : ");
 			BaseBluetoothActivity.mService = new Messenger(paramAnonymousIBinder);
 			BaseBluetoothActivity.this.mBound = true;
@@ -211,8 +205,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			AppFileLog.addTrace(": bluetooth service bound! : ");
 		}
 
-		public void onServiceDisconnected(ComponentName paramAnonymousComponentName)
-		{
+		public void onServiceDisconnected(ComponentName paramAnonymousComponentName) {
 			Log.d("com.resmed.refresh.ui", ": bluetooth service unbound! : ");
 			BaseBluetoothActivity.mService = null;
 			BaseBluetoothActivity.this.mBound = false;
@@ -233,9 +226,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	private void handleErrorRPC(JsonRPC var1, ErrorRpc var2) {
-		if(var1 != null && var2 != null) {
+		if (var1 != null && var2 != null) {
 			RPCallback var3 = var1.getRPCallback();
-			if(var3 != null) {
+			if (var3 != null) {
 				var3.onError(var2);
 			}
 		}
@@ -248,25 +241,18 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		Log.d("com.resmed.refresh.ui", "countBio : " + var2 + " countEnv :" + var3);
 	}
 
-	private void sendMessageToService(final int paramInt, final Bundle paramBundle)
-	{
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
+	private void sendMessageToService(final int paramInt, final Bundle paramBundle) {
+		new Thread(new Runnable() {
+			public void run() {
+				try {
 					Thread.sleep(1000L);
 					Message localMessage = new Message();
 					localMessage.what = paramInt;
 					localMessage.setData(paramBundle);
 					BaseBluetoothActivity.this.sendMsgBluetoothService(localMessage);
 					return;
-				}
-				catch (InterruptedException localInterruptedException)
-				{
-					for (;;)
-					{
+				} catch (InterruptedException localInterruptedException) {
+					for (; ; ) {
 						localInterruptedException.printStackTrace();
 					}
 				}
@@ -275,7 +261,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	private boolean sendRPC(JsonRPC var1) {
-		if(getRpcCommands() == null) {
+		if (getRpcCommands() == null) {
 			return false;
 		} else {
 			Message var2 = new Message();
@@ -285,12 +271,12 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			AppFileLog.addTrace("OUT NEW RPC ID : " + getRpcCommands().getRPCid() + " METHOD :" + var1.getMethod() + " PARAMS : " + var1.getParams());
 			String var4 = var3.toJson(var1);
 			Log.d("com.resmed.refresh.ui", "bluetooth json rpc : " + var4);
-			ByteBuffer var6 = VLP.getInstance().Packetize((byte)VLPacketType.PACKET_TYPE_CALL.ordinal(), (new Integer(var1.getId())).byteValue(), var4.getBytes().length, 64, var4.getBytes());
+			ByteBuffer var6 = VLP.getInstance().Packetize((byte) VLPacketType.PACKET_TYPE_CALL.ordinal(), (new Integer(var1.getId())).byteValue(), var4.getBytes().length, 64, var4.getBytes());
 			byte[] var7 = COBS.getInstance().encode(var6.array());
 			Log.d("com.resmed.refresh.bluetooth", " COBSJNI, encodedByteBuff : " + Arrays.toString(var7));
 			ByteBuffer var9 = ByteBuffer.wrap(var7);
 			RPCallback var10 = var1.getRPCallback();
-			if(var10 != null) {
+			if (var10 != null) {
 				var10.preExecute();
 			}
 
@@ -302,7 +288,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			var12.setIntegerConfigValue("PREF_LAST_RPC_ID_USED", Integer.valueOf(var1.getId()));
 
 			try {
-				if(mService != null) {
+				if (mService != null) {
 					mService.send(var2);
 				}
 
@@ -322,7 +308,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	public void bindToService() {
 		Log.d("com.resmed.refresh.ui", "binding to bluetooth service! isRunning :" + this.isBluetoothServiceRunning() + "service intent : " + this.bluetoothManagerService + " mConnection : " + this.mConnection);
 		AppFileLog.addTrace("BaseBluetoothActivity::bindToService!");
-		if(!this.mBound) {
+		if (!this.mBound) {
 			this.getApplicationContext().bindService(this.bluetoothManagerService, this.mConnection, 1);
 		}
 
@@ -333,16 +319,16 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public boolean checkBluetoothEnabled(boolean var1) {
-		if(var1) {
+		if (var1) {
 			userAllowBluetooth = true;
 		}
 
 		BluetoothAdapter var2 = BluetoothAdapter.getDefaultAdapter();
-		if(!var2.isEnabled() && userAllowBluetooth) {
+		if (!var2.isEnabled() && userAllowBluetooth) {
 			Intent var3 = new Intent("android.bluetooth.adapter.action.REQUEST_ENABLE");
 			var3.setFlags(2097152);
 			this.startActivityForResult(var3, 161);
-		} else if(var2.isEnabled()) {
+		} else if (var2.isEnabled()) {
 			userAllowBluetooth = true;
 		}
 
@@ -352,7 +338,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	protected boolean checkForFirmwareUpgrade(String var1) {
 		Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade firmware version :" + var1);
 		String var3 = RefreshTools.getFirmwareBinaryVersion(this.getApplicationContext());
-		boolean needsUpdate =  RefreshTools.compareFirmwareVersions(var1.replace("Release", "").split(" ")[0], var3) < 0;
+		boolean needsUpdate = RefreshTools.compareFirmwareVersions(var1.replace("Release", "").split(" ")[0], var3) < 0;
 		return needsUpdate;
 	}
 
@@ -360,9 +346,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		Log.d("com.resmed.refresh.pair", "connectToBeD(" + var1 + ")");
 		BluetoothDevice var3 = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
 		Log.d("com.resmed.refresh.pair", "connectToBeD mDevice : " + var3);
-		if(var3 == null) {
+		if (var3 == null) {
 			Log.d("com.resmed.refresh.pair", "connectToBeD no mDevice stored");
-			if(var1) {
+			if (var1) {
 				Log.d("com.resmed.refresh.dialog", "connectToBeD showBeDPickerDialog()");
 				this.showBeDPickerDialog();
 			}
@@ -374,7 +360,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			var6.putParcelable(this.getString(2131165303), var3);
 			var6.putBoolean(this.getString(2131165304), false);
 			this.sendMessageToService(11, var6);
-			if(var1) {
+			if (var1) {
 				this.showConnectionProgress();
 			}
 
@@ -401,11 +387,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public void handleConnectionStatus(CONNECTION_STATE var1) {
 		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + var1 + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " mBound : " + this.mBound + " isAvailable:" + this.isAvailable + " currentState : " + this.currentState);
-		if(var1 != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable && this.currentState != var1) {
+		if (var1 != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable && this.currentState != var1) {
 			this.currentState = var1;
 			Log.d("com.resmed.refresh.pair", "    handleConnectionStatus connState=" + var1);
 			RefreshApplication.getInstance().setCurrentConnectionState(var1);
-			if(CONNECTION_STATE.SOCKET_CONNECTED == var1) {
+			if (CONNECTION_STATE.SOCKET_CONNECTED == var1) {
 				//this.sendRpcToBed(RpcCommands.openSession(RefreshModelController.getInstance().getUserSessionID()));
 				this.sendRpcToBed(RpcCommands.openSession("user1"));
 				BluetoothDataSerializeUtil.writeJsonFile(this.getApplicationContext(), this.mDevice);
@@ -413,25 +399,25 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 			StringBuilder var4 = (new StringBuilder("Should show device paired? ")).append(connectingToBeD).append(" ");
 			boolean var5;
-			if(CONNECTION_STATE.SESSION_OPENED == var1) {
+			if (CONNECTION_STATE.SESSION_OPENED == var1) {
 				var5 = true;
 			} else {
 				var5 = false;
 			}
 
 			Log.d("com.resmed.refresh.dialog", var4.append(var5).toString());
-			if(connectingToBeD && CONNECTION_STATE.SESSION_OPENED == var1) {
+			if (connectingToBeD && CONNECTION_STATE.SESSION_OPENED == var1) {
 				Log.d("com.resmed.refresh.pair", "handleConnectionStatus SOCKET_CONNECTED connectingToBeD=" + connectingToBeD);
 				connectingToBeD = false;
 				Log.d("com.resmed.refresh.dialog", "showDialog device paired");
 				//this.showDialog((new CustomDialogBuilder(this)).title(2131165891).setPositiveButton(2131165892, (OnClickListener)null), false);
-			} else if(RefreshApplication.getInstance().getConnectionStatus().isReady() && this.connectionProgressDisplayed) {
+			} else if (RefreshApplication.getInstance().getConnectionStatus().isReady() && this.connectionProgressDisplayed) {
 				this.dismissConnectionProgress();
 				Log.d("com.resmed.refresh.dialog", "dismissConnectionProgress");
 			}
 
 			Log.d("com.resmed.refresh.dialog", "isReady = " + RefreshApplication.getInstance().getConnectionStatus().isReady() + " connectionProgressDisplayed=" + this.connectionProgressDisplayed);
-			if(CONNECTION_STATE.SOCKET_BROKEN == var1 || CONNECTION_STATE.SOCKET_RECONNECTING == var1) {
+			if (CONNECTION_STATE.SOCKET_BROKEN == var1 || CONNECTION_STATE.SOCKET_RECONNECTING == var1) {
 				CORRECT_FIRMWARE_VERSION = true;
 				UPDATING_FIRMWARE = false;
 				return;
@@ -445,38 +431,40 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void handleReceivedRpc(JsonRPC var1) {
-		if(var1 != null) {
+		if (var1 != null) {
 			ResultRPC var2 = var1.getResult();
-			if(var2 != null) {
+			if (var2 != null) {
 				Editor var3 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit();
 				String var4 = var2.getPayload();
-				if(var4.contains("$")) {
+				if (var4.contains("$")) {
 					int var9 = var4.indexOf("$");
 					String var10 = var4.substring(0, var9);
 					String var11 = var4.substring(var9 + 1, -1 + var4.length());
 					Log.d("com.resmed.refresh.bluetooth", "BaseBluetoothActivity::handlePayload, boardVersion : " + var10 + " firmwareVersion : " + var11);
 					/*RefreshModelController.getInstance().saveBoardVersion(var10);
 					RefreshModelController.getInstance().saveFirmwareVersion(var11);*/
-					if(CORRECT_FIRMWARE_VERSION) {
+					if (CORRECT_FIRMWARE_VERSION) {
 						var3.putString(this.getString(2131165305), var10);
 						var3.commit();
 						this.bioSensorSerialNrRPC = getRpcCommands().getBioSensorSerialNumber();
 						this.bioSensorSerialNrRPC.setRPCallback(new RPCallback() {
-							public void execute() {
-								Log.d("com.resmed.refresh.ui", "handleReceivedRpc firmwareVersion :" + var11);
-								if(RefreshTools.checkForFirmwareUpgrade(BaseBluetoothActivity.this, var11)) {
+																	public void execute() {
+																		Log.d("com.resmed.refresh.ui", "handleReceivedRpc firmwareVersion :" + var11);
+																		if (RefreshTools.checkForFirmwareUpgrade(BaseBluetoothActivity.this, var11)) {
 									/*BaseBluetoothActivity.CORRECT_FIRMWARE_VERSION = false;
 									Intent var2 = new Intent(BaseBluetoothActivity.this, UpdateOTAActivity.class);
 									BaseBluetoothActivity.this.startActivity(var2);*/
-									V.Log("@V(would be updating the firmware here)");
-								}
+																			V.Log("@V(would be updating the firmware here)");
+																		}
 
-							}
-							public void onError(ErrorRpc var1) {
-							}
-							public void preExecute() {
-							}
-						}
+																	}
+
+																	public void onError(ErrorRpc var1) {
+																	}
+
+																	public void preExecute() {
+																	}
+																}
 						);
 						this.sendRpcToBed(this.bioSensorSerialNrRPC);
 					}
@@ -484,7 +472,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 				Log.d("com.resmed.refresh.ui", "handleReceivedRpc committing  extra_bed_sensor_serial:" + var4);
 				Log.d("com.resmed.refresh.ui", "handleReceivedRpc committing  bioSensorSerialNrRPC:" + this.bioSensorSerialNrRPC + " receivedRPC.getId() :" + var1.getId() + " CORRECT_FIRMWARE_VERSION " + CORRECT_FIRMWARE_VERSION);
-				if(this.bioSensorSerialNrRPC != null && this.bioSensorSerialNrRPC.getId() == var1.getId() && CORRECT_FIRMWARE_VERSION) {
+				if (this.bioSensorSerialNrRPC != null && this.bioSensorSerialNrRPC.getId() == var1.getId() && CORRECT_FIRMWARE_VERSION) {
 					var3.putString(this.getString(2131165306), var4);
 					//RefreshModelController.getInstance().setBedId(var4);
 					var3.commit();
@@ -509,11 +497,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	protected boolean isBluetoothServiceRunning() {
-		Iterator var1 = ((ActivityManager)this.getSystemService("activity")).getRunningServices(Integer.MAX_VALUE).iterator();
+		Iterator var1 = ((ActivityManager) this.getSystemService("activity")).getRunningServices(Integer.MAX_VALUE).iterator();
 
-		while(var1.hasNext()) {
-			RunningServiceInfo var2 = (RunningServiceInfo)var1.next();
-			if(RefreshBluetoothService.class.getName().equals(var2.service.getClassName())) {
+		while (var1.hasNext()) {
+			RunningServiceInfo var2 = (RunningServiceInfo) var1.next();
+			if (RefreshBluetoothService.class.getName().equals(var2.service.getClassName())) {
 				return true;
 			}
 		}
@@ -527,8 +515,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	protected void onActivityResult(int var1, int var2, Intent var3) {
 		super.onActivityResult(var1, var1, var3);
-		if(var1 == 161) {
-			switch(var2) {
+		if (var1 == 161) {
+			switch (var2) {
 				case -1:
 					userAllowBluetooth = true;
 					return;
@@ -548,10 +536,10 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		boolean var2 = this.isBluetoothServiceRunning();
 		Log.d("com.resmed.refresh.ui", ": bluetooth service is running : " + var2);
 		this.bluetoothManagerService = new Intent(this, RefreshBluetoothService.class);
-		if(!var2) {
+		if (!var2) {
 			String var10 = this.getIntent().getStringExtra(this.getString(2131165943));
 			String var11 = this.getIntent().getStringExtra(this.getString(2131165944));
-			if(var10 != null && var11 != null) {
+			if (var10 != null && var11 != null) {
 				this.bluetoothManagerService.putExtra(this.getString(2131165943), var10);
 				this.bluetoothManagerService.putExtra(this.getString(2131165944), var11);
 			}
@@ -562,9 +550,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		SharedPreferences var4 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 		int var5 = var4.getInt("PREF_CONNECTION_STATE", -1);
 		Log.d("com.resmed.refresh.ui", " SleepTimeActivity::onResume conn state : " + var5);
-		if(var5 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
+		if (var5 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
 			int var9 = var4.getInt("PREF_LAST_RPC_ID_USED", -1);
-			if(-1 != var9) {
+			if (-1 != var9) {
 				RpcCommands.setRPCid(var9);
 			}
 		}
@@ -581,14 +569,14 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	protected void onPause() {
 		super.onPause();
 		this.unBindFromService();
-		boolean var1 = ((PowerManager)this.getSystemService("power")).isScreenOn();
+		boolean var1 = ((PowerManager) this.getSystemService("power")).isScreenOn();
 		Log.d("com.resmed.refresh.ui", " BaseBluetoothActivity::onPause() isScreenOn : " + var1);
-		if(!var1 && IN_SLEEP_SESSION) {
+		if (!var1 && IN_SLEEP_SESSION) {
 			Calendar var3 = Calendar.getInstance();
 			var3.add(13, 600);
 			Long var4 = Long.valueOf(var3.getTimeInMillis());
 			Intent var5 = new Intent(this.getApplicationContext(), AlarmReceiver.class);
-			((AlarmManager)this.getApplicationContext().getSystemService("alarm")).set(0, var4.longValue(), PendingIntent.getBroadcast(this.getApplicationContext(), 0, var5, 134217728));
+			((AlarmManager) this.getApplicationContext().getSystemService("alarm")).set(0, var4.longValue(), PendingIntent.getBroadcast(this.getApplicationContext(), 0, var5, 134217728));
 			this.registerReceiver(this.awakePowerSaveReconnect, new IntentFilter("BLUETOOTH_ALARM_RECONNECT"));
 		}
 
@@ -636,7 +624,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public Intent registerReceiver(BroadcastReceiver var1, IntentFilter var2) {
-		if(!this.receivers.contains(var1)) {
+		if (!this.receivers.contains(var1)) {
 			this.receivers.add(var1);
 			return super.registerReceiver(var1, var2);
 		} else {
@@ -648,9 +636,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		Log.d("com.resmed.refresh.bluetooth", " registerToService : ");
 
 		try {
-			Message var5 = Message.obtain((Handler)null, 4);
+			Message var5 = Message.obtain((Handler) null, 4);
 			var5.replyTo = this.mFromService;
-			if(mService != null) {
+			if (mService != null) {
 				mService.send(var5);
 			}
 		} catch (RemoteException var6) {
@@ -665,11 +653,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public boolean sendBytesToBeD(byte[] var1, VLPacketType var2) {
 		int var3 = 0;
-		if(var1 != null) {
+		if (var1 != null) {
 			var3 = var1.length;
 		}
 
-		ByteBuffer var4 = VLP.getInstance().Packetize((byte)var2.ordinal(), (byte)1, var3, 64, var1);
+		ByteBuffer var4 = VLP.getInstance().Packetize((byte) var2.ordinal(), (byte) 1, var3, 64, var1);
 		ByteBuffer var5 = ByteBuffer.wrap(COBS.getInstance().encode(var4.array()));
 		Message var6 = new Message();
 		var6.what = 2;
@@ -678,7 +666,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		var6.setData(var7);
 
 		try {
-			if(mService != null) {
+			if (mService != null) {
 				mService.send(var6);
 			}
 
@@ -691,7 +679,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public void sendMsgBluetoothService(Message var1) {
 		Log.d("com.resmed.refresh.ui", " sendMsgBluetoothService msg : " + var1 + "mService : " + mService);
-		if(mService != null) {
+		if (mService != null) {
 			try {
 				mService.send(var1);
 			} catch (RemoteException var9) {
@@ -721,7 +709,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public void unBindFromService() {
 		AppFileLog.addTrace("BaseBluetoothActivity::unBindingFromService!");
-		if(this.mBound) {
+		if (this.mBound) {
 			this.getApplicationContext().unbindService(this.mConnection);
 			this.mBound = false;
 		}
@@ -731,8 +719,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	protected void unregisterAll() {
 		Iterator var1 = this.receivers.iterator();
 
-		while(var1.hasNext()) {
-			BroadcastReceiver var2 = (BroadcastReceiver)var1.next();
+		while (var1.hasNext()) {
+			BroadcastReceiver var2 = (BroadcastReceiver) var1.next();
 
 			try {
 				this.unregisterReceiver(var2);
@@ -747,7 +735,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void updateDataStoredFlag(int var1) {
-		if(var1 == 0) {
+		if (var1 == 0) {
 			Message var2 = new Message();
 			var2.what = 28;
 			this.sendMsgBluetoothService(var2);
