@@ -44,13 +44,13 @@ public class BluetoothDataSerializeUtil
 		//    13: invokevirtual   android/content/Context.getString:(I)Ljava/lang/String;
 		//    16: invokespecial   java/io/File.<init>:(Ljava/io/File;Ljava/lang/String;)V
 		//    19: astore_1
-		//    20: new             Ljava/util/ArrayList;
+		//    20: new             Ljava.util.ArrayList;
 		//    23: dup
-		//    24: invokespecial   java/util/ArrayList.<init>:()V
+		//    24: invokespecial   java.util.ArrayList.<init>:()V
 		//    27: astore_2
-		//    28: new             Ljava/util/ArrayList;
+		//    28: new             Ljava.util.ArrayList;
 		//    31: dup
-		//    32: invokespecial   java/util/ArrayList.<init>:()V
+		//    32: invokespecial   java.util.ArrayList.<init>:()V
 		//    35: astore_3
 		//    36: aconst_null
 		//    37: astore          4
@@ -81,18 +81,18 @@ public class BluetoothDataSerializeUtil
 		//    91: aload           7
 		//    93: invokevirtual   java/io/BufferedReader.close:()V
 		//    96: aload_2
-		//    97: invokeinterface java/util/List.size:()I
+		//    97: invokeinterface java.util.List.size:()I
 		//   102: newarray        I
 		//   104: astore          14
 		//   106: aload_3
-		//   107: invokeinterface java/util/List.size:()I
+		//   107: invokeinterface java.util.List.size:()I
 		//   112: newarray        I
 		//   114: astore          15
 		//   116: iconst_0
 		//   117: istore          16
 		//   119: iload           16
 		//   121: aload_2
-		//   122: invokeinterface java/util/List.size:()I
+		//   122: invokeinterface java.util.List.size:()I
 		//   127: if_icmplt       343
 		//   130: iconst_2
 		//   131: newarray        I
@@ -142,12 +142,12 @@ public class BluetoothDataSerializeUtil
 		//   209: aload_2
 		//   210: iload           23
 		//   212: invokestatic    java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
-		//   215: invokeinterface java/util/List.add:(Ljava/lang/Object;)Z
+		//   215: invokeinterface java.util.List.add:(Ljava/lang/Object;)Z
 		//   220: pop
 		//   221: aload_3
 		//   222: iload           24
 		//   224: invokestatic    java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
-		//   227: invokeinterface java/util/List.add:(Ljava/lang/Object;)Z
+		//   227: invokeinterface java.util.List.add:(Ljava/lang/Object;)Z
 		//   232: pop
 		//   233: goto            74
 		//   236: astore          19
@@ -200,7 +200,7 @@ public class BluetoothDataSerializeUtil
 		//   345: iload           16
 		//   347: aload_2
 		//   348: iload           16
-		//   350: invokeinterface java/util/List.get:(I)Ljava/lang/Object;
+		//   350: invokeinterface java.util.List.get:(I)Ljava/lang/Object;
 		//   355: checkcast       Ljava/lang/Integer;
 		//   358: invokevirtual   java/lang/Integer.intValue:()I
 		//   361: iastore
@@ -208,7 +208,7 @@ public class BluetoothDataSerializeUtil
 		//   364: iload           16
 		//   366: aload_3
 		//   367: iload           16
-		//   369: invokeinterface java/util/List.get:(I)Ljava/lang/Object;
+		//   369: invokeinterface java.util.List.get:(I)Ljava/lang/Object;
 		//   374: checkcast       Ljava/lang/Integer;
 		//   377: invokevirtual   java/lang/Integer.intValue:()I
 		//   380: iastore

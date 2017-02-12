@@ -147,7 +147,7 @@ public class DefaultRelaxSleep
     //   0: aload_0
     //   1: monitorenter
     //   2: aload_0
-    //   3: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava/util/List;
+    //   3: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava.util.List;
     //   6: invokeinterface 85 1 0
     //   11: ifeq +23 -> 34
     //   14: ldc 113
@@ -163,9 +163,9 @@ public class DefaultRelaxSleep
     //   32: monitorexit
     //   33: return
     //   34: aload_0
-    //   35: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava/util/List;
+    //   35: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava.util.List;
     //   38: aload_0
-    //   39: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava/util/List;
+    //   39: getfield 79	com/resmed/refresh/utils/DefaultRelaxSleep:workFlowStack	Ljava.util.List;
     //   42: invokeinterface 88 1 0
     //   47: iconst_1
     //   48: isub
@@ -212,24 +212,24 @@ public class DefaultRelaxSleep
     //   134: anewarray 280	java/lang/Object
     //   137: dup
     //   138: iconst_0
-    //   139: getstatic 286	java/util/concurrent/TimeUnit:MILLISECONDS	Ljava/util/concurrent/TimeUnit;
+    //   139: getstatic 286	java.util.concurrent/TimeUnit:MILLISECONDS	Ljava.util.concurrent/TimeUnit;
     //   142: iload_1
     //   143: i2l
-    //   144: invokevirtual 290	java/util/concurrent/TimeUnit:toMinutes	(J)J
+    //   144: invokevirtual 290	java.util.concurrent/TimeUnit:toMinutes	(J)J
     //   147: invokestatic 296	java/lang/Long:valueOf	(J)Ljava/lang/Long;
     //   150: aastore
     //   151: dup
     //   152: iconst_1
-    //   153: getstatic 286	java/util/concurrent/TimeUnit:MILLISECONDS	Ljava/util/concurrent/TimeUnit;
+    //   153: getstatic 286	java.util.concurrent/TimeUnit:MILLISECONDS	Ljava.util.concurrent/TimeUnit;
     //   156: iload_1
     //   157: i2l
-    //   158: invokevirtual 299	java/util/concurrent/TimeUnit:toSeconds	(J)J
-    //   161: getstatic 302	java/util/concurrent/TimeUnit:MINUTES	Ljava/util/concurrent/TimeUnit;
-    //   164: getstatic 286	java/util/concurrent/TimeUnit:MILLISECONDS	Ljava/util/concurrent/TimeUnit;
+    //   158: invokevirtual 299	java.util.concurrent/TimeUnit:toSeconds	(J)J
+    //   161: getstatic 302	java.util.concurrent/TimeUnit:MINUTES	Ljava.util.concurrent/TimeUnit;
+    //   164: getstatic 286	java.util.concurrent/TimeUnit:MILLISECONDS	Ljava.util.concurrent/TimeUnit;
     //   167: iload_1
     //   168: i2l
-    //   169: invokevirtual 290	java/util/concurrent/TimeUnit:toMinutes	(J)J
-    //   172: invokevirtual 299	java/util/concurrent/TimeUnit:toSeconds	(J)J
+    //   169: invokevirtual 290	java.util.concurrent/TimeUnit:toMinutes	(J)J
+    //   172: invokevirtual 299	java.util.concurrent/TimeUnit:toSeconds	(J)J
     //   175: lsub
     //   176: invokestatic 296	java/lang/Long:valueOf	(J)Ljava/lang/Long;
     //   179: aastore

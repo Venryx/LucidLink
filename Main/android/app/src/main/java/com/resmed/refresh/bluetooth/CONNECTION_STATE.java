@@ -16,7 +16,7 @@ public enum CONNECTION_STATE
 	SOCKET_RECONNECTING("SOCKET_RECONNECTING", 5);
 
 	static int[] $SWITCH_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE;
-	static /* synthetic */ int[] $SWITCH_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE() {
+	public static /* synthetic */ int[] $SWITCH_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE() {
 		final int[] $switch_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE = CONNECTION_STATE.$SWITCH_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE;
 		if ($switch_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE != null) {
 			return $switch_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE;

@@ -152,12 +152,12 @@ public class RefreshTools
 		//    65: ldc             "RefreshTools::compareVersions versionNumsFirst : "
 		//    67: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
 		//    70: aload           4
-		//    72: invokestatic    java/util/Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
+		//    72: invokestatic    java.util.Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
 		//    75: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
 		//    78: ldc             " second : "
 		//    80: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
 		//    83: aload           5
-		//    85: invokestatic    java/util/Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
+		//    85: invokestatic    java.util.Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
 		//    88: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
 		//    91: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
 		//    94: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
