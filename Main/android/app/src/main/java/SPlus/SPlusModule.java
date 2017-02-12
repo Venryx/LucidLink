@@ -17,20 +17,10 @@ import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.sleepsession.SleepSessionManager;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
-import com.resmed.refresh.utils.RefreshTools;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.NotFoundException;
-import v.lucidlink.Frame.VReflection;
-import v.lucidlink.LucidLinkModule;
 import v.lucidlink.V;
 
 enum MessageType {
@@ -111,31 +101,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
-		// some monkey-patching
-		//RefreshApplication fakeRefreshApp = new RefreshApplication();
-		RefreshApplication fakeRefreshApp;
-		try {
-			ClassPool cp = ClassPool.getDefault();
-			cp.appendClassPath("libs/*");
-			cp.appendClassPath(new ClassClassPath(RefreshApplication.class));
-			CtClass cc = cp.get("com.resmed.refresh.ui.uibase.app.RefreshApplication");
-			CtMethod m = cc.getDeclaredMethod("getFilesDir");
-			m.insertBefore("{ System.out.println(\"Test4129038594\"); }");
-			Class c = cc.toClass();
-			fakeRefreshApp = (RefreshApplication)c.newInstance();
-		} catch (Exception e) {
-			throw new Error(e);
-		}
-
-		VReflection.SetField_Static(RefreshApplication.class, "instance", fakeRefreshApp);
-		V.Log("Test1:" + RefreshApplication.getInstance());
-
-
-
-		//V.Log("Test1A:" + VReflection.GetFields(RefreshApplication.class));
-		V.Log("Test1A:" + RefreshApplication.getInstance().getFilesDir());
-		V.Log("Test1B:" + RefreshTools.getFilesPath());
-
 		RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
 		V.Log("Test2");
 		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {
@@ -145,9 +110,12 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 			@Override public void handlePacket(VLP.VLPacket vlPacket) {
 				bluetoothService.handlePacket(vlPacket);
 			}
-			@Override public void sendConnectionStatus(CONNECTION_STATE connection_state) {
-				bluetoothService.sendConnectionStatus(connection_state);
+
+			@Override
+			public void sendConnectionStatus(CONNECTION_STATE paramCONNECTION_STATE) {
+
 			}
+
 			@Override public void sendMessageToClient(Message message) {
 				MessageType type = MessageType.GetEntry(message.what);
 				if (type == MessageType.OnRm20RealTimeSleepState) {
