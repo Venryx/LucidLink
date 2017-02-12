@@ -7,7 +7,6 @@ public class RST_SleepSession
 {
 	private static RST_SleepSession sleepSession;
 	private boolean analysisRunning;
-	private RST_SleepSessionInfo sessionResults;
 	private boolean sessionRunning;
 
 	public static RST_SleepSession getInstance() {
@@ -22,10 +21,6 @@ public class RST_SleepSession
 	private void setup() {
 		this.sessionRunning = false;
 		this.analysisRunning = false;
-	}
-
-	public RST_SleepSessionInfo currentSleepData() {
-		return this.sessionResults;
 	}
 
 	public boolean isSessionRunning() {

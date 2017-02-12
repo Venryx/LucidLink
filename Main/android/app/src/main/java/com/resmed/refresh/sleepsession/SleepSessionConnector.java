@@ -22,12 +22,6 @@ import android.view.Window;
 import com.google.gson.Gson;
 import com.resmed.refresh.bed.BedCommandsRPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.model.RST_EnvironmentalInfo;
-import com.resmed.refresh.model.RST_SleepEvent;
-import com.resmed.refresh.model.RST_SleepEvent.SleepEventType;
-import com.resmed.refresh.model.RST_SleepSessionInfo;
-import com.resmed.refresh.model.RST_ValueItem;
-import com.resmed.refresh.model.RefreshModelController;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
@@ -47,6 +41,7 @@ import com.resmed.refresh.utils.SortedList;
 import com.resmed.rm20.SleepParams;
 
 import de.greenrobot.dao.DaoException;
+import v.lucidlink.V;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -73,26 +68,18 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private boolean isWaitLastSamples;
 	private Long lastHeartBeatTimestamp;
 	private CONNECTION_STATE lastState;
-	private List<RST_ValueItem> lightValues;
 	private Handler myHeartbeatHandler;
 	private JsonRPC pendingBioSamplesRpc;
 	private JsonRPC pendingEnvSamplesRpc;
 	private int sizeToStore = 5;
-	private RST_SleepSessionInfo sleepSessionInfo;
-	private SleepSessionListener sleepSessionListener;
 	private SortedList<Integer> soundTopAmplitudes;
-	private List<RST_ValueItem> tempValues;
 
-	public SleepSessionConnector(BaseBluetoothActivity paramBaseBluetoothActivity, int paramInt, boolean paramBoolean, SleepSessionListener paramSleepSessionListener) {
+	public SleepSessionConnector(BaseBluetoothActivity paramBaseBluetoothActivity, int paramInt, boolean paramBoolean) {
 		this.isSyncAndStop = paramBoolean;
 		this.bAct = paramBaseBluetoothActivity;
 		this.bioOnBeD = paramInt;
 		this.isClosingSession = false;
 		this.hasSessionStarted = false;
-		this.sleepSessionListener = paramSleepSessionListener;
-		this.sleepSessionInfo = new RST_SleepSessionInfo();
-		this.lightValues = new ArrayList();
-		this.tempValues = new ArrayList();
 		this.myHeartbeatHandler = new Handler();
 	}
 
@@ -219,7 +206,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.isRecovering = false;
 			}
 			this.lastHeartBeatTimestamp = System.currentTimeMillis();
-			this.sleepSessionListener.onSessionOk();
+			V.Log("Caught up with external-only buffered data");
 			if (this.isClosingSession) {
 				this.isWaitLastSamples = true;
 				this.bAct.updateDataStoredFlag(0);
@@ -302,56 +289,18 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		stopSleepSession();
 	}
 
-	public void addEnvDataToDB() {
-		if (this.sleepSessionInfo != null) {
-		}
-		try {
-			Object localObject = new java.lang.StringBuilder("addEnvDataToDB ");
-			Log.d("com.resmed.refresh.env", this.lightValues.size() + " light values and " + this.tempValues.size() + " temp values" + " START " + this.sleepSessionInfo.getStartTime());
-			this.sleepSessionInfo.getEnvironmentalInfo().addSessionLightArray(this.lightValues);
-			this.sleepSessionInfo.getEnvironmentalInfo().addSessionTemperatureArray(this.tempValues);
-			this.sleepSessionInfo.update();
-			this.lightValues = new java.util.ArrayList();
-			this.tempValues = new java.util.ArrayList();
-			return;
-		} catch (DaoException localDaoException) {
-			for (; ; ) {
-				Log.d("com.resmed.refresh.env", localDaoException.getMessage());
-				localDaoException.printStackTrace();
-			}
-		}
-	}
-
-	public void handleAudioAmplitude(final int paramInt) {
+	public void handleAudioAmplitude(final int audioAmplitude) {
 		if (this.bAct != null) {
 			this.bAct.runOnUiThread(new Runnable() {
 				public void run() {
-					float f2 = (float) (20.0D * Math.log10(paramInt));
+					float f2 = (float) (20.0D * Math.log10(audioAmplitude));
 					float f1 = f2;
 					if (f2 == Float.NEGATIVE_INFINITY) {
 						f1 = 0.0F;
 					}
-					Log.d("com.resmed.refresh.sound", "SleepSessionConnector::handleAudioAmplitude() amplitude : " + paramInt + " db : " + f1);
-					boolean bool = SleepSessionConnector.this.soundTopAmplitudes.insert(Integer.valueOf(paramInt));
+					Log.d("com.resmed.refresh.sound", "SleepSessionConnector::handleAudioAmplitude() amplitude : " + audioAmplitude + " db : " + f1);
+					boolean bool = SleepSessionConnector.this.soundTopAmplitudes.insert(Integer.valueOf(audioAmplitude));
 					Log.d("com.resmed.refresh.sound", " SleepSessionConnector::handleAudioAmplitude() sound wasInserted : " + bool);
-					if (bool) {
-						Object localObject = new RST_SleepEvent();
-						((RST_SleepEvent) localObject).setType(RST_SleepEvent.SleepEventType.kSleepEventTypeSound.ordinal());
-						long l = SleepSessionConnector.this.sleepSessionInfo.getStartTime().getTime();
-						l = System.currentTimeMillis() - l;
-						int i = (int) (l / 1000L / 30L);
-						AppFileLog.addTrace(" SleepSessionConnector::handleAudioAmplitude saving sound epochNumber : " + i + " at :" + l);
-						((RST_SleepEvent) localObject).setEpochNumber(i);
-						((RST_SleepEvent) localObject).setIdSleepSession(Long.valueOf(SleepSessionConnector.this.sleepSessionInfo.getId()));
-						((RST_SleepEvent) localObject).setValue(paramInt);
-						SleepSessionConnector.this.sleepSessionInfo.addEvent((RST_SleepEvent) localObject);
-						localObject = (Integer) SleepSessionConnector.this.soundTopAmplitudes.getLastReplacedElement();
-						if (localObject != null) {
-							bool = SleepSessionConnector.this.sleepSessionInfo.deleteSoundEvent(((Integer) localObject).intValue());
-							Log.d("com.resmed.refresh.sound", " SleepSessionConnector::handleAudioAmplitude() sound wasDeleted : " + bool);
-						}
-						SleepSessionConnector.this.sleepSessionInfo.update();
-					}
 				}
 			});
 		}
@@ -404,32 +353,18 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 	public void handleEnvSample(final Bundle bundle) {
 		if (bundle != null) {
-			final float float1 = bundle.getFloat("tempArray");
-			final int int1 = bundle.getInt("lightArray");
-			final RST_ValueItem rst_ValueItem = new RST_ValueItem();
-			rst_ValueItem.setValue((float)this.decompressLight(int1));
-			rst_ValueItem.setOrdr(this.envTotalCount);
-			final RST_ValueItem rst_ValueItem2 = new RST_ValueItem();
-			rst_ValueItem2.setValue(float1);
-			rst_ValueItem2.setOrdr(this.envTotalCount);
+			final float temp = bundle.getFloat("tempArray");
+			final int light_compressed = bundle.getInt("lightArray");
+			final float light = (float)this.decompressLight(light_compressed);
 			++this.envTotalCount;
-			this.lightValues.add(rst_ValueItem);
-			this.tempValues.add(rst_ValueItem2);
-			AppFileLog.addTrace("IN handleEnvSample light : " + rst_ValueItem.getValue() + "  temp : " + rst_ValueItem2.getValue());
-			Log.d("com.resmed.refresh.env", "handleEnvSample light : " + rst_ValueItem.getValue() + "  temp : " + rst_ValueItem2.getValue());
-			if (this.lightValues.size() >= this.sizeToStore) {
-				this.addEnvDataToDB();
-			}
+			AppFileLog.addTrace("IN handleEnvSample light : " + light + "  temp : " + temp);
+			Log.d("com.resmed.refresh.env", "handleEnvSample light : " + light + "  temp : " + temp);
 		}
 	}
 
 	@Override
 	public void handleReceivedRpc(final JsonRPC jsonRPC) {
 		Log.d("com.resmed.refresh.ui", " SleepSessionConnector::handleReceivedRpc() receivedRPC:" + jsonRPC);
-	}
-
-	public void handleSessionRecovered(Bundle paramBundle) {
-		this.sleepSessionListener.onSessionOk();
 	}
 
 	public void handleSleepSessionStopped(final Bundle bundle) {
@@ -455,48 +390,13 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			else {
 				b = false;
 			}
-			final long n = (System.currentTimeMillis() - this.sleepSessionInfo.getStartTime().getTime()) / 1000L;
-			if (n < Consts.MIN_SECS_TO_SAVE_RECORD) {
-				AppFileLog.addTrace("ERROR UPLOADING SLEEP SESSION: session time:" + n);
-				b = true;
-			}
-			else if (sleepParams != null) {
-				this.sleepSessionInfo.processRM20Data(sleepParams);
-				this.sleepSessionInfo.setCompleted(true);
-				this.sleepSessionInfo.update();
+
+			if (sleepParams != null) {
 				Log.d("com.resmed.refresh.model", "SleepSession processed-----Env Data");
-				Log.d("com.resmed.refresh.model", "sleepSessionInfo completed? = " + this.sleepSessionInfo.getCompleted());
-				int i = 0;
-				while (true) {
-					try {
-						while (i < this.sleepSessionInfo.getEnvironmentalInfo().getSessionLight().size()) {
-							Log.d("com.resmed.refresh.model", "Light[" + i + "]=" + ((RST_ValueItem)this.sleepSessionInfo.getEnvironmentalInfo().getSessionLight().get(i)).getValue());
-							++i;
-						}
-						for (int j = 0; j < this.sleepSessionInfo.getEnvironmentalInfo().getSessionTemperature().size(); ++j) {
-							Log.d("com.resmed.refresh.model", "Temp[" + j + "]=" + ((RST_ValueItem)this.sleepSessionInfo.getEnvironmentalInfo().getSessionTemperature().get(j)).getValue());
-						}
-						Log.d("com.resmed.refresh.model", "SleepSession processed-----Env Data");
-					}
-					catch (Exception ex) {
-						continue;
-					}
-					break;
-				}
 			}
-		}
-		if (this.sleepSessionInfo != null) {
-			this.sleepSessionInfo.setStopTime(Calendar.getInstance().getTime());
-			this.sleepSessionInfo.setAlarmFireEpoch(int1);
-			this.sleepSessionInfo.setCompleted(true);
-			this.sleepSessionInfo.update();
 		}
 		if (!b) {
-			SleepSessionConnector.this.addEnvDataToDB();
-			if ((SleepSessionConnector.this.bAct != null) && (!SleepSessionConnector.this.bAct.isFinishing())) {
-				SleepSessionConnector.this.bAct.updateDataStoredFlag(0);
-			}
-			Log.d("com.resmed.refresh.finish", "progress setted to 99");
+			Log.d("com.resmed.refresh.finish", "progress setted to 99 (sleep data done being retrieved and/or saved to db)");
 		}
 		this.pendingBioSamplesRpc = null;
 		this.pendingEnvSamplesRpc = null;
@@ -552,10 +452,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	public void onClickStop() {
 		AppFileLog.addTrace("STOP SleepSessionConnector onClickStop");
 		if (this.bAct.checkBluetoothEnabled(true)) {
-			this.sleepSessionListener.stopRelax(false);
-			this.sleepSessionInfo.setStopTime(Calendar.getInstance().getTime());
-			this.sleepSessionInfo.setCompleted(false);
-			this.sleepSessionInfo.update();
 			RST_SleepSession.getInstance().stopSession(true);
 			if (this.bAct == null || this.bAct.isBoundToBluetoothService()) {
 				this.closeSession();
@@ -570,13 +466,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	public void resume() {
 		this.pendingBioSamplesRpc = null;
 		this.pendingEnvSamplesRpc = null;
-		new Handler().postDelayed(new Runnable() {
-			public void run() {
-				if ((SleepSessionConnector.this.bAct != null) && (!SleepSessionConnector.this.bAct.isFinishing())) {
-					SleepSessionConnector.this.sleepSessionListener.onSessionOk();
-				}
-			}
-		}, 9000L);
+		// back on track
 	}
 
 	public void setBioOnBeD(final int bioOnBeD) {
@@ -608,35 +498,16 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.isWaitLastSamples = false;
 		this.soundTopAmplitudes = new SortedList(5);
 		RST_SleepSession.getInstance().startSession(true);
-		Object localObject = this.sleepSessionInfo.getEvents();
-		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController() events : " + ((List) localObject).size());
-		localObject = ((List) localObject).iterator();
-		for (; ; ) {
-			if (!((Iterator) localObject).hasNext()) {
-				Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController() soundTopAmplitudes : " + this.soundTopAmplitudes.size());
-				this.pendingBioSamplesRpc = null;
-				this.pendingEnvSamplesRpc = null;
-				return;
-			}
-			RST_SleepEvent localRST_SleepEvent = (RST_SleepEvent) ((Iterator) localObject).next();
-			if (localRST_SleepEvent.getType() == RST_SleepEvent.SleepEventType.kSleepEventTypeSound.ordinal()) {
-				this.soundTopAmplitudes.insert(Integer.valueOf(localRST_SleepEvent.getValue()));
-			}
-		}
 	}
 
 	protected void startSleepSession() {
-		final RefreshModelController instance = RefreshModelController.getInstance();
-		this.sleepSessionInfo = instance.createSleepSessionInfo();
 		final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
 		edit.putInt("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_ON.ordinal());
-		edit.putLong("PREF_NIGHT_LAST_SESSION_ID", this.sleepSessionInfo.getId());
 		edit.commit();
 		AppFileLog.deleteCurrentFile();
-		AppFileLog.addTrace("START SLEEP SESSION ID : " + this.sleepSessionInfo.getId());
 		final Message message = new Message();
 		message.what = 12;
-		message.getData().putLong("sessionId", this.sleepSessionInfo.getId());
+		message.getData().putLong("sessionId", 1); // todo: make not hard-coded
 		message.getData().putInt("age", 18); // todo: make not hard-coded
 		message.getData().putInt("gender", 0); // 0 = male, 1 = female // todo: make not hard-coded
 		this.bAct.sendMsgBluetoothService(message);
@@ -667,15 +538,5 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			return;
 		} finally {
 		}
-	}
-
-	public static abstract interface SleepSessionListener {
-		public abstract void onSessionOk();
-
-		public abstract void onSessionRecovering();
-
-		public abstract void startRelax(boolean paramBoolean);
-
-		public abstract void stopRelax(boolean paramBoolean);
 	}
 }

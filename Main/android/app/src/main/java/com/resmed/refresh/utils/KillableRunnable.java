@@ -1,39 +1,27 @@
 package com.resmed.refresh.utils;
 
-public class KillableRunnable
-  implements Runnable
-{
-  private boolean killMe = false;
-  private KillableRunner runner;
-  
-  public KillableRunnable(KillableRunner paramKillableRunner)
-  {
-    this.runner = paramKillableRunner;
-  }
-  
-  public void killRunnable()
-  {
-    this.killMe = true;
-  }
-  
-  public void run()
-  {
-    if (this.killMe) {}
-    for (;;)
-    {
-      return;
-      this.runner.executeOnRun();
-    }
-  }
-  
-  public static abstract interface KillableRunner
-  {
-    public abstract void executeOnRun();
-  }
+public class KillableRunnable implements Runnable {
+	public interface KillableRunner {
+		void executeOnRun();
+	}
+
+	private boolean killMe;
+	private KillableRunnable.KillableRunner runner;
+
+	public KillableRunnable(final KillableRunnable.KillableRunner runner) {
+		this.killMe = false;
+		this.runner = runner;
+	}
+
+	public void killRunnable() {
+		this.killMe = true;
+	}
+
+	@Override
+	public void run() {
+		if (this.killMe) {
+			return;
+		}
+		this.runner.executeOnRun();
+	}
 }
-
-
-/* Location:              [...]
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

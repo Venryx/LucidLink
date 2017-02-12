@@ -2,9 +2,6 @@ package com.resmed.refresh.utils;
 
 import android.annotation.*;
 import android.graphics.*;
-import com.resmed.refresh.model.*;
-import com.resmed.refresh.model.mappers.*;
-import com.resmed.refresh.model.graphs.*;
 import com.resmed.refresh.ui.uibase.app.*;
 import android.os.*;
 import java.nio.channels.*;
@@ -13,11 +10,13 @@ import java.text.*;
 import com.resmed.refresh.ui.utils.*;
 import java.util.*;
 import android.content.res.*;
+import android.util.Base64;
+import android.util.Patterns;
 import android.view.inputmethod.*;
 import android.app.*;
 import android.widget.*;
 import android.view.*;
-import android.util.*;
+//import android.util.*;
 import java.io.*;
 
 @SuppressLint({ "SimpleDateFormat" })
@@ -349,32 +348,6 @@ public class RefreshTools
 		return list;
 	}
 
-	public static void debugSleepSessions() {
-		final RefreshModelController instance = RefreshModelController.getInstance();
-		if (instance.getUser() != null) {
-			for (final RST_SleepSessionInfo rst_SleepSessionInfo : instance.localSleepSessionsAll()) {
-				final List hypnoData = HypnoMapper.getHypnoData(rst_SleepSessionInfo);
-				final int round = Math.round((rst_SleepSessionInfo.getStopTime().getTime() - rst_SleepSessionInfo.getStartTime().getTime()) / 60000L);
-				if (rst_SleepSessionInfo.getTotalSleepTime() > 60 && round > 0) {
-					final String string = String.valueOf(getHourStringForTime(rst_SleepSessionInfo.getTotalSleepTime())) + getMinsStringForTime(rst_SleepSessionInfo.getTotalSleepTime());
-					final String string2 = String.valueOf(getHourStringForTime(round)) + getMinsStringForTime(round);
-					while (true) {
-						try {
-							final float n = (hypnoData.get(1).getHour().getTime() - hypnoData.get(0).getHour().getTime()) / 1000.0f;
-							Log.d("sessions", String.valueOf(rst_SleepSessionInfo.getId()) + "\tTotalTime = " + string + "\tsleepTime = " + string2 + "\tTimeBetweenSamples = " + n + "\t" + rst_SleepSessionInfo.getStartTime() + "\t" + rst_SleepSessionInfo.getStopTime() + "\t" + rst_SleepSessionInfo.getCompleted());
-						}
-						catch (Exception ex) {
-							ex.printStackTrace();
-							final float n = 0.0f;
-							continue;
-						}
-						break;
-					}
-				}
-			}
-		}
-	}
-
 	public static boolean deleteTimeStampFile(final Context context) {
 		synchronized (RefreshTools.class) {
 			return new File(getFilesPath(), context.getString(2131165344)).delete();
@@ -382,43 +355,26 @@ public class RefreshTools
 	}
 
 	public static boolean exportAllFilesToSD() {
-		Block_0: {
-			//break Block_0;
-			Label_0220:
-			while (true) {
-				int i;
-				int length;
-				do {
-					Label_0050: {
-						//break Label_0050;
-						try {
-							final File filesDir = RefreshApplication.getInstance().getFilesDir();
-							final String string = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/Refresh/export/";
-							final File[] listFiles = filesDir.listFiles();
-							length = listFiles.length;
-							i = 0;
-							//continue Label_0220;
-							final File file = listFiles[i];
-							Log.d("com.resmed.refresh.model", " exportAllFilesToSD:: file.getName() : " + file.getName());
-							final File file2 = new File(String.valueOf(string) + file.getName().replace(RefreshApplication.getInstance().getFilesDir().getAbsolutePath(), ""));
-							createDirectories(file2.getAbsolutePath());
-							final FileChannel channel = new FileInputStream(file).getChannel();
-							final FileChannel channel2 = new FileOutputStream(file2.getAbsolutePath()).getChannel();
-							channel2.transferFrom(channel, 0L, channel.size());
-							channel.close();
-							channel2.close();
-							++i;
-							continue Label_0220;
-						}
-						catch (Exception ex) {
-							ex.printStackTrace();
-							Log.d("com.resmed.refresh.model", "Error in exportAllFilesToSD", (Throwable)ex);
-							return false;
-						}
-					}
-					continue Label_0220;
-				} while (i < length);
-				break;
+		final File filesDir = RefreshApplication.getInstance().getFilesDir();
+		final String string = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/Refresh/export/";
+		final File[] listFiles = filesDir.listFiles();
+
+		for (int i = 0; i < listFiles.length; i++) {
+			try {
+				final File file = listFiles[i];
+				Log.d("com.resmed.refresh.model", " exportAllFilesToSD:: file.getName() : " + file.getName());
+				final File file2 = new File(String.valueOf(string) + file.getName().replace(RefreshApplication.getInstance().getFilesDir().getAbsolutePath(), ""));
+				createDirectories(file2.getAbsolutePath());
+				final FileChannel channel = new FileInputStream(file).getChannel();
+				final FileChannel channel2 = new FileOutputStream(file2.getAbsolutePath()).getChannel();
+				channel2.transferFrom(channel, 0L, channel.size());
+				channel.close();
+				channel2.close();
+			}
+			catch (Exception ex) {
+				ex.printStackTrace();
+				Log.d("com.resmed.refresh.model", "Error in exportAllFilesToSD", (Throwable)ex);
+				return false;
 			}
 		}
 		return true;
@@ -578,7 +534,7 @@ public class RefreshTools
 	}
 
 	public static boolean isAppRunning(final Context context, final String s) {
-		final List runningAppProcesses = ((ActivityManager)context.getSystemService("activity")).getRunningAppProcesses();
+		final List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = ((ActivityManager)context.getSystemService("activity")).getRunningAppProcesses();
 		for (int i = 0; i < runningAppProcesses.size(); ++i) {
 			if (runningAppProcesses.get(i).processName.equals(s)) {
 				return true;
@@ -596,32 +552,30 @@ public class RefreshTools
 		return b;
 	}
 
-	public static Long readTimeStampToFile(final Context context) {
+	public static Long readTimeStampToFile(Context context) {
 		synchronized (RefreshTools.class) {
-			final File file = new File(getFilesPath(), context.getString(2131165344));
-			Long value;
+			File file = new File(RefreshTools.getFilesPath(), context.getString(2131165344));
 			try {
-				final boolean exists = file.exists();
-				value = null;
-				if (exists) {
-					final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-					final String line = bufferedReader.readLine();
-					bufferedReader.close();
-					value = null;
-					if (line != null) {
-						value = Long.parseLong(line.trim());
-					}
+				boolean bl = file.exists();
+				Long l = null;
+				if (!bl) {
+					return l;
 				}
-				return value;
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+				String string = bufferedReader.readLine();
+				bufferedReader.close();
+				l = null;
+				if (string == null) return l;
+				Long l2 = Long.parseLong(string.trim());
+				return l2;
 			}
-			catch (IOException ex) {
-				ex.printStackTrace();
-				value = null;
-				return value;
+			catch (IOException var3_7) {
+				var3_7.printStackTrace();
+				return null;
 			}
-			return value;
 		}
 	}
+
 
 	public static void setListViewHeightBasedOnChildren(final ListView listView) {
 		final ListAdapter adapter = listView.getAdapter();
@@ -673,7 +627,7 @@ public class RefreshTools
 			}
 			catch (IOException ex) {
 				ex.printStackTrace();
-				final boolean b = false;
+				return false;
 			}
 		}
 	}

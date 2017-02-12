@@ -66,11 +66,11 @@ import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibJNI;
 import com.resmed.refresh.bluetooth.exception.BluetoohNotSupportedException;
 import com.resmed.refresh.model.json.JsonRPC;
+import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.sleepsession.SleepSessionManager;
-import com.resmed.refresh.ui.activity.SleepTimeActivity;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.Log;
@@ -310,12 +310,7 @@ class BluetoothRequestsHandler extends Handler {
 	}
 }
 
-
-public class RefreshBluetoothService
-		extends Service
-		implements RefreshBluetoothServiceClient {
-
-
+public class RefreshBluetoothService extends Service implements RefreshBluetoothServiceClient {
 	public static final String ACTION_ALREADY_PAIRED = "ACTION_ALREADY_PAIRED";
 	public static final String REFRESH_BED_NEW_CONN_STATUS = "REFRESH_BED_NEW_CONN_STATUS";
 	public static final String REFRESH_BED_NEW_DATA = "REFRESH_BED_NEW_DATA";
@@ -400,14 +395,7 @@ public class RefreshBluetoothService
 	}
 
 	static /* synthetic */ void access$9(RefreshBluetoothService refreshBluetoothService) {
-		refreshBluetoothService.changeToForeground();
-	}
-
-	private void changeToForeground() {
-		Intent intent = new Intent((Context) this, (Class) SleepTimeActivity.class);
-		intent.setFlags(603979776);
-		PendingIntent pendingIntent = PendingIntent.getActivity((Context) this, (int) 0, (Intent) intent, (int) 0);
-		this.startForeground(65531, new NotificationCompat.Builder((Context) this).setContentIntent(pendingIntent).setSmallIcon(2130837933).setPriority(-2).setContentTitle((CharSequence) this.getString(2131165865)).setContentText((CharSequence) this.getString(2131165866)).build());
+		//refreshBluetoothService.changeToForeground();
 	}
 
 	private void checkManager() {
@@ -585,14 +573,16 @@ public class RefreshBluetoothService
 				this.recoverSleepSession(l);
 				BluetoothDevice bluetoothDevice = BluetoothDataSerializeUtil.readJsonFile((Context) this.getApplicationContext());
 				this.bluetoothManager.connectDevice(bluetoothDevice);
-				Intent intent2 = new Intent((Context) this, (Class) SleepTimeActivity.class);
+
+				/*Intent intent2 = new Intent((Context) this, (Class) SleepTimeActivity.class);
 				intent2.setFlags(268468224);
 				intent2.putExtra("com.resmed.refresh.consts.recovering_app_from_service", true);
-				this.startActivity(intent2);
+				this.startActivity(intent2);*/
+
 				Intent intent3 = new Intent("BLUETOOTH_SERVICE_INTENT_RESTART");
 				intent3.putExtra("BUNDLE_LAST_CONN_STATE", n3);
 				this.getApplicationContext().sendStickyBroadcast(intent3);
-				this.changeToForeground();
+				//this.changeToForeground();
 				return 1;
 			}
 			if (CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal() != n3) return 1;
