@@ -24,6 +24,11 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
 import v.lucidlink.Frame.VReflection;
 import v.lucidlink.LucidLinkModule;
 import v.lucidlink.V;
@@ -107,17 +112,23 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
 		// some monkey-patching
-		RefreshApplication fakeRefreshApp = new RefreshApplication();
+		//RefreshApplication fakeRefreshApp = new RefreshApplication();
+		RefreshApplication fakeRefreshApp;
+		try {
+			ClassPool cp = ClassPool.getDefault();
+			cp.appendClassPath("libs/*");
+			cp.appendClassPath(new ClassClassPath(RefreshApplication.class));
+			CtClass cc = cp.get("com.resmed.refresh.ui.uibase.app.RefreshApplication");
+			CtMethod m = cc.getDeclaredMethod("getFilesDir");
+			m.insertBefore("{ System.out.println(\"Test4129038594\"); }");
+			Class c = cc.toClass();
+			fakeRefreshApp = (RefreshApplication)c.newInstance();
+		} catch (Exception e) {
+			throw new Error(e);
+		}
+
 		VReflection.SetField_Static(RefreshApplication.class, "instance", fakeRefreshApp);
 		V.Log("Test1:" + RefreshApplication.getInstance());
-
-		ClassPool cp = ClassPool.getDefault();
-		CtClass cc = cp.get("Hello");
-		CtMethod m = cc.getDeclaredMethod("say");
-		m.insertBefore("{ System.out.println(\"Hello.say():\"); }");
-		Class c = cc.toClass();
-		Hello h = (Hello)c.newInstance();
-		h.say();
 
 
 
