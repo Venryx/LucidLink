@@ -11,10 +11,6 @@
  */
 package com.resmed.refresh.model;
 
-import com.resmed.refresh.model.DaoSession;
-import com.resmed.refresh.model.RST_SleepEventDao;
-import com.resmed.refresh.model.RST_SleepSessionInfo;
-import com.resmed.refresh.model.RST_SleepSessionInfoDao;
 import de.greenrobot.dao.DaoException;
 
 public class RST_SleepEvent {

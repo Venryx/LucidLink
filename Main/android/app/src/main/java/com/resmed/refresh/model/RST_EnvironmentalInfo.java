@@ -14,15 +14,8 @@
  */
 package com.resmed.refresh.model;
 
-import com.resmed.refresh.model.DaoSession;
-import com.resmed.refresh.model.RST_EnvironmentalInfo;
-import com.resmed.refresh.model.RST_EnvironmentalInfoDao;
-import com.resmed.refresh.model.RST_SleepSessionInfo;
-import com.resmed.refresh.model.RST_SleepSessionInfoDao;
-import com.resmed.refresh.model.RST_ValueItem;
-import com.resmed.refresh.model.RST_ValueItemDao;
 import de.greenrobot.dao.DaoException;
-import java.util.Collection;
+
 import java.util.Iterator;
 import java.util.List;
 

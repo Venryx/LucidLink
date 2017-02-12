@@ -27,19 +27,6 @@
  */
 package com.resmed.refresh.model;
 
-import android.content.res.Resources;
-import com.resmed.refresh.model.DaoSession;
-import com.resmed.refresh.model.RST_EnvironmentalInfo;
-import com.resmed.refresh.model.RST_EnvironmentalInfoDao;
-import com.resmed.refresh.model.RST_NightQuestions;
-import com.resmed.refresh.model.RST_QuestionItem;
-import com.resmed.refresh.model.RST_SleepEvent;
-import com.resmed.refresh.model.RST_SleepEventDao;
-import com.resmed.refresh.model.RST_SleepSessionInfoDao;
-import com.resmed.refresh.model.RST_User;
-import com.resmed.refresh.model.RST_UserDao;
-import com.resmed.refresh.model.RST_ValueItem;
-import com.resmed.refresh.model.RST_ValueItemDao;
 import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.Log;
@@ -48,7 +35,6 @@ import com.resmed.rm20.SignalQuality;
 import com.resmed.rm20.SleepParams;
 import de.greenrobot.dao.DaoException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
