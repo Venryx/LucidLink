@@ -40,7 +40,7 @@ public class preSleepLog
       finally {}
       try
       {
-        localObject1 = new java/io/File;
+        localObject1 = new java.io.File;
         ((File)localObject1).<init>(RefreshTools.getFilesPath(), filename);
         filesDir = (File)localObject1;
         if (!filesDir.exists()) {
@@ -57,10 +57,10 @@ public class preSleepLog
       try
       {
         localObject4 = Calendar.getInstance();
-        localObject3 = new java/text/SimpleDateFormat;
+        localObject3 = new java.text.SimpleDateFormat;
         ((SimpleDateFormat)localObject3).<init>("yyyyMMdd_HH:mm:ss");
         localObject3 = ((SimpleDateFormat)localObject3).format(((Calendar)localObject4).getTime());
-        localObject4 = new java/io/FileWriter;
+        localObject4 = new java.io.FileWriter;
         ((FileWriter)localObject4).<init>(filesDir, true);
         fw = (FileWriter)localObject4;
         localObject4 = fw;
@@ -152,7 +152,7 @@ public class preSleepLog
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\preSleepLog.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

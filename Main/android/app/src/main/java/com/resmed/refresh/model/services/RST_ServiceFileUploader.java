@@ -34,10 +34,10 @@ public class RST_ServiceFileUploader
       localStringBuilder.<init>(" uploadFile(");
       Log.d("com.resmed.refresh.sync", paramString + ", sessionInfoID=" + paramRST_SleepSessionInfo.getId() + ")");
       this.callback = paramRST_CallbackItem;
-      paramRST_CallbackItem = new java/io/File;
+      paramRST_CallbackItem = new java.io.File;
       paramRST_CallbackItem.<init>(paramString);
       this.fileLZ4 = paramRST_CallbackItem;
-      paramRST_CallbackItem = new java/io/File;
+      paramRST_CallbackItem = new java.io.File;
       paramRST_CallbackItem.<init>(paramString.replace(".lz4", ".edf"));
       this.fileEDF = paramRST_CallbackItem;
       long l = paramRST_SleepSessionInfo.getId();
@@ -99,7 +99,7 @@ public class RST_ServiceFileUploader
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\model\services\RST_ServiceFileUploader.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

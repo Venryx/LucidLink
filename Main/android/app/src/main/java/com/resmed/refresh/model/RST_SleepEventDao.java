@@ -186,7 +186,7 @@ public class RST_SleepEventDao
         }
         if (!((Cursor)localObject).isLast())
         {
-          paramLong = new java/lang/IllegalStateException;
+          paramLong = new java.lang.IllegalStateException;
           localStringBuilder = new java.lang.StringBuilder;
           localStringBuilder.<init>("Expected unique result, but count was ");
           paramLong.<init>(((Cursor)localObject).getCount());
@@ -303,7 +303,7 @@ public class RST_SleepEventDao
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\model\RST_SleepEventDao.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

@@ -165,7 +165,7 @@ public class RST_EnvironmentalInfoDao
         }
         if (!((Cursor)localObject).isLast())
         {
-          localIllegalStateException = new java/lang/IllegalStateException;
+          localIllegalStateException = new java.lang.IllegalStateException;
           paramLong = new java.lang.StringBuilder;
           paramLong.<init>("Expected unique result, but count was ");
           localIllegalStateException.<init>(((Cursor)localObject).getCount());
@@ -280,7 +280,7 @@ public class RST_EnvironmentalInfoDao
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\model\RST_EnvironmentalInfoDao.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

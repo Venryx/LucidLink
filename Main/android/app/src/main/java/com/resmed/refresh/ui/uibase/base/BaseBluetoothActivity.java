@@ -502,7 +502,7 @@ public class BaseBluetoothActivity
         }
         if (VLPacketType.PACKET_TYPE_RETURN.ordinal() == i)
         {
-          paramBundle = new java/lang/String;
+          paramBundle = new java.lang.String;
           paramBundle.<init>((byte[])localObject1);
           localObject1 = new com/google/gson/Gson;
           ((Gson)localObject1).<init>();
@@ -1143,7 +1143,7 @@ public class BaseBluetoothActivity
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\ui\uibase\base\BaseBluetoothActivity.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

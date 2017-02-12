@@ -220,9 +220,9 @@ public class BluetoothDeviceSerializeUtil
     String str = new Gson().toJson(paramBluetoothDevice);
     try
     {
-      paramBluetoothDevice = new java/io/File;
+      paramBluetoothDevice = new java.io.File;
       paramBluetoothDevice.<init>(RefreshTools.getFilesPath(), paramContext.getString(2131165342));
-      paramContext = new java/io/FileOutputStream;
+      paramContext = new java.io.FileOutputStream;
       paramContext.<init>(paramBluetoothDevice);
       paramContext.write(str.getBytes());
       paramContext.flush();
@@ -249,7 +249,7 @@ public class BluetoothDeviceSerializeUtil
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\BluetoothDeviceSerializeUtil.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

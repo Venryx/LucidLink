@@ -31,8 +31,8 @@ public class RM20JNI
     try
     {
       localObject1 = paramContext.openFileInput("libVerRm20.txt");
-      BufferedReader localBufferedReader = new java/io/BufferedReader;
-      InputStreamReader localInputStreamReader = new java/io/InputStreamReader;
+      BufferedReader localBufferedReader = new java.io.BufferedReader;
+      InputStreamReader localInputStreamReader = new java.io.InputStreamReader;
       localInputStreamReader.<init>((InputStream)localObject1);
       localBufferedReader.<init>(localInputStreamReader);
       localObject1 = localBufferedReader.readLine();
@@ -170,7 +170,7 @@ public class RM20JNI
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\rm20\RM20JNI.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

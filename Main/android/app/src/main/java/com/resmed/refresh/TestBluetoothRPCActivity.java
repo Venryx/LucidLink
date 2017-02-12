@@ -183,9 +183,9 @@ public class TestBluetoothRPCActivity
         try
         {
           localObject = openFileInput("samples.edf");
-          paramArrayOfByte = new java/io/InputStreamReader;
+          paramArrayOfByte = new java.io.InputStreamReader;
           paramArrayOfByte.<init>((InputStream)localObject);
-          localObject = new java/io/BufferedReader;
+          localObject = new java.io.BufferedReader;
           ((BufferedReader)localObject).<init>(paramArrayOfByte);
         }
         catch (FileNotFoundException paramArrayOfByte)
@@ -423,7 +423,7 @@ public class TestBluetoothRPCActivity
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\TestBluetoothRPCActivity.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

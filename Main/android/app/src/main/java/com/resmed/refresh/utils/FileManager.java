@@ -1,119 +1,69 @@
 package com.resmed.refresh.utils;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
+import java.nio.*;
 
 public class FileManager
 {
-  public static void deleteFile(File paramFile)
-  {
-    if (paramFile.exists()) {
-      paramFile.delete();
-    }
-  }
-  
-  public static byte[] getByteArrayFromFile(File paramFile)
-  {
-    for (;;)
-    {
-      try
-      {
-        FileInputStream localFileInputStream = new java/io/FileInputStream;
-        localFileInputStream.<init>(paramFile);
-        localByteArrayOutputStream = new java/io/ByteArrayOutputStream;
-        localByteArrayOutputStream.<init>();
-        paramFile = new byte[' '];
-        i = localFileInputStream.read(paramFile);
-        if (i != -1) {
-          continue;
-        }
-        paramFile = localByteArrayOutputStream.toByteArray();
-      }
-      catch (FileNotFoundException paramFile)
-      {
-        ByteArrayOutputStream localByteArrayOutputStream;
-        int i;
-        paramFile.printStackTrace();
-        paramFile = null;
-        continue;
-      }
-      catch (IOException paramFile)
-      {
-        paramFile.printStackTrace();
-        continue;
-      }
-      return paramFile;
-      localByteArrayOutputStream.write(paramFile, 0, i);
-    }
-  }
-  
-  private static void getFileFromByteArray(byte[] paramArrayOfByte, File paramFile)
-  {
-    try
-    {
-      BufferedOutputStream localBufferedOutputStream = new java/io/BufferedOutputStream;
-      FileOutputStream localFileOutputStream = new java/io/FileOutputStream;
-      localFileOutputStream.<init>(paramFile);
-      localBufferedOutputStream.<init>(localFileOutputStream);
-      localBufferedOutputStream.write(paramArrayOfByte);
-      localBufferedOutputStream.flush();
-      localBufferedOutputStream.close();
-      return;
-    }
-    catch (FileNotFoundException paramArrayOfByte)
-    {
-      for (;;)
-      {
-        paramArrayOfByte.printStackTrace();
-      }
-    }
-    catch (IOException paramArrayOfByte)
-    {
-      for (;;)
-      {
-        paramArrayOfByte.printStackTrace();
-      }
-    }
-  }
-  
-  public static void mergeFiles(Vector<String> paramVector, File paramFile)
-  {
-    Vector localVector = new Vector();
-    int j = 0;
-    int i = 0;
-    byte[] arrayOfByte;
-    if (i >= paramVector.size())
-    {
-      arrayOfByte = new byte[j];
-      paramVector = ByteBuffer.wrap(arrayOfByte);
-    }
-    for (i = 0;; i++)
-    {
-      if (i >= localVector.size())
-      {
-        getFileFromByteArray(arrayOfByte, paramFile);
-        return;
-        arrayOfByte = getByteArrayFromFile(new File((String)paramVector.get(i)));
-        localVector.add(arrayOfByte);
-        j += arrayOfByte.length;
-        i++;
-        break;
-      }
-      paramVector.put((byte[])localVector.get(i));
-    }
-  }
+	public static void deleteFile(final File file) {
+		if (file.exists()) {
+			file.delete();
+		}
+	}
+
+	public static byte[] getByteArrayFromFile(final File file) {
+		try {
+			final FileInputStream fileInputStream = new FileInputStream(file);
+			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			final byte[] array = new byte[8192];
+			while (true) {
+				final int read = fileInputStream.read(array);
+				if (read == -1) {
+					break;
+				}
+				byteArrayOutputStream.write(array, 0, read);
+			}
+			return byteArrayOutputStream.toByteArray();
+		}
+		catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+		catch (IOException ex2) {
+			ex2.printStackTrace();
+			//goto Label_0062;
+		}
+		return null;
+	}
+
+	private static void getFileFromByteArray(final byte[] array, final File file) {
+		try {
+			final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
+			bufferedOutputStream.write(array);
+			bufferedOutputStream.flush();
+			bufferedOutputStream.close();
+		}
+		catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+		catch (IOException ex2) {
+			ex2.printStackTrace();
+		}
+	}
+
+	public static void mergeFiles(final Vector<String> vector, final File file) {
+		final Vector<byte[]> vector2 = new Vector<byte[]>();
+		int n = 0;
+		for (int i = 0; i < vector.size(); ++i) {
+			final byte[] byteArrayFromFile = getByteArrayFromFile(new File(vector.get(i)));
+			vector2.add(byteArrayFromFile);
+			n += byteArrayFromFile.length;
+		}
+		final byte[] array = new byte[n];
+		final ByteBuffer wrap = ByteBuffer.wrap(array);
+		for (int j = 0; j < vector2.size(); ++j) {
+			wrap.put(vector2.get(j));
+		}
+		getFileFromByteArray(array, file);
+	}
 }
-
-
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\FileManager.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

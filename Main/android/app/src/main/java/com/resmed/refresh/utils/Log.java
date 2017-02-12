@@ -139,10 +139,10 @@ public final class Log
     if (!RST_SleepSession.getInstance().isSessionRunning()) {}
     try
     {
-      StringBuffer localStringBuffer = new java/lang/StringBuffer;
+      StringBuffer localStringBuffer = new java.lang.StringBuffer;
       localStringBuffer.<init>();
       Calendar localCalendar = Calendar.getInstance();
-      SimpleDateFormat localSimpleDateFormat = new java/text/SimpleDateFormat;
+      SimpleDateFormat localSimpleDateFormat = new java.text.SimpleDateFormat;
       localSimpleDateFormat.<init>("dd-MM HH:mm:ss.SSS");
       localStringBuffer.append(localSimpleDateFormat.format(localCalendar.getTime()));
       localStringBuffer.append("\t");
@@ -155,9 +155,9 @@ public final class Log
         localStringBuffer.append(paramThrowable.getMessage());
       }
       localStringBuffer.append("\n");
-      paramString2 = new java/io/File;
+      paramString2 = new java.io.File;
       paramString2.<init>(pathToFile);
-      paramString1 = new java/io/FileWriter;
+      paramString1 = new java.io.FileWriter;
       paramString1.<init>(paramString2, true);
       paramString1.append(localStringBuffer);
       paramString1.close();
@@ -177,7 +177,7 @@ public final class Log
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\Log.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

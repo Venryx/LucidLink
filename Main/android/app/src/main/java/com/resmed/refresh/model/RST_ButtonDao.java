@@ -177,22 +177,20 @@ public class RST_ButtonDao
       SqlUtils.appendColumnsEqValue((StringBuilder)localObject, "T", getPkColumns());
       localObject = ((StringBuilder)localObject).toString();
       paramLong = paramLong.toString();
-      localObject = this.db.rawQuery((String)localObject, new String[] { paramLong });
+		Cursor query = this.db.rawQuery((String)localObject, new String[] { paramLong });
       try
       {
-        boolean bool = ((Cursor)localObject).moveToFirst();
+        boolean bool = query.moveToFirst();
         if (!bool)
         {
-          ((Cursor)localObject).close();
+			query.close();
           paramLong = localStringBuilder;
           continue;
         }
-        if (!((Cursor)localObject).isLast())
+        if (!query.isLast())
         {
-          paramLong = new java/lang/IllegalStateException;
-          localStringBuilder = new java.lang.StringBuilder;
-          localStringBuilder.<init>("Expected unique result, but count was ");
-          paramLong.<init>(((Cursor)localObject).getCount());
+          paramLong = new java.lang.IllegalStateException(query.getCount());
+          localStringBuilder = new java.lang.StringBuilder("Expected unique result, but count was ");
           throw paramLong;
         }
       }
@@ -315,7 +313,7 @@ public class RST_ButtonDao
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\model\RST_ButtonDao.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

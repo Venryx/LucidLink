@@ -25,7 +25,7 @@ public class RefreshReportHandler
   {
     try
     {
-      PrintWriter localPrintWriter = new java/io/PrintWriter;
+      PrintWriter localPrintWriter = new java.io.PrintWriter;
       localPrintWriter.<init>(this.filePath, "UTF-8");
       localPrintWriter.println(paramCrashReportData.toJSON().toString());
       localPrintWriter.close();
@@ -56,7 +56,7 @@ public class RefreshReportHandler
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\ui\uibase\app\RefreshReportHandler.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

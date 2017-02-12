@@ -65,7 +65,7 @@ public class AudioDefaultRecorder
       {
         this.mRecorder.start();
         this.isRecording = true;
-        Thread localThread = new java/lang/Thread;
+        Thread localThread = new java.lang.Thread;
         Runnable local1 = new com/resmed/refresh/utils/audio/AudioDefaultRecorder$1;
         local1.<init>(this);
         localThread.<init>(local1);
@@ -176,7 +176,7 @@ public class AudioDefaultRecorder
 }
 
 
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\audio\AudioDefaultRecorder.class
+/* Location:              [...]
  * Java compiler version: 6 (50.0)
  * JD-Core Version:       0.7.1
  */

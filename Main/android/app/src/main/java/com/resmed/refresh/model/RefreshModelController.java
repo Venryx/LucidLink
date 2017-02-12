@@ -1,6 +1,8 @@
 package com.resmed.refresh.model;
 
 import android.app.*;
+
+import com.resmed.refresh.model.json.Location;
 import com.resmed.refresh.ui.uibase.app.*;
 import com.google.android.gms.common.*;
 import com.google.android.gms.maps.model.*;
@@ -28,6 +30,7 @@ import android.location.*;
 import com.resmed.refresh.utils.*;
 import com.resmed.refresh.ui.utils.*;
 import com.resmed.refresh.model.mindclear.*;
+import com.resmed.refresh.utils.Log;
 
 public class RefreshModelController
 {
@@ -902,14 +905,14 @@ public class RefreshModelController
 
 	public List<RST_AdviceItem> localTasks() {
 		final String userId = this.getUserId();
-		return (List<RST_AdviceItem>)this.daoSession.getRST_AdviceItemDao().queryBuilder().where(RST_AdviceItemDao$Properties.IdUser.eq((Object)userId), new WhereCondition[] { RST_AdviceItemDao$Properties.Type.eq((Object)RST_AdviceItem$AdviceType.kAdviceTypeTask.ordinal()) }).where(RST_AdviceItemDao$Properties.IdUser.eq((Object)userId), new WhereCondition[0]).orderDesc(new Property[] { RST_AdviceItemDao$Properties.Timestamp }).list();
+		return (List<RST_AdviceItem>)this.daoSession.getRST_AdviceItemDao().queryBuilder().where(RST_UserDao.Properties.IdUser.eq((Object)userId), new WhereCondition[] { RST_AdviceItemDao$Properties.Type.eq((Object)RST_AdviceItem$AdviceType.kAdviceTypeTask.ordinal()) }).where(RST_AdviceItemDao$Properties.IdUser.eq((Object)userId), new WhereCondition[0]).orderDesc(new Property[] { RST_AdviceItemDao$Properties.Timestamp }).list();
 	}
 
 	public RST_User localUserDataForId(final String s) {
 		if (s == null) {
 			return null;
 		}
-		return (RST_User)this.daoSession.getRST_UserDao().queryBuilder().where(RST_UserDao$Properties.Id.eq((Object)s), new WhereCondition[0]).unique();
+		return (RST_User)this.daoSession.getRST_UserDao().queryBuilder().where(RST_UserDao.Properties.Id.eq((Object)s), new WhereCondition[0]).unique();
 	}
 
 	public List<RST_ValueItem> numberArrayFromValueSet(final List<Integer> list) {
@@ -939,14 +942,14 @@ public class RefreshModelController
 
 	public void save() {
 		if (this.user != null) {
-			this.daoSession.getRST_UserDao().update((Object)this.user);
-			this.daoSession.getRST_SettingsDao().update((Object)this.user.getSettings());
-			this.daoSession.getRST_UserProfileDao().update((Object)this.user.getProfile());
-			this.daoSession.getRST_LocationItemDao().update((Object)this.user.getLocation());
+			this.daoSession.getRST_UserDao().update(this.user);
+			this.daoSession.getRST_SettingsDao().update(this.user.getSettings());
+			this.daoSession.getRST_UserProfileDao().update(this.user.getProfile());
+			this.daoSession.getRST_LocationItemDao().update(this.user.getLocation());
 			if (this.user.getAdvices() != null) {
 				final Iterator<RST_AdviceItem> iterator = this.user.getAdvices().iterator();
 				while (iterator.hasNext()) {
-					this.daoSession.getRST_AdviceItemDao().update((Object)iterator.next());
+					this.daoSession.getRST_AdviceItemDao().update(iterator.next());
 				}
 			}
 			this.user.resetAdvices();
@@ -955,7 +958,7 @@ public class RefreshModelController
 				this.daoSession.getRST_NightQuestionsDao().update((Object)this.user.getNightQuestions());
 				for (final RST_QuestionItem rst_QuestionItem : this.user.getNightQuestions().getQuestions()) {
 					preSleepLog.addTrace("RefershModelController:save QuestionItem Question= " + rst_QuestionItem.getText() + "QuestionItem Question index= " + rst_QuestionItem.getId() + " answer=" + rst_QuestionItem.getAnswer());
-					this.daoSession.getRST_QuestionItemDao().update((Object)rst_QuestionItem);
+					this.daoSession.getRST_QuestionItemDao().update(rst_QuestionItem);
 				}
 				this.user.getNightQuestions().resetQuestions();
 			}
@@ -1254,7 +1257,7 @@ public class RefreshModelController
 			andSaveLocation.setLongitude((float)location.getLongitude());
 			andSaveLocation.setTimezone(this.userTimezoneOffset());
 			this.user.setAndSaveLocation(andSaveLocation);
-			this.daoSession.getRST_UserDao().update((Object)this.user);
+			this.daoSession.getRST_UserDao().update(this.user);
 			AppFileLog.addTrace("Location - Controller set location to (" + andSaveLocation.getLatitude() + "," + andSaveLocation.getLongitude() + ")");
 			Log.d("com.resmed.refresh.model", "Location of user " + this.user.getId() + " updated to (" + location.getLatitude() + ", " + location.getLongitude() + ")");
 		}
