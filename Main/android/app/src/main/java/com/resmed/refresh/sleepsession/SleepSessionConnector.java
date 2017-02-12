@@ -17,18 +17,11 @@ import android.view.View;
 
 import com.google.gson.Gson;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.model.RST_CallbackItem;
-import com.resmed.refresh.model.RST_EnvironmentalInfo;
-import com.resmed.refresh.model.RST_Response;
 import com.resmed.refresh.model.RST_SleepEvent;
-import com.resmed.refresh.model.RST_SleepEvent.SleepEventType;
 import com.resmed.refresh.model.RST_SleepSessionInfo;
-import com.resmed.refresh.model.RST_User;
-import com.resmed.refresh.model.RST_UserProfile;
 import com.resmed.refresh.model.RST_ValueItem;
 import com.resmed.refresh.model.RefreshModelController;
 import com.resmed.refresh.model.json.JsonRPC;
-import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.ui.activity.CrashSleepSessionActivity;

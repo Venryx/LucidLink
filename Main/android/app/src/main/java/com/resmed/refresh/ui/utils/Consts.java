@@ -41,8 +41,8 @@ public class Consts
   public static final String EDITING_PROFILE = "com.resmed.refresh.ui.uibase.app.editing_profile";
   public static String EMAIL_BUG_REPORT;
   public static final int ENVIRONMENT = 5;
-  public static final String[] ENVIRONMENTAL_NAMES;
-  private static final String[][] ENVIRONMENTAL_URL;
+  public static final String[] ENVIRONMENTAL_NAMES = null;
+  private static final String[][] ENVIRONMENTAL_URL = null;
   private static final int ENVIRONMENT_DEVELOPMENT = 0;
   private static final int ENVIRONMENT_PRODUCTION = 5;
   private static final int ENVIRONMENT_STAGE = 4;
@@ -57,7 +57,7 @@ public class Consts
   public static final String LAUNCH_FROM_ALARMSERVICE = "com.resmed.refresh.consts.launch_from_alarm_service";
   public static final int MIN_EDF_FILE_VALID_BYTE_SIZE = 12000;
   public static final int MIN_SAMPLES_TO_SAVE_RECORD;
-  public static final long MIN_SECS_TO_SAVE_RECORD;
+  public static final long MIN_SECS_TO_SAVE_RECORD = -1;
   public static final int NAV_LEFT_RIGHT = 1;
   public static final int NAV_NO = -1;
   public static final int NAV_RIGHT_LEFT = 2;
@@ -75,7 +75,7 @@ public class Consts
   public static final int RECONNECTION_CODE = 1;
   public static final String RECOVERING_APP_FROM_SERVICE = "com.resmed.refresh.consts.recovering_app_from_service";
   public static final String RECOVERING_UI_THREAD_FROM_CRASH = "com.resmed.refresh.consts.recovering_ui_thread_from_crash";
-  public static final String[] REFRESH_URL;
+  public static final String[] REFRESH_URL = null;
   public static int RELAX_TIME_DIVIDER = 0;
   public static final String RPC_STREAMING_MODE = "REAL";
   public static final int SERVICE_IPC_MAX_TRANSACTION = 1048000;

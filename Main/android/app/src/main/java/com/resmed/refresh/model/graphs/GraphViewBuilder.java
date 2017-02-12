@@ -2,7 +2,7 @@ package com.resmed.refresh.model.graphs;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import com.resmed.refresh.model.RST_CallbackItem;
+
 import com.resmed.refresh.model.RST_SleepSessionInfo;
 import com.resmed.refresh.model.mappers.HypnoMapper;
 import com.resmed.refresh.ui.customview.CustomBarChart;

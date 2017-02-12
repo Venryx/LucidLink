@@ -1,7 +1,5 @@
 package com.resmed.refresh.sleepsession;
 
-import com.resmed.refresh.model.RST_CallbackItem;
-import com.resmed.refresh.model.RST_Response;
 import com.resmed.refresh.model.RST_SleepSessionInfo;
 import com.resmed.refresh.utils.Log;
 

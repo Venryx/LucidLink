@@ -26,18 +26,13 @@ package com.resmed.refresh.model.mappers;
 
 import com.google.gson.Gson;
 import com.resmed.refresh.model.RST_EnvironmentalInfo;
-import com.resmed.refresh.model.RST_LocationItem;
-import com.resmed.refresh.model.RST_NightQuestions;
 import com.resmed.refresh.model.RST_SleepEvent;
 import com.resmed.refresh.model.RST_SleepSessionInfo;
 import com.resmed.refresh.model.RST_ValueItem;
 import com.resmed.refresh.model.RefreshModelController;
-import com.resmed.refresh.model.json.Location;
 import com.resmed.refresh.model.json.Record;
 import com.resmed.refresh.model.json.SleepEvent;
 import com.resmed.refresh.model.json.SynopsisData;
-import com.resmed.refresh.model.mappers.LocationMapper;
-import com.resmed.refresh.model.mappers.NightQuestionsMapper;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;

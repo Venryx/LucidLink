@@ -25,12 +25,9 @@ public class RST_SleepEvent {
 		}
 	}
 
-
-	private transient DaoSession daoSession;
 	private int epochNumber;
 	private Long id;
 	private Long idSleepSession;
-	private transient RST_SleepEventDao myDao;
 	private RST_SleepSessionInfo rST_SleepSessionInfo;
 	private Long rST_SleepSessionInfo__resolvedKey;
 	private int type;
@@ -51,19 +48,6 @@ public class RST_SleepEvent {
 		this.idSleepSession = l2;
 	}
 
-	public void __setDaoSession(DaoSession daoSession) {
-		this.daoSession = daoSession;
-		RST_SleepEventDao rST_SleepEventDao = daoSession != null ? daoSession.getRST_SleepEventDao() : null;
-		this.myDao = rST_SleepEventDao;
-	}
-
-	public void delete() {
-		if (this.myDao == null) {
-			throw new DaoException("Entity is detached from DAO context");
-		}
-		this.myDao.delete(this);
-	}
-
 	public int getEpochNumber() {
 		return this.epochNumber;
 	}
@@ -76,38 +60,12 @@ public class RST_SleepEvent {
 		return this.idSleepSession;
 	}
 
-	/*
-	 * Enabled unnecessary exception pruning
-	 */
-	public RST_SleepSessionInfo getRST_SleepSessionInfo() {
-		Long l = this.idSleepSession;
-		if (this.rST_SleepSessionInfo__resolvedKey != null) {
-			if (this.rST_SleepSessionInfo__resolvedKey.equals(l)) return this.rST_SleepSessionInfo;
-		}
-		if (this.daoSession == null) {
-			throw new DaoException("Entity is detached from DAO context");
-		}
-		RST_SleepSessionInfo rST_SleepSessionInfo = (RST_SleepSessionInfo)this.daoSession.getRST_SleepSessionInfoDao().load(l);
-		synchronized (this) {
-			this.rST_SleepSessionInfo = rST_SleepSessionInfo;
-			this.rST_SleepSessionInfo__resolvedKey = l;
-			return this.rST_SleepSessionInfo;
-		}
-	}
-
 	public int getType() {
 		return this.type;
 	}
 
 	public int getValue() {
 		return this.value;
-	}
-
-	public void refresh() {
-		if (this.myDao == null) {
-			throw new DaoException("Entity is detached from DAO context");
-		}
-		this.myDao.refresh(this);
 	}
 
 	public void setEpochNumber(int n) {
@@ -137,12 +95,5 @@ public class RST_SleepEvent {
 
 	public void setValue(int n) {
 		this.value = n;
-	}
-
-	public void update() {
-		if (this.myDao == null) {
-			throw new DaoException("Entity is detached from DAO context");
-		}
-		this.myDao.update(this);
 	}
 }

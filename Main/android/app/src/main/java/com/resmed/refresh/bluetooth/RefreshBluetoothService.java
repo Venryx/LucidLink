@@ -45,7 +45,6 @@
  */
 package com.resmed.refresh.bluetooth;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
@@ -65,13 +64,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibJNI;
-import com.resmed.refresh.bluetooth.BluetoothSetup;
-import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.bluetooth.exception.BluetoohNotSupportedException;
 import com.resmed.refresh.model.json.JsonRPC;
-import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
