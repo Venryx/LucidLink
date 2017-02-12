@@ -2,37 +2,30 @@ package com.resmed.rm20;
 
 import java.util.Date;
 
-public abstract interface RM20Manager
-{
-  public abstract int disableSmartAlarm();
-  
-  public abstract int getEpochCount();
-  
-  public abstract String getLibVersion();
-  
-  public abstract int getRealTimeSleepState();
-  
-  public abstract SmartAlarmInfo getSmartAlarm();
-  
-  public abstract UserInfo getUserInfo();
-  
-  public abstract SleepParams resultsForSession();
-  
-  public abstract int setSmartAlarm(Date paramDate, int paramInt, boolean paramBoolean);
-  
-  public abstract int startRespRateCallbacks(boolean paramBoolean);
-  
-  public abstract int startupLibrary(int paramInt1, int paramInt2);
-  
-  public abstract int stopAndCalculate();
-  
-  public abstract int writeSampleData(int paramInt1, int paramInt2);
-  
-  public abstract int writeSamples(int[] paramArrayOfInt1, int[] paramArrayOfInt2);
+public interface RM20Manager {
+	int disableSmartAlarm();
+
+	int getEpochCount();
+
+	String getLibVersion();
+
+	int getRealTimeSleepState();
+
+	SmartAlarmInfo getSmartAlarm();
+
+	UserInfo getUserInfo();
+
+	SleepParams resultsForSession();
+
+	int setSmartAlarm(Date paramDate, int paramInt, boolean paramBoolean);
+
+	int startRespRateCallbacks(boolean paramBoolean);
+
+	int startupLibrary(int paramInt1, int paramInt2);
+
+	int stopAndCalculate();
+
+	int writeSampleData(int paramInt1, int paramInt2);
+
+	int writeSamples(int[] paramArrayOfInt1, int[] paramArrayOfInt2);
 }
-
-
-/* Location:              [...]
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

@@ -1,9 +1,6 @@
 package com.resmed.refresh.ui.uibase.app;
 
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import com.flurry.android.FlurryAgent;
 import com.resmed.refresh.bluetooth.BeDConnectionStatus;
@@ -11,22 +8,14 @@ import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.model.json.LocaleMUnitResponse;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.Log;
-import java.util.Calendar;
 import java.util.Locale;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 
-@ReportsCrashes(
-		formKey = "",
-		mailTo = "RstAndroidTest@ResMed.com",
-		mode = ReportingInteractionMode.TOAST,
-		resToastText = 2131165352
-)
+//@ReportsCrashes(formKey = "", mailTo = "RstAndroidTest@ResMed.com", mode = ReportingInteractionMode.TOAST, resToastText = 2131165352)
 public class RefreshApplication extends Application {
 	private static int activitiesInForeground = 0;
-	private static RefreshApplication instance;
+	public static RefreshApplication instance;
 	public static boolean is64bitdevice = false;
 	private static boolean isPlayingAlarm = false;
 	public static String userCountry = "";
@@ -38,16 +27,9 @@ public class RefreshApplication extends Application {
 	}
 
 	public static RefreshApplication getInstance() {
-		synchronized(RefreshApplication.class){}
-
-		RefreshApplication var1;
-		try {
-			var1 = instance;
-		} finally {
-			;
+		synchronized(RefreshApplication.class){
+			return instance;
 		}
-
-		return var1;
 	}
 
 	public void decreaseActivitiesInForeground() {

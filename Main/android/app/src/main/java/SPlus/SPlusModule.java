@@ -17,6 +17,7 @@ import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.sleepsession.SleepSessionManager;
+import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -101,11 +102,15 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
+		RefreshApplication refreshApp = new RefreshApplication();
+		RefreshApplication.instance = refreshApp;
+
 		RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
 		V.Log("Test2");
 		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {
 			@Override public Context getContext() {
-				return bluetoothService.getContext();
+				//return bluetoothService.getContext();
+				return reactContext;
 			}
 			@Override public void handlePacket(VLP.VLPacket vlPacket) {
 				bluetoothService.handlePacket(vlPacket);
@@ -119,6 +124,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 			@Override public void sendMessageToClient(Message message) {
 				MessageType type = MessageType.GetEntry(message.what);
 				if (type == MessageType.OnRm20RealTimeSleepState) {
+					V.Toast("Received OnRm20RealTimeSleepState message!" + message.getData());
 				}
 
 				bluetoothService.sendMessageToClient(message);

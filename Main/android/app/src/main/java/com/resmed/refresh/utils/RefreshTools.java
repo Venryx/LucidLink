@@ -454,10 +454,11 @@ public class RefreshTools
 	}
 
 	public static File getFilesPath() {
-		if (Consts.USE_EXTERNAL_STORAGE) {
+		/*if (Consts.USE_EXTERNAL_STORAGE) {
 			return Environment.getExternalStorageDirectory();
 		}
-		return RefreshApplication.getInstance().getFilesDir();
+		return RefreshApplication.getInstance().getFilesDir();*/
+		return Environment.getExternalStorageDirectory();
 	}
 
 	public static String getFirmwareBinaryVersion(final Context context) {

@@ -595,13 +595,11 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public String rm20Version() {
 		return "0";
 	}
-
 	public String rm60Version() {
 		if (this.edfManager != null) {
+			return String.valueOf(this.edfManager.getRM60LibVersion()) + "_" + "1.0.0";
 		}
-		for (String str = this.edfManager.getRM60LibVersion() + "_" + "1.0.0"; ; str = "0") {
-			return str;
-		}
+		return "0";
 	}
 
 	public void setRM20AlarmTime(final Date rm20Alarmtime, final int rm20AlarmWindow) {
@@ -629,31 +627,35 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public void start(long paramLong, int paramInt1, int paramInt2) {
+	public void start(final long sessionId, final int n, final int n2) {
 		if (this.isActive) {
 			return;
 		}
 		this.nrOfBioSamples = 0;
-		this.sessionId = paramLong;
+		this.sessionId = sessionId;
 		this.isActive = true;
-		Object localObject1 = Calendar.getInstance();
-		((Calendar) localObject1).setTimeZone(TimeZone.getTimeZone("UTC"));
+		final Calendar instance = Calendar.getInstance();
+		instance.setTimeZone(TimeZone.getTimeZone("UTC"));
 		new SimpleDateFormat("yyyyMMdd_HHmm").setTimeZone(TimeZone.getTimeZone("UTC"));
-		this.startTimeStamp = ((Calendar) localObject1).getTime().getTime();
-		this.fileName = fileNameForSessionId(paramLong);
-		RstEdfMetaData localRstEdfMetaData = new RstEdfMetaData();
-		setMetaData(localRstEdfMetaData);
+		this.startTimeStamp = instance.getTime().getTime();
+		this.fileName = this.fileNameForSessionId(sessionId);
+		final RstEdfMetaData metaData = new RstEdfMetaData();
+		this.setMetaData(metaData);
+		Context context;
 		if (Consts.UNIT_TEST_MODE) {
+			context = this.unitTestContext;
 		}
-		for (localObject1 = this.unitTestContext; ; localObject1 = this.serviceHandler.getContext().getApplicationContext()) {
-			this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, (Context) localObject1);
-			this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, localRstEdfMetaData.toArray(), this, (Context) localObject1);
-			this.edfManager.openFileForMode("w");
-			this.rm20Manager.startupLibrary(paramInt1, paramInt2);
-			this.rm20Manager.startRespRateCallbacks(true);
-			AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel((Context) localObject1));
-			break;
+		else {
+			context = this.serviceHandler.getContext().getApplicationContext();
 		}
+		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, context);
+
+		this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, context);
+		//edfManager.openFileForMode("w"); // temp removed
+
+		this.rm20Manager.startupLibrary(n, n2);
+		this.rm20Manager.startRespRateCallbacks(true);
+		AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel(context));
 	}
 
 	public void stop() {
