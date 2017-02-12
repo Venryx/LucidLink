@@ -1,723 +1,589 @@
 package com.resmed.refresh.utils;
 
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import com.google.gson.Gson;
-import com.resmed.refresh.packets.PacketsByteValuesReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import android.content.*;
+import android.bluetooth.*;
+import com.resmed.refresh.packets.*;
+import com.google.gson.*;
+import java.io.*;
 
 public class BluetoothDataSerializeUtil
 {
-  public static boolean clearJSONFile(Context paramContext)
-  {
-    new File(RefreshTools.getFilesPath(), paramContext.getString(2131165342)).delete();
-    return true;
-  }
-  
-  public static boolean deleteBulkDataBioFile(Context paramContext)
-  {
-    return new File(RefreshTools.getFilesPath(), paramContext.getString(2131165343)).delete();
-  }
-  
-  public static boolean deleteJsonFile(Context paramContext)
-  {
-    try
-    {
-      File localFile1 = RefreshTools.getFilesPath();
-      File localFile2 = new java/io/File;
-      localFile2.<init>(localFile1, paramContext.getString(2131165342));
-      localFile2.delete();
-      bool = true;
-    }
-    catch (Exception paramContext)
-    {
-      for (;;)
-      {
-        paramContext.printStackTrace();
-        boolean bool = false;
-      }
-    }
-    return bool;
-  }
-  
-  /* Error */
-  public static int[][] readBulkBioDataFile(Context paramContext)
-  {
-    // Byte code:
-    //   0: ldc 2
-    //   2: monitorenter
-    //   3: invokestatic 19	com/resmed/refresh/utils/RefreshTools:getFilesPath	()Ljava/io/File;
-    //   6: astore 5
-    //   8: new 13	java/io/File
-    //   11: astore 4
-    //   13: aload 4
-    //   15: aload 5
-    //   17: aload_0
-    //   18: ldc 35
-    //   20: invokevirtual 26	android/content/Context:getString	(I)Ljava/lang/String;
-    //   23: invokespecial 29	java/io/File:<init>	(Ljava/io/File;Ljava/lang/String;)V
-    //   26: new 49	java/util/ArrayList
-    //   29: astore 9
-    //   31: aload 9
-    //   33: invokespecial 50	java/util/ArrayList:<init>	()V
-    //   36: new 49	java/util/ArrayList
-    //   39: astore 8
-    //   41: aload 8
-    //   43: invokespecial 50	java/util/ArrayList:<init>	()V
-    //   46: aconst_null
-    //   47: astore 6
-    //   49: aconst_null
-    //   50: astore 5
-    //   52: aconst_null
-    //   53: astore 7
-    //   55: aload 5
-    //   57: astore_0
-    //   58: new 52	java/io/FileInputStream
-    //   61: astore 10
-    //   63: aload 5
-    //   65: astore_0
-    //   66: aload 10
-    //   68: aload 4
-    //   70: invokespecial 55	java/io/FileInputStream:<init>	(Ljava/io/File;)V
-    //   73: aload 5
-    //   75: astore_0
-    //   76: new 57	java/io/BufferedReader
-    //   79: astore 4
-    //   81: aload 5
-    //   83: astore_0
-    //   84: new 59	java/io/InputStreamReader
-    //   87: astore 11
-    //   89: aload 5
-    //   91: astore_0
-    //   92: aload 11
-    //   94: aload 10
-    //   96: invokespecial 62	java/io/InputStreamReader:<init>	(Ljava/io/InputStream;)V
-    //   99: aload 5
-    //   101: astore_0
-    //   102: aload 4
-    //   104: aload 11
-    //   106: invokespecial 65	java/io/BufferedReader:<init>	(Ljava/io/Reader;)V
-    //   109: iconst_0
-    //   110: istore_1
-    //   111: aload 4
-    //   113: invokevirtual 69	java/io/BufferedReader:readLine	()Ljava/lang/String;
-    //   116: astore_0
-    //   117: aload_0
-    //   118: ifnonnull +89 -> 207
-    //   121: aload 4
-    //   123: ifnull +241 -> 364
-    //   126: aload 4
-    //   128: invokevirtual 72	java/io/BufferedReader:close	()V
-    //   131: aload 9
-    //   133: invokeinterface 78 1 0
-    //   138: newarray <illegal type>
-    //   140: astore_0
-    //   141: aload 8
-    //   143: invokeinterface 78 1 0
-    //   148: newarray <illegal type>
-    //   150: astore 4
-    //   152: iconst_0
-    //   153: istore_1
-    //   154: iload_1
-    //   155: aload 9
-    //   157: invokeinterface 78 1 0
-    //   162: if_icmplt +205 -> 367
-    //   165: aload_0
-    //   166: arraylength
-    //   167: istore_1
-    //   168: getstatic 84	java/lang/Integer:TYPE	Ljava/lang/Class;
-    //   171: iconst_2
-    //   172: newarray <illegal type>
-    //   174: dup
-    //   175: iconst_0
-    //   176: iconst_2
-    //   177: iastore
-    //   178: dup
-    //   179: iconst_1
-    //   180: iload_1
-    //   181: iastore
-    //   182: invokestatic 90	java/lang/reflect/Array:newInstance	(Ljava/lang/Class;[I)Ljava/lang/Object;
-    //   185: checkcast 92	[[I
-    //   188: astore 5
-    //   190: aload 5
-    //   192: iconst_0
-    //   193: aload_0
-    //   194: aastore
-    //   195: aload 5
-    //   197: iconst_1
-    //   198: aload 4
-    //   200: aastore
-    //   201: ldc 2
-    //   203: monitorexit
-    //   204: aload 5
-    //   206: areturn
-    //   207: iinc 1 1
-    //   210: aload_0
-    //   211: invokevirtual 97	java/lang/String:trim	()Ljava/lang/String;
-    //   214: ldc 99
-    //   216: invokevirtual 103	java/lang/String:split	(Ljava/lang/String;)[Ljava/lang/String;
-    //   219: astore_0
-    //   220: aload_0
-    //   221: iconst_0
-    //   222: aaload
-    //   223: invokestatic 107	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   226: istore_2
-    //   227: aload_0
-    //   228: iconst_1
-    //   229: aaload
-    //   230: invokestatic 107	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   233: istore_3
-    //   234: aload 9
-    //   236: iload_2
-    //   237: invokestatic 111	java/lang/Integer:valueOf	(I)Ljava/lang/Integer;
-    //   240: invokeinterface 115 2 0
-    //   245: pop
-    //   246: aload 8
-    //   248: iload_3
-    //   249: invokestatic 111	java/lang/Integer:valueOf	(I)Ljava/lang/Integer;
-    //   252: invokeinterface 115 2 0
-    //   257: pop
-    //   258: goto -147 -> 111
-    //   261: astore 5
-    //   263: aload 4
-    //   265: astore_0
-    //   266: aload 5
-    //   268: invokevirtual 116	java/io/FileNotFoundException:printStackTrace	()V
-    //   271: aload 4
-    //   273: ifnull -142 -> 131
-    //   276: aload 4
-    //   278: invokevirtual 72	java/io/BufferedReader:close	()V
-    //   281: goto -150 -> 131
-    //   284: astore_0
-    //   285: aload_0
-    //   286: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   289: goto -158 -> 131
-    //   292: astore_0
-    //   293: ldc 2
-    //   295: monitorexit
-    //   296: aload_0
-    //   297: athrow
-    //   298: astore 5
-    //   300: aload 6
-    //   302: astore 4
-    //   304: aload 4
-    //   306: astore_0
-    //   307: aload 5
-    //   309: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   312: aload 4
-    //   314: ifnull -183 -> 131
-    //   317: aload 4
-    //   319: invokevirtual 72	java/io/BufferedReader:close	()V
-    //   322: goto -191 -> 131
-    //   325: astore_0
-    //   326: aload_0
-    //   327: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   330: goto -199 -> 131
-    //   333: astore 4
-    //   335: aload_0
-    //   336: astore 5
-    //   338: aload 5
-    //   340: ifnull +8 -> 348
-    //   343: aload 5
-    //   345: invokevirtual 72	java/io/BufferedReader:close	()V
-    //   348: aload 4
-    //   350: athrow
-    //   351: astore_0
-    //   352: aload_0
-    //   353: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   356: goto -8 -> 348
-    //   359: astore_0
-    //   360: aload_0
-    //   361: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   364: goto -233 -> 131
-    //   367: aload_0
-    //   368: iload_1
-    //   369: aload 9
-    //   371: iload_1
-    //   372: invokeinterface 121 2 0
-    //   377: checkcast 80	java/lang/Integer
-    //   380: invokevirtual 124	java/lang/Integer:intValue	()I
-    //   383: iastore
-    //   384: aload 4
-    //   386: iload_1
-    //   387: aload 8
-    //   389: iload_1
-    //   390: invokeinterface 121 2 0
-    //   395: checkcast 80	java/lang/Integer
-    //   398: invokevirtual 124	java/lang/Integer:intValue	()I
-    //   401: iastore
-    //   402: iinc 1 1
-    //   405: goto -251 -> 154
-    //   408: astore_0
-    //   409: aload 4
-    //   411: astore 5
-    //   413: aload_0
-    //   414: astore 4
-    //   416: goto -78 -> 338
-    //   419: astore_0
-    //   420: aload_0
-    //   421: astore 5
-    //   423: goto -119 -> 304
-    //   426: astore 5
-    //   428: aload 7
-    //   430: astore 4
-    //   432: goto -169 -> 263
-    // Local variable table:
-    //   start	length	slot	name	signature
-    //   0	435	0	paramContext	Context
-    //   110	293	1	i	int
-    //   226	11	2	j	int
-    //   233	16	3	k	int
-    //   11	307	4	localObject1	Object
-    //   333	77	4	localObject2	Object
-    //   414	17	4	localObject3	Object
-    //   6	199	5	localObject4	Object
-    //   261	6	5	localFileNotFoundException1	FileNotFoundException
-    //   298	10	5	localIOException	IOException
-    //   336	86	5	localObject5	Object
-    //   426	1	5	localFileNotFoundException2	FileNotFoundException
-    //   47	254	6	localObject6	Object
-    //   53	376	7	localObject7	Object
-    //   39	349	8	localArrayList1	java.util.ArrayList
-    //   29	341	9	localArrayList2	java.util.ArrayList
-    //   61	34	10	localFileInputStream	java.io.FileInputStream
-    //   87	18	11	localInputStreamReader	java.io.InputStreamReader
-    // Exception table:
-    //   from	to	target	type
-    //   111	117	261	java/io/FileNotFoundException
-    //   210	258	261	java/io/FileNotFoundException
-    //   276	281	284	java/io/IOException
-    //   3	46	292	finally
-    //   126	131	292	finally
-    //   131	152	292	finally
-    //   154	190	292	finally
-    //   276	281	292	finally
-    //   285	289	292	finally
-    //   317	322	292	finally
-    //   326	330	292	finally
-    //   343	348	292	finally
-    //   348	351	292	finally
-    //   352	356	292	finally
-    //   360	364	292	finally
-    //   367	402	292	finally
-    //   58	63	298	java/io/IOException
-    //   66	73	298	java/io/IOException
-    //   76	81	298	java/io/IOException
-    //   84	89	298	java/io/IOException
-    //   92	99	298	java/io/IOException
-    //   102	109	298	java/io/IOException
-    //   317	322	325	java/io/IOException
-    //   58	63	333	finally
-    //   66	73	333	finally
-    //   76	81	333	finally
-    //   84	89	333	finally
-    //   92	99	333	finally
-    //   102	109	333	finally
-    //   266	271	333	finally
-    //   307	312	333	finally
-    //   343	348	351	java/io/IOException
-    //   126	131	359	java/io/IOException
-    //   111	117	408	finally
-    //   210	258	408	finally
-    //   111	117	419	java/io/IOException
-    //   210	258	419	java/io/IOException
-    //   58	63	426	java/io/FileNotFoundException
-    //   66	73	426	java/io/FileNotFoundException
-    //   76	81	426	java/io/FileNotFoundException
-    //   84	89	426	java/io/FileNotFoundException
-    //   92	99	426	java/io/FileNotFoundException
-    //   102	109	426	java/io/FileNotFoundException
-  }
-  
-  /* Error */
-  public static BluetoothDevice readJsonFile(Context paramContext)
-  {
-    // Byte code:
-    //   0: aconst_null
-    //   1: astore 4
-    //   3: aconst_null
-    //   4: astore 5
-    //   6: aconst_null
-    //   7: astore 6
-    //   9: aconst_null
-    //   10: astore_3
-    //   11: invokestatic 19	com/resmed/refresh/utils/RefreshTools:getFilesPath	()Ljava/io/File;
-    //   14: astore 8
-    //   16: aload 6
-    //   18: astore_2
-    //   19: new 13	java/io/File
-    //   22: astore 7
-    //   24: aload 6
-    //   26: astore_2
-    //   27: aload 7
-    //   29: aload 8
-    //   31: aload_0
-    //   32: ldc 20
-    //   34: invokevirtual 26	android/content/Context:getString	(I)Ljava/lang/String;
-    //   37: invokespecial 29	java/io/File:<init>	(Ljava/io/File;Ljava/lang/String;)V
-    //   40: aload 6
-    //   42: astore_2
-    //   43: new 52	java/io/FileInputStream
-    //   46: astore_0
-    //   47: aload 6
-    //   49: astore_2
-    //   50: aload_0
-    //   51: aload 7
-    //   53: invokespecial 55	java/io/FileInputStream:<init>	(Ljava/io/File;)V
-    //   56: new 128	java/lang/StringBuffer
-    //   59: astore_2
-    //   60: aload_2
-    //   61: ldc -126
-    //   63: invokespecial 133	java/lang/StringBuffer:<init>	(Ljava/lang/String;)V
-    //   66: sipush 1024
-    //   69: newarray <illegal type>
-    //   71: astore 4
-    //   73: aload_0
-    //   74: aload 4
-    //   76: invokevirtual 137	java/io/FileInputStream:read	([B)I
-    //   79: istore_1
-    //   80: iload_1
-    //   81: iconst_m1
-    //   82: if_icmpne +37 -> 119
-    //   85: new 139	com/google/gson/Gson
-    //   88: astore_3
-    //   89: aload_3
-    //   90: invokespecial 140	com/google/gson/Gson:<init>	()V
-    //   93: aload_3
-    //   94: aload_2
-    //   95: invokevirtual 143	java/lang/StringBuffer:toString	()Ljava/lang/String;
-    //   98: ldc -111
-    //   100: invokevirtual 149	com/google/gson/Gson:fromJson	(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;
-    //   103: checkcast 145	android/bluetooth/BluetoothDevice
-    //   106: astore_2
-    //   107: aload_0
-    //   108: ifnull +168 -> 276
-    //   111: aload_0
-    //   112: invokevirtual 150	java/io/FileInputStream:close	()V
-    //   115: aload_2
-    //   116: astore_0
-    //   117: aload_0
-    //   118: areturn
-    //   119: new 94	java/lang/String
-    //   122: astore_3
-    //   123: aload_3
-    //   124: aload 4
-    //   126: iconst_0
-    //   127: iload_1
-    //   128: invokespecial 153	java/lang/String:<init>	([BII)V
-    //   131: aload_2
-    //   132: aload_3
-    //   133: invokevirtual 157	java/lang/StringBuffer:append	(Ljava/lang/String;)Ljava/lang/StringBuffer;
-    //   136: pop
-    //   137: goto -64 -> 73
-    //   140: astore_2
-    //   141: aload_0
-    //   142: astore_3
-    //   143: aload_2
-    //   144: astore_0
-    //   145: aload_3
-    //   146: astore_2
-    //   147: aload_0
-    //   148: invokevirtual 116	java/io/FileNotFoundException:printStackTrace	()V
-    //   151: aconst_null
-    //   152: astore_2
-    //   153: aload_2
-    //   154: astore_0
-    //   155: aload_3
-    //   156: ifnull -39 -> 117
-    //   159: aload_3
-    //   160: invokevirtual 150	java/io/FileInputStream:close	()V
-    //   163: aload_2
-    //   164: astore_0
-    //   165: goto -48 -> 117
-    //   168: astore_0
-    //   169: aload_0
-    //   170: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   173: aload_2
-    //   174: astore_0
-    //   175: goto -58 -> 117
-    //   178: astore_0
-    //   179: aload 4
-    //   181: astore_3
-    //   182: aload_3
-    //   183: astore_2
-    //   184: aload_0
-    //   185: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   188: aconst_null
-    //   189: astore_2
-    //   190: aload_2
-    //   191: astore_0
-    //   192: aload_3
-    //   193: ifnull -76 -> 117
-    //   196: aload_3
-    //   197: invokevirtual 150	java/io/FileInputStream:close	()V
-    //   200: aload_2
-    //   201: astore_0
-    //   202: goto -85 -> 117
-    //   205: astore_0
-    //   206: aload_0
-    //   207: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   210: aload_2
-    //   211: astore_0
-    //   212: goto -95 -> 117
-    //   215: astore_0
-    //   216: aload 5
-    //   218: astore_3
-    //   219: aload_3
-    //   220: astore_2
-    //   221: aload_0
-    //   222: invokevirtual 41	java/lang/Exception:printStackTrace	()V
-    //   225: aconst_null
-    //   226: astore_2
-    //   227: aload_2
-    //   228: astore_0
-    //   229: aload_3
-    //   230: ifnull -113 -> 117
-    //   233: aload_3
-    //   234: invokevirtual 150	java/io/FileInputStream:close	()V
-    //   237: aload_2
-    //   238: astore_0
-    //   239: goto -122 -> 117
-    //   242: astore_0
-    //   243: aload_0
-    //   244: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   247: aload_2
-    //   248: astore_0
-    //   249: goto -132 -> 117
-    //   252: astore_0
-    //   253: aload_2
-    //   254: ifnull +7 -> 261
-    //   257: aload_2
-    //   258: invokevirtual 150	java/io/FileInputStream:close	()V
-    //   261: aload_0
-    //   262: athrow
-    //   263: astore_2
-    //   264: aload_2
-    //   265: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   268: goto -7 -> 261
-    //   271: astore_0
-    //   272: aload_0
-    //   273: invokevirtual 117	java/io/IOException:printStackTrace	()V
-    //   276: aload_2
-    //   277: astore_0
-    //   278: goto -161 -> 117
-    //   281: astore_3
-    //   282: aload_0
-    //   283: astore_2
-    //   284: aload_3
-    //   285: astore_0
-    //   286: goto -33 -> 253
-    //   289: astore_3
-    //   290: aload_0
-    //   291: astore_2
-    //   292: aload_3
-    //   293: astore_0
-    //   294: goto -41 -> 253
-    //   297: astore_2
-    //   298: aload_0
-    //   299: astore_3
-    //   300: aload_2
-    //   301: astore_0
-    //   302: goto -83 -> 219
-    //   305: astore_2
-    //   306: aload_0
-    //   307: astore_3
-    //   308: aload_2
-    //   309: astore_0
-    //   310: goto -91 -> 219
-    //   313: astore_2
-    //   314: aload_0
-    //   315: astore_3
-    //   316: aload_2
-    //   317: astore_0
-    //   318: goto -136 -> 182
-    //   321: astore_2
-    //   322: aload_0
-    //   323: astore_3
-    //   324: aload_2
-    //   325: astore_0
-    //   326: goto -144 -> 182
-    //   329: astore_0
-    //   330: goto -185 -> 145
-    //   333: astore_2
-    //   334: aload_0
-    //   335: astore_3
-    //   336: aload_2
-    //   337: astore_0
-    //   338: goto -193 -> 145
-    // Local variable table:
-    //   start	length	slot	name	signature
-    //   0	341	0	paramContext	Context
-    //   79	49	1	i	int
-    //   18	114	2	localObject1	Object
-    //   140	4	2	localFileNotFoundException1	FileNotFoundException
-    //   146	112	2	localObject2	Object
-    //   263	14	2	localIOException1	IOException
-    //   283	9	2	localContext1	Context
-    //   297	4	2	localException1	Exception
-    //   305	4	2	localException2	Exception
-    //   313	4	2	localIOException2	IOException
-    //   321	4	2	localIOException3	IOException
-    //   333	4	2	localFileNotFoundException2	FileNotFoundException
-    //   10	224	3	localObject3	Object
-    //   281	4	3	localObject4	Object
-    //   289	4	3	localObject5	Object
-    //   299	37	3	localContext2	Context
-    //   1	179	4	arrayOfByte	byte[]
-    //   4	213	5	localObject6	Object
-    //   7	41	6	localObject7	Object
-    //   22	30	7	localFile1	File
-    //   14	16	8	localFile2	File
-    // Exception table:
-    //   from	to	target	type
-    //   66	73	140	java/io/FileNotFoundException
-    //   73	80	140	java/io/FileNotFoundException
-    //   85	107	140	java/io/FileNotFoundException
-    //   119	137	140	java/io/FileNotFoundException
-    //   159	163	168	java/io/IOException
-    //   19	24	178	java/io/IOException
-    //   27	40	178	java/io/IOException
-    //   43	47	178	java/io/IOException
-    //   50	56	178	java/io/IOException
-    //   196	200	205	java/io/IOException
-    //   19	24	215	java/lang/Exception
-    //   27	40	215	java/lang/Exception
-    //   43	47	215	java/lang/Exception
-    //   50	56	215	java/lang/Exception
-    //   233	237	242	java/io/IOException
-    //   19	24	252	finally
-    //   27	40	252	finally
-    //   43	47	252	finally
-    //   50	56	252	finally
-    //   147	151	252	finally
-    //   184	188	252	finally
-    //   221	225	252	finally
-    //   257	261	263	java/io/IOException
-    //   111	115	271	java/io/IOException
-    //   56	66	281	finally
-    //   66	73	289	finally
-    //   73	80	289	finally
-    //   85	107	289	finally
-    //   119	137	289	finally
-    //   56	66	297	java/lang/Exception
-    //   66	73	305	java/lang/Exception
-    //   73	80	305	java/lang/Exception
-    //   85	107	305	java/lang/Exception
-    //   119	137	305	java/lang/Exception
-    //   56	66	313	java/io/IOException
-    //   66	73	321	java/io/IOException
-    //   73	80	321	java/io/IOException
-    //   85	107	321	java/io/IOException
-    //   119	137	321	java/io/IOException
-    //   19	24	329	java/io/FileNotFoundException
-    //   27	40	329	java/io/FileNotFoundException
-    //   43	47	329	java/io/FileNotFoundException
-    //   50	56	329	java/io/FileNotFoundException
-    //   56	66	333	java/io/FileNotFoundException
-  }
-  
-  public static boolean writeBulkBioDataFile(Context paramContext, byte[] paramArrayOfByte)
-  {
-    bool = true;
-    for (;;)
-    {
-      try
-      {
-        File localFile = RefreshTools.getFilesPath();
-        localObject = new java/io/File;
-        ((File)localObject).<init>(localFile, paramContext.getString(2131165343));
-        try
-        {
-          if (!((File)localObject).exists()) {
-            ((File)localObject).createNewFile();
-          }
-          paramContext = new java/io/FileWriter;
-          paramContext.<init>((File)localObject, true);
-          paramArrayOfByte = PacketsByteValuesReader.readBioData(paramArrayOfByte, paramArrayOfByte.length);
-          i = 0;
-          if (i < paramArrayOfByte[0].length) {
-            continue;
-          }
-          paramContext.flush();
-          paramContext.close();
-        }
-        catch (FileNotFoundException paramContext)
-        {
-          int i;
-          int k;
-          int j;
-          paramContext.printStackTrace();
-          bool = false;
-          continue;
-        }
-        catch (IOException paramContext)
-        {
-          paramContext.printStackTrace();
-          continue;
-        }
-        return bool;
-      }
-      finally {}
-      k = paramArrayOfByte[0][i];
-      j = paramArrayOfByte[1][i];
-      Object localObject = new java.lang.StringBuilder;
-      ((StringBuilder)localObject).<init>(String.valueOf(k));
-      paramContext.append(" " + j + "\n");
-      i++;
-    }
-  }
-  
-  public static boolean writeJsonFile(Context paramContext, BluetoothDevice paramBluetoothDevice)
-  {
-    boolean bool = false;
-    if (paramBluetoothDevice == null) {}
-    for (;;)
-    {
-      return bool;
-      String str = new Gson().toJson(paramBluetoothDevice);
-      try
-      {
-        File localFile = RefreshTools.getFilesPath();
-        paramBluetoothDevice = new java/io/File;
-        paramBluetoothDevice.<init>(localFile, paramContext.getString(2131165342));
-        if (!paramBluetoothDevice.exists()) {
-          paramBluetoothDevice.createNewFile();
-        }
-        paramContext = new java/io/FileOutputStream;
-        paramContext.<init>(paramBluetoothDevice);
-      }
-      catch (FileNotFoundException paramContext)
-      {
-        try
-        {
-          paramContext.write(str.getBytes());
-          paramContext.flush();
-          paramContext.close();
-          bool = true;
-        }
-        catch (IOException paramContext)
-        {
-          for (;;) {}
-        }
-        catch (FileNotFoundException paramContext)
-        {
-          for (;;) {}
-        }
-        paramContext = paramContext;
-        paramContext.printStackTrace();
-      }
-      catch (IOException paramContext)
-      {
-        paramContext.printStackTrace();
-      }
-    }
-  }
+	public static boolean clearJSONFile(final Context context) {
+		new File(RefreshTools.getFilesPath(), context.getString(2131165342)).delete();
+		return true;
+	}
+
+	public static boolean deleteBulkDataBioFile(final Context context) {
+		return new File(RefreshTools.getFilesPath(), context.getString(2131165343)).delete();
+	}
+
+	public static boolean deleteJsonFile(final Context context) {
+		try {
+			new File(RefreshTools.getFilesPath(), context.getString(2131165342)).delete();
+			return true;
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+
+	public static int[][] readBulkBioDataFile(final Context p0) {
+		//
+		// This method could not be decompiled.
+		//
+		// Original Bytecode:
+		//
+		//     0: ldc             Lcom/resmed/refresh/utils/BluetoothDataSerializeUtil;.class
+		//     2: monitorenter
+		//     3: new             Ljava/io/File;
+		//     6: dup
+		//     7: invokestatic    com/resmed/refresh/utils/RefreshTools.getFilesPath:()Ljava/io/File;
+		//    10: aload_0
+		//    11: ldc             2131165343
+		//    13: invokevirtual   android/content/Context.getString:(I)Ljava/lang/String;
+		//    16: invokespecial   java/io/File.<init>:(Ljava/io/File;Ljava/lang/String;)V
+		//    19: astore_1
+		//    20: new             Ljava/util/ArrayList;
+		//    23: dup
+		//    24: invokespecial   java/util/ArrayList.<init>:()V
+		//    27: astore_2
+		//    28: new             Ljava/util/ArrayList;
+		//    31: dup
+		//    32: invokespecial   java/util/ArrayList.<init>:()V
+		//    35: astore_3
+		//    36: aconst_null
+		//    37: astore          4
+		//    39: new             Ljava/io/FileInputStream;
+		//    42: dup
+		//    43: aload_1
+		//    44: invokespecial   java/io/FileInputStream.<init>:(Ljava/io/File;)V
+		//    47: astore          5
+		//    49: new             Ljava/io/InputStreamReader;
+		//    52: dup
+		//    53: aload           5
+		//    55: invokespecial   java/io/InputStreamReader.<init>:(Ljava/io/InputStream;)V
+		//    58: astore          6
+		//    60: new             Ljava/io/BufferedReader;
+		//    63: dup
+		//    64: aload           6
+		//    66: invokespecial   java/io/BufferedReader.<init>:(Ljava/io/Reader;)V
+		//    69: astore          7
+		//    71: iconst_0
+		//    72: istore          8
+		//    74: aload           7
+		//    76: invokevirtual   java/io/BufferedReader.readLine:()Ljava/lang/String;
+		//    79: astore          21
+		//    81: aload           21
+		//    83: ifnonnull       176
+		//    86: aload           7
+		//    88: ifnull          413
+		//    91: aload           7
+		//    93: invokevirtual   java/io/BufferedReader.close:()V
+		//    96: aload_2
+		//    97: invokeinterface java/util/List.size:()I
+		//   102: newarray        I
+		//   104: astore          14
+		//   106: aload_3
+		//   107: invokeinterface java/util/List.size:()I
+		//   112: newarray        I
+		//   114: astore          15
+		//   116: iconst_0
+		//   117: istore          16
+		//   119: iload           16
+		//   121: aload_2
+		//   122: invokeinterface java/util/List.size:()I
+		//   127: if_icmplt       343
+		//   130: iconst_2
+		//   131: newarray        I
+		//   133: dup
+		//   134: iconst_0
+		//   135: iconst_2
+		//   136: iastore
+		//   137: dup
+		//   138: iconst_1
+		//   139: aload           14
+		//   141: arraylength
+		//   142: iastore
+		//   143: astore          17
+		//   145: getstatic       java/lang/Integer.TYPE:Ljava/lang/Class;
+		//   148: aload           17
+		//   150: invokestatic    java/lang/reflect/Array.newInstance:(Ljava/lang/Class;[I)Ljava/lang/Object;
+		//   153: checkcast       [[I
+		//   156: astore          18
+		//   158: aload           18
+		//   160: iconst_0
+		//   161: aload           14
+		//   163: aastore
+		//   164: aload           18
+		//   166: iconst_1
+		//   167: aload           15
+		//   169: aastore
+		//   170: ldc             Lcom/resmed/refresh/utils/BluetoothDataSerializeUtil;.class
+		//   172: monitorexit
+		//   173: aload           18
+		//   175: areturn
+		//   176: iinc            8, 1
+		//   179: aload           21
+		//   181: invokevirtual   java/lang/String.trim:()Ljava/lang/String;
+		//   184: ldc             "\\s+"
+		//   186: invokevirtual   java/lang/String.split:(Ljava/lang/String;)[Ljava/lang/String;
+		//   189: astore          22
+		//   191: aload           22
+		//   193: iconst_0
+		//   194: aaload
+		//   195: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   198: istore          23
+		//   200: aload           22
+		//   202: iconst_1
+		//   203: aaload
+		//   204: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   207: istore          24
+		//   209: aload_2
+		//   210: iload           23
+		//   212: invokestatic    java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+		//   215: invokeinterface java/util/List.add:(Ljava/lang/Object;)Z
+		//   220: pop
+		//   221: aload_3
+		//   222: iload           24
+		//   224: invokestatic    java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+		//   227: invokeinterface java/util/List.add:(Ljava/lang/Object;)Z
+		//   232: pop
+		//   233: goto            74
+		//   236: astore          19
+		//   238: aload           7
+		//   240: astore          4
+		//   242: aload           19
+		//   244: invokevirtual   java/io/FileNotFoundException.printStackTrace:()V
+		//   247: aload           4
+		//   249: ifnull          96
+		//   252: aload           4
+		//   254: invokevirtual   java/io/BufferedReader.close:()V
+		//   257: goto            96
+		//   260: astore          20
+		//   262: aload           20
+		//   264: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   267: goto            96
+		//   270: astore          11
+		//   272: ldc             Lcom/resmed/refresh/utils/BluetoothDataSerializeUtil;.class
+		//   274: monitorexit
+		//   275: aload           11
+		//   277: athrow
+		//   278: astore          9
+		//   280: aload           9
+		//   282: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   285: aload           4
+		//   287: ifnull          96
+		//   290: aload           4
+		//   292: invokevirtual   java/io/BufferedReader.close:()V
+		//   295: goto            96
+		//   298: astore          13
+		//   300: aload           13
+		//   302: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   305: goto            96
+		//   308: astore          10
+		//   310: aload           4
+		//   312: ifnull          320
+		//   315: aload           4
+		//   317: invokevirtual   java/io/BufferedReader.close:()V
+		//   320: aload           10
+		//   322: athrow
+		//   323: astore          12
+		//   325: aload           12
+		//   327: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   330: goto            320
+		//   333: astore          27
+		//   335: aload           27
+		//   337: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   340: goto            413
+		//   343: aload           14
+		//   345: iload           16
+		//   347: aload_2
+		//   348: iload           16
+		//   350: invokeinterface java/util/List.get:(I)Ljava/lang/Object;
+		//   355: checkcast       Ljava/lang/Integer;
+		//   358: invokevirtual   java/lang/Integer.intValue:()I
+		//   361: iastore
+		//   362: aload           15
+		//   364: iload           16
+		//   366: aload_3
+		//   367: iload           16
+		//   369: invokeinterface java/util/List.get:(I)Ljava/lang/Object;
+		//   374: checkcast       Ljava/lang/Integer;
+		//   377: invokevirtual   java/lang/Integer.intValue:()I
+		//   380: iastore
+		//   381: iinc            16, 1
+		//   384: goto            119
+		//   387: astore          10
+		//   389: aload           7
+		//   391: astore          4
+		//   393: goto            310
+		//   396: astore          9
+		//   398: aload           7
+		//   400: astore          4
+		//   402: goto            280
+		//   405: astore          19
+		//   407: aconst_null
+		//   408: astore          4
+		//   410: goto            242
+		//   413: goto            96
+		//    Exceptions:
+		//  Try           Handler
+		//  Start  End    Start  End    Type
+		//  -----  -----  -----  -----  -------------------------------
+		//  3      36     270    278    Any
+		//  39     71     405    413    Ljava/io/FileNotFoundException;
+		//  39     71     278    280    Ljava/io/IOException;
+		//  39     71     308    310    Any
+		//  74     81     236    242    Ljava/io/FileNotFoundException;
+		//  74     81     396    405    Ljava/io/IOException;
+		//  74     81     387    396    Any
+		//  91     96     333    343    Ljava/io/IOException;
+		//  91     96     270    278    Any
+		//  96     116    270    278    Any
+		//  119    170    270    278    Any
+		//  179    233    236    242    Ljava/io/FileNotFoundException;
+		//  179    233    396    405    Ljava/io/IOException;
+		//  179    233    387    396    Any
+		//  242    247    308    310    Any
+		//  252    257    260    270    Ljava/io/IOException;
+		//  252    257    270    278    Any
+		//  262    267    270    278    Any
+		//  280    285    308    310    Any
+		//  290    295    298    308    Ljava/io/IOException;
+		//  290    295    270    278    Any
+		//  300    305    270    278    Any
+		//  315    320    323    333    Ljava/io/IOException;
+		//  315    320    270    278    Any
+		//  320    323    270    278    Any
+		//  325    330    270    278    Any
+		//  335    340    270    278    Any
+		//  343    381    270    278    Any
+		//
+		// The error that occurred was:
+		//
+		// java.lang.IndexOutOfBoundsException: Index: 193, Size: 193
+		//     at java.util.ArrayList.rangeCheck(Unknown Source)
+		//     at java.util.ArrayList.get(Unknown Source)
+		//     at com.strobel.decompiler.ast.AstBuilder.convertToAst(AstBuilder.java:3303)
+		//     at com.strobel.decompiler.ast.AstBuilder.build(AstBuilder.java:113)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:210)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:757)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:655)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:532)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:499)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:141)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:130)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:105)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
+		//     at the.bytecode.club.bytecodeviewer.decompilers.ProcyonDecompiler.decompileClassNode(ProcyonDecompiler.java:120)
+		//     at the.bytecode.club.bytecodeviewer.gui.ClassViewer$13.doShit(ClassViewer.java:624)
+		//     at the.bytecode.club.bytecodeviewer.gui.PaneUpdaterThread.run(PaneUpdaterThread.java:16)
+		//
+		throw new IllegalStateException("An error occurred while decompiling this method.");
+	}
+
+	public static BluetoothDevice readJsonFile(final Context p0) {
+		//
+		// This method could not be decompiled.
+		//
+		// Original Bytecode:
+		//
+		//     0: aconst_null
+		//     1: astore_1
+		//     2: invokestatic    com/resmed/refresh/utils/RefreshTools.getFilesPath:()Ljava/io/File;
+		//     5: astore_2
+		//     6: new             Ljava/io/FileInputStream;
+		//     9: dup
+		//    10: new             Ljava/io/File;
+		//    13: dup
+		//    14: aload_2
+		//    15: aload_0
+		//    16: ldc             2131165342
+		//    18: invokevirtual   android/content/Context.getString:(I)Ljava/lang/String;
+		//    21: invokespecial   java/io/File.<init>:(Ljava/io/File;Ljava/lang/String;)V
+		//    24: invokespecial   java/io/FileInputStream.<init>:(Ljava/io/File;)V
+		//    27: astore_3
+		//    28: new             Ljava/lang/StringBuffer;
+		//    31: dup
+		//    32: ldc             ""
+		//    34: invokespecial   java/lang/StringBuffer.<init>:(Ljava/lang/String;)V
+		//    37: astore          4
+		//    39: sipush          1024
+		//    42: newarray        B
+		//    44: astore          14
+		//    46: aload_3
+		//    47: aload           14
+		//    49: invokevirtual   java/io/FileInputStream.read:([B)I
+		//    52: istore          15
+		//    54: iload           15
+		//    56: iconst_m1
+		//    57: if_icmpne       93
+		//    60: new             Lcom/google/gson/Gson;
+		//    63: dup
+		//    64: invokespecial   com/google/gson/Gson.<init>:()V
+		//    67: aload           4
+		//    69: invokevirtual   java/lang/StringBuffer.toString:()Ljava/lang/String;
+		//    72: ldc             Landroid/bluetooth/BluetoothDevice;.class
+		//    74: invokevirtual   com/google/gson/Gson.fromJson:(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;
+		//    77: checkcast       Landroid/bluetooth/BluetoothDevice;
+		//    80: astore          8
+		//    82: aload_3
+		//    83: ifnull          233
+		//    86: aload_3
+		//    87: invokevirtual   java/io/FileInputStream.close:()V
+		//    90: aload           8
+		//    92: areturn
+		//    93: aload           4
+		//    95: new             Ljava/lang/String;
+		//    98: dup
+		//    99: aload           14
+		//   101: iconst_0
+		//   102: iload           15
+		//   104: invokespecial   java/lang/String.<init>:([BII)V
+		//   107: invokevirtual   java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+		//   110: pop
+		//   111: goto            46
+		//   114: astore          12
+		//   116: aload_3
+		//   117: astore_1
+		//   118: aload           12
+		//   120: invokevirtual   java/io/FileNotFoundException.printStackTrace:()V
+		//   123: aconst_null
+		//   124: astore          8
+		//   126: aload_1
+		//   127: ifnull          90
+		//   130: aload_1
+		//   131: invokevirtual   java/io/FileInputStream.close:()V
+		//   134: aconst_null
+		//   135: areturn
+		//   136: astore          13
+		//   138: aload           13
+		//   140: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   143: aconst_null
+		//   144: areturn
+		//   145: astore          5
+		//   147: aload           5
+		//   149: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   152: aconst_null
+		//   153: astore          8
+		//   155: aload_1
+		//   156: ifnull          90
+		//   159: aload_1
+		//   160: invokevirtual   java/io/FileInputStream.close:()V
+		//   163: aconst_null
+		//   164: areturn
+		//   165: astore          9
+		//   167: aload           9
+		//   169: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   172: aconst_null
+		//   173: areturn
+		//   174: astore          10
+		//   176: aload           10
+		//   178: invokevirtual   java/lang/Exception.printStackTrace:()V
+		//   181: aconst_null
+		//   182: astore          8
+		//   184: aload_1
+		//   185: ifnull          90
+		//   188: aload_1
+		//   189: invokevirtual   java/io/FileInputStream.close:()V
+		//   192: aconst_null
+		//   193: areturn
+		//   194: astore          11
+		//   196: aload           11
+		//   198: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   201: aconst_null
+		//   202: areturn
+		//   203: astore          6
+		//   205: aload_1
+		//   206: ifnull          213
+		//   209: aload_1
+		//   210: invokevirtual   java/io/FileInputStream.close:()V
+		//   213: aload           6
+		//   215: athrow
+		//   216: astore          7
+		//   218: aload           7
+		//   220: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   223: goto            213
+		//   226: astore          16
+		//   228: aload           16
+		//   230: invokevirtual   java/io/IOException.printStackTrace:()V
+		//   233: aload           8
+		//   235: areturn
+		//   236: astore          6
+		//   238: aload_3
+		//   239: astore_1
+		//   240: goto            205
+		//   243: astore          6
+		//   245: aload_3
+		//   246: astore_1
+		//   247: goto            205
+		//   250: astore          10
+		//   252: aload_3
+		//   253: astore_1
+		//   254: goto            176
+		//   257: astore          10
+		//   259: aload_3
+		//   260: astore_1
+		//   261: goto            176
+		//   264: astore          5
+		//   266: aload_3
+		//   267: astore_1
+		//   268: goto            147
+		//   271: astore          5
+		//   273: aload_3
+		//   274: astore_1
+		//   275: goto            147
+		//   278: astore          12
+		//   280: aconst_null
+		//   281: astore_1
+		//   282: goto            118
+		//   285: astore          12
+		//   287: aload_3
+		//   288: astore_1
+		//   289: goto            118
+		//    Exceptions:
+		//  Try           Handler
+		//  Start  End    Start  End    Type
+		//  -----  -----  -----  -----  -------------------------------
+		//  6      28     278    285    Ljava/io/FileNotFoundException;
+		//  6      28     145    147    Ljava/io/IOException;
+		//  6      28     174    176    Ljava/lang/Exception;
+		//  6      28     203    205    Any
+		//  28     39     285    292    Ljava/io/FileNotFoundException;
+		//  28     39     264    271    Ljava/io/IOException;
+		//  28     39     250    257    Ljava/lang/Exception;
+		//  28     39     236    243    Any
+		//  39     46     114    118    Ljava/io/FileNotFoundException;
+		//  39     46     271    278    Ljava/io/IOException;
+		//  39     46     257    264    Ljava/lang/Exception;
+		//  39     46     243    250    Any
+		//  46     54     114    118    Ljava/io/FileNotFoundException;
+		//  46     54     271    278    Ljava/io/IOException;
+		//  46     54     257    264    Ljava/lang/Exception;
+		//  46     54     243    250    Any
+		//  60     82     114    118    Ljava/io/FileNotFoundException;
+		//  60     82     271    278    Ljava/io/IOException;
+		//  60     82     257    264    Ljava/lang/Exception;
+		//  60     82     243    250    Any
+		//  86     90     226    233    Ljava/io/IOException;
+		//  93     111    114    118    Ljava/io/FileNotFoundException;
+		//  93     111    271    278    Ljava/io/IOException;
+		//  93     111    257    264    Ljava/lang/Exception;
+		//  93     111    243    250    Any
+		//  118    123    203    205    Any
+		//  130    134    136    145    Ljava/io/IOException;
+		//  147    152    203    205    Any
+		//  159    163    165    174    Ljava/io/IOException;
+		//  176    181    203    205    Any
+		//  188    192    194    203    Ljava/io/IOException;
+		//  209    213    216    226    Ljava/io/IOException;
+		//
+		// The error that occurred was:
+		//
+		// java.lang.IndexOutOfBoundsException: Index: 153, Size: 153
+		//     at java.util.ArrayList.rangeCheck(Unknown Source)
+		//     at java.util.ArrayList.get(Unknown Source)
+		//     at com.strobel.decompiler.ast.AstBuilder.convertToAst(AstBuilder.java:3303)
+		//     at com.strobel.decompiler.ast.AstBuilder.convertToAst(AstBuilder.java:3417)
+		//     at com.strobel.decompiler.ast.AstBuilder.build(AstBuilder.java:113)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:210)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:757)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:655)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:532)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:499)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:141)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:130)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:105)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
+		//     at the.bytecode.club.bytecodeviewer.decompilers.ProcyonDecompiler.decompileClassNode(ProcyonDecompiler.java:120)
+		//     at the.bytecode.club.bytecodeviewer.gui.ClassViewer$13.doShit(ClassViewer.java:624)
+		//     at the.bytecode.club.bytecodeviewer.gui.PaneUpdaterThread.run(PaneUpdaterThread.java:16)
+		//
+		throw new IllegalStateException("An error occurred while decompiling this method.");
+	}
+
+	public static boolean writeBulkBioDataFile(final Context context, final byte[] array) {
+		while (true) {
+			boolean b = true;
+			synchronized (BluetoothDataSerializeUtil.class) {
+				final File file = new File(RefreshTools.getFilesPath(), context.getString(2131165343));
+				try {
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+					final FileWriter fileWriter = new FileWriter(file, true);
+					final int[][] bioData = PacketsByteValuesReader.readBioData(array, array.length);
+					for (int i = 0; i < bioData[0].length; ++i) {
+						fileWriter.append((CharSequence)(String.valueOf(bioData[0][i]) + " " + bioData[1][i] + "\n"));
+					}
+					fileWriter.flush();
+					fileWriter.close();
+					return b;
+				}
+				catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+				}
+				catch (IOException ex2) {
+					ex2.printStackTrace();
+				}
+			}
+			b = false;
+			return b;
+		}
+	}
+
+	public static boolean writeJsonFile(final Context context, final BluetoothDevice bluetoothDevice) {
+		if (bluetoothDevice == null) {
+			return false;
+		}
+		final String json = new Gson().toJson((Object)bluetoothDevice);
+		FileOutputStream fileOutputStream = null;
+		try {
+			final File file = new File(RefreshTools.getFilesPath(), context.getString(2131165342));
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			final FileOutputStream fileOutputStream2;
+			fileOutputStream = (fileOutputStream2 = new FileOutputStream(file));
+			final String s = json;
+			final byte[] array = s.getBytes();
+			fileOutputStream2.write(array);
+			final FileOutputStream fileOutputStream3 = fileOutputStream;
+			fileOutputStream3.flush();
+			final FileOutputStream fileOutputStream4 = fileOutputStream;
+			fileOutputStream4.close();
+			return true;
+		}
+		catch (FileNotFoundException ex3) {}
+		catch (IOException ex4) {}
+		Label_0089_Outer:
+		while (true) {
+			while (true) {
+				try {
+					final FileOutputStream fileOutputStream2 = fileOutputStream;
+					final String s = json;
+					final byte[] array = s.getBytes();
+					fileOutputStream2.write(array);
+					final FileOutputStream fileOutputStream3 = fileOutputStream;
+					fileOutputStream3.flush();
+					final FileOutputStream fileOutputStream4 = fileOutputStream;
+					fileOutputStream4.close();
+					return true;
+				}
+				catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+					return false;
+				}
+				catch (IOException ex2) {
+					ex2.printStackTrace();
+					return false;
+				}
+			}
+		}
+	}
 }
-
-
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\BluetoothDataSerializeUtil.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

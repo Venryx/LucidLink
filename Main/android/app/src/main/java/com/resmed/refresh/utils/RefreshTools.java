@@ -1,948 +1,680 @@
 package com.resmed.refresh.utils;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.IntentFilter;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.util.Base64;
-import android.util.Patterns;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import com.resmed.refresh.model.RST_SleepSessionInfo;
-import com.resmed.refresh.model.RefreshModelController;
-import com.resmed.refresh.model.graphs.RRHypnoData;
-import com.resmed.refresh.model.mappers.HypnoMapper;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
-import com.resmed.refresh.ui.utils.Consts;
+import android.annotation.*;
+import android.graphics.*;
+import com.resmed.refresh.model.*;
+import com.resmed.refresh.model.mappers.*;
+import com.resmed.refresh.model.graphs.*;
+import com.resmed.refresh.ui.uibase.app.*;
+import android.os.*;
+import java.nio.channels.*;
+import android.content.*;
+import java.text.*;
+import com.resmed.refresh.ui.utils.*;
+import java.util.*;
+import android.content.res.*;
+import android.view.inputmethod.*;
+import android.app.*;
+import android.widget.*;
+import android.view.*;
+import android.util.*;
+import java.io.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
-
-@SuppressLint({"SimpleDateFormat"})
+@SuppressLint({ "SimpleDateFormat" })
 public class RefreshTools
 {
-  private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-  private static final String DATE_FORMAT_Z = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-  protected static final char[] hexArray = "0123456789ABCDEF".toCharArray();
-  
-  public static String BitMapToString(Bitmap paramBitmap)
-  {
-    ByteArrayOutputStream localByteArrayOutputStream = new ByteArrayOutputStream();
-    paramBitmap.compress(Bitmap.CompressFormat.PNG, 100, localByteArrayOutputStream);
-    return Base64.encodeToString(localByteArrayOutputStream.toByteArray(), 0);
-  }
-  
-  public static Bitmap StringToBitMap(String paramString)
-  {
-    try
-    {
-      paramString = Base64.decode(paramString, 0);
-      paramString = BitmapFactory.decodeByteArray(paramString, 0, paramString.length);
-      return paramString;
-    }
-    catch (Exception paramString)
-    {
-      for (;;)
-      {
-        paramString.getMessage();
-        paramString = null;
-      }
-    }
-  }
-  
-  public static BitSet bitmaskFromInt(int paramInt)
-  {
-    BitSet localBitSet = new BitSet();
-    for (int i = 0;; i++)
-    {
-      if (i >= 32) {
-        return localBitSet;
-      }
-      if ((paramInt >> i & 0x1) == 1) {
-        localBitSet.set(i);
-      }
-    }
-  }
-  
-  public static int bitmaskToInt(BitSet paramBitSet)
-  {
-    int i = 0;
-    int j = -1;
-    for (;;)
-    {
-      j = paramBitSet.nextSetBit(j + 1);
-      if (j == -1) {
-        return i;
-      }
-      i |= 1 << j;
-    }
-  }
-  
-  public static String bytesToHex(List<Byte> paramList)
-  {
-    char[] arrayOfChar = new char[paramList.size() * 2];
-    for (int i = 0;; i++)
-    {
-      if (i >= paramList.size()) {
-        return new String(arrayOfChar);
-      }
-      int j = ((Byte)paramList.get(i)).byteValue() & 0xFF;
-      arrayOfChar[(i * 2)] = hexArray[(j >>> 4)];
-      arrayOfChar[(i * 2 + 1)] = hexArray[(j & 0xF)];
-    }
-  }
-  
-  public static String bytesToHex(byte[] paramArrayOfByte)
-  {
-    char[] arrayOfChar = new char[paramArrayOfByte.length * 2];
-    for (int i = 0;; i++)
-    {
-      if (i >= paramArrayOfByte.length) {
-        return new String(arrayOfChar);
-      }
-      int j = paramArrayOfByte[i] & 0xFF;
-      arrayOfChar[(i * 2)] = hexArray[(j >>> 4)];
-      arrayOfChar[(i * 2 + 1)] = hexArray[(j & 0xF)];
-    }
-  }
-  
-  public static int calculateAge(Date paramDate)
-  {
-    Calendar localCalendar = Calendar.getInstance();
-    localCalendar.setTime(paramDate);
-    paramDate = Calendar.getInstance();
-    int j = paramDate.get(1) - localCalendar.get(1);
-    int i;
-    if (paramDate.get(2) < localCalendar.get(2)) {
-      i = j - 1;
-    }
-    for (;;)
-    {
-      return i;
-      i = j;
-      if (paramDate.get(2) == localCalendar.get(2))
-      {
-        i = j;
-        if (paramDate.get(5) < localCalendar.get(5)) {
-          i = j - 1;
-        }
-      }
-    }
-  }
-  
-  public static boolean checkForFirmwareUpgrade(Context paramContext, String paramString)
-  {
-    Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade firmware version :" + paramString);
-    paramContext = getFirmwareBinaryVersion(paramContext);
-    if (compareFirmwareVersions(paramString.replace("Release", "").split(" ")[0], paramContext) < 0) {}
-    for (boolean bool = true;; bool = false) {
-      return bool;
-    }
-  }
-  
-  /* Error */
-  public static int compareFirmwareVersions(String paramString1, String paramString2)
-  {
-    // Byte code:
-    //   0: ldc -122
-    //   2: new 136	java/lang/StringBuilder
-    //   5: dup
-    //   6: ldc -79
-    //   8: invokespecial 141	java/lang/StringBuilder:<init>	(Ljava/lang/String;)V
-    //   11: aload_0
-    //   12: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   15: ldc -77
-    //   17: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   20: aload_1
-    //   21: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   24: invokevirtual 148	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   27: invokestatic 154	com/resmed/refresh/utils/Log:d	(Ljava/lang/String;Ljava/lang/String;)I
-    //   30: pop
-    //   31: aload_0
-    //   32: ifnull +7 -> 39
-    //   35: aload_1
-    //   36: ifnonnull +7 -> 43
-    //   39: iconst_0
-    //   40: istore_2
-    //   41: iload_2
-    //   42: ireturn
-    //   43: aload_0
-    //   44: ldc -75
-    //   46: invokevirtual 172	java/lang/String:split	(Ljava/lang/String;)[Ljava/lang/String;
-    //   49: astore_0
-    //   50: aload_1
-    //   51: ldc -75
-    //   53: invokevirtual 172	java/lang/String:split	(Ljava/lang/String;)[Ljava/lang/String;
-    //   56: astore_1
-    //   57: ldc -122
-    //   59: new 136	java/lang/StringBuilder
-    //   62: dup
-    //   63: ldc -73
-    //   65: invokespecial 141	java/lang/StringBuilder:<init>	(Ljava/lang/String;)V
-    //   68: aload_0
-    //   69: invokestatic 188	java/util/Arrays:toString	([Ljava/lang/Object;)Ljava/lang/String;
-    //   72: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   75: ldc -77
-    //   77: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   80: aload_1
-    //   81: invokestatic 188	java/util/Arrays:toString	([Ljava/lang/Object;)Ljava/lang/String;
-    //   84: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   87: invokevirtual 148	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   90: invokestatic 154	com/resmed/refresh/utils/Log:d	(Ljava/lang/String;Ljava/lang/String;)I
-    //   93: pop
-    //   94: aload_0
-    //   95: arraylength
-    //   96: ifeq +8 -> 104
-    //   99: aload_1
-    //   100: arraylength
-    //   101: ifne +8 -> 109
-    //   104: iconst_0
-    //   105: istore_2
-    //   106: goto -65 -> 41
-    //   109: aload_0
-    //   110: iconst_0
-    //   111: aaload
-    //   112: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   115: istore_2
-    //   116: aload_1
-    //   117: iconst_0
-    //   118: aaload
-    //   119: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   122: istore_3
-    //   123: ldc -122
-    //   125: new 136	java/lang/StringBuilder
-    //   128: dup
-    //   129: ldc -60
-    //   131: invokespecial 141	java/lang/StringBuilder:<init>	(Ljava/lang/String;)V
-    //   134: iload_2
-    //   135: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   138: ldc -55
-    //   140: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   143: iload_3
-    //   144: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   147: invokevirtual 148	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   150: invokestatic 154	com/resmed/refresh/utils/Log:d	(Ljava/lang/String;Ljava/lang/String;)I
-    //   153: pop
-    //   154: iload_2
-    //   155: iload_3
-    //   156: invokestatic 205	java/lang/Integer:compare	(II)I
-    //   159: istore_3
-    //   160: iload_3
-    //   161: istore_2
-    //   162: iload_3
-    //   163: ifne -122 -> 41
-    //   166: aload_0
-    //   167: iconst_1
-    //   168: aaload
-    //   169: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   172: istore_2
-    //   173: aload_1
-    //   174: iconst_1
-    //   175: aaload
-    //   176: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   179: istore_3
-    //   180: ldc -122
-    //   182: new 136	java/lang/StringBuilder
-    //   185: dup
-    //   186: ldc -49
-    //   188: invokespecial 141	java/lang/StringBuilder:<init>	(Ljava/lang/String;)V
-    //   191: iload_2
-    //   192: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   195: ldc -47
-    //   197: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   200: iload_3
-    //   201: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   204: invokevirtual 148	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   207: invokestatic 154	com/resmed/refresh/utils/Log:d	(Ljava/lang/String;Ljava/lang/String;)I
-    //   210: pop
-    //   211: iload_2
-    //   212: iload_3
-    //   213: invokestatic 205	java/lang/Integer:compare	(II)I
-    //   216: istore_3
-    //   217: iload_3
-    //   218: istore_2
-    //   219: iload_3
-    //   220: ifne -179 -> 41
-    //   223: aload_0
-    //   224: iconst_2
-    //   225: aaload
-    //   226: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   229: istore_2
-    //   230: aload_1
-    //   231: iconst_2
-    //   232: aaload
-    //   233: invokestatic 194	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-    //   236: istore_3
-    //   237: ldc -122
-    //   239: new 136	java/lang/StringBuilder
-    //   242: dup
-    //   243: ldc -45
-    //   245: invokespecial 141	java/lang/StringBuilder:<init>	(Ljava/lang/String;)V
-    //   248: iload_2
-    //   249: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   252: ldc -43
-    //   254: invokevirtual 145	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   257: iload_3
-    //   258: invokevirtual 199	java/lang/StringBuilder:append	(I)Ljava/lang/StringBuilder;
-    //   261: invokevirtual 148	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   264: invokestatic 154	com/resmed/refresh/utils/Log:d	(Ljava/lang/String;Ljava/lang/String;)I
-    //   267: pop
-    //   268: iload_2
-    //   269: iload_3
-    //   270: invokestatic 205	java/lang/Integer:compare	(II)I
-    //   273: istore_3
-    //   274: iload_3
-    //   275: istore_2
-    //   276: iload_3
-    //   277: ifne -236 -> 41
-    //   280: iconst_0
-    //   281: istore_2
-    //   282: goto -241 -> 41
-    //   285: astore_0
-    //   286: iconst_0
-    //   287: istore_2
-    //   288: goto -247 -> 41
-    //   291: astore_0
-    //   292: iconst_0
-    //   293: istore_2
-    //   294: goto -253 -> 41
-    //   297: astore_0
-    //   298: iconst_0
-    //   299: istore_2
-    //   300: goto -259 -> 41
-    // Local variable table:
-    //   start	length	slot	name	signature
-    //   0	303	0	paramString1	String
-    //   0	303	1	paramString2	String
-    //   40	260	2	i	int
-    //   122	155	3	j	int
-    // Exception table:
-    //   from	to	target	type
-    //   109	123	285	java/lang/Exception
-    //   166	180	291	java/lang/Exception
-    //   223	237	297	java/lang/Exception
-  }
-  
-  public static boolean createDirectories(String paramString)
-  {
-    for (;;)
-    {
-      try
-      {
-        arrayOfString = paramString.split("/");
-        localObject = "";
-        i = 0;
-        if (i < arrayOfString.length - 1) {
-          continue;
-        }
-        bool = true;
-      }
-      catch (Exception paramString)
-      {
-        String[] arrayOfString;
-        Object localObject;
-        int i;
-        Log.d("com.resmed.refresh.model", "Error creating directories", paramString);
-        boolean bool = false;
-        continue;
-      }
-      return bool;
-      paramString = (String)localObject;
-      if (arrayOfString[i].length() > 0)
-      {
-        paramString = new java.lang.StringBuilder;
-        paramString.<init>(String.valueOf(localObject));
-        paramString = "/" + arrayOfString[i];
-      }
-      localObject = new java/io/File;
-      ((File)localObject).<init>(paramString);
-      ((File)localObject).mkdirs();
-      i++;
-      localObject = paramString;
-    }
-  }
-  
-  public static List<Date> dateRangesForDay(Date paramDate)
-  {
-    Calendar localCalendar2 = GregorianCalendar.getInstance();
-    localCalendar2.setTime(paramDate);
-    Calendar localCalendar1 = GregorianCalendar.getInstance();
-    localCalendar1.setTime(paramDate);
-    localCalendar2.set(11, 0);
-    localCalendar2.set(12, 0);
-    localCalendar2.set(13, 0);
-    localCalendar1.set(11, 23);
-    localCalendar1.set(12, 59);
-    localCalendar1.set(13, 59);
-    paramDate = new ArrayList();
-    paramDate.add(localCalendar2.getTime());
-    paramDate.add(localCalendar1.getTime());
-    return paramDate;
-  }
-  
-  public static List<Date> dateRangesForExactTime(Date paramDate)
-  {
-    long l = paramDate.getTime();
-    Date localDate = new Date(l - 1000L);
-    paramDate = new Date(l + 1000L);
-    ArrayList localArrayList = new ArrayList();
-    localArrayList.add(localDate);
-    localArrayList.add(paramDate);
-    return localArrayList;
-  }
-  
-  public static void debugSleepSessions()
-  {
-    Object localObject = RefreshModelController.getInstance();
-    if (((RefreshModelController)localObject).getUser() == null) {}
-    for (;;)
-    {
-      return;
-      Iterator localIterator = ((RefreshModelController)localObject).localSleepSessionsAll().iterator();
-      while (localIterator.hasNext())
-      {
-        localObject = (RST_SleepSessionInfo)localIterator.next();
-        List localList = HypnoMapper.getHypnoData((RST_SleepSessionInfo)localObject);
-        int i = Math.round((float)((((RST_SleepSessionInfo)localObject).getStopTime().getTime() - ((RST_SleepSessionInfo)localObject).getStartTime().getTime()) / 60000L));
-        String str1;
-        String str2;
-        float f;
-        if ((((RST_SleepSessionInfo)localObject).getTotalSleepTime() > 60) && (i > 0))
-        {
-          str1 = getHourStringForTime(((RST_SleepSessionInfo)localObject).getTotalSleepTime()) + getMinsStringForTime(((RST_SleepSessionInfo)localObject).getTotalSleepTime());
-          str2 = getHourStringForTime(i) + getMinsStringForTime(i);
-          f = 0.0F;
-        }
-        try
-        {
-          long l1 = ((RRHypnoData)localList.get(1)).getHour().getTime();
-          long l2 = ((RRHypnoData)localList.get(0)).getHour().getTime();
-          f = (float)(l1 - l2) / 1000.0F;
-        }
-        catch (Exception localException)
-        {
-          for (;;)
-          {
-            localException.printStackTrace();
-          }
-        }
-        Log.d("sessions", ((RST_SleepSessionInfo)localObject).getId() + "\tTotalTime = " + str1 + "\tsleepTime = " + str2 + "\tTimeBetweenSamples = " + f + "\t" + ((RST_SleepSessionInfo)localObject).getStartTime() + "\t" + ((RST_SleepSessionInfo)localObject).getStopTime() + "\t" + ((RST_SleepSessionInfo)localObject).getCompleted());
-      }
-    }
-  }
-  
-  public static boolean deleteTimeStampFile(Context paramContext)
-  {
-    try
-    {
-      File localFile = new java/io/File;
-      localFile.<init>(getFilesPath(), paramContext.getString(2131165344));
-      boolean bool = localFile.delete();
-      return bool;
-    }
-    finally
-    {
-      paramContext = finally;
-      throw paramContext;
-    }
-  }
-  
-  public static boolean exportAllFilesToSD()
-  {
-    for (;;)
-    {
-      try
-      {
-        localObject2 = RefreshApplication.getInstance().getFilesDir();
-        localObject1 = new java.lang.StringBuilder;
-        ((StringBuilder)localObject1).<init>(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()));
-        localObject1 = "/Refresh/export/";
-        localObject2 = ((File)localObject2).listFiles();
-        int j = localObject2.length;
-        i = 0;
-        if (i < j) {
-          continue;
-        }
-        bool = true;
-      }
-      catch (Exception localException)
-      {
-        Object localObject2;
-        Object localObject1;
-        int i;
-        Object localObject3;
-        Object localObject4;
-        Object localObject5;
-        localException.printStackTrace();
-        Log.d("com.resmed.refresh.model", "Error in exportAllFilesToSD", localException);
-        boolean bool = false;
-        continue;
-      }
-      return bool;
-      localObject3 = localObject2[i];
-      localObject4 = new java.lang.StringBuilder;
-      ((StringBuilder)localObject4).<init>(" exportAllFilesToSD:: file.getName() : ");
-      Log.d("com.resmed.refresh.model", ((File)localObject3).getName());
-      localObject4 = ((File)localObject3).getName().replace(RefreshApplication.getInstance().getFilesDir().getAbsolutePath(), "");
-      localObject5 = new java.lang.StringBuilder;
-      ((StringBuilder)localObject5).<init>(String.valueOf(localObject1));
-      localObject5 = (String)localObject4;
-      localObject4 = new java/io/File;
-      ((File)localObject4).<init>((String)localObject5);
-      createDirectories(((File)localObject4).getAbsolutePath());
-      localObject5 = new java/io/FileInputStream;
-      ((FileInputStream)localObject5).<init>((File)localObject3);
-      localObject3 = ((FileInputStream)localObject5).getChannel();
-      localObject5 = new java/io/FileOutputStream;
-      ((FileOutputStream)localObject5).<init>(((File)localObject4).getAbsolutePath());
-      localObject4 = ((FileOutputStream)localObject5).getChannel();
-      ((FileChannel)localObject4).transferFrom((ReadableByteChannel)localObject3, 0L, ((FileChannel)localObject3).size());
-      ((FileChannel)localObject3).close();
-      ((FileChannel)localObject4).close();
-      i++;
-    }
-  }
-  
-  public static boolean exportDataBaseToSD()
-  {
-    for (;;)
-    {
-      try
-      {
-        localObject1 = new java.lang.StringBuilder;
-        ((StringBuilder)localObject1).<init>(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()));
-        localObject2 = "/Refresh/refresh-db.db";
-        localObject1 = new java.lang.StringBuilder;
-        ((StringBuilder)localObject1).<init>("exportDataBaseToSD db_path=");
-        Log.d("com.resmed.refresh.model", "data/data/com.resmed.refresh/databases/refresh-db");
-        localObject1 = new java.lang.StringBuilder;
-        ((StringBuilder)localObject1).<init>("exportDataBaseToSD pathToCopy=");
-        Log.d("com.resmed.refresh.model", (String)localObject2);
-        localObject3 = new java/io/File;
-        ((File)localObject3).<init>("data/data/com.resmed.refresh/databases/refresh-db");
-        localObject1 = new java/io/File;
-        ((File)localObject1).<init>((String)localObject2);
-        if (((File)localObject3).exists()) {
-          continue;
-        }
-        Log.w("Copy DB", "Data base doesn't exits!");
-        bool = false;
-      }
-      catch (Exception localException)
-      {
-        Object localObject1;
-        Object localObject2;
-        Object localObject3;
-        localException.printStackTrace();
-        Log.d("com.resmed.refresh.model", "Error in copyDataBaseFromData", localException);
-        boolean bool = false;
-        continue;
-      }
-      return bool;
-      createDirectories((String)localObject2);
-      localObject2 = new java/io/FileInputStream;
-      ((FileInputStream)localObject2).<init>((File)localObject3);
-      localObject2 = ((FileInputStream)localObject2).getChannel();
-      localObject3 = new java/io/FileOutputStream;
-      ((FileOutputStream)localObject3).<init>((File)localObject1);
-      localObject1 = ((FileOutputStream)localObject3).getChannel();
-      ((FileChannel)localObject1).transferFrom((ReadableByteChannel)localObject2, 0L, ((FileChannel)localObject2).size());
-      ((FileChannel)localObject2).close();
-      ((FileChannel)localObject1).close();
-      bool = true;
-    }
-  }
-  
-  public static File findFileByName(File paramFile, String paramString)
-  {
-    if (!paramFile.isDirectory())
-    {
-      paramFile = null;
-      return paramFile;
-    }
-    File[] arrayOfFile = paramFile.listFiles();
-    int j = arrayOfFile.length;
-    for (int i = 0;; i++)
-    {
-      if (i >= j)
-      {
-        paramFile = null;
-        break;
-      }
-      paramFile = arrayOfFile[i];
-      Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager a file : " + paramFile);
-      if (paramFile.isFile())
-      {
-        String str = paramFile.getName();
-        Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager edf file : " + paramFile);
-        if (str.endsWith(paramString)) {
-          break;
-        }
-      }
-    }
-  }
-  
-  public static float getBatteryLevel(Context paramContext)
-  {
-    paramContext = paramContext.registerReceiver(null, new IntentFilter("android.intent.action.BATTERY_CHANGED"));
-    int j = paramContext.getIntExtra("level", -1);
-    int i = paramContext.getIntExtra("scale", -1);
-    if ((j == -1) || (i == -1)) {}
-    for (float f = 50.0F;; f = j / i * 100.0F) {
-      return f;
-    }
-  }
-  
-  public static Date getDateFromString(String paramString)
-  {
-    for (;;)
-    {
-      try
-      {
-        if (!paramString.contains("Z")) {
-          continue;
-        }
-        localSimpleDateFormat = new java/text/SimpleDateFormat;
-        localSimpleDateFormat.<init>("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        localSimpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Calendar localCalendar = Calendar.getInstance();
-        localCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        localCalendar.setTime(localSimpleDateFormat.parse(paramString));
-        paramString = localCalendar.getTime();
-      }
-      catch (ParseException paramString)
-      {
-        SimpleDateFormat localSimpleDateFormat;
-        paramString = new Date();
-        continue;
-      }
-      return paramString;
-      localSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    }
-  }
-  
-  public static File getFilesPath()
-  {
-    if (Consts.USE_EXTERNAL_STORAGE) {}
-    for (File localFile = Environment.getExternalStorageDirectory();; localFile = RefreshApplication.getInstance().getFilesDir()) {
-      return localFile;
-    }
-  }
-  
-  public static String getFirmwareBinaryVersion(Context paramContext)
-  {
-    Object localObject1 = "1.0.5";
-    Object localObject2 = paramContext.getResources().getAssets();
-    paramContext = (Context)localObject1;
-    try
-    {
-      arrayOfString1 = ((AssetManager)localObject2).list("");
-      i = 0;
-      paramContext = (Context)localObject1;
-      if (i < arrayOfString1.length) {
-        break label37;
-      }
-      paramContext = (Context)localObject1;
-    }
-    catch (IOException localIOException)
-    {
-      for (;;)
-      {
-        String[] arrayOfString1;
-        int i;
-        label37:
-        String[] arrayOfString2;
-        localIOException.printStackTrace();
-      }
-    }
-    return paramContext;
-    paramContext = (Context)localObject1;
-    localObject2 = new java.lang.StringBuilder;
-    paramContext = (Context)localObject1;
-    ((StringBuilder)localObject2).<init>("getFirmwareBinary; fileName = ");
-    paramContext = (Context)localObject1;
-    Log.d("com.resmed.refresh.ui", arrayOfString1[i]);
-    localObject2 = localObject1;
-    paramContext = (Context)localObject1;
-    if (arrayOfString1[i].contains("BeD_"))
-    {
-      paramContext = (Context)localObject1;
-      arrayOfString2 = arrayOfString1[i].split("_");
-      paramContext = (Context)localObject1;
-      localObject2 = new java.lang.StringBuilder;
-      paramContext = (Context)localObject1;
-      ((StringBuilder)localObject2).<init>("checkForFirmwareUpgrade tokens :");
-      paramContext = (Context)localObject1;
-      Log.d("com.resmed.refresh.ui", Arrays.toString(arrayOfString2));
-      paramContext = (Context)localObject1;
-      if (arrayOfString2.length < 3) {
-        break label191;
-      }
-    }
-    label191:
-    for (localObject1 = arrayOfString2[2];; localObject1 = arrayOfString1[i])
-    {
-      paramContext = (Context)localObject1;
-      localObject2 = new java.lang.StringBuilder;
-      paramContext = (Context)localObject1;
-      ((StringBuilder)localObject2).<init>("checkForFirmwareUpgrade firmware version :");
-      paramContext = (Context)localObject1;
-      Log.d("com.resmed.refresh.ui", (String)localObject1);
-      localObject2 = localObject1;
-      i++;
-      localObject1 = localObject2;
-      break;
-    }
-  }
-  
-  public static String getHourMinsStringForTime(int paramInt)
-  {
-    return paramInt / 60 + ":" + String.format("%02d", new Object[] { Integer.valueOf(paramInt % 60) });
-  }
-  
-  public static String getHourStringForTime(int paramInt)
-  {
-    paramInt /= 60;
-    if (paramInt == 0) {}
-    for (String str = "";; str = String.format("%02dh", new Object[] { Integer.valueOf(paramInt) })) {
-      return str;
-    }
-  }
-  
-  public static String getMinsSecsStringForTime(int paramInt)
-  {
-    paramInt = Math.round(paramInt / 1000);
-    return String.format("%02d", new Object[] { Integer.valueOf(paramInt / 60) }) + ":" + String.format("%02d", new Object[] { Integer.valueOf(paramInt % 60) });
-  }
-  
-  public static String getMinsStringForTime(int paramInt)
-  {
-    return String.format("%02dm", new Object[] { Integer.valueOf(paramInt % 60) });
-  }
-  
-  public static String getStringFromDate(Date paramDate)
-  {
-    Object localObject = Calendar.getInstance();
-    ((Calendar)localObject).setTimeZone(TimeZone.getTimeZone("UTC"));
-    ((Calendar)localObject).setTime(paramDate);
-    paramDate = ((Calendar)localObject).getTime();
-    localObject = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    ((SimpleDateFormat)localObject).setTimeZone(TimeZone.getTimeZone("UTC"));
-    return ((SimpleDateFormat)localObject).format(paramDate);
-  }
-  
-  public static void hideKeyBoard(Activity paramActivity)
-  {
-    try
-    {
-      ((InputMethodManager)paramActivity.getSystemService("input_method")).hideSoftInputFromWindow(paramActivity.getCurrentFocus().getWindowToken(), 2);
-      return;
-    }
-    catch (Exception paramActivity)
-    {
-      for (;;) {}
-    }
-  }
-  
-  public static boolean isAppRunning(Context paramContext, String paramString)
-  {
-    paramContext = ((ActivityManager)paramContext.getSystemService("activity")).getRunningAppProcesses();
-    for (int i = 0;; i++)
-    {
-      if (i >= paramContext.size()) {}
-      for (boolean bool = false;; bool = true)
-      {
-        return bool;
-        if (!((ActivityManager.RunningAppProcessInfo)paramContext.get(i)).processName.equals(paramString)) {
-          break;
-        }
-      }
-    }
-  }
-  
-  public static boolean isPluggedIn(Context paramContext)
-  {
-    boolean bool2 = true;
-    int i = paramContext.registerReceiver(null, new IntentFilter("android.intent.action.BATTERY_CHANGED")).getIntExtra("plugged", -1);
-    boolean bool1 = bool2;
-    if (i != 1)
-    {
-      bool1 = bool2;
-      if (i != 2) {
-        bool1 = false;
-      }
-    }
-    return bool1;
-  }
-  
-  public static Long readTimeStampToFile(Context paramContext)
-  {
-    localObject1 = null;
-    for (;;)
-    {
-      try
-      {
-        localObject3 = new java/io/File;
-        ((File)localObject3).<init>(getFilesPath(), paramContext.getString(2131165344));
-        try
-        {
-          boolean bool = ((File)localObject3).exists();
-          if (bool) {
-            continue;
-          }
-          paramContext = (Context)localObject1;
-        }
-        catch (IOException paramContext)
-        {
-          Object localObject2;
-          long l;
-          paramContext.printStackTrace();
-          paramContext = (Context)localObject1;
-          continue;
-        }
-        return paramContext;
-      }
-      finally {}
-      localObject2 = new java/io/FileInputStream;
-      ((FileInputStream)localObject2).<init>((File)localObject3);
-      paramContext = new java/io/BufferedReader;
-      Object localObject3 = new java/io/InputStreamReader;
-      ((InputStreamReader)localObject3).<init>((InputStream)localObject2);
-      paramContext.<init>((Reader)localObject3);
-      localObject2 = paramContext.readLine();
-      paramContext.close();
-      paramContext = (Context)localObject1;
-      if (localObject2 != null)
-      {
-        l = Long.parseLong(((String)localObject2).trim());
-        paramContext = Long.valueOf(l);
-      }
-    }
-  }
-  
-  public static void setListViewHeightBasedOnChildren(ListView paramListView)
-  {
-    ListAdapter localListAdapter = paramListView.getAdapter();
-    if (localListAdapter == null) {
-      return;
-    }
-    int j = 0;
-    for (int i = 0;; i++)
-    {
-      if (i >= localListAdapter.getCount())
-      {
-        localObject = paramListView.getLayoutParams();
-        ((ViewGroup.LayoutParams)localObject).height = (paramListView.getDividerHeight() * (localListAdapter.getCount() - 1) + j);
-        paramListView.setLayoutParams((ViewGroup.LayoutParams)localObject);
-        break;
-      }
-      Object localObject = localListAdapter.getView(i, null, paramListView);
-      ((View)localObject).measure(0, 0);
-      j += ((View)localObject).getMeasuredHeight();
-    }
-  }
-  
-  public static boolean validateEmail(String paramString)
-  {
-    if ((paramString == null) || (paramString.length() == 0)) {}
-    for (boolean bool = false;; bool = Patterns.EMAIL_ADDRESS.matcher(paramString).matches()) {
-      return bool;
-    }
-  }
-  
-  public static void writeStringAsFile(String paramString1, String paramString2)
-  {
-    try
-    {
-      Object localObject1 = new java/io/File;
-      Object localObject2 = new java.lang.StringBuilder;
-      ((StringBuilder)localObject2).<init>();
-      ((File)localObject1).<init>(Environment.getExternalStorageDirectory() + "/refresh", paramString2);
-      createDirectories(((File)localObject1).getAbsolutePath());
-      localObject2 = new java.lang.StringBuilder;
-      ((StringBuilder)localObject2).<init>("writeStringAsFile path file:");
-      Log.d("com.resmed.refresh.model", ((File)localObject1).getAbsolutePath());
-      localObject2 = new java/io/FileWriter;
-      ((FileWriter)localObject2).<init>((File)localObject1);
-      localObject1 = new java.lang.StringBuilder;
-      ((StringBuilder)localObject1).<init>("writeStringAsFile path file:");
-      Log.d("com.resmed.refresh.model", Environment.getExternalStorageDirectory() + "/refresh/" + paramString2);
-      ((FileWriter)localObject2).write(paramString1);
-      ((FileWriter)localObject2).close();
-      return;
-    }
-    catch (IOException paramString1)
-    {
-      for (;;)
-      {
-        Log.d("com.resmed.refresh.model", "ERROR", paramString1);
-      }
-    }
-  }
-  
-  public static boolean writeTimeStampToFile(Context paramContext, long paramLong)
-  {
-    boolean bool = false;
-    try
-    {
-      Object localObject = new java/io/File;
-      ((File)localObject).<init>(getFilesPath(), paramContext.getString(2131165344));
-      try
-      {
-        if (!((File)localObject).exists()) {
-          ((File)localObject).createNewFile();
-        }
-        paramContext = new java/io/FileWriter;
-        paramContext.<init>((File)localObject, false);
-        localObject = new java.lang.StringBuilder;
-        ((StringBuilder)localObject).<init>(String.valueOf(Long.toString(paramLong)));
-        paramContext.write(" \n");
-        paramContext.flush();
-        paramContext.close();
-        bool = true;
-      }
-      catch (IOException paramContext)
-      {
-        for (;;)
-        {
-          paramContext.printStackTrace();
-        }
-      }
-      return bool;
-    }
-    finally {}
-  }
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String DATE_FORMAT_Z = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	protected static final char[] hexArray;
+
+	static {
+		hexArray = "0123456789ABCDEF".toCharArray();
+	}
+
+	public static String BitMapToString(final Bitmap bitmap) {
+		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, (OutputStream)byteArrayOutputStream);
+		return Base64.encodeToString(byteArrayOutputStream.toByteArray(), 0);
+	}
+
+	public static Bitmap StringToBitMap(final String s) {
+		try {
+			final byte[] decode = Base64.decode(s, 0);
+			return BitmapFactory.decodeByteArray(decode, 0, decode.length);
+		}
+		catch (Exception ex) {
+			ex.getMessage();
+			return null;
+		}
+	}
+
+	public static BitSet bitmaskFromInt(final int n) {
+		final BitSet set = new BitSet();
+		for (int i = 0; i < 32; ++i) {
+			if ((0x1 & n >> i) == 0x1) {
+				set.set(i);
+			}
+		}
+		return set;
+	}
+
+	public static int bitmaskToInt(final BitSet set) {
+		int n = 0;
+		int nextSetBit = -1;
+		while (true) {
+			nextSetBit = set.nextSetBit(nextSetBit + 1);
+			if (nextSetBit == -1) {
+				break;
+			}
+			n |= 1 << nextSetBit;
+		}
+		return n;
+	}
+
+	public static String bytesToHex(final List<Byte> list) {
+		final char[] array = new char[2 * list.size()];
+		for (int i = 0; i < list.size(); ++i) {
+			final int n = 0xFF & list.get(i);
+			array[i * 2] = RefreshTools.hexArray[n >>> 4];
+			array[1 + i * 2] = RefreshTools.hexArray[n & 0xF];
+		}
+		return new String(array);
+	}
+
+	public static String bytesToHex(final byte[] array) {
+		final char[] array2 = new char[2 * array.length];
+		for (int i = 0; i < array.length; ++i) {
+			final int n = 0xFF & array[i];
+			array2[i * 2] = RefreshTools.hexArray[n >>> 4];
+			array2[1 + i * 2] = RefreshTools.hexArray[n & 0xF];
+		}
+		return new String(array2);
+	}
+
+	public static int calculateAge(final Date time) {
+		final Calendar instance = Calendar.getInstance();
+		instance.setTime(time);
+		final Calendar instance2 = Calendar.getInstance();
+		int n = instance2.get(1) - instance.get(1);
+		if (instance2.get(2) < instance.get(2)) {
+			--n;
+		}
+		else if (instance2.get(2) == instance.get(2) && instance2.get(5) < instance.get(5)) {
+			return n - 1;
+		}
+		return n;
+	}
+
+	public static boolean checkForFirmwareUpgrade(final Context context, final String s) {
+		Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade firmware version :" + s);
+		return compareFirmwareVersions(s.replace("Release", "").split(" ")[0], getFirmwareBinaryVersion(context)) < 0;
+	}
+
+	public static int compareFirmwareVersions(final String p0, final String p1) {
+		//
+		// This method could not be decompiled.
+		//
+		// Original Bytecode:
+		//
+		//     0: ldc             "com.resmed.refresh.ui"
+		//     2: new             Ljava/lang/StringBuilder;
+		//     5: dup
+		//     6: ldc             "RefreshTools::compareVersions first : "
+		//     8: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
+		//    11: aload_0
+		//    12: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    15: ldc             " second : "
+		//    17: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    20: aload_1
+		//    21: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    24: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
+		//    27: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
+		//    30: pop
+		//    31: aload_0
+		//    32: ifnull          39
+		//    35: aload_1
+		//    36: ifnonnull       43
+		//    39: iconst_0
+		//    40: istore_3
+		//    41: iload_3
+		//    42: ireturn
+		//    43: aload_0
+		//    44: ldc             "\\."
+		//    46: invokevirtual   java/lang/String.split:(Ljava/lang/String;)[Ljava/lang/String;
+		//    49: astore          4
+		//    51: aload_1
+		//    52: ldc             "\\."
+		//    54: invokevirtual   java/lang/String.split:(Ljava/lang/String;)[Ljava/lang/String;
+		//    57: astore          5
+		//    59: ldc             "com.resmed.refresh.ui"
+		//    61: new             Ljava/lang/StringBuilder;
+		//    64: dup
+		//    65: ldc             "RefreshTools::compareVersions versionNumsFirst : "
+		//    67: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
+		//    70: aload           4
+		//    72: invokestatic    java/util/Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
+		//    75: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    78: ldc             " second : "
+		//    80: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    83: aload           5
+		//    85: invokestatic    java/util/Arrays.toString:([Ljava/lang/Object;)Ljava/lang/String;
+		//    88: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//    91: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
+		//    94: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
+		//    97: pop
+		//    98: aload           4
+		//   100: arraylength
+		//   101: ifeq            110
+		//   104: aload           5
+		//   106: arraylength
+		//   107: ifne            112
+		//   110: iconst_0
+		//   111: ireturn
+		//   112: aload           4
+		//   114: iconst_0
+		//   115: aaload
+		//   116: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   119: istore          8
+		//   121: aload           5
+		//   123: iconst_0
+		//   124: aaload
+		//   125: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   128: istore          9
+		//   130: ldc             "com.resmed.refresh.ui"
+		//   132: new             Ljava/lang/StringBuilder;
+		//   135: dup
+		//   136: ldc             "RefreshTools::compareVersions firstVersionFirstInt : "
+		//   138: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
+		//   141: iload           8
+		//   143: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   146: ldc             " secondVersionFirstInt : "
+		//   148: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//   151: iload           9
+		//   153: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   156: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
+		//   159: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
+		//   162: pop
+		//   163: iload           8
+		//   165: iload           9
+		//   167: invokestatic    java/lang/Integer.compare:(II)I
+		//   170: istore_3
+		//   171: iload_3
+		//   172: ifne            41
+		//   175: aload           4
+		//   177: iconst_1
+		//   178: aaload
+		//   179: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   182: istore          12
+		//   184: aload           5
+		//   186: iconst_1
+		//   187: aaload
+		//   188: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   191: istore          13
+		//   193: ldc             "com.resmed.refresh.ui"
+		//   195: new             Ljava/lang/StringBuilder;
+		//   198: dup
+		//   199: ldc             "RefreshTools::compareVersions firstVersionSecondInt : "
+		//   201: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
+		//   204: iload           12
+		//   206: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   209: ldc             " secondVersionSecondInt : "
+		//   211: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//   214: iload           13
+		//   216: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   219: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
+		//   222: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
+		//   225: pop
+		//   226: iload           12
+		//   228: iload           13
+		//   230: invokestatic    java/lang/Integer.compare:(II)I
+		//   233: istore_3
+		//   234: iload_3
+		//   235: ifne            41
+		//   238: aload           4
+		//   240: iconst_2
+		//   241: aaload
+		//   242: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   245: istore          16
+		//   247: aload           5
+		//   249: iconst_2
+		//   250: aaload
+		//   251: invokestatic    java/lang/Integer.parseInt:(Ljava/lang/String;)I
+		//   254: istore          17
+		//   256: ldc             "com.resmed.refresh.ui"
+		//   258: new             Ljava/lang/StringBuilder;
+		//   261: dup
+		//   262: ldc             "RefreshTools::compareVersions firstVersionThirdInt : "
+		//   264: invokespecial   java/lang/StringBuilder.<init>:(Ljava/lang/String;)V
+		//   267: iload           16
+		//   269: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   272: ldc             " secondVersionThirdInt : "
+		//   274: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+		//   277: iload           17
+		//   279: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+		//   282: invokevirtual   java/lang/StringBuilder.toString:()Ljava/lang/String;
+		//   285: invokestatic    com/resmed/refresh/utils/Log.d:(Ljava/lang/String;Ljava/lang/String;)I
+		//   288: pop
+		//   289: iload           16
+		//   291: iload           17
+		//   293: invokestatic    java/lang/Integer.compare:(II)I
+		//   296: istore_3
+		//   297: iload_3
+		//   298: ifne            41
+		//   301: iconst_0
+		//   302: ireturn
+		//   303: astore          7
+		//   305: iconst_0
+		//   306: ireturn
+		//   307: astore          11
+		//   309: iconst_0
+		//   310: ireturn
+		//   311: astore          15
+		//   313: iconst_0
+		//   314: ireturn
+		//    Exceptions:
+		//  Try           Handler
+		//  Start  End    Start  End    Type
+		//  -----  -----  -----  -----  ---------------------
+		//  112    130    303    307    Ljava/lang/Exception;
+		//  175    193    307    311    Ljava/lang/Exception;
+		//  238    256    311    315    Ljava/lang/Exception;
+		//
+		// The error that occurred was:
+		//
+		// java.lang.IndexOutOfBoundsException: Index: 155, Size: 155
+		//     at java.util.ArrayList.rangeCheck(Unknown Source)
+		//     at java.util.ArrayList.get(Unknown Source)
+		//     at com.strobel.decompiler.ast.AstBuilder.convertToAst(AstBuilder.java:3303)
+		//     at com.strobel.decompiler.ast.AstBuilder.build(AstBuilder.java:113)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:210)
+		//     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:757)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:655)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:532)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:499)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:141)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:130)
+		//     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:105)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
+		//     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
+		//     at the.bytecode.club.bytecodeviewer.decompilers.ProcyonDecompiler.decompileClassNode(ProcyonDecompiler.java:120)
+		//     at the.bytecode.club.bytecodeviewer.gui.ClassViewer$13.doShit(ClassViewer.java:624)
+		//     at the.bytecode.club.bytecodeviewer.gui.PaneUpdaterThread.run(PaneUpdaterThread.java:16)
+		//
+		throw new IllegalStateException("An error occurred while decompiling this method.");
+	}
+
+	public static boolean createDirectories(final String s) {
+		try {
+			final String[] split = s.split("/");
+			String string = "";
+			for (int i = 0; i < -1 + split.length; ++i) {
+				if (split[i].length() > 0) {
+					string = String.valueOf(string) + "/" + split[i];
+				}
+				new File(string).mkdirs();
+			}
+			return true;
+		}
+		catch (Exception ex) {
+			Log.d("com.resmed.refresh.model", "Error creating directories", (Throwable)ex);
+			return false;
+		}
+	}
+
+	public static List<Date> dateRangesForDay(final Date date) {
+		final Calendar instance = Calendar.getInstance();
+		instance.setTime(date);
+		final Calendar instance2 = Calendar.getInstance();
+		instance2.setTime(date);
+		instance.set(11, 0);
+		instance.set(12, 0);
+		instance.set(13, 0);
+		instance2.set(11, 23);
+		instance2.set(12, 59);
+		instance2.set(13, 59);
+		final ArrayList<Date> list = new ArrayList<Date>();
+		list.add(instance.getTime());
+		list.add(instance2.getTime());
+		return list;
+	}
+
+	public static List<Date> dateRangesForExactTime(final Date date) {
+		final long time = date.getTime();
+		final Date date2 = new Date(time - 1000L);
+		final Date date3 = new Date(time + 1000L);
+		final ArrayList<Date> list = new ArrayList<Date>();
+		list.add(date2);
+		list.add(date3);
+		return list;
+	}
+
+	public static void debugSleepSessions() {
+		final RefreshModelController instance = RefreshModelController.getInstance();
+		if (instance.getUser() != null) {
+			for (final RST_SleepSessionInfo rst_SleepSessionInfo : instance.localSleepSessionsAll()) {
+				final List hypnoData = HypnoMapper.getHypnoData(rst_SleepSessionInfo);
+				final int round = Math.round((rst_SleepSessionInfo.getStopTime().getTime() - rst_SleepSessionInfo.getStartTime().getTime()) / 60000L);
+				if (rst_SleepSessionInfo.getTotalSleepTime() > 60 && round > 0) {
+					final String string = String.valueOf(getHourStringForTime(rst_SleepSessionInfo.getTotalSleepTime())) + getMinsStringForTime(rst_SleepSessionInfo.getTotalSleepTime());
+					final String string2 = String.valueOf(getHourStringForTime(round)) + getMinsStringForTime(round);
+					while (true) {
+						try {
+							final float n = (hypnoData.get(1).getHour().getTime() - hypnoData.get(0).getHour().getTime()) / 1000.0f;
+							Log.d("sessions", String.valueOf(rst_SleepSessionInfo.getId()) + "\tTotalTime = " + string + "\tsleepTime = " + string2 + "\tTimeBetweenSamples = " + n + "\t" + rst_SleepSessionInfo.getStartTime() + "\t" + rst_SleepSessionInfo.getStopTime() + "\t" + rst_SleepSessionInfo.getCompleted());
+						}
+						catch (Exception ex) {
+							ex.printStackTrace();
+							final float n = 0.0f;
+							continue;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public static boolean deleteTimeStampFile(final Context context) {
+		synchronized (RefreshTools.class) {
+			return new File(getFilesPath(), context.getString(2131165344)).delete();
+		}
+	}
+
+	public static boolean exportAllFilesToSD() {
+		Block_0: {
+			//break Block_0;
+			Label_0220:
+			while (true) {
+				int i;
+				int length;
+				do {
+					Label_0050: {
+						//break Label_0050;
+						try {
+							final File filesDir = RefreshApplication.getInstance().getFilesDir();
+							final String string = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/Refresh/export/";
+							final File[] listFiles = filesDir.listFiles();
+							length = listFiles.length;
+							i = 0;
+							//continue Label_0220;
+							final File file = listFiles[i];
+							Log.d("com.resmed.refresh.model", " exportAllFilesToSD:: file.getName() : " + file.getName());
+							final File file2 = new File(String.valueOf(string) + file.getName().replace(RefreshApplication.getInstance().getFilesDir().getAbsolutePath(), ""));
+							createDirectories(file2.getAbsolutePath());
+							final FileChannel channel = new FileInputStream(file).getChannel();
+							final FileChannel channel2 = new FileOutputStream(file2.getAbsolutePath()).getChannel();
+							channel2.transferFrom(channel, 0L, channel.size());
+							channel.close();
+							channel2.close();
+							++i;
+							continue Label_0220;
+						}
+						catch (Exception ex) {
+							ex.printStackTrace();
+							Log.d("com.resmed.refresh.model", "Error in exportAllFilesToSD", (Throwable)ex);
+							return false;
+						}
+					}
+					continue Label_0220;
+				} while (i < length);
+				break;
+			}
+		}
+		return true;
+	}
+
+	public static boolean exportDataBaseToSD() {
+		try {
+			final String string = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/Refresh/refresh-db.db";
+			Log.d("com.resmed.refresh.model", "exportDataBaseToSD db_path=" + "data/data/com.resmed.refresh/databases/refresh-db");
+			Log.d("com.resmed.refresh.model", "exportDataBaseToSD pathToCopy=" + string);
+			final File file = new File("data/data/com.resmed.refresh/databases/refresh-db");
+			final File file2 = new File(string);
+			if (!file.exists()) {
+				Log.w("Copy DB", "Data base doesn't exits!");
+				return false;
+			}
+			createDirectories(string);
+			final FileChannel channel = new FileInputStream(file).getChannel();
+			final FileChannel channel2 = new FileOutputStream(file2).getChannel();
+			channel2.transferFrom(channel, 0L, channel.size());
+			channel.close();
+			channel2.close();
+			return true;
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			Log.d("com.resmed.refresh.model", "Error in copyDataBaseFromData", (Throwable)ex);
+			return false;
+		}
+	}
+
+	public static File findFileByName(final File file, final String s) {
+		if (file.isDirectory()) {
+			for (final File file2 : file.listFiles()) {
+				Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager a file : " + file2);
+				if (file2.isFile()) {
+					final String name = file2.getName();
+					Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager edf file : " + file2);
+					if (name.endsWith(s)) {
+						return file2;
+					}
+				}
+			}
+			return null;
+		}
+		return null;
+	}
+
+	public static float getBatteryLevel(final Context context) {
+		final Intent registerReceiver = context.registerReceiver((BroadcastReceiver)null, new IntentFilter("android.intent.action.BATTERY_CHANGED"));
+		final int intExtra = registerReceiver.getIntExtra("level", -1);
+		final int intExtra2 = registerReceiver.getIntExtra("scale", -1);
+		if (intExtra == -1 || intExtra2 == -1) {
+			return 50.0f;
+		}
+		return 100.0f * (intExtra / intExtra2);
+	}
+
+	public static Date getDateFromString(final String s) {
+		try {
+			SimpleDateFormat simpleDateFormat;
+			if (s.contains("Z")) {
+				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			}
+			else {
+				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			}
+			simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+			final Calendar instance = Calendar.getInstance();
+			instance.setTimeZone(TimeZone.getTimeZone("UTC"));
+			instance.setTime(simpleDateFormat.parse(s));
+			return instance.getTime();
+		}
+		catch (ParseException ex) {
+			return new Date();
+		}
+	}
+
+	public static File getFilesPath() {
+		if (Consts.USE_EXTERNAL_STORAGE) {
+			return Environment.getExternalStorageDirectory();
+		}
+		return RefreshApplication.getInstance().getFilesDir();
+	}
+
+	public static String getFirmwareBinaryVersion(final Context context) {
+		while (true) {
+			String s = "1.0.5";
+			final AssetManager assets = context.getResources().getAssets();
+			while (true) {
+				int n;
+				try {
+					final String[] list = assets.list("");
+					n = 0;
+					if (n >= list.length) {
+						return s;
+					}
+					Log.d("com.resmed.refresh.ui", "getFirmwareBinary; fileName = " + list[n]);
+					if (list[n].contains("BeD_")) {
+						final String[] split = list[n].split("_");
+						Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade tokens :" + Arrays.toString(split));
+						if (split.length >= 3) {
+							s = split[2];
+						}
+						else {
+							s = list[n];
+						}
+						Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade firmware version :" + s);
+					}
+				}
+				catch (IOException ex) {
+					ex.printStackTrace();
+					return s;
+				}
+				++n;
+				continue;
+			}
+		}
+	}
+
+	public static String getHourMinsStringForTime(final int n) {
+		return String.valueOf(n / 60) + ":" + String.format("%02d", n % 60);
+	}
+
+	public static String getHourStringForTime(final int n) {
+		final int n2 = n / 60;
+		if (n2 == 0) {
+			return "";
+		}
+		return String.format("%02dh", n2);
+	}
+
+	public static String getMinsSecsStringForTime(final int n) {
+		final int round = Math.round(n / 1000);
+		return String.valueOf(String.format("%02d", round / 60)) + ":" + String.format("%02d", round % 60);
+	}
+
+	public static String getMinsStringForTime(final int n) {
+		return String.format("%02dm", n % 60);
+	}
+
+	public static String getStringFromDate(final Date time) {
+		final Calendar instance = Calendar.getInstance();
+		instance.setTimeZone(TimeZone.getTimeZone("UTC"));
+		instance.setTime(time);
+		final Date time2 = instance.getTime();
+		final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return simpleDateFormat.format(time2);
+	}
+
+	public static void hideKeyBoard(final Activity activity) {
+		try {
+			((InputMethodManager)activity.getSystemService("input_method")).hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 2);
+		}
+		catch (Exception ex) {}
+	}
+
+	public static boolean isAppRunning(final Context context, final String s) {
+		final List runningAppProcesses = ((ActivityManager)context.getSystemService("activity")).getRunningAppProcesses();
+		for (int i = 0; i < runningAppProcesses.size(); ++i) {
+			if (runningAppProcesses.get(i).processName.equals(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isPluggedIn(final Context context) {
+		boolean b = true;
+		final int intExtra = context.registerReceiver((BroadcastReceiver)null, new IntentFilter("android.intent.action.BATTERY_CHANGED")).getIntExtra("plugged", -1);
+		if (intExtra != (b ? 1 : 0) && intExtra != 2) {
+			b = false;
+		}
+		return b;
+	}
+
+	public static Long readTimeStampToFile(final Context context) {
+		synchronized (RefreshTools.class) {
+			final File file = new File(getFilesPath(), context.getString(2131165344));
+			Long value;
+			try {
+				final boolean exists = file.exists();
+				value = null;
+				if (exists) {
+					final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+					final String line = bufferedReader.readLine();
+					bufferedReader.close();
+					value = null;
+					if (line != null) {
+						value = Long.parseLong(line.trim());
+					}
+				}
+				return value;
+			}
+			catch (IOException ex) {
+				ex.printStackTrace();
+				value = null;
+				return value;
+			}
+			return value;
+		}
+	}
+
+	public static void setListViewHeightBasedOnChildren(final ListView listView) {
+		final ListAdapter adapter = listView.getAdapter();
+		if (adapter == null) {
+			return;
+		}
+		int n = 0;
+		for (int i = 0; i < adapter.getCount(); ++i) {
+			final View view = adapter.getView(i, (View)null, (ViewGroup)listView);
+			view.measure(0, 0);
+			n += view.getMeasuredHeight();
+		}
+		final ViewGroup.LayoutParams layoutParams = listView.getLayoutParams();
+		layoutParams.height = n + listView.getDividerHeight() * (-1 + adapter.getCount());
+		listView.setLayoutParams(layoutParams);
+	}
+
+	public static boolean validateEmail(final String s) {
+		return s != null && s.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(s).matches();
+	}
+
+	public static void writeStringAsFile(final String s, final String s2) {
+		try {
+			final File file = new File(Environment.getExternalStorageDirectory() + "/refresh", s2);
+			createDirectories(file.getAbsolutePath());
+			Log.d("com.resmed.refresh.model", "writeStringAsFile path file:" + file.getAbsolutePath());
+			final FileWriter fileWriter = new FileWriter(file);
+			Log.d("com.resmed.refresh.model", "writeStringAsFile path file:" + Environment.getExternalStorageDirectory() + "/refresh/" + s2);
+			fileWriter.write(s);
+			fileWriter.close();
+		}
+		catch (IOException ex) {
+			Log.d("com.resmed.refresh.model", "ERROR", (Throwable)ex);
+		}
+	}
+
+	public static boolean writeTimeStampToFile(final Context context, final long n) {
+		synchronized (RefreshTools.class) {
+			final File file = new File(getFilesPath(), context.getString(2131165344));
+			try {
+				if (!file.exists()) {
+					file.createNewFile();
+				}
+				final FileWriter fileWriter = new FileWriter(file, false);
+				fileWriter.write(String.valueOf(Long.toString(n)) + " \n");
+				fileWriter.flush();
+				fileWriter.close();
+				return true;
+			}
+			catch (IOException ex) {
+				ex.printStackTrace();
+				final boolean b = false;
+			}
+		}
+	}
 }
-
-
-/* Location:              C:\Root\@Objects\Tablet\Resmed\App Inspect\JD Gui\com.resmed.refresh-158.jar!\com\resmed\refresh\utils\RefreshTools.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

@@ -61,7 +61,7 @@ public class RST_AdviceItemDao
     {
       if (this.rST_User_AdvicesQuery == null)
       {
-        localObject = queryBuilder();
+		  QueryBuilder localObject = queryBuilder();
         ((QueryBuilder)localObject).where(Properties.IdUser.eq(null), new WhereCondition[0]);
         ((QueryBuilder)localObject).orderRaw("TIMESTAMP ASC");
         this.rST_User_AdvicesQuery = ((QueryBuilder)localObject).build();
@@ -210,10 +210,8 @@ public class RST_AdviceItemDao
         }
         if (!((Cursor)localObject).isLast())
         {
-          paramLong = new java/lang/IllegalStateException;
-          localStringBuilder = new java.lang.StringBuilder;
-          localStringBuilder.<init>("Expected unique result, but count was ");
-          paramLong.<init>(((Cursor)localObject).getCount());
+          paramLong = new java.lang.IllegalStateException(((Cursor)localObject).getCount());
+          localStringBuilder = new java.lang.StringBuilder("Expected unique result, but count was ");
           throw paramLong;
         }
       }
