@@ -1,6 +1,12 @@
 // ClassExtensions.ts
 // ==========
 
+// special, early codes
+var g: any = global;
+g.g = g;
+Object.freeze = obj=>obj; // mwahahaha!! React can no longer freeze it's objects, so we can do as we please
+Object.isFrozen = obj=>true;
+
 var {VDF} = require("../Packages/VDF/VDF");
 var {List, Dictionary} = require("../Packages/VDF/VDFExtras");
 var {VDFTypeInfo} = require("../Packages/VDF/VDFTypeInfo");
@@ -62,6 +68,7 @@ Object.prototype._AddGetterSetter("_AddSetter_Inline", null, function(func) { th
 
 //interface Function {
 interface Object { // add to Object interface, otherwise TS thinks "Function" refers to this interface instead of the Function class
+	GetName(): string;
 }
 
 //Function.prototype._AddFunction_Inline = function GetName() { return this.name || this.name_fake || this.toString().match(/^function\s*([^\s(]+)/)[1]; };

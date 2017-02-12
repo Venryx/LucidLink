@@ -52,7 +52,7 @@ import {ProfileMethod} from "./VProfiler";
 	static Disconnect() {
 		LibMuse.Disconnect();
 	}
-	static status = "disconnected";
+	static status: "disconnected" | "connecting" | "connected" = "disconnected";
 	static OnChangeMuseConnectStatus(status) {
 		Log("muse link", `Muse connection status changed: ${status}`);
 		if (status == "connected") {

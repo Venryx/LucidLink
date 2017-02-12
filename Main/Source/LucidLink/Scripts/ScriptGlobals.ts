@@ -1,4 +1,4 @@
-import {Assert, E, Timer, WaitXThenRun, IsString} from "../../Frame/Globals";
+import {E, IsString} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
 import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";
@@ -6,6 +6,7 @@ import V from "../../Packages/V/V";
 import {DeviceEventEmitter} from "react-native";
 import {LL} from "../../LucidLink";
 import {AudioFile} from "../../Frame/AudioFile";
+import {Timer} from "../../Frame/General/Timers";
 var Sound = require("react-native-sound");
 
 // re-exports

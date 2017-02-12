@@ -1,5 +1,6 @@
-import {Assert, IsPrimitive} from "../../Frame/Globals";
+import {IsPrimitive, Log, IsString} from "../../Frame/Globals";
 import {Dictionary, List} from "../VDF/VDFExtras";
+import {Assert} from "../../Frame/General/Assert";
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;
@@ -123,13 +124,24 @@ export default class V {
 			if (!(prop.value instanceof Function) && (propMatchFunc == null || propMatchFunc.call(obj, prop.name, prop.value)))
 				result[prop.name] = V.CloneObject(prop.value, propMatchFunc, depth + 1);
 		return result;
-	};
+	}
 	static CloneArray(array) {
 		//array.slice(0); //deep: JSON.parse(JSON.stringify(array));
 		return Array.prototype.slice.call(array, 0);
-	};
+	}
 	/*static IsEqual(a, b) {
 		function _equals(a, b) { return JSON.stringify(a) === JSON.stringify($.extend(true, {}, a, b)); }
 		return _equals(a, b) && _equals(b, a);
 	};*/
+
+	static GetStackTraceStr(stackTrace?: string, sourceStackTrace?: boolean);
+	static GetStackTraceStr(sourceStackTrace?: boolean);
+	static GetStackTraceStr(...args) {
+	    if (IsString(args[0])) var [stackTrace, sourceStackTrace = true] = args;
+	    else var [sourceStackTrace = true] = args;
+
+		stackTrace = stackTrace || new Error()[sourceStackTrace ? "Stack" : "stack"];
+		return stackTrace.substr(stackTrace.IndexOf_X(1, "\n")); // remove "Error" line and first stack-frame (that of this method)
+	}
+	static LogStackTrace() { Log(V.GetStackTraceStr()); }
 }

@@ -14,9 +14,10 @@ import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitc
 import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPicker";
 import {autorun} from "mobx";
 import {EveryXSecondsDo, GetRandomNumber, Speak} from "../Scripts/ScriptGlobals";
-import {Log, Timer, WaitXThenRun} from "../../Frame/Globals";
+import {Log} from "../../Frame/Globals";
 import Sound from "react-native-sound";
 import {AudioFile} from "../../Frame/AudioFile";
+import {WaitXThenRun, Timer} from "../../Frame/General/Timers";
 
 var audioFiles = audioFiles || {};
 function GetAudioFile(name) {

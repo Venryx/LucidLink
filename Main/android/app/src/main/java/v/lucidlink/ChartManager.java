@@ -2,7 +2,6 @@ package v.lucidlink;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.choosemuse.libmuse.Muse;
-import com.choosemuse.libmuse.MuseArtifactPacket;
-import com.choosemuse.libmuse.MuseDataListener;
-import com.choosemuse.libmuse.MuseDataPacket;
-import com.choosemuse.libmuse.MuseDataPacketType;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
@@ -23,7 +17,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import v.LibMuse.MainModule;
+
 import v.LibMuse.VMuseDataPacket;
 
 import java.util.ArrayList;
@@ -323,10 +317,10 @@ class ChartManager {
 
 				DataSet dataSet = (DataSet) data.getDataSetByIndex(channel);
 
-				if (channel == 0) dataSet.setVisible(Main.main.channel1);
-				else if (channel == 1) dataSet.setVisible(Main.main.channel2);
-				else if (channel == 2) dataSet.setVisible(Main.main.channel3);
-				else if (channel == 3) dataSet.setVisible(Main.main.channel4);
+				if (channel == 0) dataSet.setVisible(LL.main.channel1);
+				else if (channel == 1) dataSet.setVisible(LL.main.channel2);
+				else if (channel == 2) dataSet.setVisible(LL.main.channel3);
+				else if (channel == 3) dataSet.setVisible(LL.main.channel4);
 
 				float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
 				float yValue = (float)packet.eegValues[channel];
@@ -339,7 +333,7 @@ class ChartManager {
 				chart.setVisibleXRange(0, eegProcessor.maxX);
 
 			MainActivity.main.runOnUiThread(() -> {
-				if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
+				if (eegProcessor.currentIndex % LL.main.updateInterval == 0)
 					UpdateChart();
 				UpdateEyeTrackerUI(); // update eye-tracker ui to match processor's changes
 				UpdateDebugUI();
@@ -379,7 +373,7 @@ class ChartManager {
 
 		chart.setVisibleXRange(0, eegProcessor.maxX);
 
-		if (eegProcessor.currentIndex % Main.main.updateInterval == 0)
+		if (eegProcessor.currentIndex % LL.main.updateInterval == 0)
 			UpdateChart();
 	}
 

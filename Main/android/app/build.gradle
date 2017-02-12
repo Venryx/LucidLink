@@ -1,12 +1,12 @@
 buildscript {
     repositories {
-        maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://maven.fabric.io/public" }
     }
 
     dependencies {
         // The Fabric Gradle plugin uses an open ended version to react
         // quickly to Android tooling updates
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath "io.fabric.tools:gradle:1.+"
     }
 }
 plugins {
@@ -49,8 +49,8 @@ import com.android.build.OutputFile
  *   // whether to bundle JS and assets in another build variant (if configured).
  *   // See http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants
  *   // The configuration property can be in the following formats
- *   //         'bundleIn${productFlavor}${buildType}'
- *   //         'bundleIn${buildType}'
+ *   //         "bundleIn${productFlavor}${buildType}"
+ *   //         "bundleIn${buildType}"
  *   // bundleInFreeDebug: true,
  *   // bundleInPaidRelease: true,
  *   // bundleInBeta: true,
@@ -65,11 +65,11 @@ import com.android.build.OutputFile
  *   jsBundleDirRelease: "$buildDir/intermediates/assets/release",
  *
  *   // where to put drawable resources / React Native assets, e.g. the ones you use via
- *   // require('./image.png')), in debug mode
+ *   // require("./image.png")), in debug mode
  *   resourcesDirDebug: "$buildDir/intermediates/res/merged/debug",
  *
  *   // where to put drawable resources / React Native assets, e.g. the ones you use via
- *   // require('./image.png')), in release mode
+ *   // require("./image.png")), in release mode
  *   resourcesDirRelease: "$buildDir/intermediates/res/merged/release",
  *
  *   // by default the gradle tasks are skipped if none of the JS files or assets change; this means
@@ -87,7 +87,10 @@ import com.android.build.OutputFile
  * ]
  */
 
-
+project.ext.react = [
+    // the entry file for bundle generation
+    entryFile: "Build/Source/index.android.js",
+];
 
 apply from: "../../node_modules/react-native/react.gradle"
 
@@ -107,7 +110,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     //buildToolsVersion "23.0.1"
     buildToolsVersion "25.0.0"
 
@@ -115,7 +118,7 @@ android {
         applicationId "v.lucidlink"
         //minSdkVersion 18
         minSdkVersion 21
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 2
         versionName "1.0.1"
         ndk {
@@ -186,83 +189,94 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/NOTICE' // will not include NOTICE file
-        exclude 'META-INF/LICENSE' // will not include LICENSE file
+        exclude "META-INF/NOTICE" // will not include NOTICE file
+        exclude "META-INF/LICENSE" // will not include LICENSE file
         // as noted by @Vishnuvathsan you may also need to include
         // variations on the file name. It depends on your dependencies.
         // Some other common variations on notice and license file names
-        exclude 'META-INF/notice'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/license'
-        exclude 'META-INF/license.txt'
+        exclude "META-INF/notice"
+        exclude "META-INF/notice.txt"
+        exclude "META-INF/license"
+        exclude "META-INF/license.txt"
     }
 }
 
-//apply plugin: 'io.fabric'
+//apply plugin: "io.fabric"
 // todo: make-so this is uncommented again once api key is added
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://maven.fabric.io/public" }
     maven { url "https://jitpack.io" }
     jcenter()
 }
 
-String userConfig = new File('../UserConfig.json').text
+String userConfig = new File("../UserConfig.json").text
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    // android support
-    compile 'com.android.support:appcompat-v7:24.0.1'
-    compile 'com.android.support:support-annotations:24.2.0'
-    compile 'com.android.support:design:24.0.0'
-    compile 'com.android.support:percent:24.0.0'
-    compile 'com.android.support:recyclerview-v7:24.0.0'
-
-    compile project(':react-native-dialogs')
-    compile project(':react-native-numberpicker-dialog')
-    compile project(':react-native-file-picker')
-    compile project(':react-native-orientation')
-    compile project(':react-native-fs')
-    compile project(':RNSound')
-    compile project(':react-native-dialogs')
-    compile project(':react-native-android-speech')
-    compile project(':react-native-android-snackbar')
-    compile project(':react-native-background-timer')
-    compile project(':react-native-keep-awake')
-    compile 'com.annimon:stream:1.1.4'
-
-    if (userConfig.contains("reactNativeLibMuse_external: true"))
-        compile project(':react-native-libmuse')
-    if (userConfig.contains("mpChartLib_external: true"))
-        compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
+/*configurations.all((Closure) {
+    resolutionStrategy {
+        force "com.android.support:support-v4:25.1.0" // force runtime to use this version of support library
+    }
+})
+allprojects {
+    configurations.all((Closure) {
+        resolutionStrategy {
+            force "com.android.support:support-v4:25.1.0" // force runtime to use this version of support library
+        }
+    })
+}*/
+configurations {
+    /*compile.exclude module: 'commons'
+    all*.exclude group: 'org.gradle.test.excludes', module: 'reports'*/
+    /*all*.exclude group: 'com.android.support'
+    all*.exclude module: 'com.android.support'
+    all*.exclude module: 'support-v4'*/
 }
 
-/*dependencies {
-    compile 'com.android.support.test:runner:0.4'
-    // Set this dependency to use JUnit 4 rules
-    compile 'com.android.support.test:rules:0.4'
-    // Set this dependency to build and run Espresso tests
-    compile 'com.android.support.test.espresso:espresso-core:2.2.1'
-    // Set this dependency to build and run UI Automator tests
-    compile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-}*/
 
-/*android {
-    defaultConfig {
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+dependencies {
+    // android support
+    compile("com.android.support:support-v4:25.1.0") {
+        force = true
     }
-}*/
+    compile("com.android.support:appcompat-v7:25.1.0") {
+        force = true
+    }
+    compile "com.android.support:support-annotations:25.1.0"
+    compile "com.android.support:design:25.0.0"
+    compile "com.android.support:percent:25.0.0"
+    compile "com.android.support:recyclerview-v7:25.0.0"
+
+    compile project(":react-native-dialogs")
+    compile project(":react-native-numberpicker-dialog")
+    compile project(":react-native-file-picker")
+    compile project(":react-native-orientation")
+    compile project(":react-native-fs")
+    compile project(":react-native-dialogs")
+    compile project(":react-native-android-speech")
+    compile project(":react-native-android-snackbar")
+    compile project(":react-native-background-timer")
+    compile project(":react-native-keep-awake")
+    compile project(":react-native-libmuse")
+    compile project(":MPChartLib")
+    compile project(":RNMaterialKit")
+    compile project(":RNSound")
+    compile "com.annimon:stream:1.1.4"
+
+    if (userConfig.contains("reactNativeLibMuse_external: true"))
+        compile project(":react-native-libmuse")
+    if (userConfig.contains("mpChartLib_external: true"))
+        compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
+
+    compile fileTree(dir: "libs", include: ["*.jar"])
+    /*compile(files("libs/com.resmed.refresh-158.jar")) {
+        exclude group: "com.android.support"
+    }*/
+}
 
 // Run this once to be able to run the application with BUCK
 // puts all compile dependencies into folder libs for BUCK to use
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
-    into 'libs'
-}
-
-dependencies {
-    compile project(path: ':react-native-libmuse')
-    compile project(path: ':MPChartLib')
-    compile project(':RNMaterialKit')
+    into "libs"
 }

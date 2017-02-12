@@ -35,7 +35,7 @@ export default class LucidLinkUI extends Component<{}, {}> {
 					<Panel tabLabel="Settings">{marker}</Panel>
 					<Panel tabLabel="More">{marker}</Panel>
 				</ScrollableTabView>
-			)
+			);
 		}
 
      	var {activeTab} = this.state;

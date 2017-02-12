@@ -1,34 +1,36 @@
 package v.lucidlink;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.facebook.react.ReactActivity;
-import com.facebook.react.bridge.ReactMethod;
 
-import v.LibMuse.LibMuse;
+import SPlus.SPlusModule;
+import SPlus.SPlusPackage;
+import v.LibMuse.LibMuseModule;
+
+import static android.os.Build.VERSION.SDK;
 
 public class MainActivity extends ReactActivity {
 	public static MainActivity main;
 	public MainActivity() {
 		super();
 		main = this;
-		LibMuse.mainActivity = this;
+		LibMuseModule.mainActivity = this;
+		SPlusModule.mainActivity = this;
 	}
 
 	static final int REQUEST_WRITE_STORAGE = 112;
 	public boolean ArePermissionsGranted() {
-		return ContextCompat.checkSelfPermission(Main.main.reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+		// workaround for runtime bug of ContextCompat evaluating to the old version (in S+ jar)
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+			return true;
+		return ContextCompat.checkSelfPermission(LL.main.reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 	}
 	public void EnsurePermissionsGranted() {
 		boolean hasPermission = ArePermissionsGranted();
@@ -62,15 +64,15 @@ public class MainActivity extends ReactActivity {
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
 		char keyChar = (char)event.getUnicodeChar();
-		Main.main.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
-		if (Main.main.blockUnusedKeys)
+		LL.main.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
+		if (LL.main.blockUnusedKeys)
 			return true;
 		return super.onKeyDown(keyCode, event);
 	}
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		char keyChar = (char)event.getUnicodeChar();
-		Main.main.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
-		if (Main.main.blockUnusedKeys)
+		LL.main.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
+		if (LL.main.blockUnusedKeys)
 			return true;
 		return super.onKeyUp(keyCode, event);
 	}

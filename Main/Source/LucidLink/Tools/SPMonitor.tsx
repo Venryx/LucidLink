@@ -1,6 +1,6 @@
-import {JavaBridge,} from "../../Frame/Globals";
+import {JavaBridge, Global} from "../../Frame/Globals";
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {BaseComponent as Component, Column, Panel, Row, VButton} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Vector2i} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
@@ -8,47 +8,21 @@ import Drawer from "react-native-drawer";
 import {MKRangeSlider} from "react-native-material-kit";
 import DialogAndroid from "react-native-dialogs";
 import {Text, Switch, View} from "react-native";
-
-export class Monitor extends Node {
-	@O @P() updateInterval = 3;
-	@O @P() channel1 = true;
-	@O @P() channel2 = true;
-	@O @P() channel3 = true;
-	@O @P() channel4 = true;
-
-	@O @P() connect = true;
-	@O @P() monitor = true;
-	@O @P() patternMatch = true;
-
-	eegProcessor = new EEGProcessor();
-
-	ui = null;
-}
-g.Extend({Monitor});
-
-import OptionsPanel from "./Monitor/OptionsPanel";
-import MuseBridge from "../../Frame/MuseBridge";
 import {LL} from "../../LucidLink";
-import {P} from "../../Packages/VDF/VDFTypeInfo";
 import Node from "../../Packages/VTree/Node";
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
+import OptionsPanel from "./SPMonitor/OptionsPanel";
+import {P} from "../../Packages/VDF/VDFTypeInfo";
+
+@Global
+export class SPMonitor extends Node {
+	@O @P() connect = true;
+	@O @P() monitor = true;
+	@O @P() process = true;
+}
 
 @observer
-export class MonitorUI extends Component<any, any> {
-	constructor(props) {
-		super(props);
-		LL.tools.monitor.ui = this;
-		this.patternGrab_minX = 0;
-		this.patternGrab_maxX = 1000;
-	}
-	patternGrab_minX;
-	patternGrab_maxX;
-
-	/*ComponentWillMountOrReceiveProps(props) {
-		var {visible} = props;
-		JavaBridge.Main.OnMonitorChangeVisible(visible);
-	}*/
-
+export class SPMonitorUI extends Component<BaseProps, {}> {
 	sidePanel = null;
 	ToggleSidePanelOpen() {
 		if (this.sidePanel._open)
@@ -58,8 +32,8 @@ export class MonitorUI extends Component<any, any> {
 	}
 
 	render() {
-		var {visible} = this.props;
-		var node = LL.tools.monitor;
+		var node = LL.tools.spMonitor;
+		var bridge = LL.spBridge;
 		
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
@@ -74,23 +48,20 @@ export class MonitorUI extends Component<any, any> {
 				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
-						{/*temp*/}
-						<VButton text="Center" ml10 mt3 style={{width: 100, height: 35}}
-							enabled={MuseBridge.status == "connected"} onPress={()=>JavaBridge.Main.CenterEyeTracker()}/>
 						<Panel style={{flex: 1}}/>
 
-						{["unknown", "disconnected", "needs_update"].Contains(MuseBridge.status) && node.connect &&
-							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Searching for muse headband...</Text>}
-						{MuseBridge.status == "connecting" &&
+						{["unknown", "disconnected", "needs_update"].Contains(bridge.status) && node.connect &&
+							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Searching for S+ device...</Text>}
+						{bridge.status == "connecting" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connecting...</Text>}
-						{MuseBridge.status == "connected" &&
+						{bridge.status == "connected" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connected</Text>}
 						<VSwitch_Auto mt={8} path={()=>node.p.connect}/>
 						<VSwitch_Auto text="Monitor" ml={5} mt={8} path={()=>node.p.monitor}/>
-						<VSwitch_Auto text="Pattern match" ml={5} mt={8} path={()=>node.p.patternMatch}/>
+						<VSwitch_Auto text="Process" ml={5} mt={8} path={()=>node.p.process}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
-						<ChannelsUI/>
+						<GraphUI/>
 					</Panel>
 				</Column>
 			</Drawer>
@@ -99,7 +70,7 @@ export class MonitorUI extends Component<any, any> {
 }
 
 var didFirstRender = false;
-class ChannelsUI extends Component<{}, {}> {
+class GraphUI extends Component<{}, {}> {
     render() {
         return (
 			<View style={{flex: 1, backgroundColor: colors.background}}
@@ -107,16 +78,16 @@ class ChannelsUI extends Component<{}, {}> {
         );
     }
 
-	PostRender() {
+	/*PostRender() {
 		if (!didFirstRender) {
 			didFirstRender = true;
 			JavaBridge.Main.AddChart();
 			/*DeviceEventEmitter.addListener("PostAddChart", args=> {
 				// do one more render, to fix positioning
 				this.forceUpdate();
-			});*/
+			});*#/
 		} else {
 			JavaBridge.Main.UpdateChartBounds();
 		}
-	}
+	}*/
 }

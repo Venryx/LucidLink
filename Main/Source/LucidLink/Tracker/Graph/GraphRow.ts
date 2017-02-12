@@ -1,5 +1,5 @@
 import {Event} from "../Session";
-import {A} from "../../../Frame/Globals";
+import {A} from "../../../Frame/General/Assert";
 
 export class Segment {
 	constructor(events: Event[]) {

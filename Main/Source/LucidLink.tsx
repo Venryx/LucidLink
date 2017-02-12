@@ -1,9 +1,3 @@
-// special, early codes
-var g: any = global;
-g.g = g;
-Object.freeze = obj=>obj; // mwahahaha!! React can no longer freeze it's objects, so we can do as we please
-Object.isFrozen = obj=>true;
-
 // imports for external (basic js) modules
 import "./Packages/VDF/VDF";
 import "./Packages/VDF/VDFLoader";
@@ -13,9 +7,9 @@ import "./Packages/VDF/VDFTokenParser";
 import "./Packages/VDF/VDFTypeInfo";
 
 // special, early imports (eg type extensions)
-import "./Frame/CE";
+import "./Frame/CE"; // contains first actual statements (eg, setting global "g")
 
-import {Assert, E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';
+import {E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';
 import {Panel} from "./Frame/ReactGlobals";
 import Node from "./Packages/VTree/Node";
 import {colors} from './Frame/Styles';
@@ -116,6 +110,8 @@ export class LucidLink extends Node {
 	@T("Settings") @P(true, true) settings = new Settings();
 	@T("More") @P(true, true) more = new More();
 
+	spBridge = new SPBridge();
+
 	PushBasicDataToJava() {
 		var basicData = {};
 		// monitor
@@ -215,13 +211,31 @@ import TestData from "./Frame/TestData";
 import LibMuse from "react-native-libmuse";
 import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
 import {Tools} from "./LucidLink/Tools";
+import SPBridge from "./Frame/SPBridge";
+
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	var inEmulator = await JavaBridge.Main.IsInEmulator();
-	if (inEmulator)
+	if (inEmulator) {
 		Log("general", `In emulator: ${inEmulator}`);
-	if (!inEmulator && !MuseBridge.initialized) {
+		return;
+	}
+	
+	if (!MuseBridge.initialized)
 		MuseBridge.Init();
+	autorun(()=> {
 		if (LL.tools.monitor.connect)
 			MuseBridge.StartSearch(); // start listening for a muse headband
-	}
+		else
+			MuseBridge.Disconnect();
+	});
+
+	// also for sp-monitor
+	if (!LL.spBridge.initialized)
+		LL.spBridge.Init();
+	autorun(()=> {
+		if (LL.tools.spMonitor.connect)
+			LL.spBridge.Connect();
+		else
+			LL.spBridge.Disconnect();
+	});
 }

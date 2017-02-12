@@ -1,5 +1,5 @@
 import {Assert} from "../Packages/VDF/VDF";
-import {WaitXThenRun, Timer} from "./Globals";
+import {Timer, WaitXThenRun} from "./General/Timers";
 
 export class AudioFile {
 	constructor(baseFile) {

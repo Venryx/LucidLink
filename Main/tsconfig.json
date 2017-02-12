@@ -27,14 +27,13 @@
     "include": [
         "Typings/**/*.d.ts",
 		//"Typings/globals/**/*.d.ts",
+		"index.android.tsx",
         "Source/**/*.ts",
         "Source/**/*.tsx",
 		"Source/**/*.js",
 		"Source/**/*.jsx"
     ],
     "exclude": [
-        "index.android.js",
-        "index.ios.js",
         "Build"
         /*"node_modules"
 		"Typings/main",

@@ -1,10 +1,11 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {Log, WaitXThenRun} from "../../Frame/Globals";
+import {Log} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
 import {Pattern} from "../../Frame/Patterns/Pattern";
+import {WaitXThenRun} from "../../Frame/General/Timers";
 
 export default class ScriptRunner {
 	constructor() {

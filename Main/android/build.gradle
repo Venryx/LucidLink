@@ -27,6 +27,12 @@ allprojects {
         // required to find the project's artifacts
         maven { url "https://www.jitpack.io" }
     }
+    configurations.all((Closure) {
+        resolutionStrategy {
+            force "com.android.support:support-v4:25.1.0" // force runtime to use this version of support library
+        }
+    })
+
     // Allow more errors
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {

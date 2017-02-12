@@ -1,14 +1,10 @@
 package v.lucidlink;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Debug;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -35,20 +31,21 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Main extends ReactContextBaseJavaModule {
-	public static Main main;
-
+class LL {
+	public static LucidLinkModule main;
+}
+public class LucidLinkModule extends ReactContextBaseJavaModule {
     private static final String DURATION_SHORT_KEY = "SHORT";
     private static final String DURATION_LONG_KEY = "LONG";
 
-    public Main(ReactApplicationContext reactContext) {
+    public LucidLinkModule(ReactApplicationContext reactContext) {
         super(reactContext);
-		// when the react-native Reload button is pressed, a new Main class instance is created; check if this just happened
-		firstLaunch = main == null;
+		// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
+		firstLaunch = LL.main == null;
 		if (!firstLaunch)
-			main.Shutdown();
+			LL.main.Shutdown();
 
-		main = this;
+		LL.main = this;
 		this.reactContext = reactContext;
 
 		MainActivity.main.EnsurePermissionsGranted();
@@ -72,7 +69,7 @@ public class Main extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "Main";
+        return "LucidLink";
     }
 
     @Override
@@ -117,7 +114,7 @@ public class Main extends ReactContextBaseJavaModule {
 			V.Assert(false, "Length-string is invalid. (" + lengthStr + ")");
 
 		//MainApplication.GetPackageOfType(ReactSnackbarPackage.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
-		Main.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, length, true, Color.parseColor("#FFFFFF"), "HI", null);
+		LL.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, length, true, Color.parseColor("#FFFFFF"), "HI", null);
 	}
 
 	@ReactMethod public void IsInEmulator(Promise promise) {

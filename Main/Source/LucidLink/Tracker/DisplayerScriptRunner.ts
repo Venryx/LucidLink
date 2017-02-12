@@ -1,11 +1,13 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {Assert, Log, WaitXThenRun} from "../../Frame/Globals";
+import {Log} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "../Scripts/ScriptGlobals";
 import {GraphRow} from "./Graph/GraphRow";
 import {GraphOverlay} from "./Graph/GraphOverlay";
+import {Assert} from "../../Frame/General/Assert";
+import {WaitXThenRun} from "../../Frame/General/Timers";
 
 // displayer-script globals
 // ==========

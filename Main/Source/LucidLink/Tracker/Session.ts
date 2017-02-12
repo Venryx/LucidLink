@@ -1,9 +1,11 @@
-import {Assert, BufferAction, FromVDF, GetTypeName, ToVDF} from "../../Frame/Globals";
+import {FromVDF, GetTypeName, ToVDF} from "../../Frame/Globals";
 import {autorun} from 'mobx';
 import {LL} from "../../LucidLink";
 import moment from "moment";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
-var DialogAndroid = require("react-native-dialogs");
+import {Assert} from "../../Frame/General/Assert";
+import DialogAndroid from "react-native-dialogs";
+import {BufferAction} from "../../Frame/General/Timers";
 
 export class Session {
 	static async Load(folder) {

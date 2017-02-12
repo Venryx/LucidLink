@@ -1,9 +1,10 @@
 import {BaseComponent as Component, BasicStyles, BaseProps, Row} from "../../Frame/ReactGlobals";
 import {observer} from "mobx-react/native";
 import {View, Text, Switch} from "react-native";
-import {Assert, E} from "../../Frame/Globals";
+import {E} from "../../Frame/Globals";
 import NumberPicker from "../ReactNativeComponents/NumberPicker";
 import Node from "../VTree/Node";
+import {Assert} from "../../Frame/General/Assert";
 
 @observer
 export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BaseProps, {}> {
@@ -31,7 +32,7 @@ export class VSwitch extends Component<{text?, value?, onChange?, style?, contai
 @observer
 export class VSwitch_Auto extends Component<
 		{text?, value?, onChange?, style?, containerStyle?,
-			path: ()=>any}, {}> {
+			path: ()=>any} & BaseProps, {}> {
 	render() {
 		var {onChange, path, ...rest} = this.props;
 		let {node, key: propName} = path();

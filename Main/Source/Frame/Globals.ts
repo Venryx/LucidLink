@@ -1,5 +1,7 @@
-var g: any = global;
-g.g = g;
+import {VDF} from "../Packages/VDF/VDF";
+import {VDFDeserialize, VDFSerialize} from "../Packages/VDF/VDFTypeInfo";
+import {VDFLoader, VDFLoadOptions} from "../Packages/VDF/VDFLoader";
+import {VDFNode} from "../Packages/VDF/VDFNode";
 
 //import {LogEntry, More} from '../LucidLink/More';
 import {LogEntry, More} from '../LucidLink/More';
@@ -9,11 +11,12 @@ import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-
 //import {observable as O, autorun} from "mobx";
 import {observable as O} from "mobx";
 //import Moment from "moment";
+import {VDFSaveOptions, VDFSaver, VDFTypeMarking} from "../Packages/VDF/VDFSaver";
 var Moment = require("moment");
 
 var globalComps = {O};
-(globalComps as any).Moment = Moment;
-//globalComps.Extend({Moment});
+//(globalComps as any).Moment = Moment;
+globalComps.Extend({Moment});
 //g.Extend(globalComps);
 for (let key in globalComps)
 	g[key] = globalComps[key];
@@ -32,7 +35,7 @@ export function HandleError(error, isFatal = false) {
 	Log(`${error}
 Stack) ${error.stack}
 Fatal) ${isFatal}`);
-};
+}
 
 export function DoNothing(...args) {}
 export function DN(...args) {}
@@ -54,7 +57,7 @@ export function Log(...args) {
 			JavaLog(type, message);
 		//} catch (ex) {}
 	}
-};
+}
 export function JavaLog(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
@@ -63,14 +66,14 @@ export function JavaLog(...args) {
 }
 export function Trace(...args) {
 	console.trace.apply(this, args);
-};
+}
 
 export function Toast(text, duration = 0) {
 	if (!IsString(text))
 		text = text != null ? text.toString() : "";
 	JavaBridge.Main.ShowToast(text, duration);
 }
-(global as any).Toast = Toast;
+g.Extend({Toast});
 
 enum NotifyLength { Short, Long, Persistent }
 export function Notify(text: string, length = NotifyLength.Persistent) {
@@ -80,49 +83,9 @@ export function Notify(text: string, length = NotifyLength.Persistent) {
 	JavaBridge.Main.Notify(text, lengthStr);
 }
 
-export function Assert(condition, messageOrMessageFunc = "") {
-	if (condition) return;
-
-	var message = (messageOrMessageFunc as any) instanceof Function ? (messageOrMessageFunc as any)() : messageOrMessageFunc;
-
-	Log("Assert failed) " + message);
-	console.error(message);
-	throw new Error(message);
-};
-export function AssertWarn(condition, messageOrMessageFunc) {
-	if (condition) return;
-
-	var message = messageOrMessageFunc instanceof Function ? messageOrMessageFunc() : messageOrMessageFunc;
-
-	console.warn(message);
-};
-
-export class A {
-    static set NonNull(value) {
-		Assert(value != null, `Value cannot be null. (provided value: ${value})`);
-	}
-	static NotEqualTo(val1) {
-	    return new A_NotEqualTo_Wrapper(val1);
-	}
-	/*static OfType(typeNameOrType) {
-	    var type = Type(typeNameOrType);
-	    return new A_OfType_Wrapper(type);
-	}*/
-} 
-export class A_NotEqualTo_Wrapper {
-	constructor(val1) { this.val1 = val1; }
-	val1;
-    set a(val2) { Assert(val2 != this.val1); }
-}
-export class A_OfType_Wrapper {
-	constructor(type) { this.type = type; }
-	type;
-    set a(val) { Assert(val != null && val.GetType().IsDerivedFrom(this.type)); }
-}
-
 export class JavaBridge {
     static get Main() {
-        return NativeModules.Main;
+        return NativeModules.LucidLink;
     }
 }
 
@@ -351,122 +314,6 @@ export function IsNaN(obj) { return typeof obj == "number" && obj != obj; }
 export function IsInt(obj) { return typeof obj == "number" && parseFloat(obj as any) == parseInt(obj as any); }
 export function IsDouble(obj) { return typeof obj == "number" && parseFloat(obj as any) != parseInt(obj as any); }
 
-// timer stuff
-// ==========
-
-import BackgroundTimer from "react-native-background-timer";
-import {VDF} from "../Packages/VDF/VDF";
-import {VDFLoadOptions, VDFLoader} from "../Packages/VDF/VDFLoader";
-import {VDFTypeInfo, VDFProp, VDFDeserialize, VDFSerialize} from "../Packages/VDF/VDFTypeInfo";
-import {VDFNode} from "../Packages/VDF/VDFNode";
-import {VDFSaveOptions, VDFSaver, VDFTypeMarking} from "../Packages/VDF/VDFSaver";
-
-export function WaitXThenRun(waitTime, func): number { return BackgroundTimer.setTimeout(func, waitTime); }
-export function WaitXThenRun_BuiltIn(waitTime, func): number { return setTimeout(func, waitTime); }
-export function Sleep(ms) {
-	var startTime = new Date().getTime();
-	while (new Date().getTime() - startTime < ms)
-	{}
-}
-
-// interval is in seconds (can be decimal)
-export class Timer {
-	constructor(interval, func, maxCallCount = -1) {
-	    this.interval = interval;
-	    this.func = func;
-	    this.maxCallCount = maxCallCount;
-	}
-
-	interval;
-	func;
-	maxCallCount;
-	timerID = -1;
-	get IsRunning() { return this.timerID != -1; }
-
-	callCount = 0;
-	Start() {
-		this.timerID = BackgroundTimer.setInterval(()=> {
-			this.func();
-			this.callCount++;
-			if (this.maxCallCount != -1 && this.callCount >= this.maxCallCount)
-				this.Stop();
-		}, this.interval * 1000);
-		return this;
-	}
-	Stop() {
-		BackgroundTimer.clearInterval(this.timerID);
-		this.timerID = -1;
-	}
-}
-export class TimerMS extends Timer {
-    constructor(interval_decimal, func, maxCallCount = -1) {
-        super(interval_decimal / 1000, func, maxCallCount);
-    }
-}
-
-var funcLastScheduledRunTimes = {};
-/** If time-since-last-run is above minInterval, run func right away.
- * Else, schedule next-run to occur as soon as the minInterval is passed. */
-export function BufferAction(minInterval: number, func: Function);
-/** If time-since-last-run is above minInterval, run func right away.
- * Else, schedule next-run to occur as soon as the minInterval is passed. */
-export function BufferAction(key: string, minInterval: number, func: Function);
-export function BufferAction(...args) {
-	if (args.length == 2) var [minInterval, func] = args, key = null;
-	else if (args.length == 3) var [key, minInterval, func] = args;
-
-    var lastScheduledRunTime = funcLastScheduledRunTimes[key] || 0;
-    var now = new Date().getTime();
-    var timeSinceLast = now - lastScheduledRunTime;
-    if (timeSinceLast >= minInterval) { // if we've waited enough since last run, run right now
-        func();
-        funcLastScheduledRunTimes[key] = now;
-    } else {
-		let waitingForNextRunAlready = lastScheduledRunTime > now;
-		if (!waitingForNextRunAlready) { // else, if we're not already waiting for next-run, schedule next-run
-			var nextRunTime = lastScheduledRunTime + minInterval;
-			var timeTillNextRun = nextRunTime - now;
-			WaitXThenRun(timeTillNextRun, func);
-			funcLastScheduledRunTimes[key] = nextRunTime;
-		}
-	}
-}
-
-// Random
-// ==========
-
-export class Random {
-	static canvasContext;
-	static canvas;
-
-	constructor(seed = new Date().getTime()) {
-		if (seed == 0)
-			throw new Error("Cannot use 0 as seed. (prng algorithm isn't very good, and doesn't work with seeds that are multiples of PI)");
-		this.seed = seed;
-	}
-	seed = -1;
-	NextInt() {
-		var randomDouble = Math.sin(this.seed) * 10000;
-		var randomDouble_onlyIntegerPart = Math.floor(this.seed);
-		this.seed = randomDouble;
-		return randomDouble_onlyIntegerPart;
-	}
-	NextDouble() {
-		var randomDouble = Math.sin(this.seed) * 10000;
-		var randomDouble_onlyFractionalPart = this.seed - Math.floor(this.seed);
-		this.seed = randomDouble;
-		return randomDouble_onlyFractionalPart;
-	}
-	/*s.NextColor = function() { return new VColor(s.NextDouble(), s.NextDouble(), s.NextDouble()); };
-	NextColor_ImageStr() {
-		var color = this.NextColor();
-		Random.canvasContext.fillStyle = color.ToHexStr();
-		Random.canvasContext.fillRect(0, 0, Random.canvas[0].width, Random.canvas[0].height);
-		var imageStr = Random.canvas[0].toDataURL();
-		return imageStr.substr(imageStr.indexOf(",") + 1);
-	}*/
-}
-
 // others
 // ==========
 
@@ -475,4 +322,10 @@ export function Range(min, max, includeMax = true) {
 	for (let i = min; includeMax ? i <= max : i < max; i++)
 		result.push(i);
 	return result;
+}
+
+export function Global(target: Function) {
+	var name = (target as any).GetName();
+	//console.log("Globalizing: " + name);
+	g[name] = target;
 }

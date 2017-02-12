@@ -1,4 +1,4 @@
-import {AssertWarn, Log, ToJSON} from "../Frame/Globals";
+import {Log, ToJSON} from "../Frame/Globals";
 import {Script} from "./Scripts/Script";
 import {Session} from "./Tracker/Session";
 import ScriptRunner from "./Scripts/ScriptRunner";
@@ -17,6 +17,7 @@ import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import DisplayerScriptRunner from "./Tracker/DisplayerScriptRunner";
 import {_VDFPreSerialize, P} from "../Packages/VDF/VDFTypeInfo";
+import {AssertWarn} from "../Frame/General/Assert";
 
 export class Tracker extends Node {
 	@_VDFPreSerialize() PreSerialize() {

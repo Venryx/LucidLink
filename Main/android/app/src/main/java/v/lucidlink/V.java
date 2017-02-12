@@ -7,13 +7,10 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.Spannable;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -33,6 +30,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +89,7 @@ public class V {
 		//Log.i(tag, message);
 		JavaLog(tag, message);
 		if (sendToJS)
-			Main.main.SendEvent("PostJavaLog", tag, message);
+			LL.main.SendEvent("PostJavaLog", tag, message);
 	}
 
 	// logcat has a message length limit, so cut long messages into pieces that are displayable
@@ -224,17 +222,17 @@ public class V {
 	}
 
 	public static void Toast(String message) {
-		Main.main.ShowToast(message, 0);
+		LL.main.ShowToast(message, 0);
 	}
 	public static void Toast(String message, int duration) {
-		Main.main.ShowToast(message, duration);
+		LL.main.ShowToast(message, duration);
 	}
 
 	public static void Notify(String message) {
-		Main.main.Notify(message, "Long");
+		LL.main.Notify(message, "Long");
 	}
 	public static void Notify(String message, String lengthStr) {
-		Main.main.Notify(message, lengthStr);
+		LL.main.Notify(message, lengthStr);
 	}
 
 	public static void WaitXThenRun(int waitMS, Runnable runnable) {

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Component} from "react";
-import {Assert, E, WaitXThenRun, IsString, WaitXThenRun_BuiltIn} from "./Globals";
+import {E, IsString} from "./Globals";
 import {colors, styles} from "./Styles";
 import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
@@ -55,6 +55,8 @@ import Bind from "autobind-decorator";
 EStyleSheet.build();
 
 import autoBind from "react-autobind";
+import {Assert} from "./General/Assert";
+import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/

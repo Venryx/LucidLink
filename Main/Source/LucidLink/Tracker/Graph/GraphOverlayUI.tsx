@@ -5,7 +5,9 @@ import moment from "moment";
 import {View, Text} from "react-native";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import {GraphOverlay, EventRenderInfo} from "./GraphOverlay";
-import {Assert, Notify, WaitXThenRun, WaitXThenRun_BuiltIn} from "../../../Frame/Globals";
+import {Notify} from "../../../Frame/Globals";
+import {Assert} from "../../../Frame/General/Assert";
+import {WaitXThenRun_BuiltIn} from "../../../Frame/General/Timers";
 
 export default class GraphOverlayUI extends Component<
 		{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number, events: Event[], overlay: GraphOverlay}, {}> {

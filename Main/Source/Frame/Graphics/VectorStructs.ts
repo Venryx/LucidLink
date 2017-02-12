@@ -1,6 +1,7 @@
-import {Assert, IsNumber} from '../Globals';
+import {IsNumber} from '../Globals';
 import {VDFNode} from "../../Packages/VDF/VDFNode";
 import {_VDFSerialize, _VDFDeserialize} from "../../Packages/VDF/VDFTypeInfo";
+import {Assert} from "../General/Assert";
 export class Vector2i {
 	static get zero() { return new Vector2i(0, 0); }
 	static get one() { return new Vector2i(1, 1); }

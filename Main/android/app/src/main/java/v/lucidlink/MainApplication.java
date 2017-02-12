@@ -4,10 +4,12 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.zmxv.RNSound.RNSoundPackage;
-import com.github.yamill.orientation.OrientationPackage;
+
+import SPlus.SPlusPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
-import v.LibMuse.LibMuse;
+import v.LibMuse.LibMusePackage;
+
 import com.rnfs.RNFSPackage;
 import com.filepicker.FilePickerPackage;
 import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
@@ -30,6 +32,11 @@ public class MainApplication extends Application implements ReactApplication {
 
 	private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 		@Override
+		protected String getJSMainModuleName() {
+			return "Build/Source/index.android";
+		}
+
+		@Override
 		protected boolean getUseDeveloperSupport() {
 		  return BuildConfig.DEBUG;
 		}
@@ -41,13 +48,14 @@ public class MainApplication extends Application implements ReactApplication {
 				new MainReactPackage(),
             	new ReactMaterialKitPackage(),
            		new RNNumberPickerDialogPackage(),
-				new Main_ReactPackage(),
+				new LucidLinkPackage(),
 				new RNFSPackage(),
 				new FilePickerPackage(),
 				//new OrientationPackage(),
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
-				new LibMuse(),
+				new LibMusePackage(),
+				new SPlusPackage(),
 				new RCTTextToSpeechModule(),
 				new ReactSnackbarPackage(),
 				new BackgroundTimerPackage(),

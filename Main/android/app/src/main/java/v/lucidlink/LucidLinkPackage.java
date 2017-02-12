@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class Main_ReactPackage implements ReactPackage {
+class LucidLinkPackage implements ReactPackage {
 	public static ReactApplicationContext reactContext;
 
     @Override
@@ -20,17 +20,14 @@ class Main_ReactPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-		Main_ReactPackage.reactContext = reactContext;
+		LucidLinkPackage.reactContext = reactContext;
         return Collections.emptyList();
     }
 
     @Override
-    public List<NativeModule> createNativeModules(
-            ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-
-        modules.add(new Main(reactContext));
-
+        modules.add(new LucidLinkModule(reactContext));
         return modules;
     }
 }

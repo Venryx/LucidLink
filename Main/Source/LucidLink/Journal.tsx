@@ -3,7 +3,7 @@ import DialogAndroid from "react-native-dialogs";
 import Moment from "moment";
 
 import DreamUI from "./Journal/DreamUI";
-import {Assert, FromVDF, GetTypeName, ToVDF, E, Toast} from "../Frame/Globals";
+import {FromVDF, GetTypeName, ToVDF, E, Toast} from "../Frame/Globals";
 import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
@@ -11,6 +11,7 @@ import {P} from "../Packages/VDF/VDFTypeInfo";
 import {File} from "../Packages/V/VFile";
 import {autorun} from "mobx";
 import {observer} from "mobx-react/native";
+import {Assert} from "../Frame/General/Assert";
 
 export class Dream extends Node {
 	static async Load(file) {

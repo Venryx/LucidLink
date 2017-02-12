@@ -1,6 +1,7 @@
-import {Assert, WaitXThenRun_BuiltIn} from "../Globals";
 import {Dictionary} from "../../Packages/VDF/VDFExtras";
 import {P, T} from "../../Packages/VDF/VDFTypeInfo";
+import {Assert} from "../General/Assert";
+import {WaitXThenRun_BuiltIn} from "../General/Timers";
 
 export default class BlockRunInfo {
 	static fakeBlockRunInfo: BlockRunInfo;
