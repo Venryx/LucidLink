@@ -12,18 +12,20 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-/*import com.resmed.refresh.bluetooth.CONNECTION_STATE;
+import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.sleepsession.SleepSessionManager;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;*/
+import com.resmed.refresh.ui.uibase.app.RefreshApplication;
+import com.resmed.refresh.utils.RefreshTools;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
 import v.lucidlink.Frame.VReflection;
+import v.lucidlink.LucidLinkModule;
 import v.lucidlink.V;
 
 enum MessageType {
@@ -99,15 +101,29 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		jsModuleEventEmitter.emit(eventName, argsList);
 	}
 
-	//public SleepSessionManager baseManager;
+	public SleepSessionManager baseManager;
 	@ReactMethod public void Init() {
-		/*if (mainActivity == null)
+		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
 		// some monkey-patching
 		RefreshApplication fakeRefreshApp = new RefreshApplication();
 		VReflection.SetField_Static(RefreshApplication.class, "instance", fakeRefreshApp);
-		V.Log("Test1");
+		V.Log("Test1:" + RefreshApplication.getInstance());
+
+		ClassPool cp = ClassPool.getDefault();
+		CtClass cc = cp.get("Hello");
+		CtMethod m = cc.getDeclaredMethod("say");
+		m.insertBefore("{ System.out.println(\"Hello.say():\"); }");
+		Class c = cc.toClass();
+		Hello h = (Hello)c.newInstance();
+		h.say();
+
+
+
+		//V.Log("Test1A:" + VReflection.GetFields(RefreshApplication.class));
+		V.Log("Test1A:" + RefreshApplication.getInstance().getFilesDir());
+		V.Log("Test1B:" + RefreshTools.getFilesPath());
 
 		RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
 		V.Log("Test2");
@@ -129,20 +145,20 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 				bluetoothService.sendMessageToClient(message);
 			}
 		});
-		V.Log("Test3");*/
+		V.Log("Test3");
 	}
 
 
 	@ReactMethod void Connect() {
-		/*int sessionID = -1;
-		baseManager.start(sessionID, -1, -1);*/
+		int sessionID = -1;
+		baseManager.start(sessionID, -1, -1);
 	}
 	@ReactMethod void Disconnect() {
-		//baseManager.stop();
+		baseManager.stop();
 	}
 
 	@ReactMethod void GetSleepStage(Promise promise) {
-		/*int stage = baseManager.rm20ManagerInstance().getRealTimeSleepState();
-		promise.resolve(stage);*/
+		int stage = baseManager.rm20ManagerInstance().getRealTimeSleepState();
+		promise.resolve(stage);
 	}
 }
