@@ -113,7 +113,7 @@ public class SoundRecordingActivty
       ((SimpleDateFormat)localObject).<init>("dd-MM HH:mm:ss.SSS");
       localStringBuffer.append(((SimpleDateFormat)localObject).format(localCalendar.getTime()));
       localStringBuffer.append("\t");
-      localObject = new java/lang/StringBuilder;
+      localObject = new java.lang.StringBuilder;
       ((StringBuilder)localObject).<init>("sound value:");
       localStringBuffer.append(paramString);
       localStringBuffer.append("\n");

@@ -88,7 +88,7 @@ public abstract class BaseActivity
   {
     try
     {
-      Object localObject1 = new java/lang/StringBuilder;
+      Object localObject1 = new java.lang.StringBuilder;
       ((StringBuilder)localObject1).<init>("BaseActivity showDialog cancelable = ");
       Log.d("com.resmed.refresh.dialog", paramBoolean1);
       if (isActivityReadyToCommit())

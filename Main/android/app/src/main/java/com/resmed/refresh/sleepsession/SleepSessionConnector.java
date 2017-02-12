@@ -490,7 +490,7 @@ public class SleepSessionConnector
     if (this.sleepSessionInfo != null) {}
     try
     {
-      Object localObject = new java/lang/StringBuilder;
+      Object localObject = new java.lang.StringBuilder;
       ((StringBuilder)localObject).<init>("addEnvDataToDB ");
       Log.d("com.resmed.refresh.env", this.lightValues.size() + " light values and " + this.tempValues.size() + " temp values" + " START " + this.sleepSessionInfo.getStartTime());
       this.sleepSessionInfo.getEnvironmentalInfo().addSessionLightArray(this.lightValues);
@@ -796,12 +796,12 @@ public class SleepSessionConnector
       j = m;
       k = i;
       break;
-      paramBundle = new java/lang/StringBuilder;
+      paramBundle = new java.lang.StringBuilder;
       paramBundle.<init>("Light[");
       Log.d("com.resmed.refresh.model", j + "]=" + ((RST_ValueItem)this.sleepSessionInfo.getEnvironmentalInfo().getSessionLight().get(j)).getValue());
       j++;
       continue;
-      paramBundle = new java/lang/StringBuilder;
+      paramBundle = new java.lang.StringBuilder;
       paramBundle.<init>("Temp[");
       Log.d("com.resmed.refresh.model", j + "]=" + ((RST_ValueItem)this.sleepSessionInfo.getEnvironmentalInfo().getSessionTemperature().get(j)).getValue());
       j++;
@@ -1099,7 +1099,7 @@ public class SleepSessionConnector
     {
       AppFileLog.addTrace("STOP SLEEP SESSION");
       preSleepLog.addTrace("STOP SLEEP SESSION");
-      Object localObject1 = new java/lang/StringBuilder;
+      Object localObject1 = new java.lang.StringBuilder;
       ((StringBuilder)localObject1).<init>("SleepTrackFragment stopSleepSession isClosingSession? ");
       Log.d("com.resmed.refresh.finish", this.isClosingSession);
       this.bAct.getWindow().addFlags(128);
@@ -1111,7 +1111,7 @@ public class SleepSessionConnector
         {
           this.pendingBioSamplesRpc = null;
           this.pendingEnvSamplesRpc = null;
-          localObject1 = new java/lang/StringBuilder;
+          localObject1 = new java.lang.StringBuilder;
           ((StringBuilder)localObject1).<init>("stopStreamAndRequestAllSamples Conditions");
           Log.d("com.resmed.refresh.finish", this.isHandlingHeartBeat + ":" + this.isSyncAndStop);
           stopStreamAndRequestAllSamples();

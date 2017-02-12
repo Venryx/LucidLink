@@ -52,7 +52,7 @@ public class DefaultRelaxMeditation
         this.diracDefaultManager.changeDuration(localRelaxState.getDuration());
         setCurrentVolume(localRelaxState.getVolume());
         this.countDownTimer = createCountDownTimer(getTimeForStage(localRelaxState.getStage()));
-        StringBuilder localStringBuilder2 = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder2 = new java.lang.StringBuilder;
         localStringBuilder2.<init>("workflowThread - updateState Dirac to ");
         Log.i("com.resmed.refresh.relax", localRelaxState.getDuration() + " or " + localRelaxState.getBPM() + " beats per minute.");
         switch (localRelaxState.getStage())
@@ -82,7 +82,7 @@ public class DefaultRelaxMeditation
       else
       {
         ((RelaxState)this.workFlowStack.get(this.workFlowStack.size() - 1)).setBPM(f);
-        StringBuilder localStringBuilder1 = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder1 = new java.lang.StringBuilder;
         localStringBuilder1.<init>("workflowThread - next step ");
         Log.i("com.resmed.refresh.relax", f + " bpms");
         continue;
@@ -97,7 +97,7 @@ public class DefaultRelaxMeditation
         else
         {
           ((RelaxState)this.workFlowStack.get(this.workFlowStack.size() - 1)).setVolume(i);
-          localStringBuilder1 = new java/lang/StringBuilder;
+          localStringBuilder1 = new java.lang.StringBuilder;
           localStringBuilder1.<init>("workflowThread - next step ");
           Log.i("com.resmed.refresh.relax", i + " volume");
         }

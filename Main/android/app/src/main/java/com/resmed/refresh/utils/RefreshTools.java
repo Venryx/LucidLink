@@ -377,7 +377,7 @@ public class RefreshTools
       paramString = (String)localObject;
       if (arrayOfString[i].length() > 0)
       {
-        paramString = new java/lang/StringBuilder;
+        paramString = new java.lang.StringBuilder;
         paramString.<init>(String.valueOf(localObject));
         paramString = "/" + arrayOfString[i];
       }
@@ -481,7 +481,7 @@ public class RefreshTools
       try
       {
         localObject2 = RefreshApplication.getInstance().getFilesDir();
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()));
         localObject1 = "/Refresh/export/";
         localObject2 = ((File)localObject2).listFiles();
@@ -507,11 +507,11 @@ public class RefreshTools
       }
       return bool;
       localObject3 = localObject2[i];
-      localObject4 = new java/lang/StringBuilder;
+      localObject4 = new java.lang.StringBuilder;
       ((StringBuilder)localObject4).<init>(" exportAllFilesToSD:: file.getName() : ");
       Log.d("com.resmed.refresh.model", ((File)localObject3).getName());
       localObject4 = ((File)localObject3).getName().replace(RefreshApplication.getInstance().getFilesDir().getAbsolutePath(), "");
-      localObject5 = new java/lang/StringBuilder;
+      localObject5 = new java.lang.StringBuilder;
       ((StringBuilder)localObject5).<init>(String.valueOf(localObject1));
       localObject5 = (String)localObject4;
       localObject4 = new java/io/File;
@@ -536,13 +536,13 @@ public class RefreshTools
     {
       try
       {
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>(String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()));
         localObject2 = "/Refresh/refresh-db.db";
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>("exportDataBaseToSD db_path=");
         Log.d("com.resmed.refresh.model", "data/data/com.resmed.refresh/databases/refresh-db");
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>("exportDataBaseToSD pathToCopy=");
         Log.d("com.resmed.refresh.model", (String)localObject2);
         localObject3 = new java/io/File;
@@ -684,7 +684,7 @@ public class RefreshTools
     }
     return paramContext;
     paramContext = (Context)localObject1;
-    localObject2 = new java/lang/StringBuilder;
+    localObject2 = new java.lang.StringBuilder;
     paramContext = (Context)localObject1;
     ((StringBuilder)localObject2).<init>("getFirmwareBinary; fileName = ");
     paramContext = (Context)localObject1;
@@ -696,7 +696,7 @@ public class RefreshTools
       paramContext = (Context)localObject1;
       arrayOfString2 = arrayOfString1[i].split("_");
       paramContext = (Context)localObject1;
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       paramContext = (Context)localObject1;
       ((StringBuilder)localObject2).<init>("checkForFirmwareUpgrade tokens :");
       paramContext = (Context)localObject1;
@@ -710,7 +710,7 @@ public class RefreshTools
     for (localObject1 = arrayOfString2[2];; localObject1 = arrayOfString1[i])
     {
       paramContext = (Context)localObject1;
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       paramContext = (Context)localObject1;
       ((StringBuilder)localObject2).<init>("checkForFirmwareUpgrade firmware version :");
       paramContext = (Context)localObject1;
@@ -882,16 +882,16 @@ public class RefreshTools
     try
     {
       Object localObject1 = new java/io/File;
-      Object localObject2 = new java/lang/StringBuilder;
+      Object localObject2 = new java.lang.StringBuilder;
       ((StringBuilder)localObject2).<init>();
       ((File)localObject1).<init>(Environment.getExternalStorageDirectory() + "/refresh", paramString2);
       createDirectories(((File)localObject1).getAbsolutePath());
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       ((StringBuilder)localObject2).<init>("writeStringAsFile path file:");
       Log.d("com.resmed.refresh.model", ((File)localObject1).getAbsolutePath());
       localObject2 = new java/io/FileWriter;
       ((FileWriter)localObject2).<init>((File)localObject1);
-      localObject1 = new java/lang/StringBuilder;
+      localObject1 = new java.lang.StringBuilder;
       ((StringBuilder)localObject1).<init>("writeStringAsFile path file:");
       Log.d("com.resmed.refresh.model", Environment.getExternalStorageDirectory() + "/refresh/" + paramString2);
       ((FileWriter)localObject2).write(paramString1);
@@ -921,7 +921,7 @@ public class RefreshTools
         }
         paramContext = new java/io/FileWriter;
         paramContext.<init>((File)localObject, false);
-        localObject = new java/lang/StringBuilder;
+        localObject = new java.lang.StringBuilder;
         ((StringBuilder)localObject).<init>(String.valueOf(Long.toString(paramLong)));
         paramContext.write(" \n");
         paramContext.flush();

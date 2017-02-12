@@ -214,14 +214,14 @@ public class RefreshSyncService
       try
       {
         l = Long.parseLong(localFile.getName().split("_")[2].replace(".lz4", ""));
-        localObject = new java/lang/StringBuilder;
+        localObject = new java.lang.StringBuilder;
         ((StringBuilder)localObject).<init>("recordId of filename=");
         Log.d("com.resmed.refresh.sync", l);
         RST_SleepSessionInfo localRST_SleepSessionInfo = RefreshModelController.getInstance().localSleepSessionForId(l);
         if ((localRST_SleepSessionInfo == null) || (!localRST_SleepSessionInfo.getUploaded())) {
           continue;
         }
-        localObject = new java/lang/StringBuilder;
+        localObject = new java.lang.StringBuilder;
         ((StringBuilder)localObject).<init>("Uploading file =");
         Log.d("com.resmed.refresh.sync", localFile.getName());
         if (i != localFile.length() - 1L) {
@@ -246,7 +246,7 @@ public class RefreshSyncService
       if (i == localFile.length() - 1L) {
         executeCallback(this.syncData);
       }
-      localObject = new java/lang/StringBuilder;
+      localObject = new java.lang.StringBuilder;
       ((StringBuilder)localObject).<init>("Record ");
       Log.d("com.resmed.refresh.sync", l + " is not uploaded. Stop upload of file " + localFile.getName());
     }
@@ -315,14 +315,14 @@ public class RefreshSyncService
             Thread.sleep(1500L);
             uploadProfile();
             continue;
-            StringBuilder localStringBuilder = new java/lang/StringBuilder;
+            StringBuilder localStringBuilder = new java.lang.StringBuilder;
             localStringBuilder.<init>(String.valueOf(localException1.size()));
             Log.d("com.resmed.refresh.sync", " records to upload");
             i = 0;
             if (i >= localException1.size()) {
               continue;
             }
-            localStringBuilder = new java/lang/StringBuilder;
+            localStringBuilder = new java.lang.StringBuilder;
             localStringBuilder.<init>("Uploading record ");
             Log.d("com.resmed.refresh.sync", ((RST_SleepSessionInfo)localException1.get(i)).getId());
             if (i == localException1.size() - 1) {

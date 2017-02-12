@@ -100,65 +100,47 @@ public class DiracDefaultManager
   
   public void startPlaying(String paramString)
   {
-    Log.i("Java_DiracDefaultManager", "startPlayling");
+    Log.i("J_DiracDefaultManager", "startPlayling");
     DiracFileLog.addTrace("DiracDefaultManager startPlaying fileName:" + paramString);
   }
-  
-  void stopAudioThreads()
-  {
-    DiracFileLog.addTrace("DiracDefaultManager stopAudioThreads");
-    this.mStopAudioThreads = true;
-    for (;;)
-    {
-      try
-      {
-        if ((this.mAudioPlayer.mMusicTrack != null) && (this.mAudioPlayer.mMusicTrack.getState() == 0))
-        {
-          i = 2;
-          if ((this.mAudioPlayer.mMusicTrack.getState() != 1) && (i > 0)) {}
-        }
-        else
-        {
-          if (this.mAudioPlayer.mMusicTrack != null)
-          {
-            StringBuilder localStringBuilder = new java/lang/StringBuilder;
-            localStringBuilder.<init>("DiracDefaultManager stopAudioThreads state:");
-            DiracFileLog.addTrace(this.mAudioPlayer.mMusicTrack.getState());
-          }
-          if (this.mAudioPlayer.itemsToPlay != null) {
-            this.mAudioPlayer.itemsToPlay.clear();
-          }
-          if ((this.mAudioPlayer.mMusicTrack != null) && (this.mAudioPlayer.mMusicTrack.getState() == 1))
-          {
-            this.mAudioPlayer.mMusicTrack.pause();
-            this.mAudioPlayer.mMusicTrack.flush();
-            this.mAudioPlayer.mMusicTrack.stop();
-            this.mAudioPlayer.mMusicTrack.release();
-            DiracFileLog.addTrace("DiracDefaultManager stopAudioThreads mAudioPlayer.mMusicTrack != null && STATE_INITIALIZED");
-          }
-          if (this.mStreamThread != null) {
-            this.mStreamThread.join();
-          }
-          return;
-        }
-      }
-      catch (Exception localException2)
-      {
-        int i;
-        localException2.printStackTrace();
-        continue;
-      }
-      try
-      {
-        Thread.sleep(100L);
-        i--;
-      }
-      catch (Exception localException1)
-      {
-        localException1.printStackTrace();
-      }
-    }
-  }
+
+	void stopAudioThreads() {
+		DiracFileLog.addTrace("DiracDefaultManager stopAudioThreads");
+		this.mStopAudioThreads = true;
+		try {
+			if (this.mAudioPlayer.mMusicTrack != null && this.mAudioPlayer.mMusicTrack.getState() == 0) {
+				int n = 2;
+				while (this.mAudioPlayer.mMusicTrack.getState() != 1 && n > 0) {
+					try {
+						Thread.sleep(100L);
+						--n;
+					}
+					catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+			if (this.mAudioPlayer.mMusicTrack != null) {
+				DiracFileLog.addTrace("DiracDefaultManager stopAudioThreads state:" + this.mAudioPlayer.mMusicTrack.getState());
+			}
+			if (this.mAudioPlayer.itemsToPlay != null) {
+				this.mAudioPlayer.itemsToPlay.clear();
+			}
+			if (this.mAudioPlayer.mMusicTrack != null && this.mAudioPlayer.mMusicTrack.getState() == 1) {
+				this.mAudioPlayer.mMusicTrack.pause();
+				this.mAudioPlayer.mMusicTrack.flush();
+				this.mAudioPlayer.mMusicTrack.stop();
+				this.mAudioPlayer.mMusicTrack.release();
+				DiracFileLog.addTrace("DiracDefaultManager stopAudioThreads mAudioPlayer.mMusicTrack != null && STATE_INITIALIZED");
+			}
+			if (this.mStreamThread != null) {
+				this.mStreamThread.join();
+			}
+		}
+		catch (Exception ex2) {
+			ex2.printStackTrace();
+		}
+	}
   
   public void stopPlaying()
   {

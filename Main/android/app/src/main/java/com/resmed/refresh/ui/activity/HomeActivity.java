@@ -47,7 +47,7 @@ public class HomeActivity
               {
                 Object localObject = HomeActivity.getRpcCommands().openSession(RefreshModelController.getInstance().getUserSessionID());
                 HomeActivity.this.sendRpcToBed((JsonRPC)localObject);
-                localObject = new java/lang/StringBuilder;
+                localObject = new java.lang.StringBuilder;
                 ((StringBuilder)localObject).<init>("jsonRPC.sendRpcToBed.openSession(");
                 Log.d("com.resmed.refresh.pair", RefreshModelController.getInstance().getUserSessionID() + ")");
               }

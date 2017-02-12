@@ -515,7 +515,7 @@ public class SmartAlarmDataManager
     {
       localObject1 = ((SimpleDateFormat)localObject2).parse(((String)localObject1).toString());
       localObject3 = ((SimpleDateFormat)localObject2).parse(((String)localObject3).toString());
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       ((StringBuilder)localObject2).<init>(String.valueOf(localContext.getString(2131166060)));
       Toast.makeText(localContext, " " + getStringTimeForNow(((Date)localObject1).getTime() - ((Date)localObject3).getTime()) + localContext.getString(2131166061), 1).show();
       return;

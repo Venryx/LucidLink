@@ -30,7 +30,7 @@ public class RST_ServiceFileUploader
   {
     try
     {
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>(" uploadFile(");
       Log.d("com.resmed.refresh.sync", paramString + ", sessionInfoID=" + paramRST_SleepSessionInfo.getId() + ")");
       this.callback = paramRST_CallbackItem;

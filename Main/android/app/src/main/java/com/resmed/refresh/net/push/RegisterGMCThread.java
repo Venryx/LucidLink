@@ -18,7 +18,7 @@ public class RegisterGMCThread
     try
     {
       String str = GoogleCloudMessaging.getInstance(RefreshApplication.getInstance().getApplicationContext()).register(new String[] { "147713031299" });
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>("GoogleCloudMessaging: registration_id=");
       Log.d("com.resmed.refresh.push", str);
       RefreshModelController.getInstance().registerPushNotificationToken(str);

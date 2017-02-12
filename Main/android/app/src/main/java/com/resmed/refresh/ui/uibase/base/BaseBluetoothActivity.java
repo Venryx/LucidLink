@@ -509,19 +509,19 @@ public class BaseBluetoothActivity
           try
           {
             localObject1 = (JsonRPC)((Gson)localObject1).fromJson(paramBundle, JsonRPC.class);
-            localObject2 = new java/lang/StringBuilder;
+            localObject2 = new java.lang.StringBuilder;
             ((StringBuilder)localObject2).<init>(" handleStreamPacket() rpc id : ");
             Log.d("com.resmed.refresh.ui", ((JsonRPC)localObject1).getId() + " strPacket : " + paramBundle);
             handleReceivedRpc((JsonRPC)localObject1);
             localObject2 = (JsonRPC)CommandStack.remove(Integer.valueOf(((JsonRPC)localObject1).getId()));
-            Object localObject3 = new java/lang/StringBuilder;
+            Object localObject3 = new java.lang.StringBuilder;
             ((StringBuilder)localObject3).<init>(" handleStreamPacket() rpcSent : ");
             Log.d("com.resmed.refresh.ui", localObject2);
             if (localObject2 == null) {
               continue;
             }
             localObject3 = ((JsonRPC)localObject2).getRPCallback();
-            StringBuilder localStringBuilder = new java/lang/StringBuilder;
+            StringBuilder localStringBuilder = new java.lang.StringBuilder;
             localStringBuilder.<init>(" handleStreamPacket() callback : ");
             Log.d("com.resmed.refresh.ui", localObject3);
             if (((JsonRPC)localObject2).getRPCallback() != null) {
@@ -535,7 +535,7 @@ public class BaseBluetoothActivity
           }
           catch (JsonSyntaxException localJsonSyntaxException)
           {
-            Object localObject2 = new java/lang/StringBuilder;
+            Object localObject2 = new java.lang.StringBuilder;
             ((StringBuilder)localObject2).<init>(" strPacket : ");
             Log.w("com.resmed.refresh.ui", paramBundle + "  " + localJsonSyntaxException.getMessage());
           }
@@ -546,7 +546,7 @@ public class BaseBluetoothActivity
         }
       }
       finally {}
-      paramBundle = new java/lang/StringBuilder;
+      paramBundle = new java.lang.StringBuilder;
       paramBundle.<init>("BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_NOTE_HEARTBEAT : ");
       Log.d("com.resmed.refresh.ui", Arrays.toString(localJsonSyntaxException));
       handleHearBeat(localJsonSyntaxException);
@@ -556,7 +556,7 @@ public class BaseBluetoothActivity
         if ((VLPacketType.PACKET_TYPE_NOTE_STORE_FOREIGN.ordinal() == i) || (VLPacketType.PACKET_TYPE_NOTE_STORE_LOCAL.ordinal() == i))
         {
           j = PacketsByteValuesReader.getStoreLocalBio(localJsonSyntaxException);
-          paramBundle = new java/lang/StringBuilder;
+          paramBundle = new java.lang.StringBuilder;
           paramBundle.<init>("PACKET_TYPE_NOTE_STORE!!! = ");
           Log.w("com.resmed.refresh.ui", i + " NUMBER OF SAMPLES : " + j);
           if (j >= 32)
@@ -565,14 +565,14 @@ public class BaseBluetoothActivity
           }
           else
           {
-            paramBundle = new java/lang/StringBuilder;
+            paramBundle = new java.lang.StringBuilder;
             paramBundle.<init>("Ignoring samples on BeD because : ");
             AppFileLog.addTrace(j + " samples < 32");
           }
         }
         else
         {
-          paramBundle = new java/lang/StringBuilder;
+          paramBundle = new java.lang.StringBuilder;
           paramBundle.<init>("BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_");
           Log.d("com.resmed.refresh.ui", i + " bytes : " + Arrays.toString(localJsonSyntaxException));
         }
@@ -830,10 +830,10 @@ public class BaseBluetoothActivity
     try
     {
       boolean bool = sendRPC(paramJsonRPC);
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>(" BaseBluetoothActivity::sendRpcToBed(rpc) rpc : ");
       AppFileLog.addTrace(paramJsonRPC + " wasSent : " + bool + " mBound : " + this.mBound);
-      localStringBuilder = new java/lang/StringBuilder;
+      localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>("sendRpcToBed wasSent : ");
       Log.d("com.resmed.refresh.ui", bool);
       if (bool) {

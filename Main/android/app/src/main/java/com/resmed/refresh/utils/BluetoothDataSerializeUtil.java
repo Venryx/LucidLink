@@ -662,7 +662,7 @@ public class BluetoothDataSerializeUtil
       finally {}
       k = paramArrayOfByte[0][i];
       j = paramArrayOfByte[1][i];
-      Object localObject = new java/lang/StringBuilder;
+      Object localObject = new java.lang.StringBuilder;
       ((StringBuilder)localObject).<init>(String.valueOf(k));
       paramContext.append(" " + j + "\n");
       i++;

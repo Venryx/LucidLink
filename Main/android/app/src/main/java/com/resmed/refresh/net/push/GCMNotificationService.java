@@ -100,7 +100,7 @@ public class GCMNotificationService
         Log.i("com.resmed.refresh.push", "JSON parse error on PUSH: " + localJSONException1.getLocalizedMessage());
         continue;
         RefreshModelController localRefreshModelController = RefreshModelController.getInstance();
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("UserID logged in:");
         Log.i("com.resmed.refresh.push", localRefreshModelController.getUserSessionID());
         if ((!localRefreshModelController.getUserSessionID().equalsIgnoreCase(localParseException)) || (!localRefreshModelController.getUsePushNotifications())) {
@@ -119,7 +119,7 @@ public class GCMNotificationService
         }
         if (i == 1)
         {
-          localObject2 = new java/lang/StringBuilder;
+          localObject2 = new java.lang.StringBuilder;
           ((StringBuilder)localObject2).<init>("notification logs1 ");
           Log.i("com.resmed.refresh.push", localObject1);
           String str = ((JSONObject)localObject1).getString("C");
@@ -149,7 +149,7 @@ public class GCMNotificationService
       }
       catch (JSONException localJSONException2)
       {
-        localObject3 = new java/lang/StringBuilder;
+        localObject3 = new java.lang.StringBuilder;
         ((StringBuilder)localObject3).<init>("JSON parse error in isReminder: ");
         Log.i("com.resmed.refresh.push", localJSONException2.getLocalizedMessage());
         i = j;

@@ -435,7 +435,7 @@ public class SleepHistoryDayActivity
         localObject1 = ((SimpleDateFormat)localObject1).format(((Calendar)localObject2).getTime());
         localObject3 = new java/io/File;
         File localFile = RefreshTools.getFilesPath();
-        localObject2 = new java/lang/StringBuilder;
+        localObject2 = new java.lang.StringBuilder;
         ((StringBuilder)localObject2).<init>("sleep_score_");
         ((File)localObject3).<init>(localFile, (String)localObject1 + ".jpg");
         this.fileImageToShare = ((File)localObject3);
@@ -472,16 +472,16 @@ public class SleepHistoryDayActivity
         continue;
         continue;
       }
-      localObject1 = new java/lang/StringBuilder;
+      localObject1 = new java.lang.StringBuilder;
       ((StringBuilder)localObject1).<init>();
       localObject1 = Uri.parse(InternalFileProvider.CONTENT_URI + this.fileImageToShare.getName());
       if (Consts.USE_EXTERNAL_STORAGE)
       {
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>("file://");
         localObject1 = Uri.parse(this.fileImageToShare);
       }
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       ((StringBuilder)localObject2).<init>("ParcelFileDescriptor uri:");
       Log.d("com.resmed.refresh", ((Uri)localObject1).toString());
       localIntent.putExtra("android.intent.extra.STREAM", (Parcelable)localObject1);

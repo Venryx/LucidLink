@@ -188,7 +188,7 @@ public class RefreshModelController
     String str = "";
     try
     {
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>(String.valueOf(paramString2));
       paramString1 = Sha.hash256(paramString1).toUpperCase();
       return paramString1;
@@ -780,7 +780,7 @@ public class RefreshModelController
       localObject = "";
       try
       {
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>(String.valueOf(str4));
         str1 = Sha.hmacSha256(str1, str3);
         localObject = str1;
@@ -1736,7 +1736,7 @@ public class RefreshModelController
       this.daoSession.update(this.user);
       this.daoSession.update(this.user.getProfile());
       localObject1 = System.out;
-      localObject2 = new java/lang/StringBuilder;
+      localObject2 = new java.lang.StringBuilder;
       ((StringBuilder)localObject2).<init>("###### updateUserProfile : ");
       ((PrintStream)localObject1).println(this.user.getSettings().getWeightUnit());
       serviceUpdateUserProfile(paramRST_CallbackItem);

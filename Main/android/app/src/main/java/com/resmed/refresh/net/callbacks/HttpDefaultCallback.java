@@ -182,7 +182,7 @@ public class HttpDefaultCallback<T>
       try
       {
         Object localObject1 = getStringFromInputStream(paramHttpResponse.getEntity().getContent());
-        localObject2 = new java/lang/StringBuilder;
+        localObject2 = new java.lang.StringBuilder;
         ((StringBuilder)localObject2).<init>("http response str body : ");
         Log.d("com.resmed.refresh.net", (String)localObject1);
         localObject2 = new com/google/gson/GsonBuilder;
@@ -195,7 +195,7 @@ public class HttpDefaultCallback<T>
         ((HttpAPIResultListDeserializer)localObject3).<init>(this.classType);
         ((GsonBuilder)localObject2).registerTypeAdapter(localType, localObject3);
         this.result = ((GsonBuilder)localObject2).create().fromJson((String)localObject1, this.classType);
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>(" result :");
         Log.d("com.resmed.refresh.net", this.result);
       }
@@ -242,7 +242,7 @@ public class HttpDefaultCallback<T>
         paramHttpResponse.printStackTrace();
         continue;
         String str = getStringFromInputStream(paramHttpResponse.getEntity().getContent());
-        Object localObject = new java/lang/StringBuilder;
+        Object localObject = new java.lang.StringBuilder;
         ((StringBuilder)localObject).<init>(" http error CALLBACK : ");
         Log.d("com.resmed.refresh.net", str + " " + paramHttpResponse.getStatusLine());
         localObject = new com/resmed/refresh/net/callbacks/HttpDefaultCallback$ErrorResponse;
@@ -276,7 +276,7 @@ public class HttpDefaultCallback<T>
       this.code = paramInt;
       try
       {
-        this$1 = new java/lang/StringBuilder;
+        this$1 = new java.lang.StringBuilder;
         HttpDefaultCallback.this.<init>(" http onError() code");
         Log.d("com.resmed.refresh.net", paramInt + "    ***** JSON  value= > " + paramString);
         this$1 = new org/json/JSONObject;

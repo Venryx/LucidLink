@@ -96,7 +96,7 @@ public class SleepSessionMapper
         }
         localRecord.setLocation(LocationMapper.getLocation(paramRST_NightQuestions));
         localRecord.getLocation().setTimeZone(String.valueOf(RefreshModelController.getInstance().userTimezoneOffset()));
-        paramRST_NightQuestions = new java/lang/StringBuilder;
+        paramRST_NightQuestions = new java.lang.StringBuilder;
         paramRST_NightQuestions.<init>("Location - Adding location (");
         AppFileLog.addTrace(localRecord.getLocation().getLatitude() + "," + localRecord.getLocation().getLongitude() + ") to RecordID:" + localRecord.getRecordId());
         if (RefreshModelController.getInstance().getLocationPermission()) {

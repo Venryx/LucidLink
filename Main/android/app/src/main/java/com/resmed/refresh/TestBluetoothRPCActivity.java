@@ -210,7 +210,7 @@ public class TestBluetoothRPCActivity
         localFileNotFoundException = localFileNotFoundException;
         localFileNotFoundException.printStackTrace();
         continue;
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("EDF FILE LINE : ");
         Log.d("com.resmed.refresh", paramArrayOfByte);
         paramArrayOfByte = ((BufferedReader)localObject).readLine();

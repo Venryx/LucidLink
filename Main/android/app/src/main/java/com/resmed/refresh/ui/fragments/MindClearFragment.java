@@ -100,7 +100,7 @@ public class MindClearFragment
         if ((localList1.get(j) instanceof MindClearVoice)) {
           ((MindClearVoice)localList1.get(j)).deleteFileAudio();
         }
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("position to delete -> ");
         Log.i("com.resmed.refresh.mindClear", j);
         MindClearManager.getInstance().deleteElement(j);

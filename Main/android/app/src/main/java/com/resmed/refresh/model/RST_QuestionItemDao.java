@@ -189,7 +189,7 @@ public class RST_QuestionItemDao
         if (!((Cursor)localObject).isLast())
         {
           localIllegalStateException = new java/lang/IllegalStateException;
-          paramLong = new java/lang/StringBuilder;
+          paramLong = new java.lang.StringBuilder;
           paramLong.<init>("Expected unique result, but count was ");
           localIllegalStateException.<init>(((Cursor)localObject).getCount());
           throw localIllegalStateException;

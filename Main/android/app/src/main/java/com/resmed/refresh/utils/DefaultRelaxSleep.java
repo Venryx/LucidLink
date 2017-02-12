@@ -68,15 +68,15 @@ public class DefaultRelaxSleep
       else
       {
         ((RelaxState)this.workFlowStack.get(this.workFlowStack.size() - 1)).setBPM(f);
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("workflowThread - next step ");
         Log.i("com.resmed.refresh.relax", f + " bpms");
         continue;
         ((RelaxState)this.workFlowStack.get(this.workFlowStack.size() - 1)).setStage(RelaxState.IntervalStage.INTERVAL_STAGE_CHECK_AWAKE);
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("workflowThread - UserStatus ");
         Log.i("com.resmed.refresh.relax", this.status);
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("Relax - INTERVAL_STAGE_CHECK_AWAKE=");
         AppFileLog.addTrace(this.status);
         if (this.status == RelaxSoundManager.UserStatus.USER_ASLEEP)
@@ -86,7 +86,7 @@ public class DefaultRelaxSleep
         }
         else
         {
-          localStringBuilder = new java/lang/StringBuilder;
+          localStringBuilder = new java.lang.StringBuilder;
           localStringBuilder.<init>("workflowThread - ");
           Log.i("com.resmed.refresh.relax", getTimePlayed() + " + " + TOTAL_VOLUME_DROPOFF + " >= " + MAX_WORKFLOW);
           if (getTimePlayed() + TOTAL_VOLUME_DROPOFF >= MAX_WORKFLOW)
@@ -103,7 +103,7 @@ public class DefaultRelaxSleep
             else
             {
               ((RelaxState)this.workFlowStack.get(this.workFlowStack.size() - 1)).setVolume(i);
-              localStringBuilder = new java/lang/StringBuilder;
+              localStringBuilder = new java.lang.StringBuilder;
               localStringBuilder.<init>("workflowThread - next step ");
               Log.i("com.resmed.refresh.relax", i + " volume");
             }

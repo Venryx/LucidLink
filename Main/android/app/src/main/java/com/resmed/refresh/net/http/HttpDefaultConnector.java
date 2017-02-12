@@ -130,7 +130,7 @@ public class HttpDefaultConnector
     {
       StringEntity localStringEntity = new org/apache/http/entity/StringEntity;
       localStringEntity.<init>(paramString2, "UTF-8");
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>(" http post body :");
       Log.d("com.resmed.refresh.net", paramString2);
       paramString1.setEntity(localStringEntity);
@@ -168,7 +168,7 @@ public class HttpDefaultConnector
     {
       StringEntity localStringEntity = new org/apache/http/entity/StringEntity;
       localStringEntity.<init>(paramString2, "UTF-8");
-      StringBuilder localStringBuilder = new java/lang/StringBuilder;
+      StringBuilder localStringBuilder = new java.lang.StringBuilder;
       localStringBuilder.<init>(" http put body :");
       Log.d("com.resmed.refresh.net", paramString2);
       paramString1.setEntity(localStringEntity);

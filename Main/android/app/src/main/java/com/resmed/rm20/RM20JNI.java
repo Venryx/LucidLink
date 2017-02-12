@@ -63,7 +63,7 @@ public class RM20JNI
     {
       try
       {
-        localObject2 = new java/lang/StringBuilder;
+        localObject2 = new java.lang.StringBuilder;
         ((StringBuilder)localObject2).<init>(String.valueOf(Build.CPU_ABI));
         localObject2 = localAssetManager.open("/librm20-jni.so", 3);
         localObject3 = paramContext.openFileOutput("librm20-jni.so", 0);

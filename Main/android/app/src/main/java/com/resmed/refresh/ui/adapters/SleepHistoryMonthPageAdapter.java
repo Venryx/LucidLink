@@ -277,7 +277,7 @@ public class SleepHistoryMonthPageAdapter
       paramAdapterView.<init>();
       paramAdapterView.setTimeInMillis(((Long)getCurrentIndicator()).longValue());
       paramAdapterView = RefreshModelController.getInstance().localSleepSessionsInMonth(paramAdapterView.get(2), paramAdapterView.get(1));
-      paramView = new java/lang/StringBuilder;
+      paramView = new java.lang.StringBuilder;
       paramView.<init>("Month Adapter onItemClick(");
       Log.d("com.resmed.refresh.ui", paramInt + ")  ");
       paramView = new android/content/Intent;

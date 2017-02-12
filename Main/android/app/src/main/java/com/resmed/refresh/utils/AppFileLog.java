@@ -64,11 +64,11 @@ public class AppFileLog
         ((FileWriter)localObject4).<init>(filesDir, true);
         fw = (FileWriter)localObject4;
         localFileWriter = fw;
-        localObject4 = new java/lang/StringBuilder;
+        localObject4 = new java.lang.StringBuilder;
         ((StringBuilder)localObject4).<init>(String.valueOf(localObject1));
         localFileWriter.append((String)localObject3 + "\t" + paramString + " \n");
         fw.flush();
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>(String.valueOf(localObject3));
         Log.d("com.resmed.refresh.filelog", "\t" + paramString);
       }

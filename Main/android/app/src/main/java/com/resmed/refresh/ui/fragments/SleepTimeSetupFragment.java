@@ -117,13 +117,13 @@ public class SleepTimeSetupFragment
     {
       if (j >= ((List)localObject2).size())
       {
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("addQuestionsToView ");
         Log.e("com.resmed.refresh.ui", ((List)localObject2).size() + " size, title = " + ((RST_QuestionItem)localList.get(i)).getText());
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("SleepTimeSetupFragment onResult => refreshPreSleepQuestions ");
         Log.d("com.resmed.refresh.ui", ((List)localObject2).size() + " size, title = " + ((RST_QuestionItem)localList.get(i)).getText());
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>("SDTeam: refreshPreSleepQuestions: number of answer option ");
         AppFileLog.addTrace(((List)localObject2).size() + " for title = " + ((RST_QuestionItem)localList.get(i)).getText());
         localObject2 = new com/resmed/refresh/ui/customview/PreSleepQuestionView;

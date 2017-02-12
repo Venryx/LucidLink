@@ -184,7 +184,7 @@ public class HttpStatusCallback
       {
         return;
         String str = getStringFromInputStream(paramHttpResponse.getEntity().getContent());
-        StringBuilder localStringBuilder = new java/lang/StringBuilder;
+        StringBuilder localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>(" http error CALLBACK : ");
         Log.d("com.resmed.refresh.net", str);
         this.result.setErrorCode(paramHttpResponse.getStatusLine().getStatusCode());

@@ -198,7 +198,7 @@ public class SleepHistoryDayPageAdapter
           {
             int[] arrayOfInt = new int[2];
             paramView.getLocationOnScreen(arrayOfInt);
-            StringBuilder localStringBuilder = new java/lang/StringBuilder;
+            StringBuilder localStringBuilder = new java.lang.StringBuilder;
             localStringBuilder.<init>("getLocationOnScreen:");
             Log.e("facebook", arrayOfInt[0] + "," + arrayOfInt[1]);
             SleepHistoryDayActivity.setEndPositionForScreenShot(arrayOfInt[1]);

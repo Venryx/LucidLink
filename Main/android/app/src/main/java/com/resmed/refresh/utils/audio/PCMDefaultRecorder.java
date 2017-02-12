@@ -335,7 +335,7 @@ public class PCMDefaultRecorder
         try
         {
           bool = ((File)localObject).createNewFile();
-          localObject = new java/lang/StringBuilder;
+          localObject = new java.lang.StringBuilder;
           ((StringBuilder)localObject).<init>("File created? ");
           Log.i("com.resmed.refresh.recorder", bool);
           localObject = new java/io/FileOutputStream;

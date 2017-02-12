@@ -64,11 +64,11 @@ public class preSleepLog
         ((FileWriter)localObject4).<init>(filesDir, true);
         fw = (FileWriter)localObject4;
         localObject4 = fw;
-        localStringBuilder = new java/lang/StringBuilder;
+        localStringBuilder = new java.lang.StringBuilder;
         localStringBuilder.<init>(String.valueOf(localObject1));
         ((FileWriter)localObject4).append((String)localObject3 + "\t" + paramString + " \n");
         fw.flush();
-        localObject1 = new java/lang/StringBuilder;
+        localObject1 = new java.lang.StringBuilder;
         ((StringBuilder)localObject1).<init>(String.valueOf(localObject3));
         Log.d("com.resmed.refresh.filelog", "\t" + paramString);
       }

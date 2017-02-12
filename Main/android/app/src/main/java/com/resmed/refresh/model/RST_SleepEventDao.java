@@ -187,7 +187,7 @@ public class RST_SleepEventDao
         if (!((Cursor)localObject).isLast())
         {
           paramLong = new java/lang/IllegalStateException;
-          localStringBuilder = new java/lang/StringBuilder;
+          localStringBuilder = new java.lang.StringBuilder;
           localStringBuilder.<init>("Expected unique result, but count was ");
           paramLong.<init>(((Cursor)localObject).getCount());
           throw paramLong;
