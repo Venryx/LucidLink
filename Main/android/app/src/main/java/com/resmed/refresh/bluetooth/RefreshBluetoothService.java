@@ -45,7 +45,6 @@
  */
 package com.resmed.refresh.bluetooth;
 
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -60,7 +59,6 @@ import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibJNI;
@@ -83,121 +81,123 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
+import v.lucidlink.LL;
+import v.lucidlink.MainActivity;
 import v.lucidlink.V;
 
 class BluetoothRequestsHandler extends Handler {
-	final /* synthetic */ RefreshBluetoothService this$0;
+	final /* synthetic */ RefreshBluetoothService service;
 
 	public BluetoothRequestsHandler(RefreshBluetoothService refreshBluetoothService) {
-		this.this$0 = refreshBluetoothService;
+		this.service = refreshBluetoothService;
 	}
 
 	public void handleMessage(Message message) {
-		RefreshTools.writeTimeStampToFile(this.this$0.getApplicationContext(), System.currentTimeMillis());
-		RefreshBluetoothService.access$0(this.this$0);
+		RefreshTools.writeTimeStampToFile(this.service.getApplicationContext(), System.currentTimeMillis());
+		RefreshBluetoothService.access$0(this.service);
 		switch (message.what) {
 			default: {
 				return;
 			}
 			case 29: {
-				if (RefreshBluetoothService.access$1(this.this$0) == null)
+				if (this.service.bluetoothManager == null)
 					return;
-				RefreshBluetoothService.access$1(this.this$0).bluetoothOff();
+				this.service.bluetoothManager.bluetoothOff();
 				return;
 			}
 			case 27: {
 				Message message2 = new Message();
 				message2.what = 27;
 				Bundle bundle = new Bundle();
-				bundle.putInt("BUNDLE_BED_AVAILABLE_DATA", RefreshBluetoothService.access$2(this.this$0));
+				bundle.putInt("BUNDLE_BED_AVAILABLE_DATA", RefreshBluetoothService.access$2(this.service));
 				message2.setData(bundle);
-				this.this$0.sendMessageToClient(message2);
+				this.service.sendMessageToClient(message2);
 				return;
 			}
 			case 28: {
-				RefreshBluetoothService.access$3(this.this$0, -1);
+				RefreshBluetoothService.access$3(this.service, -1);
 				return;
 			}
 			case 24: {
-				RefreshBluetoothService.access$4(this.this$0, true);
-				Log.d("com.resmed.refresh.bluetooth", (" RefreshBluetoothService isHandleBulkTransfer : " + RefreshBluetoothService.access$5(this.this$0)));
+				RefreshBluetoothService.access$4(this.service, true);
+				Log.d("com.resmed.refresh.bluetooth", (" RefreshBluetoothService isHandleBulkTransfer : " + RefreshBluetoothService.access$5(this.service)));
 				return;
 			}
 			case 25: {
-				RefreshBluetoothService.access$4(this.this$0, false);
+				RefreshBluetoothService.access$4(this.service, false);
 				return;
 			}
 			case 7: {
-				RefreshBluetoothService.access$1(this.this$0).disable();
+				this.service.bluetoothManager.disable();
 				return;
 			}
 			case 6: {
-				this.this$0.sendConnectionStatus(RefreshBluetoothService.access$1(this.this$0).getConnectionStatus());
+				this.service.sendConnectionStatus(this.service.bluetoothManager.getConnectionStatus());
 				return;
 			}
 			case 4: {
-				RefreshBluetoothService.access$6(this.this$0, message.replyTo);
+				RefreshBluetoothService.access$6(this.service, message.replyTo);
 				Message message3 = new Message();
 				message3.what = 4;
 				try {
-					RefreshBluetoothService.access$7(this.this$0).send(message3);
+					RefreshBluetoothService.access$7(this.service).send(message3);
 				} catch (RemoteException var48_5) {
 					var48_5.printStackTrace();
 				}
-				this.this$0.sendConnectionStatus(RefreshBluetoothService.access$1(this.this$0).getConnectionStatus());
+				this.service.sendConnectionStatus(this.service.bluetoothManager.getConnectionStatus());
 				return;
 			}
 			case 9: {
-				RefreshBluetoothService.access$6(this.this$0, null);
+				RefreshBluetoothService.access$6(this.service, null);
 				return;
 			}
 			case 1: {
-				RefreshBluetoothService.access$1(this.this$0).discoverResMedDevices(true);
+				this.service.bluetoothManager.discoverResMedDevices(true);
 				return;
 			}
 			case 10: {
-				RefreshBluetoothService.access$1(this.this$0).discoverResMedDevices(false);
+				this.service.bluetoothManager.discoverResMedDevices(false);
 				return;
 			}
 			case 22: {
-				RefreshBluetoothService.access$1(this.this$0).cancelDiscovery();
+				this.service.bluetoothManager.cancelDiscovery();
 				return;
 			}
 			case 11: {
 				Bundle bundle = message.getData();
-				Parcelable parcelable = bundle.getParcelable(this.this$0.getContext().getString(2131165303));
-				boolean bl = bundle.getBoolean(this.this$0.getContext().getString(2131165304));
-				BluetoothDevice bluetoothDevice = (BluetoothDevice) parcelable;
-				if (RefreshBluetoothService.access$1(this.this$0).isDevicePaired(bluetoothDevice)) {
+				Parcelable deviceInfo = bundle.getParcelable(this.service.getContext().getString(2131165303));
+				boolean makePaired = bundle.getBoolean(this.service.getContext().getString(2131165304));
+				BluetoothDevice bluetoothDevice = (BluetoothDevice) deviceInfo;
+				if (this.service.bluetoothManager.isDevicePaired(bluetoothDevice)) {
 					Log.d("com.resmed.refresh.pair", (" RefreshBluetoothService connecting to device : " + (Object) bluetoothDevice));
-					RefreshBluetoothService.access$1(this.this$0).connectDevice(bluetoothDevice);
+					this.service.bluetoothManager.connectDevice(bluetoothDevice);
 					return;
 				}
-				if (bl) {
+				if (makePaired) {
 					Log.d("com.resmed.refresh.pair", (" RefreshBluetoothService pairing to device : " + (Object) bluetoothDevice));
-					RefreshBluetoothService.access$1(this.this$0).pairDevice(bluetoothDevice);
+					this.service.bluetoothManager.pairDevice(bluetoothDevice);
 					return;
 				}
 				Log.d("com.resmed.refresh.pair", (" RefreshBluetoothService the device : " + (Object) bluetoothDevice + " has been unpair"));
 				Message message4 = new Message();
 				message4.what = 8;
-				this.this$0.sendMessageToClient(message4);
+				this.service.sendMessageToClient(message4);
 				return;
 			}
 			case 2: {
 				Bundle bundle = message.getData();
 				if (bundle == null) return;
-				if (RefreshBluetoothService.access$1(this.this$0) == null)
+				if (this.service.bluetoothManager == null)
 					return;
 				byte[] arrby = bundle.getByteArray("bytes");
 				Log.d("com.resmed.refresh.bluetooth", (" bytes sending : " + arrby));
-				RefreshBluetoothService.access$1(this.this$0).writeData(arrby);
-				RefreshBluetoothService.access$8(this.this$0, true);
+				this.service.bluetoothManager.writeData(arrby);
+				RefreshBluetoothService.access$8(this.service, true);
 				return;
 			}
 			case 12: {
-				RefreshBluetoothService.access$9(this.this$0);
-				RefreshBluetoothService.access$10(this.this$0, (SleepSessionManager) new SleepSessionManager(this.this$0));
+				RefreshBluetoothService.access$9(this.service);
+				RefreshBluetoothService.access$10(this.service, (SleepSessionManager) new SleepSessionManager(this.service));
 				long l = -1;
 				int n = 44;
 				Bundle bundle = message.getData();
@@ -208,12 +208,12 @@ class BluetoothRequestsHandler extends Handler {
 					n2 = bundle.getInt("gender", 0);
 				}
 
-				SleepSessionManager sessionManager = RefreshBluetoothService.access$11(this.this$0);
+				SleepSessionManager sessionManager = RefreshBluetoothService.access$11(this.service);
 				sessionManager.start(l, n, n2);
 
-				RefreshBluetoothService.access$1(this.this$0).testStreamData(RefreshBluetoothService.access$11(this.this$0));
-				long l2 = RefreshBluetoothService.access$12(this.this$0).getLong("PREF_NIGHT_LAST_SESSION_ID", -1);
-				SharedPreferences.Editor editor = RefreshBluetoothService.access$12(this.this$0).edit();
+				this.service.bluetoothManager.testStreamData(RefreshBluetoothService.access$11(this.service));
+				long l2 = RefreshBluetoothService.access$12(this.service).getLong("PREF_NIGHT_LAST_SESSION_ID", -1);
+				SharedPreferences.Editor editor = RefreshBluetoothService.access$12(this.service).edit();
 				editor.putLong("PREF_NIGHT_LAST_SESSION_ID", l);
 				editor.putInt("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_ON.ordinal());
 				editor.putInt("PREF_AGE", n);
@@ -224,19 +224,19 @@ class BluetoothRequestsHandler extends Handler {
 				return;
 			}
 			case 26: {
-				if (RefreshBluetoothService.access$11(this.this$0) == null)
+				if (RefreshBluetoothService.access$11(this.service) == null)
 					return;
 				Log.d("com.resmed.refresh.smartAlarm", "RefreshBluetoothService MSG_SMARTALARM_UPDATE");
 				Bundle bundle = message.getData();
 				long l = bundle.getLong("com.resmed.refresh.consts.smart_alarm_time_value");
 				int n = bundle.getInt("com.resmed.refresh.consts.smart_alarm_window_value");
-				RefreshBluetoothService.access$11(this.this$0).updateAlarmSettings(l, n);
+				RefreshBluetoothService.access$11(this.service).updateAlarmSettings(l, n);
 				return;
 			}
 			case 14: {
-				Log.d("com.resmed.refresh.bluetooth", ("Bluetooth service isHandleBulkTransfer : " + RefreshBluetoothService.access$5(this.this$0)));
-				RefreshBluetoothService.access$13(this.this$0);
-				RefreshBluetoothService.access$3(this.this$0, (int) -1);
+				Log.d("com.resmed.refresh.bluetooth", ("Bluetooth service isHandleBulkTransfer : " + RefreshBluetoothService.access$5(this.service)));
+				RefreshBluetoothService.access$13(this.service);
+				RefreshBluetoothService.access$3(this.service, (int) -1);
 				return;
 			}
 			case 16: {
@@ -245,44 +245,44 @@ class BluetoothRequestsHandler extends Handler {
 				long l = bundle.getLong("BUNDLE_SMART_ALARM_TIMESTAMP");
 				int n = bundle.getInt("BUNDLE_SMART_ALARM_WINDOW");
 				Log.d("com.resmed.refresh.smartAlarm", "did RefreshBluetoothServiceClient::MSG_SLEEP_SET_SMART_ALARM ");
-				if (RefreshBluetoothService.access$11(this.this$0) == null)
+				if (RefreshBluetoothService.access$11(this.service) == null)
 					return;
 				Date date = new Date(l);
-				RefreshBluetoothService.access$11(this.this$0).setRM20AlarmTime(date, n);
+				RefreshBluetoothService.access$11(this.service).setRM20AlarmTime(date, n);
 				return;
 			}
 			case 17: {
-				if (RefreshBluetoothService.access$11(this.this$0) == null)
+				if (RefreshBluetoothService.access$11(this.service) == null)
 					return;
-				RefreshBluetoothService.access$11(this.this$0).requestUserSleepState();
+				RefreshBluetoothService.access$11(this.service).requestUserSleepState();
 				return;
 			}
 			case 21: {
 				long l = message.getData().getLong("PREF_NIGHT_LAST_SESSION_ID", -1);
-				if (RefreshBluetoothService.access$12(this.this$0) == null) {
-					RefreshBluetoothService.access$14(this.this$0, (SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this.this$0.getApplicationContext()));
+				if (RefreshBluetoothService.access$12(this.service) == null) {
+					RefreshBluetoothService.access$14(this.service, (SharedPreferences) PreferenceManager.getDefaultSharedPreferences(this.service.getApplicationContext()));
 				}
-				int n = RefreshBluetoothService.access$12(this.this$0).getInt("PREF_AGE", 44);
-				int n3 = RefreshBluetoothService.access$12(this.this$0).getInt("PREF_GENDER", 0);
+				int n = RefreshBluetoothService.access$12(this.service).getInt("PREF_AGE", 44);
+				int n3 = RefreshBluetoothService.access$12(this.service).getInt("PREF_GENDER", 0);
 				AppFileLog.addTrace(("RefreshBluetoothService::MSG_SLEEP_SESSION_RECOVER, sessionToRecover : " + l));
-				if (RefreshBluetoothService.access$11(this.this$0) != null) {
-					AppFileLog.addTrace(("RefreshBluetoothService::MSG_SLEEP_SESSION_RECOVER, sleepSessionManager.getSessionId() : " + RefreshBluetoothService.access$11(this.this$0).getSessionId()));
-					AppFileLog.addTrace(("RefreshBluetoothService::MSG_SLEEP_SESSION_RECOVER, sleepSessionManager.isActive() : " + RefreshBluetoothService.access$11(this.this$0).isActive()));
+				if (RefreshBluetoothService.access$11(this.service) != null) {
+					AppFileLog.addTrace(("RefreshBluetoothService::MSG_SLEEP_SESSION_RECOVER, sleepSessionManager.getSessionId() : " + RefreshBluetoothService.access$11(this.service).getSessionId()));
+					AppFileLog.addTrace(("RefreshBluetoothService::MSG_SLEEP_SESSION_RECOVER, sleepSessionManager.isActive() : " + RefreshBluetoothService.access$11(this.service).isActive()));
 				}
-				if ((RefreshBluetoothService.access$11(this.this$0) == null || RefreshBluetoothService.access$11(this.this$0).getSessionId() == l || RefreshBluetoothService.access$11(this.this$0).isActive()) && RefreshBluetoothService.access$11(this.this$0) != null) {
+				if ((RefreshBluetoothService.access$11(this.service) == null || RefreshBluetoothService.access$11(this.service).getSessionId() == l || RefreshBluetoothService.access$11(this.service).isActive()) && RefreshBluetoothService.access$11(this.service) != null) {
 					Message message5 = new Message();
 					message5.what = 21;
-					this.this$0.sendMessageToClient(message5);
+					this.service.sendMessageToClient(message5);
 					return;
 				}
-				RefreshBluetoothService.access$10(this.this$0, (SleepSessionManager) new SleepSessionManager(this.this$0));
-				RefreshBluetoothService.access$11(this.this$0).recoverSession(l, n, n3);
+				RefreshBluetoothService.access$10(this.service, new SleepSessionManager(this.service));
+				RefreshBluetoothService.access$11(this.service).recoverSession(l, n, n3);
 				return;
 			}
 			case 23:
 		}
 		Log.d("com.resmed.refresh.bluetooth", "RefreshBluetoothService::MSG_BeD_UNPAIR_ALL, unpairing all : ");
-		RefreshBluetoothService.access$1(this.this$0).unpairAll("S+");
+		this.service.bluetoothManager.unpairAll("S+");
 	}
 }
 
@@ -293,7 +293,8 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	public static final String REFRESH_BED_NEW_DATA_SIZE = "REFRESH_BED_NEW_DATA_SIZE";
 	public static final String REFRESH_BED_NEW_DATA_TYPE = "REFRESH_BED_NEW_DATA_TYPE";
 	public static final String REFRESH_BT_SERVICE_RUNNING = "REFRESH_BT_SERVICE_RUNNING";
-	private RefreshBluetoothManager bluetoothManager;
+	//public RefreshBluetoothManager bluetoothManager;
+	public BluetoothSetup bluetoothManager;
 	private boolean isBindToClient;
 	private int isDataAvailableOnDevice;
 	private boolean isHandleBulkTransfer;
@@ -303,9 +304,13 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	public boolean sessionToBeStopped;
 	private SleepSessionManager sleepSessionManager;
 
+	public static RefreshBluetoothService main;
+
 	public RefreshBluetoothService() {
-		V.Log("Starting bluetooth service!");
-		this.mMessenger = new Messenger((Handler) new BluetoothRequestsHandler(this));
+		main = this;
+
+		V.JavaLog("Starting bluetooth service!");
+		this.mMessenger = new Messenger(new BluetoothRequestsHandler(this));
 		this.isBindToClient = true;
 		this.isHandleBulkTransfer = false;
 		this.sessionToBeStopped = false;
@@ -313,10 +318,6 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 
 	static /* synthetic */ void access$0(RefreshBluetoothService refreshBluetoothService) {
 		refreshBluetoothService.checkManager();
-	}
-
-	static /* synthetic */ RefreshBluetoothManager access$1(RefreshBluetoothService refreshBluetoothService) {
-		return refreshBluetoothService.bluetoothManager;
 	}
 
 	static /* synthetic */ void access$10(RefreshBluetoothService refreshBluetoothService, SleepSessionManager sleepSessionManager) {
@@ -531,10 +532,36 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		super.onRebind(intent);
 	}
 
+	boolean listening;
+	public void StartListening() {
+		if (listening) return;
+		listening = true;
+
+		V.JavaLog("Start listening;" + MainActivity.main + ";" + this.getApplicationContext() + ";" + LL.main);
+
+		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
+		EdfLibJNI.loadLibrary(this.getApplicationContext());
+		RM20JNI.loadLibrary(this.getApplicationContext());
+
+		try {
+			// rather than remember last one, just find first device and connect to it
+			main.bluetoothManager = new BluetoothSetup(main);
+			main.bluetoothManager.enable();
+			main.bluetoothManager.discoverResMedDevices(true);
+		} catch (Exception ex) {
+			throw new Error(ex);
+		}
+	}
+
 	public int onStartCommand(Intent intent, int n, int n2) {
 		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
 		EdfLibJNI.loadLibrary(this.getApplicationContext());
 		RM20JNI.loadLibrary(this.getApplicationContext());
+
+		V.WaitXThenRun(1000, ()-> {
+			StartListening();
+		});
+
 		try {
 			this.bluetoothManager = new BluetoothSetup(this);
 			this.bluetoothManager.enable();

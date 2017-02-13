@@ -79,7 +79,7 @@ public class Consts
 	public static int RELAX_TIME_DIVIDER = 0;
 	public static final String RPC_STREAMING_MODE = "REAL";
 	public static final int SERVICE_IPC_MAX_TRANSACTION = 1048000;
-	public static final boolean SHOW_LOG = false;
+	public static final boolean SHOW_LOG = true;
 	public static final String SLEEP_HISTORY_ID = "com.resmed.refresh.ui.uibase.app.sleep_history_id";
 	public static final long SLEEP_SUB_TIMER_INTERVAL = 5000L;
 	public static final long SLEEP_TIMER_INTERVAL = 120000L;

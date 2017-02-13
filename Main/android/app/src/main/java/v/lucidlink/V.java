@@ -89,13 +89,17 @@ public class V {
 		//Log.i(tag, message);
 		JavaLog(tag, message);
 		//if (sendToJS)
-		if (sendToJS && LL.main != null)
-			LL.main.SendEvent("PostJavaLog", tag, message);
+		if (sendToJS) {
+			if (LL.main != null && LL.main.reactContext.hasActiveCatalystInstance())
+				LL.main.SendEvent("PostJavaLog", tag, message);
+			else
+				JavaLog(tag, "Could not log to JS, because react was not yet fully initialized.");
+		}
 	}
 
 	// logcat has a message length limit, so cut long messages into pieces that are displayable
-	static void JavaLog(String message) { JavaLog("default", message); }
-	static void JavaLog(String tag, String message) {
+	public static void JavaLog(String message) { JavaLog("default", message); }
+	public static void JavaLog(String tag, String message) {
 		//Log.i(tag, "Length: " + message.length());
 		if (message.length() > 4000) {
 			Log.i(tag, message.substring(0, 4000));

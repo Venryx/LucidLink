@@ -14,6 +14,7 @@ import com.annimon.stream.Stream;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -46,6 +47,8 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		this.reactContext = reactContext;
 
 		MainActivity.main.EnsurePermissionsGranted();
+
+		MainActivity.main.PostModuleInit();
     }
 	public ReactApplicationContext reactContext;
 	public boolean firstLaunch;

@@ -30,6 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+import v.lucidlink.V;
+
 public class BluetoothSetup implements RefreshBluetoothManager
 {
 	public class ConnectThread extends Thread {
@@ -94,7 +96,16 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		}
 
 		public void run() {
-			// $FF: Couldn't be decompiled
+			try {
+				mmSocket.connect();
+				Log.i("Connection result","connected");
+			} catch (IOException connectException) {
+				Log.i("Connection result","unable to connect");
+				try {
+					mmSocket.close();
+				} catch (IOException closeException) { }
+
+			}
 		}
 	}
 
@@ -463,47 +474,45 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		}
 	}
 
-	public void discoverResMedDevices(final boolean b) {
-		while (true) {
-			while (true) {
-				final Iterator<BluetoothDevice> iterator;
-				Label_0176: {
-					synchronized (this) {
-						Log.d("com.resmed.refresh.bluetooth", "connection status : " + this.connectionStatus);
-						if (this.mReconnectionThread != null) {
-							this.mReconnectionThread.interrupt();
-							this.mReconnectionThread = null;
-						}
-						if (this.mConnectThread != null) {
-							this.mConnectThread.cancel();
-							this.mConnectThread.interrupt();
-							this.mConnectThread = null;
-						}
-						this.cancelDiscovery();
-						Log.d("com.resmed.refresh.bluetooth", " this.connectionStatus : " + this.connectionStatus);
-						if (CONNECTION_STATE.SOCKET_NOT_CONNECTED == this.connectionStatus || CONNECTION_STATE.SOCKET_RECONNECTING == this.connectionStatus || !b) {
-							iterator = this.queryPairedDevices().iterator();
-							if (iterator.hasNext()) {
-								break Label_0176;
-							}
-							this.bluetoothAdapter.startDiscovery();
-						}
-						return;
-					}
-				}
-				final BluetoothDevice bluetoothDevice = iterator.next();
-				Log.d("com.resmed.refresh.bluetooth", "paired device : " + bluetoothDevice.getName() + " address : " + bluetoothDevice.getAddress());
-				if (this.device != null && bluetoothDevice.getName().equals(this.device.getName()) && bluetoothDevice.getAddress().equals(this.device.getAddress()) && b) {
-					this.connectDevice(bluetoothDevice);
-					return;
-				}
-				final Intent intent = new Intent("ACTION_ALREADY_PAIRED");
-				intent.putExtra("android.bluetooth.device.extra.DEVICE", (Parcelable)bluetoothDevice);
-				this.bluetoothService.getContext().sendStickyBroadcast(intent);
-				continue;
+	public void discoverResMedDevices(boolean something) {
+		V.JavaLog("Looking for resmed devices:" + something);
+		synchronized (this) {
+			CONNECTION_STATE cONNECTION_STATE;
+			CONNECTION_STATE cONNECTION_STATE2;
+			Log.d((String)"com.resmed.refresh.bluetooth", (String)("connection status : " + (Object)this.connectionStatus));
+			if (this.mReconnectionThread != null) {
+				this.mReconnectionThread.interrupt();
+				this.mReconnectionThread = null;
 			}
+			if (this.mConnectThread != null) {
+				this.mConnectThread.cancel();
+				this.mConnectThread.interrupt();
+				this.mConnectThread = null;
+			}
+			this.cancelDiscovery();
+			Log.d((String)"com.resmed.refresh.bluetooth", (String)(" this.connectionStatus : " + (Object)this.connectionStatus));
+			if (CONNECTION_STATE.SOCKET_NOT_CONNECTED != this.connectionStatus && (cONNECTION_STATE = CONNECTION_STATE.SOCKET_RECONNECTING) != (cONNECTION_STATE2 = this.connectionStatus)) {
+				if (something) return;
+			}
+			Iterator iterator = this.queryPairedDevices().iterator();
+			do {
+				if (!iterator.hasNext()) {
+					this.bluetoothAdapter.startDiscovery();
+					break;
+				}
+				BluetoothDevice bluetoothDevice = (BluetoothDevice)iterator.next();
+				Log.d((String)"com.resmed.refresh.bluetooth", (String)("paired device : " + bluetoothDevice.getName() + " address : " + bluetoothDevice.getAddress()));
+				//if (this.device != null && bluetoothDevice.getName().equals(this.device.getName()) && bluetoothDevice.getAddress().equals(this.device.getAddress()) && something) {
+					this.connectDevice(bluetoothDevice);
+					break;
+				/*}
+				Intent intent = new Intent("ACTION_ALREADY_PAIRED");
+				intent.putExtra("android.bluetooth.device.extra.DEVICE", (Parcelable)bluetoothDevice);
+				this.bluetoothService.getContext().sendStickyBroadcast(intent);*/
+			} while (true);
 		}
 	}
+
 
 	public void enable() {
 		this.bluetoothService.getContext().registerReceiver(this.deviceFoundReceiver, new IntentFilter("android.bluetooth.device.action.FOUND"));

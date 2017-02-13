@@ -18,6 +18,8 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.resmed.refresh.bed.BedCommandsRPCMapper;
+import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
@@ -111,6 +113,8 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}
 
 	public SleepSessionManager baseManager;
+
+	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	@ReactMethod public void Init() {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
@@ -118,9 +122,35 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		/*RefreshApplication refreshApp = new RefreshApplication();
 		RefreshApplication.instance = refreshApp;*/
 
+
+
+
 		//RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
-		Intent myIntent = new Intent(reactContext, RefreshBluetoothService.class);
+		/*Intent myIntent = new Intent(reactContext, RefreshBluetoothService.class);
 		reactContext.startService(myIntent);
+
+		RpcCommands.setContextBroadcaster(reactContext);
+		com.resmed.refresh.utils.Log.d("com.resmed.refresh.ui", ": bluetooth service is running : " + var2);
+		Intent intent = new Intent(reactContext, RefreshBluetoothService.class);
+		intent.putExtra("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_ON);
+		intent.putExtra("PREF_NIGHT_LAST_SESSION_ID", 0);
+		reactContext.startService(intent);
+
+		SharedPreferences var4 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+		int var5 = var4.getInt("PREF_CONNECTION_STATE", -1);
+		com.resmed.refresh.utils.Log.d("com.resmed.refresh.ui", " SleepTimeActivity::onResume conn state : " + var5);
+		if(var5 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
+			int var9 = var4.getInt("PREF_LAST_RPC_ID_USED", -1);
+			if(-1 != var9) {
+				RpcCommands.setRPCid(var9);
+			}
+		}
+
+		this.registerReceiver(this.connectionStatusReceiver, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
+		this.registerReceiver(this.bluetoothServiceRestartReceiver, new IntentFilter("BLUETOOTH_SERVICE_INTENT_RESTART"));*/
+
+
+
 
 		V.Log("Test2");
 		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {

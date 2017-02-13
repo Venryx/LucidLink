@@ -29,6 +29,7 @@ import com.resmed.cobs.COBS;
 import com.resmed.refresh.bed.BedCommandsRPCMapper;
 import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bluetooth.BluetoothDataWriter;
+import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.BluetoothSetup.AlarmReceiver;
@@ -306,12 +307,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void bindToService() {
-		Log.d("com.resmed.refresh.ui", "binding to bluetooth service! isRunning :" + this.isBluetoothServiceRunning() + "service intent : " + this.bluetoothManagerService + " mConnection : " + this.mConnection);
+		/*Log.d("com.resmed.refresh.ui", "binding to bluetooth service! isRunning :" + this.isBluetoothServiceRunning() + "service intent : " + this.bluetoothManagerService + " mConnection : " + this.mConnection);
 		AppFileLog.addTrace("BaseBluetoothActivity::bindToService!");
 		if (!this.mBound) {
 			this.getApplicationContext().bindService(this.bluetoothManagerService, this.mConnection, 1);
-		}
-
+		}*/
 	}
 
 	public boolean checkBluetoothEnabled() {
@@ -342,11 +342,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return needsUpdate;
 	}
 
-	public boolean connectToBeD(boolean var1) {
+	/*public boolean connectToBeD(boolean var1) {
 		Log.d("com.resmed.refresh.pair", "connectToBeD(" + var1 + ")");
-		BluetoothDevice var3 = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
-		Log.d("com.resmed.refresh.pair", "connectToBeD mDevice : " + var3);
-		if (var3 == null) {
+		BluetoothDevice deviceInfo = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
+		Log.d("com.resmed.refresh.pair", "connectToBeD mDevice : " + deviceInfo);
+		if (deviceInfo == null) {
 			Log.d("com.resmed.refresh.pair", "connectToBeD no mDevice stored");
 			if (var1) {
 				Log.d("com.resmed.refresh.dialog", "connectToBeD showBeDPickerDialog()");
@@ -356,17 +356,19 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			return false;
 		} else {
 			Log.d("com.resmed.refresh.pair", "connectToBeD sending message to service : ");
-			Bundle var6 = new Bundle();
-			var6.putParcelable(this.getString(2131165303), var3);
-			var6.putBoolean(this.getString(2131165304), false);
-			this.sendMessageToService(11, var6);
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(this.getString(2131165303), deviceInfo);
+			bundle.putBoolean(this.getString(2131165304), false); // makePaired
+			//this.sendMessageToService(11, bundle);
+			int pairAndConnect = 11;
+			this.sendMessageToService(pairAndConnect, bundle);
 			if (var1) {
 				this.showConnectionProgress();
 			}
 
 			return true;
 		}
-	}
+	}*/
 
 	public void disconnectBluetoothConn() {
 		Message var1 = new Message();
@@ -513,7 +515,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return this.mBound;
 	}
 
-	protected void onActivityResult(int var1, int var2, Intent var3) {
+	public void onActivityResult(int var1, int var2, Intent var3) {
 		super.onActivityResult(var1, var1, var3);
 		if (var1 == 161) {
 			switch (var2) {
@@ -533,17 +535,26 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		super.onCreate(var1);
 		RpcCommands.setContextBroadcaster(this);
 		this.receivers = new ArrayList();
-		boolean var2 = this.isBluetoothServiceRunning();
-		Log.d("com.resmed.refresh.ui", ": bluetooth service is running : " + var2);
+	}
+
+	public void PostModuleInit() {
+		boolean serviceRunning = this.isBluetoothServiceRunning();
+		V.JavaLog("com.resmed.refresh.ui", ": bluetooth service is running : " + serviceRunning);
 		this.bluetoothManagerService = new Intent(this, RefreshBluetoothService.class);
-		if (!var2) {
-			String var10 = this.getIntent().getStringExtra(this.getString(2131165943));
+
+		// kill the service each time, so we create a new one that's in the same instance as us
+		if (serviceRunning) {
+			stopService(new Intent(this, RefreshBluetoothService.class));
+			serviceRunning = false;
+		}
+
+		if (!serviceRunning) {
+			/*String var10 = this.getIntent().getStringExtra(this.getString(2131165943));
 			String var11 = this.getIntent().getStringExtra(this.getString(2131165944));
 			if (var10 != null && var11 != null) {
 				this.bluetoothManagerService.putExtra(this.getString(2131165943), var10);
 				this.bluetoothManagerService.putExtra(this.getString(2131165944), var11);
-			}
-
+			}*/
 			this.startService(this.bluetoothManagerService);
 		}
 
@@ -582,12 +593,12 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	}
 
-	public void onPickedDevice(BluetoothDevice var1) {
+	/*public void onPickedDevice(BluetoothDevice var1) {
 		Log.d("com.resmed.refresh.pair", "onPickedDevice");
 		Log.d("com.resmed.refresh.dialog", "onPickedDevice() connectionProgressDisplayed = true");
 		this.connectionProgressDisplayed = true;
 		this.pairAndConnect(var1);
-	}
+	}*/
 
 	protected void onResume() {
 		super.onResume();
@@ -612,14 +623,14 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		V.Log("Gone: this.showReconnectionScreen();");
 	}
 
-	protected void pairAndConnect(BluetoothDevice var1) {
+	protected void pairAndConnect(BluetoothDevice deviceInfo) {
 		Log.d("com.resmed.refresh.pair", "connectAndPair");
-		this.mDevice = var1;
+		this.mDevice = deviceInfo;
 		connectingToBeD = true;
-		Bundle var3 = new Bundle();
-		var3.putParcelable(this.getString(2131165303), var1);
-		var3.putBoolean(this.getString(2131165304), true);
-		this.sendMessageToService(11, var3);
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(this.getString(2131165303), deviceInfo);
+		bundle.putBoolean(this.getString(2131165304), true);
+		this.sendMessageToService(11, bundle);
 		this.showConnectionProgress();
 	}
 
@@ -649,6 +660,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		Message var4 = new Message();
 		var4.what = 27;
 		this.sendMsgBluetoothService(var4);
+		V.Log("Send message;");
 	}
 
 	public boolean sendBytesToBeD(byte[] var1, VLPacketType var2) {
@@ -708,12 +720,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void unBindFromService() {
-		AppFileLog.addTrace("BaseBluetoothActivity::unBindingFromService!");
+		/*AppFileLog.addTrace("BaseBluetoothActivity::unBindingFromService!");
 		if (this.mBound) {
 			this.getApplicationContext().unbindService(this.mConnection);
 			this.mBound = false;
-		}
-
+		}*/
 	}
 
 	protected void unregisterAll() {

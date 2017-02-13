@@ -13,6 +13,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 
 //@ReportsCrashes(formKey = "", mailTo = "RstAndroidTest@ResMed.com", mode = ReportingInteractionMode.TOAST, resToastText = 2131165352)
+//public class RefreshApplication extends Application {
 public class RefreshApplication extends Application {
 	private static int activitiesInForeground = 0;
 	public static RefreshApplication instance;

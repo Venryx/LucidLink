@@ -614,7 +614,7 @@ public class RefreshTools
 	}
 
 	public static boolean writeTimeStampToFile(final Context context, final long n) {
-		synchronized (RefreshTools.class) {
+		/*synchronized (RefreshTools.class) {
 			final File file = new File(getFilesPath(), context.getString(2131165344));
 			try {
 				if (!file.exists()) {
@@ -630,6 +630,7 @@ public class RefreshTools
 				ex.printStackTrace();
 				return false;
 			}
-		}
+		}*/
+		return false;
 	}
 }

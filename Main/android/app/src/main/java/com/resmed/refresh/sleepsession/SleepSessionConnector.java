@@ -347,7 +347,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.isHandlingHeartBeat = false;
 				break;
 			case SESSION_OPENED:
-				this.bAct.connectToBeD(false);
+				//this.bAct.connectToBeD(false);
 		}
 	}
 

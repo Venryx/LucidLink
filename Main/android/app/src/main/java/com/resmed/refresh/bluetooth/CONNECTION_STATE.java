@@ -80,7 +80,9 @@ public enum CONNECTION_STATE
 		return $switch_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE;
 	}
 
+	public int value;
 	private CONNECTION_STATE(final String s, final int n) {
+		this.value = n;
 	}
 
 	public static String toString(final CONNECTION_STATE connection_STATE) {
