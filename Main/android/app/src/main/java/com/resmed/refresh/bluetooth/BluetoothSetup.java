@@ -29,6 +29,7 @@ import com.resmed.refresh.utils.Log;
 import java.io.IOException;
 import java.util.UUID;
 
+import SPlus.SPlusModule;
 import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
 import v.lucidlink.V;
@@ -721,7 +722,18 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().clearBuffers());
 			} else if (newState == CONNECTION_STATE.SESSION_OPENED) {*/
 				V.Log("YAY3!!!");
+				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
+
+				/*Timer timer = new Timer();
+				timer.scheduleAtFixedRate(new TimerTask(){@Override public void run() {
+					//SleepSessionManager.this.requestUserSleepState();
+					V.Log("Stage:" + SPlusModule.main.baseManager.rm20Manager.getRealTimeSleepState());
+					//SPlusModule.main.baseManager.rm20Manager.startRespRateCallbacks(true);
+
+					/*SPlusModule.main.baseManager.stopCalculateAndSendResults();
+					SPlusModule.main.baseManager.start(71, 20, 1);*#/
+				}}, 10000, 10000);*/
 			}
 		}
 	}

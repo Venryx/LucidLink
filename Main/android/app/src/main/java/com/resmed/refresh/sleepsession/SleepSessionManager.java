@@ -83,8 +83,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			SleepSessionManager.this.start(71, 20, 1);
 		}}, 10000, 10000);*/
 
-		SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
-		connector.init(true);
+		/*SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
+		connector.init(true);*/
 
 		SleepSessionManager.this.start(71, 20, 1);
 	}
@@ -137,7 +137,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		rstEdfMetaData.addMetaField(RstEdfMetaData.Enum_EDF_Meta.rm20LibVer, this.rm20Version());
 	}
 
-	private void stopCalculateAndSendResults() {
+	public void stopCalculateAndSendResults() {
 		this.rm20Manager.startRespRateCallbacks(false);
 		this.rm20Manager.stopAndCalculate();
 		Object localObject = this.rm20Manager.resultsForSession();
