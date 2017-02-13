@@ -1,7 +1,6 @@
 package com.resmed.refresh.bed;
 
-public enum LedsState
-{
+public enum LedsState {
 	GREEN("GREEN", 3, "grn"),
 	GREENFLASH("GREENFLASH", 4, "grnFlash"),
 	OFF("OFF", 0, "off"),

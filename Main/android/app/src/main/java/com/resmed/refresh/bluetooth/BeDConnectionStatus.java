@@ -3,9 +3,11 @@ package com.resmed.refresh.bluetooth;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshUserPreferencesData;
+
+import v.lucidlink.LL;
+import v.lucidlink.MainActivity;
 
 public class BeDConnectionStatus {
 	// $FF: synthetic field
@@ -115,13 +117,13 @@ public class BeDConnectionStatus {
 
 	public static BeDConnectionStatus getInstance() {
 		if(Instance == null) {
-			SharedPreferences var0 = PreferenceManager.getDefaultSharedPreferences(RefreshApplication.getInstance());
-			CONNECTION_STATE var1 = CONNECTION_STATE.SOCKET_NOT_CONNECTED;
-			if(var0.getInt("PREF_CONNECTION_STATE", -1) == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
+			//SharedPreferences var0 = PreferenceManager.getDefaultSharedPreferences(RefreshApplication.getInstance());
+			CONNECTION_STATE initialState = CONNECTION_STATE.SOCKET_NOT_CONNECTED;
+			/*if(var0.getInt("PREF_CONNECTION_STATE", -1) == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
 				var1 = CONNECTION_STATE.NIGHT_TRACK_ON;
-			}
+			}*/
 
-			Instance = new BeDConnectionStatus(var1);
+			Instance = new BeDConnectionStatus(initialState);
 		}
 
 		return Instance;
@@ -241,7 +243,7 @@ public class BeDConnectionStatus {
 	public void updateBeDDataFlag(int var1) {
 		Log.d("com.resmed.refresh.ui", "updateDataStoredFlag(" + var1 + ")");
 		this.dataStoredFlag = var1;
-		RefreshUserPreferencesData var3 = new RefreshUserPreferencesData(RefreshApplication.getInstance().getApplicationContext());
+		RefreshUserPreferencesData var3 = new RefreshUserPreferencesData(LL.main.reactContext);
 		var3.setIntegerConfigValue("PREF_DATA_ON_BED_NOTIFICATION_ID", Integer.valueOf(var1));
 		Log.d("com.resmed.refresh.ui", "prefs updateDataStoredFlag(" + var3.getIntegerConfigValue("PREF_DATA_ON_BED_NOTIFICATION_ID") + ")");
 	}

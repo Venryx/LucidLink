@@ -13,7 +13,6 @@ import com.resmed.edflib.RstEdfMetaData;
 import com.resmed.edflib.RstEdfMetaData.Enum_EDF_Meta;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.Log;
@@ -74,11 +73,18 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.sampleBuffer = new ArrayList();
 		this.filesFolder = RefreshTools.getFilesPath();
 
-		Timer timer = new Timer();
+		/*Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask(){@Override public void run() {
-			SleepSessionManager.this.requestUserSleepState();
-			SleepSessionManager.this.rm20Manager.startRespRateCallbacks(true);
-		}}, 10000, 10000);
+			//SleepSessionManager.this.requestUserSleepState();
+			V.Log("Data2:" + SleepSessionManager.this.rm20Manager.getRealTimeSleepState());
+			//SleepSessionManager.this.rm20Manager.startRespRateCallbacks(true);
+
+			SleepSessionManager.this.stopCalculateAndSendResults();
+			SleepSessionManager.this.start(71, 20, 1);
+		}}, 10000, 10000);*/
+
+		SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
+		connector.init(true);
 	}
 
 	private void didFinishEdfRecovery() {

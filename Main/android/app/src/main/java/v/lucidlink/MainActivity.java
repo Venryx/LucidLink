@@ -45,7 +45,6 @@ import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.ui.utils.Consts;
@@ -137,10 +136,10 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	private void disconnectFromBeD(final boolean b) {
 		Log.d("com.resmed.refresh.pair", "disconnectFromBeD(" + b + ")");
 		final BluetoothDevice jsonFile = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
-		final CONNECTION_STATE currentConnectionState = RefreshApplication.getInstance().getCurrentConnectionState();
-		Log.d("com.resmed.refresh.pair", " HomeActivity::last conn state : " + currentConnectionState);
-		if (currentConnectionState == CONNECTION_STATE.SESSION_OPENED || currentConnectionState == CONNECTION_STATE.SESSION_OPENING || currentConnectionState == CONNECTION_STATE.SOCKET_CONNECTED || currentConnectionState == CONNECTION_STATE.SOCKET_RECONNECTING) {
-			Log.d("com.resmed.refresh.pair", "CONNECTION_STATE = " + currentConnectionState);
+		Log.d("com.resmed.refresh.pair", " HomeActivity::last conn state : " + LL.main.connectionState);
+		if (LL.main.connectionState == CONNECTION_STATE.SESSION_OPENED || LL.main.connectionState == CONNECTION_STATE.SESSION_OPENING
+				|| LL.main.connectionState == CONNECTION_STATE.SOCKET_CONNECTED || LL.main.connectionState == CONNECTION_STATE.SOCKET_RECONNECTING) {
+			Log.d("com.resmed.refresh.pair", "CONNECTION_STATE = " + LL.main.connectionState);
 			final JsonRPC closeSession = getRpcCommands().closeSession();
 			if (b) {
 				closeSession.setRPCallback(new JsonRPC.RPCallback() {
@@ -219,18 +218,19 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		beginTransaction.commit();*/
 	}
 
-	protected void onResume() {
+	/*protected void onResume() {
 		super.onResume();
 		//this.connectToBeD(false);
 		//RefreshModelController.getInstance().setupNotifications(this);
-		final CONNECTION_STATE currentConnectionState = RefreshApplication.getInstance().getCurrentConnectionState();
-		if (currentConnectionState == CONNECTION_STATE.SESSION_OPENED || currentConnectionState == CONNECTION_STATE.SESSION_OPENING || currentConnectionState == CONNECTION_STATE.SOCKET_CONNECTED || currentConnectionState == CONNECTION_STATE.SOCKET_RECONNECTING) {
+		final CONNECTION_STATE state = LL.main.connectionState;
+		if (state == CONNECTION_STATE.SESSION_OPENED || state == CONNECTION_STATE.SESSION_OPENING
+				|| state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING) {
 			final JsonRPC leds = BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN);
 			if (leds != null) {
 				this.sendRpcToBed(leds);
 			}
 		}
-	}
+	}*/
 
 	public void onStart() {
 		super.onStart();

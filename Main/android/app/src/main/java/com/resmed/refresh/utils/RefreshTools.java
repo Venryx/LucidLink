@@ -2,7 +2,6 @@ package com.resmed.refresh.utils;
 
 import android.annotation.*;
 import android.graphics.*;
-import com.resmed.refresh.ui.uibase.app.*;
 import android.os.*;
 import java.nio.channels.*;
 import android.content.*;
@@ -355,7 +354,7 @@ public class RefreshTools
 	}
 
 	public static boolean exportAllFilesToSD() {
-		final File filesDir = RefreshApplication.getInstance().getFilesDir();
+		/*final File filesDir = RefreshApplication.getInstance().getFilesDir();
 		final String string = String.valueOf(Environment.getExternalStorageDirectory().getAbsolutePath()) + "/Refresh/export/";
 		final File[] listFiles = filesDir.listFiles();
 
@@ -377,7 +376,8 @@ public class RefreshTools
 				return false;
 			}
 		}
-		return true;
+		return true;*/
+		return false;
 	}
 
 	public static boolean exportDataBaseToSD() {

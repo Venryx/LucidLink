@@ -1,5 +1,6 @@
 package v.lucidlink;
 
+import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -24,6 +25,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.views.textinput.ReactEditText;
 import v.lucidlink.Frame.Vector2i;
 import com.lugg.ReactSnackbar.ReactSnackbarModule;
+import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -173,6 +175,10 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 	}
 
 	EEGProcessor eegProcessor = new EEGProcessor();
+
+	// special
+	//public BluetoothDevice targetDevice;
+	public CONNECTION_STATE connectionState = CONNECTION_STATE.SOCKET_NOT_CONNECTED;
 
 	/*@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
 		String type = args.getString(0);

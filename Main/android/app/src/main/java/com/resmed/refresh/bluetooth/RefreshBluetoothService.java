@@ -93,6 +93,7 @@ class BluetoothRequestsHandler extends Handler {
 	}
 
 	public void handleMessage(Message message) {
+		V.Log("Handle message:" + message.what);
 		RefreshTools.writeTimeStampToFile(this.service.getApplicationContext(), System.currentTimeMillis());
 		RefreshBluetoothService.access$0(this.service);
 		switch (message.what) {
@@ -132,7 +133,7 @@ class BluetoothRequestsHandler extends Handler {
 				return;
 			}
 			case 6: {
-				this.service.sendConnectionStatus(this.service.bluetoothManager.getConnectionStatus());
+				this.service.sendConnectionStatus(LL.main.connectionState);
 				return;
 			}
 			case 4: {
@@ -144,7 +145,7 @@ class BluetoothRequestsHandler extends Handler {
 				} catch (RemoteException var48_5) {
 					var48_5.printStackTrace();
 				}
-				this.service.sendConnectionStatus(this.service.bluetoothManager.getConnectionStatus());
+				this.service.sendConnectionStatus(LL.main.connectionState);
 				return;
 			}
 			case 9: {
@@ -165,8 +166,8 @@ class BluetoothRequestsHandler extends Handler {
 			}
 			case 11: {
 				Bundle bundle = message.getData();
-				Parcelable deviceInfo = bundle.getParcelable(this.service.getContext().getString(2131165303));
-				boolean makePaired = bundle.getBoolean(this.service.getContext().getString(2131165304));
+				Parcelable deviceInfo = bundle.getParcelable("deviceInfo");
+				boolean makePaired = bundle.getBoolean("makePaired");
 				BluetoothDevice bluetoothDevice = (BluetoothDevice) deviceInfo;
 				if (this.service.bluetoothManager.isDevicePaired(bluetoothDevice)) {
 					Log.d("com.resmed.refresh.pair", (" RefreshBluetoothService connecting to device : " + (Object) bluetoothDevice));
@@ -390,7 +391,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 
 	private void checkNightTrack() {
 		this.isBindToClient = false;
-		new Handler().postDelayed((Runnable) new RefreshBluetoothService(), 120000L);
+		//new Handler().postDelayed((Runnable) new RefreshBluetoothService(), 120000L);
 	}
 
 	private void recoverSleepSession(long l) {
@@ -415,6 +416,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	}
 
 	public void handlePacket(VLP.VLPacket vLPacket) {
+		V.Log("Handling packet...");
 		AppFileLog.addTrace(" _ ");
 		if (VLPacketType.PACKET_TYPE_RETURN.ordinal() == vLPacket.packetType) {
 			String string;
@@ -562,7 +564,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			StartListening();
 		});
 
-		try {
+		/*try {
 			this.bluetoothManager = new BluetoothSetup(this);
 			this.bluetoothManager.enable();
 			this.prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
@@ -581,7 +583,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 				/*Intent intent2 = new Intent(this, SleepTimeActivity.class);
 				intent2.setFlags(268468224);
 				intent2.putExtra("com.resmed.refresh.consts.recovering_app_from_service", true);
-				this.startActivity(intent2);*/
+				this.startActivity(intent2);*#/
 
 				Intent intent3 = new Intent("BLUETOOTH_SERVICE_INTENT_RESTART");
 				intent3.putExtra("BUNDLE_LAST_CONN_STATE", n3);
@@ -598,7 +600,31 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		} catch (BluetoohNotSupportedException var5_10) {
 			var5_10.printStackTrace();
 		}
+		return 1;*/
 		return 1;
+	}
+
+	public void ReactToFoundDevice(BluetoothDevice device) {
+		try {
+			/*this.bluetoothManager = new BluetoothSetup(this);
+			this.bluetoothManager.enable();
+			this.checkNightTrack();
+			AppFileLog.addTrace("SERVICE onStartCommand overnight in progress");
+			Log.d("com.resmed.refresh.ui", " RefreshBluetoothService::onStartCommand overnight in progress");
+			bluetoothManager.pairDevice(device);
+			bluetoothManager.connectDevice(device);
+			bluetoothManager.enable();
+			this.bluetoothManager.connectDevice(device);*/
+
+			/*Intent intent2 = new Intent(this, SleepTimeActivity.class);
+			intent2.setFlags(268468224);
+			intent2.putExtra("com.resmed.refresh.consts.recovering_app_from_service", true);
+			this.startActivity(intent2);*/
+
+			MainActivity.main.pairAndConnect(device);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void sendConnectionStatus(CONNECTION_STATE cONNECTION_STATE) {

@@ -4,12 +4,13 @@ import android.content.Intent;
 
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.model.json.JsonRPC;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.utils.Log;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import v.lucidlink.LL;
 
 public class BedDefaultRPCMapper
 		implements BedCommandsRPCMapper {
@@ -135,7 +136,7 @@ public class BedDefaultRPCMapper
 			}
 
 			public void preExecute() {
-				Log.d("com.resmed.refresh.pair", "**************** Sending openning when state is " + RefreshApplication.getInstance().getCurrentConnectionState().toString());
+				Log.d("com.resmed.refresh.pair", "**************** Sending openning when state is " + LL.main.connectionState.toString());
 				BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SESSION_OPENING);
 			}
 		});

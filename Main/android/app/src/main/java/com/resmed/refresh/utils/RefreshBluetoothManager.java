@@ -25,9 +25,7 @@ public abstract interface RefreshBluetoothManager
   public abstract void enable();
   
   public abstract BluetoothAdapter getBluetoothAdapter();
-  
-  public abstract CONNECTION_STATE getConnectionStatus();
-  
+
   public abstract void handleNewPacket(ByteBuffer paramByteBuffer);
   
   public abstract boolean isBluetoothEnabled();

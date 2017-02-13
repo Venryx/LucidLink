@@ -1,11 +1,9 @@
 package com.resmed.refresh.bluetooth.receivers;
-
 import com.resmed.refresh.utils.*;
 import android.content.*;
 import com.resmed.refresh.bluetooth.*;
 
-public class BluetoothStateChangesReceiver extends BroadcastReceiver
-{
+public class BluetoothStateChangesReceiver extends BroadcastReceiver {
 	private RefreshBluetoothManager bluetoothManager;
 
 	public BluetoothStateChangesReceiver(final RefreshBluetoothManager bluetoothManager) {
@@ -17,8 +15,7 @@ public class BluetoothStateChangesReceiver extends BroadcastReceiver
 			final int intExtra = intent.getIntExtra("android.bluetooth.adapter.extra.STATE", -1);
 			if (12 == intExtra) {
 				this.bluetoothManager.setConnectionStatusAndNotify(CONNECTION_STATE.BLUETOOTH_ON, true);
-			}
-			else if (10 == intExtra) {
+			} else if (10 == intExtra) {
 				this.bluetoothManager.setConnectionStatusAndNotify(CONNECTION_STATE.BLUETOOTH_OFF, true);
 			}
 		}

@@ -27,8 +27,6 @@ import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLPacketType;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
-import com.resmed.refresh.ui.uibase.base.BaseActivity;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.ui.utils.Consts;
@@ -41,10 +39,12 @@ import com.resmed.refresh.utils.SortedList;
 import com.resmed.rm20.SleepParams;
 
 import de.greenrobot.dao.DaoException;
+import v.lucidlink.LL;
 import v.lucidlink.V;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -67,7 +67,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private boolean isSyncAndStop;
 	private boolean isWaitLastSamples;
 	private Long lastHeartBeatTimestamp;
-	private CONNECTION_STATE lastState;
 	private Handler myHeartbeatHandler;
 	private JsonRPC pendingBioSamplesRpc;
 	private JsonRPC pendingEnvSamplesRpc;
@@ -87,14 +86,11 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		int n3;
 		if (n2 < 5000) {
 			n3 = 15000;
-		}
-		else if (n2 < 50000) {
+		} else if (n2 < 50000) {
 			n3 = 100000;
-		}
-		else if (n2 < 500000) {
+		} else if (n2 < 500000) {
 			n3 = 400000;
-		}
-		else {
+		} else {
 			n3 = 900000;
 		}
 		Log.d("com.resmed.refresh.sleepFragment", "Heartbeat time to be completed : " + n3);
@@ -109,13 +105,14 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				SleepSessionConnector.this.isHandlingHeartBeat = false;
 			}
 		};
-		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long)n3);
+		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) n3);
 	}
 
 	private void closeSession() {
 		AppFileLog.addTrace("CLOSING SLEEP SESSION, isHandlingHeartBeat :" + this.isHandlingHeartBeat);
-		if ((this.lastState == CONNECTION_STATE.SOCKET_NOT_CONNECTED) || (this.lastState == CONNECTION_STATE.BLUETOOTH_OFF)
-				|| (this.lastState == CONNECTION_STATE.SOCKET_BROKEN) || (this.lastState == CONNECTION_STATE.SOCKET_RECONNECTING))
+		CONNECTION_STATE state = LL.main.connectionState;
+		if ((state == CONNECTION_STATE.SOCKET_NOT_CONNECTED) || (state == CONNECTION_STATE.BLUETOOTH_OFF)
+				|| (state == CONNECTION_STATE.SOCKET_BROKEN) || (state == CONNECTION_STATE.SOCKET_RECONNECTING))
 			return;
 		stopSleepSession();
 	}
@@ -154,7 +151,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
 			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", (long)this.lastHeartBeatTimestamp);
+			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", (long) this.lastHeartBeatTimestamp);
 			edit.commit();
 			if (this.isWaitLastSamples || this.isHandlingHeartBeat) {
 				AppFileLog.addTrace("IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
@@ -176,8 +173,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		String s;
 		if (this.pendingBioSamplesRpc == null) {
 			s = "null";
-		}
-		else {
+		} else {
 			s = "NOT null";
 		}
 		final String string = sb.append(s).toString();
@@ -185,8 +181,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		String s2;
 		if (this.pendingEnvSamplesRpc == null) {
 			s2 = "null";
-		}
-		else {
+		} else {
 			s2 = "NOT null";
 		}
 		AppFileLog.addTrace("IN : " + jsonRPC.getId() + "  Tx completed " + string + "  " + sb2.append(s2).toString() + " isWaitLastSamples=" + this.isWaitLastSamples);
@@ -248,8 +243,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				final Message message = new Message();
 				message.what = 24;
 				this.bAct.sendMsgBluetoothService(message);
-			}
-			else if (n < 1000) {
+			} else if (n < 1000) {
 				n3 = n;
 				n4 = n2;
 			}
@@ -311,7 +305,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public void handleConnectionStatus(CONNECTION_STATE paramCONNECTION_STATE) {
-		this.lastState = paramCONNECTION_STATE;
 		if (this.isSyncAndStop) {
 		}
 		final Handler localHandler = new Handler();
@@ -347,7 +340,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.isHandlingHeartBeat = false;
 				break;
 			case SESSION_OPENED:
-				//this.bAct.connectToBeD(false);
+				//this.bAct.pairAndConnect(false);
 		}
 	}
 
@@ -355,7 +348,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		if (bundle != null) {
 			final float temp = bundle.getFloat("tempArray");
 			final int light_compressed = bundle.getInt("lightArray");
-			final float light = (float)this.decompressLight(light_compressed);
+			final float light = (float) this.decompressLight(light_compressed);
 			++this.envTotalCount;
 			AppFileLog.addTrace("IN handleEnvSample light : " + light + "  temp : " + temp);
 			Log.d("com.resmed.refresh.env", "handleEnvSample light : " + light + "  temp : " + temp);
@@ -382,12 +375,11 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			Log.d("com.resmed.refresh.finish", "handleSleepSessionStopped() sParamsJson : " + string + " sessionId : " + long1 + " secondsElapsed : " + long2);
 			AppFileLog.addTrace("STOP handleSleepSessionStopped() sessionId : " + long1 + " secondsElapsed : " + long2 + " sParamsJson : " + string);
 			AppFileLog.addTrace("Session AlarmFireEpoch: " + int1);
-			final SleepParams sleepParams = (SleepParams)new Gson().fromJson(string, (Class)SleepParams.class);
+			final SleepParams sleepParams = (SleepParams) new Gson().fromJson(string, (Class) SleepParams.class);
 			Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment::handleSleepSessionStopped(Bundle data) bioTotalCount : " + this.bioCurrentTotalCount);
 			if (int2 < Consts.MIN_SAMPLES_TO_SAVE_RECORD) {
 				b = true;
-			}
-			else {
+			} else {
 				b = false;
 			}
 
@@ -403,6 +395,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public void handleStreamPacket(Bundle paramBundle) {
+		V.Log("HandleStreamPacket:" + Arrays.toString(paramBundle.getByteArray("REFRESH_BED_NEW_DATA")));
 		byte[] arrayOfByte = paramBundle.getByteArray("REFRESH_BED_NEW_DATA");
 		int i = paramBundle.getByte("REFRESH_BED_NEW_DATA_TYPE");
 		if (VLPacketType.PACKET_TYPE_NOTE_ILLUMINANCE_CHANGE.ordinal() == i) {
@@ -422,24 +415,16 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public void init(final boolean b) {
-		this.lastState = RefreshApplication.getInstance().getCurrentConnectionState();
-		final SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext());
-		final int int1 = defaultSharedPreferences.getInt("PREF_CONNECTION_STATE", -1);
-		AppFileLog.addTrace("SleepSessionConnector recovering state " + int1 + " for session id : " + defaultSharedPreferences.getLong("PREF_NIGHT_LAST_SESSION_ID", -1L));
 		//this.bAct.registerReceiver(this.reconnectReceiver, new IntentFilter("BLUETOOTH_SERVICE_INTENT_RESTART"));
 		if (this.isSyncAndStop) {
 			this.syncDataAndStop();
-		}
-		else if (int1 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
-		}
-		else {
+		} else {
 			this.startSleepSession();
 		}
 		int sizeToStore;
 		if (this.isSyncAndStop) {
 			sizeToStore = 640;
-		}
-		else {
+		} else {
 			sizeToStore = 2;
 		}
 		this.sizeToStore = sizeToStore;
@@ -459,7 +444,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			}
 			Log.d("com.resmed.refresh.bluetooth", " SleepTrackFragment::onViewCreate is isBoundToBluetoothService :" + this.bAct.isBoundToBluetoothService());
 			this.bAct.bindToService();
-			new Handler().postDelayed(()->SleepSessionConnector.this.closeSession(), 200L);
+			new Handler().postDelayed(() -> SleepSessionConnector.this.closeSession(), 200L);
 		}
 	}
 
@@ -474,14 +459,11 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		int n = 15000;
 		if (bioOnBeD < 50000) {
 			n = 2000;
-		}
-		else if (bioOnBeD > 50000 && bioOnBeD < 200000) {
+		} else if (bioOnBeD > 50000 && bioOnBeD < 200000) {
 			n = 5000;
-		}
-		else if (bioOnBeD > 300000) {
+		} else if (bioOnBeD > 300000) {
 			n = 10000;
-		}
-		else if (bioOnBeD > 500000) {
+		} else if (bioOnBeD > 500000) {
 			n = 20000;
 		}
 		/*if (this.processRecord != null) {

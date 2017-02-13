@@ -3,7 +3,6 @@ package v.lucidlink;
 import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.corbt.keepawake.KCKeepAwakePackage;
-import com.resmed.refresh.ui.uibase.app.RefreshApplication;
 import com.zmxv.RNSound.RNSoundPackage;
 
 import SPlus.SPlusPackage;
@@ -25,7 +24,7 @@ import android.content.res.Configuration;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends RefreshApplication implements ReactApplication {
+public class MainApplication extends Application implements ReactApplication {
 	/*public static List<ReactPackage> packages;
 	public static <T> T GetPackageOfType(Class<T> class1) {
 		return (T)Stream.of(packages).filter(a->a.getClass() == class1).toArray()[0];

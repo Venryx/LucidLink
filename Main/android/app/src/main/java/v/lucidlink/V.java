@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.annimon.stream.Stream;
 import com.facebook.react.bridge.Arguments;
@@ -227,7 +228,8 @@ public class V {
 	}
 
 	public static void Toast(String message) {
-		LL.main.ShowToast(message, 0);
+		//LL.main.ShowToast(message, 0);
+		LL.main.ShowToast(message, Toast.LENGTH_LONG);
 	}
 	public static void Toast(String message, int duration) {
 		LL.main.ShowToast(message, duration);
