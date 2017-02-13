@@ -116,7 +116,6 @@ public class RM20JNI {
 	}
 
 	public void onRealTimeSleepState(int n, int n2) {
-		V.Log("Test1: " + n);
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20RealTimeSleepState(n, n2);
 	}
@@ -127,7 +126,6 @@ public class RM20JNI {
 	}
 
 	public void onValidBreathingRate(float f, int n) {
-		V.Log("Test2: " + n);
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20ValidBreathingRate(f, n);
 	}

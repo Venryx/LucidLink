@@ -83,11 +83,13 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 	Toast lastToast;
     @ReactMethod
     public void ShowToast(String message, int duration) {
-		if (lastToast != null)
-			lastToast.cancel();
-        Toast toast = Toast.makeText(getReactApplicationContext(), message, duration);
-		toast.show();
-		lastToast = toast;
+		MainActivity.main.runOnUiThread(()-> {
+			if (lastToast != null)
+				lastToast.cancel();
+			Toast toast = Toast.makeText(getReactApplicationContext(), message, duration);
+			toast.show();
+			lastToast = toast;
+		});
     }
 	/*TextView toastView;
 	@ReactMethod

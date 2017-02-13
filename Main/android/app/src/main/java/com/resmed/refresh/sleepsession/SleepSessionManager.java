@@ -33,11 +33,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import v.lucidlink.LL;
 import v.lucidlink.LucidLinkModule;
 import v.lucidlink.MainActivity;
 import v.lucidlink.MainApplication;
+import v.lucidlink.V;
 
 public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks {
 	public static String ParamAlarmFireEpoch = "alarmFireEpoch";
@@ -70,6 +73,12 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.serviceHandler = paramRefreshBluetoothServiceClient;
 		this.sampleBuffer = new ArrayList();
 		this.filesFolder = RefreshTools.getFilesPath();
+
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask(){@Override public void run() {
+			SleepSessionManager.this.requestUserSleepState();
+			SleepSessionManager.this.rm20Manager.startRespRateCallbacks(true);
+		}}, 10000, 10000);
 	}
 
 	private void didFinishEdfRecovery() {
@@ -520,17 +529,19 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public void onFileOpened() {
 	}
 
-	public void onRm20RealTimeSleepState(int paramInt1, int paramInt2) {
+	public void onRm20RealTimeSleepState(int sleepState, int somethingElse) {
+		V.Log("Got sleep-state data!" + sleepState + ";" + somethingElse);
 		Message localMessage = new Message();
 		localMessage.what = 17;
 		Bundle localBundle = new Bundle();
-		localBundle.putInt("BUNDLE_SLEEP_STATE", paramInt1);
-		localBundle.putInt("BUNDLE_SLEEP_EPOCH_INDEX", paramInt2);
+		localBundle.putInt("BUNDLE_SLEEP_STATE", sleepState);
+		localBundle.putInt("BUNDLE_SLEEP_EPOCH_INDEX", somethingElse);
 		localMessage.setData(localBundle);
 		this.serviceHandler.sendMessageToClient(localMessage);
 	}
 
 	public void onRm20ValidBreathingRate(float paramFloat, int paramInt) {
+		V.Log("Got breathing-rate data!" + paramFloat + ";" + paramInt);
 		Message localMessage = new Message();
 		localMessage.what = 18;
 		Bundle localBundle = new Bundle();
@@ -552,7 +563,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.isActive = true;
 		//this.setRM20AlarmTime(new Date(SmartAlarmDataManager.getInstance().getAlarmDateTime()), SmartAlarmDataManager.getInstance().getWindowValue());
 
-		this.rm20Manager = new RM20DefaultManager(this.filesFolder, (RM20Callbacks) this, this.serviceHandler.getContext().getApplicationContext());
+		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, this.serviceHandler.getContext().getApplicationContext());
 		this.rm20Manager.startupLibrary(n, n2);
 		this.rm20Manager.startRespRateCallbacks(true);
 
