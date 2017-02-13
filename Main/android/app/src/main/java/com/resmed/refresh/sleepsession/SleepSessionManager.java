@@ -85,6 +85,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 
 		SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
 		connector.init(true);
+
+		SleepSessionManager.this.start(71, 20, 1);
 	}
 
 	private void didFinishEdfRecovery() {

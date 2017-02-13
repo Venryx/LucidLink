@@ -1,6 +1,7 @@
 package com.resmed.refresh.bluetooth;
 
 import com.resmed.cobs.COBS;
+import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bed.LedsState;
 import com.resmed.refresh.bluetooth.receivers.*;
 import com.resmed.refresh.bluetooth.exception.*;
@@ -37,11 +38,11 @@ public class BluetoothSetup implements RefreshBluetoothManager
 	public class ConnectThread extends Thread {
 		private BluetoothSocket mmSocket;
 		// $FF: synthetic field
-		final BluetoothSetup this$0;
+		final BluetoothSetup setup;
 		private UUID uuid;
 
 		public ConnectThread(BluetoothSetup var1, BluetoothDevice var2, UUID var3) {
-			this.this$0 = var1;
+			this.setup = var1;
 			this.uuid = var3;
 			Log.d("com.resmed.refresh.bluetooth", "PAIRED DEVICE UUID : " + this.uuid);
 			this.mmSocket = this.makeSocket(var2, var3);
@@ -101,8 +102,8 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			try {
 				Exception a = null;
 				NullPointerException a0 = null;
-				boolean b = this.this$0.cancelDiscovery();
-				com.resmed.refresh.utils.Log.d("com.resmed.refresh.pair", new StringBuilder(" CONNECTING TO PAIRED DEVICE ! , discovery cancelled: ").append(b).append(" mmSocket :").append((Object) this.mmSocket).toString());
+				boolean b = this.setup.cancelDiscovery();
+				com.resmed.refresh.utils.Log.d("com.resmed.refresh.pair", new StringBuilder(" CONNECTING TO PAIRED DEVICE ! , discovery cancelled: ").append(b).append(" mmSocket :").append(this.mmSocket).toString());
 				label0:
 				try {
 					this.mmSocket.connect();
@@ -131,14 +132,15 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				} catch (java.io.IOException a4) {
 					a4.printStackTrace();
 				}
-				this.this$0.setConnectionStatusAndNotify(com.resmed.refresh.bluetooth.CONNECTION_STATE.SOCKET_BROKEN, false);
-				this.this$0.manageConnection(null);
+				this.setup.setConnectionStatusAndNotify(com.resmed.refresh.bluetooth.CONNECTION_STATE.SOCKET_BROKEN, false);
+				this.setup.manageConnection(null);
 				return;
 			}
-			com.resmed.refresh.bluetooth.BluetoothSetup a5 = this.this$0;
+
+			//com.resmed.refresh.bluetooth.BluetoothSetup a5 = this.setup;
 			//monenter(a5);
 			try {
-				com.resmed.refresh.bluetooth.BluetoothSetup.access$0(this.this$0, null);
+				this.setup.mConnectThread = null;
 				//monexit(a5);
 			} catch (Throwable a6) {
 				throw new Error(a6);
@@ -146,7 +148,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			if (this.mmSocket != null) {
 				com.resmed.refresh.utils.Log.d("com.resmed.refresh.pair", new StringBuilder(" CONNECTED TO PAIRED DEVICE : ").append(this.mmSocket.isConnected()).toString());
 			}
-			this.this$0.manageConnection(this.mmSocket);
+			this.setup.manageConnection(this.mmSocket);
 		}
 
 	}
@@ -207,10 +209,10 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			try {
 				this.setName(this.getName());
 				List<Byte> var1_1 = new ArrayList<>();
-				byte[] var2_2 = new byte[1024];
+				byte[] byteBuffer = new byte[1024];
 				Log.d("com.resmed.refresh.bluetooth", "bluetooth ConnectedThread, run()!");
 				int var9_4 = 0;
-				int var7_3 = 0;
+				int bytesRead = 0;
 				List<Byte> var10_5 = new ArrayList<>();
 				block4:
 				do {
@@ -223,16 +225,24 @@ public class BluetoothSetup implements RefreshBluetoothManager
 								this.mmInStream.available();
 								this.isConnected = true;
 								this.this$0.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_CONNECTED, true);
-								BluetoothSetup.access$1(1);
-								BluetoothSetup.access$3(BluetoothSetup.access$2(this.this$0).getContext());
+								BluetoothSetup.count = 1;
+								CancelRepeatingReconnectAlarmWake(this.this$0.bluetoothService.getContext());
 							}
 							Log.d("com.resmed.refresh.bluetooth", (" BluetoothSetup$ConnectedThread::run() available bytes : " + this.mmInStream.available()));
-							var7_3 = this.mmInStream.read(var2_2);
-							if (var7_3 <= 0)
+							bytesRead = this.mmInStream.read(byteBuffer);
+							V.Log("After:" + bytesRead);
+							if (bytesRead <= 0) {
+								try {
+									Thread.sleep(10l);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+
 								break lbl1000;
-							Log.d("com.resmed.refresh.bluetooth", ("bluetooth ConnectedThread::run() bytes read : " + var7_3 + " byte array :" + Arrays.toString(var2_2)));
-							AppFileLog.addTrace((" BluetoothSetup$ConnectedThread::run() bytes read : " + var7_3));
-						} while (var7_3 > 1024);
+							}
+							Log.d("com.resmed.refresh.bluetooth", ("bluetooth ConnectedThread::run() bytes read : " + bytesRead + " byte array :" + Arrays.toString(byteBuffer)));
+							AppFileLog.addTrace((" BluetoothSetup$ConnectedThread::run() bytes read : " + bytesRead));
+						} while (bytesRead > 1024);
 						var9_4 = 0;
 						var10_5 = var1_1;
 						break block9;
@@ -243,13 +253,13 @@ public class BluetoothSetup implements RefreshBluetoothManager
 						List<Byte> var13_6;
 						block10:
 						{
-							if (var9_4 >= var7_3) {
-								var2_2 = new byte[1024];
+							if (var9_4 >= bytesRead) {
+								byteBuffer = new byte[1024];
 								var1_1 = var10_5;
 								continue block4;
 							}
-							var10_5.add(Byte.valueOf(var2_2[var9_4]));
-							if (var2_2[var9_4] == 0) {
+							var10_5.add(Byte.valueOf(byteBuffer[var9_4]));
+							if (byteBuffer[var9_4] == 0) {
 								this.processNewData(var10_5);
 								var10_5.clear();
 								var13_6 = new ArrayList<>();
@@ -263,8 +273,10 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				} while (true);
 			} catch (IOException ex) {
 				this.this$0.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_BROKEN, true);
-				Log.d("com.resmed.refresh.bluetooth", (String)("bluetooth ConnectedThread, IOException :" + ex));
+				Log.d("com.resmed.refresh.bluetooth", ("bluetooth ConnectedThread, IOException :" + ex));
 				ex.printStackTrace();
+			} finally {
+				V.Log("FINISHEDDDDDDDDDDDDDDDDDDDD");
 			}
 		}
 
@@ -299,54 +311,35 @@ public class BluetoothSetup implements RefreshBluetoothManager
 	}
 
 	public class AlarmReceiver extends BroadcastReceiver {
-		public void onReceive(Context var1, Intent var2) {
+		public void onReceive(Context context, Intent intent) {
 			Log.d("com.resmed.refresh.bluetooth", " BluetoothSetup$AlarmReceiver::onReceive()");
 			AppFileLog.addTrace(" BluetoothSetup$AlarmReceiver alarm fired to RECONNECT ! ");
 			AppFileLog.addTrace("BluetoothSetup$AlarmReceiver alarm fired to RECONNECT ! Bluetooth Status : " + BluetoothAdapter.getDefaultAdapter().isEnabled());
-			((PowerManager)var1.getSystemService("power")).newWakeLock(1, "MyWakeLock").acquire(10000L);
+			((PowerManager)context.getSystemService("power")).newWakeLock(1, "MyWakeLock").acquire(10000L);
 			if(BluetoothAdapter.getDefaultAdapter().isEnabled() && !BeDConnectionStatus.getInstance().isSocketConnected()) {
 				AppFileLog.addTrace("BluetoothSetup$AlarmReceiver alarm fired to RECONNECT ! Count : " + BluetoothSetup.access$5() + ":isSocketConnected:" + BeDConnectionStatus.getInstance().isSocketConnected());
-				BluetoothSetup.access$1(1 + BluetoothSetup.access$5());
+				BluetoothSetup.count = 1 + BluetoothSetup.access$5();
 				if(BluetoothSetup.access$5() < 31) {
 					if(BluetoothSetup.access$5() > 20) {
-						BluetoothSetup.access$6(var1, 3600000L);
+						RegisterRepeatingReconnectAlarmWakeWithTimerReset(context, 3600000L);
 					} else if(BluetoothSetup.access$5() > 15) {
-						BluetoothSetup.access$6(var1, 1800000L);
+						RegisterRepeatingReconnectAlarmWakeWithTimerReset(context, 1800000L);
 					} else if(BluetoothSetup.access$5() > 10) {
-						BluetoothSetup.access$6(var1, 600000L);
+						RegisterRepeatingReconnectAlarmWakeWithTimerReset(context, 600000L);
 					} else if(BluetoothSetup.access$5() > 5) {
-						BluetoothSetup.access$6(var1, 300000L);
+						RegisterRepeatingReconnectAlarmWakeWithTimerReset(context, 300000L);
 					} else if(BluetoothSetup.access$5() > 1) {
-						BluetoothSetup.access$6(var1, 60000L);
+						RegisterRepeatingReconnectAlarmWakeWithTimerReset(context, 60000L);
 					}
 				}
 			} else {
-				BluetoothSetup.access$1(1);
+				BluetoothSetup.count = 1;
 			}
 
-			var1.sendBroadcast(new Intent("BLUETOOTH_ALARM_RECONNECT"));
+			context.sendBroadcast(new Intent("BLUETOOTH_ALARM_RECONNECT"));
 		}
 	}
 
-	// $FF: synthetic method
-	static void access$0(BluetoothSetup var0, ConnectThread var1) {
-		var0.mConnectThread = var1;
-	}
-
-	// $FF: synthetic method
-	static void access$1(int var0) {
-		count = var0;
-	}
-
-	// $FF: synthetic method
-	static RefreshBluetoothServiceClient access$2(BluetoothSetup var0) {
-		return var0.bluetoothService;
-	}
-
-	// $FF: synthetic method
-	static void access$3(Context var0) {
-		CancelRepeatingReconnectAlarmWake(var0);
-	}
 
 	// $FF: synthetic method
 	static BluetoothDevice access$4(BluetoothSetup var0) {
@@ -358,11 +351,6 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		return count;
 	}
 
-	// $FF: synthetic method
-	static void access$6(Context var0, long var1) {
-		RegisterRepeatingReconnectAlarmWakeWithTimerReset(var0, var1);
-	}
-
 	public static final String BLUETOOTH_ALARM_RECONNECT = "BLUETOOTH_ALARM_RECONNECT";
 	private static final int BT_RECONNECT_REQUEST_CODE = 6367;
 	public static final String BeD_INCOMING_DATA = "RESMED_BED_INCOMING_DATA";
@@ -370,15 +358,15 @@ public class BluetoothSetup implements RefreshBluetoothManager
 	public static final String BeD_INCOMING_DATA_EXTRA = "RESMED_BED_INCOMING_DATA_EXTRA";
 	public static final String BeD_INCOMING_DATA_TYPE_EXTRA = "RESMED_BED_INCOMING_DATA_TYPE_EXTRA";
 	public static final int REQUEST_ENABLE_BT = 1;
-	private static int count;
+	public static int count;
 	private BroadcastReceiver alarmWakeReconnectReceiver;
 	private BluetoothAdapter bluetoothAdapter;
-	private RefreshBluetoothServiceClient bluetoothService;
+	public RefreshBluetoothServiceClient bluetoothService;
 	private BroadcastReceiver bluetoothStateChangesReceiver;
 	public BluetoothDevice device;
 	private BroadcastReceiver deviceFoundReceiver;
 	private BroadcastReceiver devicePairedReceiver;
-	private BluetoothSetup.ConnectThread mConnectThread;
+	public BluetoothSetup.ConnectThread mConnectThread;
 	private BluetoothSetup.ConnectedThread mConnectedThread;
 	private Thread mReconnectionThread;
 	private UUID uuid;
@@ -400,7 +388,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		}
 	}
 
-	private static void CancelRepeatingReconnectAlarmWake(final Context context) {
+	public static void CancelRepeatingReconnectAlarmWake(final Context context) {
 		if (context != null) {
 			((AlarmManager)context.getSystemService("alarm")).cancel(PendingIntent.getBroadcast(context, 6367, new Intent(context, (Class)BluetoothSetup.AlarmReceiver.class), 0));
 		}
@@ -585,9 +573,9 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				//if (this.device != null && bluetoothDevice.getName().equals(this.device.getName()) && bluetoothDevice.getAddress().equals(this.device.getAddress()) && something) {
 					this.connectDevice(bluetoothDevice);
 					break;
-				/*}
-				Intent intent = new Intent("ACTION_ALREADY_PAIRED");
-				intent.putExtra("android.bluetooth.device.extra.DEVICE", (Parcelable)bluetoothDevice);
+
+				/*Intent intent = new Intent("ACTION_ALREADY_PAIRED");
+				intent.putExtra("android.bluetooth.device.extra.DEVICE", bluetoothDevice);
 				this.bluetoothService.getContext().sendStickyBroadcast(intent);*/
 			} while (true);
 		}
@@ -648,7 +636,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 
 	public void manageConnection(BluetoothSocket bluetoothSocket) {
 		synchronized (this) {
-			Log.d((String)"com.resmed.refresh.bluetooth", (String)" manage connection ! ");
+			Log.d((String)"com.resmed.refresh.bluetooth", " manage connection ! ");
 			if (this.mConnectThread != null) {
 				this.mConnectThread.cancel();
 				this.mConnectThread.interrupt();
@@ -690,7 +678,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		return this.bluetoothAdapter.getBondedDevices();
 	}
 
-	public void setConnectionStatusAndNotify(final CONNECTION_STATE newState, final boolean b) {
+	public void setConnectionStatusAndNotify(final CONNECTION_STATE newState, final boolean makeStickyBroadcast) {
 		synchronized (this) {
 			LL.main.connectionState = newState;
 
@@ -703,7 +691,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			if (newState == CONNECTION_STATE.SOCKET_CONNECTED && this.bluetoothService.getContext() != null) {
 				BluetoothSetup.count = 1;
 			}
-			if (b) {
+			if (makeStickyBroadcast) {
 				final Intent intent = new Intent("ACTION_RESMED_CONNECTION_STATUS");
 				intent.putExtra("EXTRA_RESMED_CONNECTION_STATE", newState);
 				this.bluetoothService.getContext().sendStickyOrderedBroadcast(intent, null, null, -1, null, null);
@@ -715,14 +703,39 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			if (this.device != null)
 				RefreshBluetoothService.main.ReactToFoundDevice(this.device);
 
-			/*if (newState == CONNECTION_STATE.SESSION_OPENED || newState == CONNECTION_STATE.SESSION_OPENING
+			if (newState == CONNECTION_STATE.SESSION_OPENED || newState == CONNECTION_STATE.SESSION_OPENING
 					|| newState == CONNECTION_STATE.SOCKET_CONNECTED || newState == CONNECTION_STATE.SOCKET_RECONNECTING) {
 				final JsonRPC leds = BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN);
 				if (leds != null) {
 					MainActivity.main.sendRpcToBed(leds);
 				}
-			}*/
+			}
+
+			if (newState == CONNECTION_STATE.SOCKET_CONNECTED) {
+				V.Log("YAY1!!!");
+				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-0800200c9a66"));
+				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000009"));
+				AddReceivers(); // since this section always gets called, use it to set up the receivers for the second and third steps
+			} else if (newState == CONNECTION_STATE.SESSION_OPENING) {
+				/*V.Log("YAY2!!!");
+				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().clearBuffers());
+			} else if (newState == CONNECTION_STATE.SESSION_OPENED) {*/
+				V.Log("YAY3!!!");
+				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
+			}
 		}
+	}
+	boolean addedReceivers;
+	void AddReceivers() {
+		if (addedReceivers) return;
+		addedReceivers = true;
+
+		MainActivity.main.registerReceiver(new BroadcastReceiver() {
+			public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
+				CONNECTION_STATE state = (CONNECTION_STATE)paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
+				setConnectionStatusAndNotify(state, false);
+			}
+		}, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
 	}
 
 	public void testStreamData(final SleepSessionManager sleepSessionManager) {

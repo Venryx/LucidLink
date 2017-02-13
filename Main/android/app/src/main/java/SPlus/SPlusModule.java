@@ -114,7 +114,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 	public SleepSessionManager baseManager;
 
-	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	@ReactMethod public void Init() {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
@@ -152,7 +151,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 
 
-		V.Log("Test2");
 		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {
 			@Override public Context getContext() {
 				//return bluetoothService.getContext();
@@ -178,7 +176,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 				//bluetoothService.sendMessageToClient(message);
 			}
 		});
-		V.Log("Test3");
 
 		/*this.rm20Lib = new RM20JNI(Environment.getExternalStorageDirectory(), new RM20Callbacks() {
 			@Override

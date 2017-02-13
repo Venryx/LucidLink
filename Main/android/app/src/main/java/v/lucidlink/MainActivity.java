@@ -167,8 +167,8 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		}
 	}
 
-	public void handleConnectionStatus(final CONNECTION_STATE connection_STATE) {
-		super.handleConnectionStatus(connection_STATE);
+	public void handleConnectionStatus(final CONNECTION_STATE newState) {
+		super.handleConnectionStatus(newState);
 		V.Log("in handleConnectionStatus");
 		/*if (this.homeFragment instanceof BluetoothDataListener) {
 			((BluetoothDataListener)this.homeFragment).handleConnectionStatus(connection_STATE);

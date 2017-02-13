@@ -561,6 +561,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		RM20JNI.loadLibrary(this.getApplicationContext());
 
 		V.WaitXThenRun(1000, ()-> {
+			if (LL.main == null) return;
 			StartListening();
 		});
 

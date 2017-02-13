@@ -21,7 +21,9 @@ import android.view.Window;
 
 import com.google.gson.Gson;
 import com.resmed.refresh.bed.BedCommandsRPCMapper;
+import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
+import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
@@ -40,6 +42,7 @@ import com.resmed.rm20.SleepParams;
 
 import de.greenrobot.dao.DaoException;
 import v.lucidlink.LL;
+import v.lucidlink.MainActivity;
 import v.lucidlink.V;
 
 import java.io.PrintStream;
@@ -340,7 +343,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.isHandlingHeartBeat = false;
 				break;
 			case SESSION_OPENED:
-				//this.bAct.pairAndConnect(false);
+				this.bAct.pairAndConnect(RefreshBluetoothService.main.bluetoothManager.device);
 		}
 	}
 
