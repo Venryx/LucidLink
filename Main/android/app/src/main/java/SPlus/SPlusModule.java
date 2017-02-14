@@ -1,43 +1,45 @@
 package SPlus;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Environment;
-import android.os.Message;
-import android.preference.PreferenceManager;
-import android.util.Log;
+		import android.app.Activity;
+		import android.content.Context;
+		import android.content.Intent;
+		import android.content.IntentFilter;
+		import android.content.SharedPreferences;
+		import android.os.Environment;
+		import android.os.Message;
+		import android.preference.PreferenceManager;
+		import android.util.Log;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.resmed.refresh.bed.BedCommandsRPCMapper;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
-import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
-import com.resmed.refresh.packets.VLP;
-import com.resmed.refresh.sleepsession.SleepSessionConnector;
-import com.resmed.refresh.sleepsession.SleepSessionManager;
-import com.resmed.rm20.IndexActivity;
-import com.resmed.rm20.RM20Callbacks;
-import com.resmed.rm20.RM20JNI;
-import com.resmed.rm20.SleepParams;
+		import com.facebook.react.bridge.Arguments;
+		import com.facebook.react.bridge.Promise;
+		import com.facebook.react.bridge.ReactApplicationContext;
+		import com.facebook.react.bridge.ReactContextBaseJavaModule;
+		import com.facebook.react.bridge.ReactMethod;
+		import com.facebook.react.bridge.WritableArray;
+		import com.facebook.react.bridge.WritableMap;
+		import com.facebook.react.modules.core.DeviceEventManagerModule;
+		import com.resmed.refresh.bed.BedCommandsRPCMapper;
+		import com.resmed.refresh.bed.BedDefaultRPCMapper;
+		import com.resmed.refresh.bluetooth.BluetoothSetup;
+		import com.resmed.refresh.bluetooth.CONNECTION_STATE;
+		import com.resmed.refresh.bluetooth.RefreshBluetoothService;
+		import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
+		import com.resmed.refresh.packets.VLP;
+		import com.resmed.refresh.sleepsession.SleepSessionConnector;
+		import com.resmed.refresh.sleepsession.SleepSessionManager;
+		import com.resmed.rm20.IndexActivity;
+		import com.resmed.rm20.RM20Callbacks;
+		import com.resmed.rm20.RM20JNI;
+		import com.resmed.rm20.SleepParams;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+		import java.util.ArrayList;
+		import java.util.HashMap;
+		import java.util.Map;
+		import java.util.Random;
 
-import v.lucidlink.MainActivity;
-import v.lucidlink.V;
+		import v.lucidlink.LL;
+		import v.lucidlink.MainActivity;
+		import v.lucidlink.V;
 
 enum MessageType {
 	None(0),
@@ -222,20 +224,38 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}
 	//protected RM20JNI rm20Lib;
 
-	@ReactMethod public void Connect() {
-		V.Log("Connecting...");
+	@ReactMethod public void Connect(int age, int gender) { // for gender: 0=male, 1=female
+		V.Log("Connecting..." + age + ";" + gender);
+
+		RefreshBluetoothService.main.StartListening();
+
 		int sessionID = 70;
-		int age = 20;
-		int gender = 0; // 0: male, 1: female
 		//baseManager.rm20Manager.rm20Lib.loadLibrary(reactContext);
 		baseManager.start(sessionID, age, gender);
 	}
 	@ReactMethod public void Disconnect() {
+		if (!baseManager.isActive) return;
+		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		baseManager.stop();
 	}
 
 	@ReactMethod public void GetSleepStage(Promise promise) {
-		int stage = baseManager.rm20Manager.getRealTimeSleepState();
-		promise.resolve(stage);
+		/*int stage = baseManager.rm20Manager.getRealTimeSleepState();
+		promise.resolve(stage); // this is not actually the sleep-stage, but rather the success-flag (I think)*/
+		MainActivity.main.getSleepStage_currentWaiter = promise;
+		baseManager.rm20Manager.getRealTimeSleepState();
+	}
+	@ReactMethod public void StartRealTimeStream() {
+		/*int stage = baseManager.rm20Manager.();
+		promise.resolve(stage);*/
+		V.Log("StartingRealTimeStream!!!");
+		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
+	}
+	@ReactMethod public void StartSleep() {
+		V.Log("StartingSleep");
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 	}
 }

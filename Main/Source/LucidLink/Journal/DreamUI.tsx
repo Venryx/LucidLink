@@ -28,7 +28,7 @@ export default class DreamUI extends Component<{onBack: Function, dream: Dream},
 						onBack();
 					}}/>
 					<Panel style={{flex: 1}}/>
-					<VButton text="Save" mr10 style={{width: 100}} enabled={dream.fileOutdated} onPress={()=> {
+					<VButton text="Save" mr={10} style={{width: 100}} enabled={dream.fileOutdated} onPress={()=> {
 						dream.Save();
 					}}/>
 					<VButton text="Delete" style={{width: 100}} onPress={()=> {

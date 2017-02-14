@@ -648,15 +648,20 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				}
 			}
 
-			if (newState == CONNECTION_STATE.SOCKET_CONNECTED) {
+			// handling moved to BaseBluetoothActivity
+
+			/*if (newState == CONNECTION_STATE.SOCKET_CONNECTED) {
 				V.Log("YAY1!!!");
 				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-0800200c9a66"));
 				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000009"));
 				AddReceivers(); // since this section always gets called, use it to set up the receivers for the second and third steps
 			} else if (newState == CONNECTION_STATE.SESSION_OPENING) {
-				/*V.Log("YAY2!!!");
+				V.Log("YAY2!!!");
 				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().clearBuffers());
-			} else if (newState == CONNECTION_STATE.SESSION_OPENED) {*/
+			} else*/
+
+			// session is auto-started
+			/*if (newState == CONNECTION_STATE.SESSION_OPENED) {
 				V.Log("YAY3!!!");
 				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
@@ -669,12 +674,12 @@ public class BluetoothSetup implements RefreshBluetoothManager
 
 					/*SPlusModule.main.baseManager.stopCalculateAndSendResults();
 					SPlusModule.main.baseManager.start(71, 20, 1);*#/
-				}}, 10000, 10000);*/
-			}
+				}}, 10000, 10000);*#/
+			}*/
 		}
 	}
 	boolean addedReceivers;
-	void AddReceivers() {
+	public void AddReceivers() {
 		if (addedReceivers) return;
 		addedReceivers = true;
 

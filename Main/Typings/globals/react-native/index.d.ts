@@ -4469,6 +4469,17 @@ declare namespace  __React {
         removeEventListener(eventName: string, handler: () => void): void;
     }
 
+	export interface ButtonProperties {
+        //title: string;
+        onPress: () => any;
+        color?: string;
+        accessibilityLabel?: string;
+        disabled?: boolean;
+    }
+
+    export interface ButtonStatic extends ComponentClass<ButtonProperties> {
+    }
+
     export interface CameraRollFetchParams {
         first: number;
         after?: string;

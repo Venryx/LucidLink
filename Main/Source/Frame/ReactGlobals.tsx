@@ -57,6 +57,7 @@ EStyleSheet.build();
 import autoBind from "react-autobind";
 import {Assert} from "./General/Assert";
 import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
+import {ButtonProperties} from "react-native";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/
@@ -319,7 +320,7 @@ export class VText extends BaseComponent<any, any> {
 	}
 }
 
-export class VButton extends BaseComponent<any, {}> {
+export class VButton extends BaseComponent<BaseProps & ButtonProperties & {text, caps?, style?, textStyle?, enabled?}, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;

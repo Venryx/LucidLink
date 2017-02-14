@@ -47,6 +47,10 @@ DeviceEventEmitter.addListener("PostJavaLog", (args: any)=> {
 	var [tag, message] = args;
 	Log(tag + " [java]", message, false);
 });
+DeviceEventEmitter.addListener("Alert", (args: any)=> {
+	var [message] = args;
+	alert(message);
+});
 
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 DeviceEventEmitter.addListener("OnKeyDown", (args: any)=> {
@@ -233,9 +237,14 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	if (!LL.spBridge.initialized)
 		LL.spBridge.Init();
 	autorun(()=> {
-		if (LL.tools.spMonitor.connect)
-			LL.spBridge.Connect();
-		else
+		if (LL.tools.spMonitor.connect) {
+			LL.spBridge.Connect(20, "male");
+			/*WaitXThenRun(1000, ()=> {
+				LL.spBridge.StartSession();
+			});*/
+		} else {
+			//LL.spBridge.StopSession();
 			LL.spBridge.Disconnect();
+		}
 	});
 }

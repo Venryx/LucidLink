@@ -110,6 +110,14 @@ public class V {
 		}
 	}
 
+	public static void Alert(String message) {
+		if (LL.main != null && LL.main.reactContext.hasActiveCatalystInstance())
+			LL.main.SendEvent("Alert", message);
+		else
+			JavaLog("Could not alert to JS, because react was not yet fully initialized.");
+
+	}
+
 	public static void Assert(boolean condition) {
 		Assert(condition, "");
 	}

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 
+import com.facebook.react.bridge.Promise;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.cobs.COBS;
@@ -34,6 +36,7 @@ import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.BluetoothSetup.AlarmReceiver;
+import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
@@ -41,8 +44,10 @@ import com.resmed.refresh.model.json.JsonRPC.RPCallback;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
+import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
+import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.RefreshUserPreferencesData;
@@ -57,114 +62,8 @@ import java.util.List;
 import java.util.Map;
 
 import v.lucidlink.LL;
+import v.lucidlink.MainActivity;
 import v.lucidlink.V;
-
-class IncomingHandler extends Handler {
-	private List partialMsgBuffer;
-	// $FF: synthetic field
-	final BaseBluetoothActivity this$0;
-
-	public IncomingHandler(BaseBluetoothActivity var1) {
-		this.this$0 = var1;
-		this.partialMsgBuffer = new ArrayList();
-	}
-
-	private void handlePartialStreamPacket(Bundle var1) {
-		if (var1 != null) {
-			byte[] var2 = var1.getByteArray("REFRESH_BED_NEW_DATA");
-
-			for (int var3 = 0; var3 < var2.length; ++var3) {
-				this.partialMsgBuffer.add(Byte.valueOf(var2[var3]));
-			}
-		}
-
-	}
-
-	private void handlePartialStreamPacketEnd(Bundle var1) {
-		ByteBuffer var2 = ByteBuffer.allocate(this.partialMsgBuffer.size());
-		Iterator var3 = this.partialMsgBuffer.iterator();
-
-		while (var3.hasNext()) {
-			var2.put(((Byte) var3.next()).byteValue());
-		}
-
-		this.partialMsgBuffer.clear();
-		Bundle var5 = new Bundle();
-		var5.putByteArray("REFRESH_BED_NEW_DATA", var2.array());
-		if (var1 != null) {
-			byte var6 = var1.getByte("REFRESH_BED_NEW_DATA_TYPE");
-			int var7 = var1.getInt("REFRESH_BED_NEW_DATA_SIZE");
-			var5.putByte("REFRESH_BED_NEW_DATA_TYPE", var6);
-			var5.putInt("REFRESH_BED_NEW_DATA_SIZE", var7);
-		}
-
-		this.this$0.handleStreamPacket(var5);
-	}
-
-	public void handleMessage(Message var1) {
-		V.Log("Handling message 2...");
-		switch (var1.what) {
-			case 5:
-				this.this$0.handleStreamPacket(var1.getData());
-				return;
-			case 6:
-				CONNECTION_STATE var4 = (CONNECTION_STATE) var1.getData().get("REFRESH_BED_NEW_CONN_STATUS");
-				Log.d("com.resmed.refresh.pair", "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + CONNECTION_STATE.toString(var4));
-				this.this$0.handleConnectionStatus(var4);
-				return;
-			case 7:
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 16:
-			case 22:
-			case 23:
-			case 24:
-			case 25:
-			case 26:
-			default:
-				super.handleMessage(var1);
-				break;
-			case 8:
-				BluetoothDataSerializeUtil.deleteJsonFile(this.this$0.getApplicationContext());
-				Log.d("com.resmed.refresh.dialog", "MSG_UNPAIR showBeDPickerDialog()");
-				this.this$0.showBeDPickerDialog();
-				return;
-			case 14:
-				this.this$0.handleSleepSessionStopped(var1.getData());
-				return;
-			case 15:
-				this.this$0.handleEnvSample(var1.getData());
-				return;
-			case 17:
-				this.this$0.handleUserSleepState(var1.getData());
-				return;
-			case 18:
-				this.this$0.handleBreathingRate(var1.getData());
-				return;
-			case 19:
-				this.handlePartialStreamPacket(var1.getData());
-				return;
-			case 20:
-				this.handlePartialStreamPacketEnd(var1.getData());
-				return;
-			case 21:
-				this.this$0.handleSessionRecovered(var1.getData());
-				return;
-			case 27:
-				Bundle var6 = var1.getData();
-				if (var6 != null) {
-					int var7 = var6.getInt("BUNDLE_BED_AVAILABLE_DATA", -1);
-					this.this$0.updateDataStoredFlag(var7);
-					return;
-				}
-		}
-
-	}
-}
-
 
 public class BaseBluetoothActivity extends BaseActivity implements BluetoothDataListener, BluetoothDataWriter {
 	public static boolean CORRECT_FIRMWARE_VERSION = true;
@@ -183,7 +82,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	};
 	private JsonRPC bioSensorSerialNrRPC;
-	protected Intent bluetoothManagerService;
 	protected BroadcastReceiver bluetoothServiceRestartReceiver = new BroadcastReceiver() {
 		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
 			BaseBluetoothActivity.this.registerToService();
@@ -215,12 +113,93 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	};
 	private BluetoothDevice mDevice;
-	protected Messenger mFromService = new Messenger(new IncomingHandler(this));
-	private List receivers;
+	public IncomingHandler mFromServiceHandler = new IncomingHandler();
+	public Messenger mFromService = new Messenger(mFromServiceHandler);
+	private List<BroadcastReceiver> receivers;
 
-	// $FF: synthetic method
-	static void access$0(Messenger var0) {
-		mService = var0;
+	public class IncomingHandler extends Handler {
+		private List<Byte> partialMsgBuffer = new ArrayList();
+
+		public void handleMessage(Message msg) {
+			V.Log("BaseBluetoothActivity.handler.handleMessage..." + msg.what);
+			switch (msg.what) {
+				case 5:
+					BaseBluetoothActivity.this.handleStreamPacket(msg.getData());
+					return;
+				case 6:
+					CONNECTION_STATE state = (CONNECTION_STATE) msg.getData().get(RefreshBluetoothService.REFRESH_BED_NEW_CONN_STATUS);
+					Log.d(LOGGER.TAG_PAIR, "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + CONNECTION_STATE.toString(state));
+					BaseBluetoothActivity.this.handleConnectionStatus(state);
+					return;
+				case 8:
+					BluetoothDataSerializeUtil.deleteJsonFile(BaseBluetoothActivity.this.getApplicationContext());
+					Log.d(LOGGER.TAG_DIALOG, "MSG_UNPAIR showBeDPickerDialog()");
+					BaseBluetoothActivity.this.showBeDPickerDialog();
+					return;
+				case 14:
+					BaseBluetoothActivity.this.handleSleepSessionStopped(msg.getData());
+					return;
+				case 15:
+					BaseBluetoothActivity.this.handleEnvSample(msg.getData());
+					return;
+				case 17:
+					BaseBluetoothActivity.this.handleUserSleepState(msg.getData());
+					return;
+				case 18:
+					BaseBluetoothActivity.this.handleBreathingRate(msg.getData());
+					return;
+				case 19:
+					handlePartialStreamPacket(msg.getData());
+					return;
+				case 20:
+					handlePartialStreamPacketEnd(msg.getData());
+					return;
+				case 21:
+					BaseBluetoothActivity.this.handleSessionRecovered(msg.getData());
+					return;
+				case RefreshBluetoothServiceClient.MSG_REQUEST_BeD_AVAILABLE_DATA /*27*/:
+					Bundle bData = msg.getData();
+					if (bData != null) {
+						BaseBluetoothActivity.this.updateDataStoredFlag(bData.getInt(Consts.BUNDLE_BED_AVAILABLE_DATA, -1));
+						return;
+					}
+					return;
+				default:
+					super.handleMessage(msg);
+					return;
+			}
+		}
+
+		private void handlePartialStreamPacketEnd(Bundle data) {
+			ByteBuffer bBuffer = ByteBuffer.allocate(this.partialMsgBuffer.size());
+			for (Byte b : this.partialMsgBuffer) {
+				bBuffer.put(b.byteValue());
+			}
+			this.partialMsgBuffer.clear();
+			Bundle fullData = new Bundle();
+			fullData.putByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA, bBuffer.array());
+			if (data != null) {
+				byte packetType = data.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
+				int packetSize = data.getInt(RefreshBluetoothService.REFRESH_BED_NEW_DATA_SIZE);
+				fullData.putByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE, packetType);
+				fullData.putInt(RefreshBluetoothService.REFRESH_BED_NEW_DATA_SIZE, packetSize);
+			}
+			BaseBluetoothActivity.this.handleStreamPacket(fullData);
+
+			// for some reason, we also need to send it to handleMessage
+			Message message = new Message();
+			message.what = data.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
+			message.setData(data);
+		}
+
+		private void handlePartialStreamPacket(Bundle data) {
+			if (data != null) {
+				byte[] buff = data.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
+				for (byte valueOf : buff) {
+					this.partialMsgBuffer.add(Byte.valueOf(valueOf));
+				}
+			}
+		}
 	}
 
 	public static BedCommandsRPCMapper getRpcCommands() {
@@ -289,6 +268,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			RefreshUserPreferencesData var12 = new RefreshUserPreferencesData(this.getApplicationContext());
 			var12.setIntegerConfigValue("PREF_LAST_RPC_ID_USED", Integer.valueOf(var1.getId()));
 
+			V.Log("Service exists?:" + mService);
+
 			try {
 				if (mService != null) {
 					mService.send(var2);
@@ -308,11 +289,17 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void bindToService() {
-		/*Log.d("com.resmed.refresh.ui", "binding to bluetooth service! isRunning :" + this.isBluetoothServiceRunning() + "service intent : " + this.bluetoothManagerService + " mConnection : " + this.mConnection);
-		AppFileLog.addTrace("BaseBluetoothActivity::bindToService!");
-		if (!this.mBound) {
-			this.getApplicationContext().bindService(this.bluetoothManagerService, this.mConnection, 1);
-		}*/
+		// some code resulting from the below, relies on LL.main, which isn't initialized yet
+		// so be lazy for now, and just wait 3 seconds
+		V.WaitXThenRun(3000, ()-> {
+			Intent bluetoothManagerService = new Intent(MainActivity.main, RefreshBluetoothService.class);
+
+			Log.d("com.resmed.refresh.ui", "binding to bluetooth service! isRunning :" + this.isBluetoothServiceRunning() + "service intent : " + bluetoothManagerService + " mConnection : " + this.mConnection);
+			AppFileLog.addTrace("BaseBluetoothActivity::bindToService!");
+			if (!this.mBound) {
+				this.getApplicationContext().bindService(bluetoothManagerService, this.mConnection, 1);
+			}
+		});
 	}
 
 	public boolean checkBluetoothEnabled() {
@@ -385,20 +372,27 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		// $FF: Couldn't be decompiled
 	}
 
-	public void handleBreathingRate(Bundle var1) {
-		V.Log("Breathing rate: " + var1);
-	}
-
 	public void handleConnectionStatus(CONNECTION_STATE newState) {
 		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " mBound : " + this.mBound + " isAvailable:" + this.isAvailable);
-		if (newState != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable && LL.main.connectionState != newState) {
+		if (newState != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable) { // && LL.main.connectionState != newState) {
 			//this.currentState = newState;
 			Log.d("com.resmed.refresh.pair", "    handleConnectionStatus connState=" + newState);
 			if (CONNECTION_STATE.SOCKET_CONNECTED == newState) {
 				//this.sendRpcToBed(RpcCommands.openSession(RefreshModelController.getInstance().getUserSessionID()));
-				this.sendRpcToBed(RpcCommands.openSession("user1"));
-				BluetoothDataSerializeUtil.writeJsonFile(this.getApplicationContext(), this.mDevice);
-			}
+				//this.sendRpcToBed(RpcCommands.openSession("user1"));
+				// use static user-id different than S+ app's one
+				sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000009"));
+				// set up receivers, so BluetoothSetup.setConnectionStatusAndNotify gets called whenever the state changes
+				RefreshBluetoothService.main.bluetoothManager.AddReceivers();
+				V.Log("Starting session!!!");
+
+				//BluetoothDataSerializeUtil.writeJsonFile(this.getApplicationContext(), this.mDevice);
+				// todo: if you want to store the bluetooth-device-info for auto-connect next time, do it here
+			} /*else if (newState == CONNECTION_STATE.SESSION_OPENED) {
+				V.Log("YAY3!!!");
+				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
+			}*/
 
 			StringBuilder var4 = (new StringBuilder("Should show device paired? ")).append(connectingToBeD).append(" ");
 			boolean var5 = CONNECTION_STATE.SESSION_OPENED == newState;
@@ -421,10 +415,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 				return;
 			}
 		}
-	}
-
-	public void handleEnvSample(Bundle var1) {
-		Log.d("com.resmed.refresh.ui", "handleEnvSample() ");
 	}
 
 	public void handleReceivedRpc(JsonRPC var1) {
@@ -533,7 +523,24 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 		}
 	}
 
-	public void handleUserSleepState(Bundle var1) {
+	public void handleBreathingRate(Bundle var1) {
+		V.Log("Breathing rate: " + var1);
+		V.Alert("Breathing rate: " + var1);
+	}
+
+	public void handleEnvSample(Bundle var1) {
+		Log.d("com.resmed.refresh.ui", "handleEnvSample() ");
+	}
+
+	public Promise getSleepStage_currentWaiter;
+	public void handleUserSleepState(Bundle bundle) {
+		int stage = bundle.getInt("BUNDLE_SLEEP_STATE");
+		V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
+			+ ";BUNDLE_SLEEP_EPOCH_INDEX:" + bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX"));
+		if (getSleepStage_currentWaiter != null) {
+			getSleepStage_currentWaiter.resolve(stage);
+			getSleepStage_currentWaiter = null;
+		}
 	}
 
 	protected boolean isBluetoothServiceRunning() {
@@ -578,14 +585,14 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 	public void PostModuleInit() {
 		boolean serviceRunning = this.isBluetoothServiceRunning();
 		V.JavaLog("com.resmed.refresh.ui", ": bluetooth service is running : " + serviceRunning);
-		this.bluetoothManagerService = new Intent(this, RefreshBluetoothService.class);
+		//this.bluetoothManagerService = new Intent(this, RefreshBluetoothService.class);
 
 		// kill the service each time, so we create a new one that's in the same instance as us
+		// todo: make so this isn't needed here (wasn't needed for orig code)
 		if (serviceRunning) {
 			stopService(new Intent(this, RefreshBluetoothService.class));
 			serviceRunning = false;
 		}
-
 		if (!serviceRunning) {
 			/*String var10 = this.getIntent().getStringExtra(this.getString(2131165943));
 			String var11 = this.getIntent().getStringExtra(this.getString(2131165944));
@@ -593,7 +600,8 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 				this.bluetoothManagerService.putExtra(this.getString(2131165943), var10);
 				this.bluetoothManagerService.putExtra(this.getString(2131165944), var11);
 			}*/
-			this.startService(this.bluetoothManagerService);
+			Intent bluetoothManagerService = new Intent(MainActivity.main, RefreshBluetoothService.class);
+			this.startService(bluetoothManagerService);
 		}
 
 		SharedPreferences var4 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
@@ -614,7 +622,7 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 		super.onDestroy();
 		this.unregisterAll();
 
-		stopService(new Intent(this, RefreshBluetoothService.class));
+		//stopService(new Intent(this, RefreshBluetoothService.class));
 	}
 
 	protected void onPause() {
@@ -686,7 +694,7 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 		Log.d("com.resmed.refresh.bluetooth", " registerToService : ");
 
 		try {
-			Message var5 = Message.obtain((Handler) null, 4);
+			Message var5 = Message.obtain(null, 4);
 			var5.replyTo = this.mFromService;
 			if (mService != null) {
 				mService.send(var5);
@@ -766,11 +774,11 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 	}
 
 	public void unBindFromService() {
-		/*AppFileLog.addTrace("BaseBluetoothActivity::unBindingFromService!");
+		AppFileLog.addTrace("BaseBluetoothActivity::unBindingFromService!");
 		if (this.mBound) {
 			this.getApplicationContext().unbindService(this.mConnection);
 			this.mBound = false;
-		}*/
+		}
 	}
 
 	protected void unregisterAll() {

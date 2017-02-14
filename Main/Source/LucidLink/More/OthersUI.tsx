@@ -16,16 +16,16 @@ export default class OthersUI extends Component<any, any> {
 				<Row>
 					<VButton text='Reset "built-in script"' style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Built-in script")}/>
-					<VButton text='Reset "fake-data provider"' ml5 style={{flex: 1}}
+					<VButton text='Reset "fake-data provider"' ml={5} style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Fake-data provider")}/>
-					<VButton text='Reset "custom script"' ml5 style={{flex: 1}}
+					<VButton text='Reset "custom script"' ml={5} style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Custom script")}/>
-					<VButton text='Reset "custom patterns"' ml5 style={{flex: 1}}
+					<VButton text='Reset "custom patterns"' ml={5} style={{flex: 1}}
 						onPress={()=>LL.scripts.ResetScript("Custom patterns")}/>
 				</Row>
 				<Row>
 					<VButton text="Refresh profiler data" style={{width: 300}} onPress={this.AllFrames_Refresh}/>
-					<VButton text="Clear" ml5 style={{width: 300}} onPress={this.AllFrames_Clear}/>
+					<VButton text="Clear" ml={5} style={{width: 300}} onPress={this.AllFrames_Clear}/>
 				</Row>
 				<ScrollView style={{flex: 1, flexDirection: "column"}}>
 					<ObjectInspectorUI

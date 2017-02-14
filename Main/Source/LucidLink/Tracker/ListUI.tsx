@@ -42,7 +42,7 @@ export default class ListUI extends Component<any, any> {
 			<Column>
 				<Row style={{padding: 3}}>
 					<VButton text="<" style={{width: 100}} onPress={()=>this.ShiftMonth(-1)}/>
-					<VButton text={Moment(month).format("MMMM, YYYY")} ml5 style={{flex: 1}}
+					<VButton text={Moment(month).format("MMMM, YYYY")} ml={5} style={{flex: 1}}
 						onPress={async ()=> {
 							const {action, year, month: month2, day} = await DatePickerAndroid.open({
 								date: month.toDate()
@@ -50,8 +50,8 @@ export default class ListUI extends Component<any, any> {
 							if (action == DatePickerAndroid.dismissedAction) return;
 							this.setState({month: month.clone().set({year, month: month2})});
 						}}/>
-					<VButton text=">" ml5 style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
-					<VButton text="Trim sessions" ml5 style={{width: 200}} onPress={this.TrimSessions}/>
+					<VButton text=">" ml={5} style={{width: 100}} onPress={()=>this.ShiftMonth(1)}/>
+					<VButton text="Trim sessions" ml={5} style={{width: 200}} onPress={this.TrimSessions}/>
 				</Row>
 				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}
 						automaticallyAdjustContentInsets={false}>

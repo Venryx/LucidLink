@@ -75,7 +75,7 @@ export class MonitorUI extends Component<any, any> {
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
 						{/*temp*/}
-						<VButton text="Center" ml10 mt3 style={{width: 100, height: 35}}
+						<VButton text="Center" ml={10} mt={3} style={{width: 100, height: 35}}
 							enabled={MuseBridge.status == "connected"} onPress={()=>JavaBridge.Main.CenterEyeTracker()}/>
 						<Panel style={{flex: 1}}/>
 

@@ -1,4 +1,4 @@
-import {JavaBridge, Global} from "../../Frame/Globals";
+import {Global, JavaBridge, Log} from "../../Frame/Globals";
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
@@ -7,12 +7,13 @@ import {Observer, observer} from "mobx-react/native";
 import Drawer from "react-native-drawer";
 import {MKRangeSlider} from "react-native-material-kit";
 import DialogAndroid from "react-native-dialogs";
-import {Text, Switch, View} from "react-native";
+import {Text, Switch, View, NativeModules} from "react-native";
 import {LL} from "../../LucidLink";
 import Node from "../../Packages/VTree/Node";
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
 import OptionsPanel from "./SPMonitor/OptionsPanel";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
+import SPBridge from "../../Frame/SPBridge";
 
 @Global
 export class SPMonitor extends Node {
@@ -59,6 +60,16 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 						<VSwitch_Auto mt={8} path={()=>node.p.connect}/>
 						<VSwitch_Auto text="Monitor" ml={5} mt={8} path={()=>node.p.monitor}/>
 						<VSwitch_Auto text="Process" ml={5} mt={8} path={()=>node.p.process}/>
+
+						<VButton text="Get stage" onPress={async ()=> {
+							alert(await LL.spBridge.GetSleepStage());
+						}}/>
+						<VButton text="RealTime" onPress={()=> {
+							LL.spBridge.StartRealTimeStream();
+						}}/>
+						<VButton text="Sleep" onPress={()=> {
+							LL.spBridge.StartSleep();
+						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<GraphUI/>
@@ -74,7 +85,7 @@ class GraphUI extends Component<{}, {}> {
     render() {
         return (
 			<View style={{flex: 1, backgroundColor: colors.background}}
-				accessible={true} accessibilityLabel="chart holder"/>
+				accessible={true} accessibilityLabel="chart holder 2"/>
         );
     }
 

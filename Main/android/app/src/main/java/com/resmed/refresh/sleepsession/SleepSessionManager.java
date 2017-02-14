@@ -11,6 +11,7 @@ import com.resmed.edflib.EdfLibCallbackHandler;
 import com.resmed.edflib.FileEdfInterface;
 import com.resmed.edflib.RstEdfMetaData;
 import com.resmed.edflib.RstEdfMetaData.Enum_EDF_Meta;
+import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.ui.utils.Consts;
@@ -51,7 +52,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	private FileEdfInterface edfManager;
 	private String fileName;
 	private File filesFolder;
-	private boolean isActive = false;
+	public boolean isActive = false;
 	private long lengthOfSession;
 	private int nrOfBioSamples = 0;
 	private int nrOfEnvSamples = 0;
@@ -86,7 +87,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		/*SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
 		connector.init(true);*/
 
-		SleepSessionManager.this.start(71, 20, 1);
+		//SleepSessionManager.this.start(71, 20, 1);
 	}
 
 	private void didFinishEdfRecovery() {
@@ -506,10 +507,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		return this.sessionId;
 	}
 
-	public boolean isActive() {
-		return this.isActive;
-	}
-
 	public void onDigitalSamplesRead(int[] paramArrayOfInt1, int[] paramArrayOfInt2) {
 		for (int i = 0; ; i++) {
 			if (i >= paramArrayOfInt2.length) {
@@ -537,15 +534,16 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public void onFileOpened() {
 	}
 
-	public void onRm20RealTimeSleepState(int sleepState, int somethingElse) {
-		V.Log("Got sleep-state data!" + sleepState + ";" + somethingElse);
+	public void onRm20RealTimeSleepState(int sleepState, int epochIndex) {
+		V.Log("Got sleep-state data!" + sleepState + ";" + epochIndex);
 		Message localMessage = new Message();
 		localMessage.what = 17;
 		Bundle localBundle = new Bundle();
 		localBundle.putInt("BUNDLE_SLEEP_STATE", sleepState);
-		localBundle.putInt("BUNDLE_SLEEP_EPOCH_INDEX", somethingElse);
+		localBundle.putInt("BUNDLE_SLEEP_EPOCH_INDEX", epochIndex);
 		localMessage.setData(localBundle);
-		this.serviceHandler.sendMessageToClient(localMessage);
+		//this.serviceHandler.sendMessageToClient(localMessage);
+		RefreshBluetoothService.main.sendMessageToClient(localMessage);
 	}
 
 	public void onRm20ValidBreathingRate(float paramFloat, int paramInt) {
@@ -556,7 +554,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		localBundle.putFloat("BUNDLE_BREATHING_RATE", paramFloat);
 		localBundle.putInt("BUNDLE_BREATHING_SECINDEX", paramInt);
 		localMessage.setData(localBundle);
-		this.serviceHandler.sendMessageToClient(localMessage);
+		//this.serviceHandler.sendMessageToClient(localMessage);
+		RefreshBluetoothService.main.sendMessageToClient(localMessage);
 	}
 
 	public void onWroteDigitalSamples() {
@@ -651,9 +650,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	}
 
 	public void start(final long sessionId, final int age, final int gender) {
-		if (this.isActive) {
-			return;
-		}
+		if (this.isActive) return;
 		this.nrOfBioSamples = 0;
 		this.sessionId = sessionId;
 		this.isActive = true;
