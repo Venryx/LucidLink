@@ -536,6 +536,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 
 	public void onRm20RealTimeSleepState(int sleepState, int epochIndex) {
 		V.Log("Got sleep-state data!" + sleepState + ";" + epochIndex);
+		V.Toast("Got sleep-state data!" + sleepState + ";" + epochIndex);
 		Message localMessage = new Message();
 		localMessage.what = 17;
 		Bundle localBundle = new Bundle();
@@ -649,36 +650,47 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public void start(final long sessionId, final int age, final int gender) {
+	public void start(long sessionId, int age, int gender) {
 		if (this.isActive) return;
+		Context context;
 		this.nrOfBioSamples = 0;
 		this.sessionId = sessionId;
 		this.isActive = true;
-		final Calendar instance = Calendar.getInstance();
-		instance.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
 		new SimpleDateFormat("yyyyMMdd_HHmm").setTimeZone(TimeZone.getTimeZone("UTC"));
-		this.startTimeStamp = instance.getTime().getTime();
-		this.fileName = this.fileNameForSessionId(sessionId);
-		final RstEdfMetaData metaData = new RstEdfMetaData();
-		this.setMetaData(metaData);
-		Context context;
+		this.startTimeStamp = cal.getTime().getTime();
+		this.fileName = fileNameForSessionId(sessionId);
+		/*if (!Consts.UNIT_TEST_MODE) {
+			this.rm20Alarmtime = new Date(SmartAlarmDataManager.getInstance().getAlarmDateTime());
+			this.rm20AlarmWindow = SmartAlarmDataManager.getInstance().getWindowValue();
+		}*/
+		RstEdfMetaData pMeta = new RstEdfMetaData();
+		setMetaData(pMeta);
 		if (Consts.UNIT_TEST_MODE) {
 			context = this.unitTestContext;
-		}
-		else {
+		} else {
 			context = this.serviceHandler.getContext().getApplicationContext();
 		}
 		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, context);
-
-		this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, context);
-		//edfManager.openFileForMode("w"); // temp removed
-
-		this.rm20Manager.rm20Lib.loadLibrary(LL.main.reactContext); // custom
-
+		this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, pMeta.toArray(), this, context);
+		this.edfManager.openFileForMode("w");
 		this.rm20Manager.startupLibrary(age, gender);
 		this.rm20Manager.startRespRateCallbacks(true);
+		/*SmartAlarmDataManager smartAlarmManager = SmartAlarmDataManager.getInstance();
+		if (smartAlarmManager.getActiveAlarm()) {
+			setRM20AlarmTime(new Date(smartAlarmManager.getAlarmDateTime()), smartAlarmManager.getWindowValue() * 60);
+		}*/
+		/*String boardVersion = RefreshModelController.getInstance().getBoardVersion();
+		String firmwareVersion = RefreshModelController.getInstance().getFirmwareVersion();
+		RefreshModelController.getInstance().saveRM20LibraryVersion(rm20Version());
+		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::startSleepSession boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);
+		pMeta.addMetaField(Enum_EDF_Meta.unitVer, boardVersion);
+		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, firmwareVersion);*/
 		AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel(context));
+		//RefreshModelController.getInstance().updateLocation();
 	}
+
 
 	public void stop() {
 		Log.d("com.resmed.refresh.finish", " SleepSessionManager isActive : " + this.isActive + " edfManager : " + this.edfManager);

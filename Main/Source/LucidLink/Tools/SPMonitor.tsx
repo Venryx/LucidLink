@@ -14,6 +14,7 @@ import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitc
 import OptionsPanel from "./SPMonitor/OptionsPanel";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
 import SPBridge from "../../Frame/SPBridge";
+import {Timer} from "../../Frame/General/Timers";
 
 @Global
 export class SPMonitor extends Node {
@@ -73,6 +74,7 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<GraphUI/>
+						<GraphOverlayUI/>
 					</Panel>
 				</Column>
 			</Drawer>
@@ -80,25 +82,51 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 	}
 }
 
-var didFirstRender = false;
 class GraphUI extends Component<{}, {}> {
     render() {
         return (
-			<View style={{flex: 1, backgroundColor: colors.background}}
-				accessible={true} accessibilityLabel="chart holder 2"/>
+			<View style={{flex: 1, backgroundColor: colors.background}}/>
         );
     }
+}
 
-	/*PostRender() {
-		if (!didFirstRender) {
-			didFirstRender = true;
-			JavaBridge.Main.AddChart();
-			/*DeviceEventEmitter.addListener("PostAddChart", args=> {
-				// do one more render, to fix positioning
-				this.forceUpdate();
-			});*#/
-		} else {
-			JavaBridge.Main.UpdateChartBounds();
-		}
-	}*/
+class GraphOverlayUI extends Component<{}, {}> {
+	timer: Timer;
+	componentDidMount() {
+		LL.spBridge.listeners_onReceiveTempValue.push(this.OnReceiveTempValue);
+		LL.spBridge.listeners_onReceiveLightValue.push(this.OnReceiveLightValue);
+		LL.spBridge.listeners_onReceiveBreathValue.push(this.OnReceiveBreathValue);
+		this.timer = new Timer(1, ()=> {
+			this.forceUpdate();
+		}).Start();
+	}
+	componentWillUnmount() {
+		LL.spBridge.listeners_onReceiveTempValue.Remove(this.OnReceiveTempValue);
+		LL.spBridge.listeners_onReceiveLightValue.Remove(this.OnReceiveLightValue);
+		LL.spBridge.listeners_onReceiveBreathValue.Remove(this.OnReceiveBreathValue);
+		this.timer.Stop();
+	}
+
+	temp = -1;
+	OnReceiveTempValue(tempInC, tempInF) {
+		this.temp = tempInF;
+	}
+	light = -1;
+	OnReceiveLightValue(lightVal) {
+		this.light = lightVal;
+	}
+	breath = -1;
+	OnReceiveBreathValue(breathVal) {
+		this.breath = breathVal;
+	}
+
+    render() {
+        return (
+			<Column style={{position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: colors.background}}>
+				<Text>Temp: {this.temp}f</Text>
+				<Text>Light: {this.light}</Text>
+				<Text>Breath: {this.breath}</Text>
+			</Column>
+        );
+    }
 }

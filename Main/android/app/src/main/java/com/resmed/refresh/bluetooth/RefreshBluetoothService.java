@@ -483,9 +483,9 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 
 		V.JavaLog("Start listening;" + MainActivity.main + ";" + this.getApplicationContext() + ";" + LL.main);
 
-		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
+		/*Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
 		EdfLibJNI.loadLibrary(this.getApplicationContext());
-		RM20JNI.loadLibrary(this.getApplicationContext());
+		RM20JNI.loadLibrary(this.getApplicationContext());*/
 
 		try {
 			// rather than remember last one, just find first device and connect to it
@@ -588,7 +588,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 
 	public void sendMessageToClient(Message message) {
 		//V.Log("Sending message to client;" + this.mClient + ";" + message.what);
-		V.Log("Sending message to client;" + message.what);
+		//V.Log("Sending message to client;" + message.what);
 
 		/*if (this.mClient == null) return;
 		try {

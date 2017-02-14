@@ -49,6 +49,7 @@ import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
+import com.resmed.refresh.utils.MeasureManager;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.RefreshUserPreferencesData;
 
@@ -61,8 +62,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import SPlus.SPlusModule;
 import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
+import v.lucidlink.R;
 import v.lucidlink.V;
 
 public class BaseBluetoothActivity extends BaseActivity implements BluetoothDataListener, BluetoothDataWriter {
@@ -121,7 +124,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		private List<Byte> partialMsgBuffer = new ArrayList();
 
 		public void handleMessage(Message msg) {
-			V.Log("BaseBluetoothActivity.handler.handleMessage..." + msg.what);
+			if (msg.what != 19 && msg.what != 20)
+				V.Log("BaseBluetoothActivity.handler.handleMessage(meaningful)..." + msg.what);
 			switch (msg.what) {
 				case 5:
 					BaseBluetoothActivity.this.handleStreamPacket(msg.getData());
@@ -417,56 +421,52 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	}
 
-	public void handleReceivedRpc(JsonRPC var1) {
-		if (var1 != null) {
-			ResultRPC var2 = var1.getResult();
-			if (var2 != null) {
-				Editor var3 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit();
-				String var4 = var2.getPayload();
-				if (var4.contains("$")) {
-					int var9 = var4.indexOf("$");
-					String var10 = var4.substring(0, var9);
-					String var11 = var4.substring(var9 + 1, -1 + var4.length());
-					Log.d("com.resmed.refresh.bluetooth", "BaseBluetoothActivity::handlePayload, boardVersion : " + var10 + " firmwareVersion : " + var11);
-					/*RefreshModelController.getInstance().saveBoardVersion(var10);
-					RefreshModelController.getInstance().saveFirmwareVersion(var11);*/
+	public void handleReceivedRpc(JsonRPC receivedRPC) {
+		if (receivedRPC != null) {
+			ResultRPC result = receivedRPC.getResult();
+			if (result != null) {
+				Editor editorPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+				String payload = result.getPayload();
+				if (payload.contains("$")) {
+					int indexSeparationChar = payload.indexOf("$");
+					String boardVersion = payload.substring(0, indexSeparationChar);
+					final String firmwareVersion = payload.substring(indexSeparationChar + 1, payload.length() - 1);
+					Log.d(LOGGER.TAG_BLUETOOTH, "BaseBluetoothActivity::handlePayload, boardVersion : " + boardVersion + " firmwareVersion : " + firmwareVersion);
+					/*RefreshModelController.getInstance().saveBoardVersion(boardVersion);
+					RefreshModelController.getInstance().saveFirmwareVersion(firmwareVersion);*/
 					if (CORRECT_FIRMWARE_VERSION) {
-						var3.putString(this.getString(2131165305), var10);
-						var3.commit();
+						/*editorPref.putString(getString(R.string.extra_bed_board_version), boardVersion);
+						editorPref.commit();
 						this.bioSensorSerialNrRPC = getRpcCommands().getBioSensorSerialNumber();
 						this.bioSensorSerialNrRPC.setRPCallback(new RPCallback() {
-							public void execute() {
-								Log.d("com.resmed.refresh.ui", "handleReceivedRpc firmwareVersion :" + var11);
-								if (RefreshTools.checkForFirmwareUpgrade(BaseBluetoothActivity.this, var11)) {
-/*BaseBluetoothActivity.CORRECT_FIRMWARE_VERSION = false;
-Intent var2 = new Intent(BaseBluetoothActivity.this, UpdateOTAActivity.class);
-BaseBluetoothActivity.this.startActivity(var2);*/
-									V.Log("@V(would be updating the firmware here)");
-								}
-
-							}
-
-							public void onError(ErrorRpc var1) {
-							}
-
 							public void preExecute() {
 							}
+
+							public void onError(ErrorRpc errRpc) {
+							}
+
+							public void execute() {
+								Log.d(LOGGER.TAG_UI, "handleReceivedRpc firmwareVersion :" + firmwareVersion);
+								if (RefreshTools.checkForFirmwareUpgrade(BaseBluetoothActivity.this, firmwareVersion)) {
+									BaseBluetoothActivity.CORRECT_FIRMWARE_VERSION = false;
+									BaseBluetoothActivity.this.startActivity(new Intent(BaseBluetoothActivity.this, UpdateOTAActivity.class));
+								}
+							}
 						});
-						this.sendRpcToBed(this.bioSensorSerialNrRPC);
+						sendRpcToBed(this.bioSensorSerialNrRPC);*/
 					}
 				}
-
-				Log.d("com.resmed.refresh.ui", "handleReceivedRpc committing  extra_bed_sensor_serial:" + var4);
-				Log.d("com.resmed.refresh.ui", "handleReceivedRpc committing  bioSensorSerialNrRPC:" + this.bioSensorSerialNrRPC + " receivedRPC.getId() :" + var1.getId() + " CORRECT_FIRMWARE_VERSION " + CORRECT_FIRMWARE_VERSION);
-				if (this.bioSensorSerialNrRPC != null && this.bioSensorSerialNrRPC.getId() == var1.getId() && CORRECT_FIRMWARE_VERSION) {
-					var3.putString(this.getString(2131165306), var4);
-					//RefreshModelController.getInstance().setBedId(var4);
-					var3.commit();
+				Log.d(LOGGER.TAG_UI, "handleReceivedRpc committing  extra_bed_sensor_serial:" + payload);
+				Log.d(LOGGER.TAG_UI, "handleReceivedRpc committing  bioSensorSerialNrRPC:" + this.bioSensorSerialNrRPC + " receivedRPC.getId() :" + receivedRPC.getId() + " CORRECT_FIRMWARE_VERSION " + CORRECT_FIRMWARE_VERSION);
+				if (this.bioSensorSerialNrRPC != null && this.bioSensorSerialNrRPC.getId() == receivedRPC.getId() && CORRECT_FIRMWARE_VERSION) {
+					/*editorPref.putString(getString(R.string.extra_bed_sensor_serial), payload);
+					//RefreshModelController.getInstance().setBedId(payload);
+					editorPref.commit();*/
 				}
 			}
 		}
-
 	}
+
 
 	public void handleSessionRecovered(Bundle var1) {
 		Log.d("com.resmed.refresh.ui", " BaseBluetoothActivity::handleSessionRecovered()");
@@ -475,49 +475,82 @@ BaseBluetoothActivity.this.startActivity(var2);*/
 	public void handleSleepSessionStopped(Bundle var1) {
 	}
 
+	private void handleNoteEnv(byte[] decobbed) {
+		int illumValue = PacketsByteValuesReader.readIlluminanceValue(decobbed);
+		float tempValue = PacketsByteValuesReader.readTemperatureValue(decobbed);
+		this.setLightValue(illumValue);
+		this.setTempValue(tempValue);
+	}
+	public void setTempValue(float value) {
+		double degreesCelsuis = value;
+		double degreesFarenheit = Math.round(MeasureManager.convertCelsiusToFahrenheit(value));
+		//V.Log("TempVal:" + degreesCelsuis + " (" + degreesFarenheit + "f)");
+		SPlusModule.main.SendEvent("OnReceiveTempValue", degreesCelsuis, degreesFarenheit);
+	}
+	public void setLightValue(int value) {
+		//V.Log("LightLevel:" + value);
+		SPlusModule.main.SendEvent("OnReceiveLightValue", value);
+	}
+	private void handleBioToGraph(byte[] decobbed) {
+		if (decobbed.length == 0) return;
+		int[] bioData = PacketsByteValuesReader.readBioData(decobbed);
+		//V.Log("BreathVal:" + bioData[0]);
+		SPlusModule.main.SendEvent("OnReceiveBreathValue", bioData[0]);
+	}
+
 	public void handleStreamPacket(Bundle bundle) {
 		synchronized (this) {
-			byte[] arrby = bundle.getByteArray("REFRESH_BED_NEW_DATA");
-			byte by = bundle.getByte("REFRESH_BED_NEW_DATA_TYPE");
-			int n = arrby.length;
-			if (n == 0) return;
-			if (VLPacketType.PACKET_TYPE_RETURN.ordinal() == by) {
-				String string = new String(arrby);
-				Gson gson = new Gson();
+			byte[] decobbed = bundle.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
+			byte packetType = bundle.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
+			Log.d(LOGGER.TAG_UI, "handleStreamPacket decobbed : " + Arrays.toString(decobbed) + "packet type : " + packetType);
+			if (VLPacketType.PACKET_TYPE_NOTE_ENV_1.ordinal() == packetType) {
+				handleNoteEnv(decobbed);
+			} else if (VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal() == packetType) {
+				handleBioToGraph(decobbed);
+			} else if (VLPacketType.PACKET_TYPE_ENV_1.ordinal() == packetType) {
+				handleNoteEnv(decobbed);
+			}
+
+
+			byte[] bytes = bundle.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
+			//byte packetType = bundle.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
+			if (bytes.length == 0) return;
+			if (VLPacketType.PACKET_TYPE_RETURN.ordinal() == packetType) {
+				String strPacket = new String(bytes);
 				try {
-					JsonRPC.ErrorRpc errorRpc;
-					JsonRPC jsonRPC = (JsonRPC)gson.fromJson(string, (Class)JsonRPC.class);
-					Log.d("com.resmed.refresh.ui", (" handleStreamPacket() rpc id : " + jsonRPC.getId() + " strPacket : " + string));
-					this.handleReceivedRpc(jsonRPC);
-					JsonRPC jsonRPC2 = (JsonRPC)CommandStack.remove(jsonRPC.getId());
-					Log.d("com.resmed.refresh.ui", (" handleStreamPacket() rpcSent : " + jsonRPC2));
-					if (jsonRPC2 == null) return;
-					JsonRPC.RPCallback rPCallback = jsonRPC2.getRPCallback();
-					Log.d("com.resmed.refresh.ui", (" handleStreamPacket() callback : " + rPCallback));
-					if (jsonRPC2.getRPCallback() != null) {
-						rPCallback.execute();
+					JsonRPC receivedRPC = (JsonRPC) new Gson().fromJson(strPacket, JsonRPC.class);
+					Log.d(LOGGER.TAG_UI, " handleStreamPacket() rpc id : " + receivedRPC.getId() + " strPacket : " + strPacket);
+					handleReceivedRpc(receivedRPC);
+					JsonRPC rpcSent = (JsonRPC) CommandStack.remove(Integer.valueOf(receivedRPC.getId()));
+					Log.d(LOGGER.TAG_UI, " handleStreamPacket() rpcSent : " + rpcSent);
+					if (rpcSent != null) {
+						RPCallback callback = rpcSent.getRPCallback();
+						Log.d(LOGGER.TAG_UI, " handleStreamPacket() callback : " + callback);
+						if (rpcSent.getRPCallback() != null) {
+							callback.execute();
+						}
+						ErrorRpc errorRpc = receivedRPC.getError();
+						if (errorRpc != null) {
+							handleErrorRPC(rpcSent, errorRpc);
+						}
 					}
-					if ((errorRpc = jsonRPC.getError()) == null) return;
-					this.handleErrorRPC(jsonRPC2, errorRpc);
+				} catch (JsonSyntaxException e) {
+					Log.w(LOGGER.TAG_UI, " strPacket : " + strPacket + "  " + e.getMessage());
 				}
-				catch (JsonSyntaxException var8_11) {
-					Log.w("com.resmed.refresh.ui", (" strPacket : " + string + "  " + var8_11.getMessage()));
-				}
-			} else if (VLPacketType.PACKET_TYPE_NOTE_HEARTBEAT.ordinal() == by) {
-				Log.d("com.resmed.refresh.ui", ("BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_NOTE_HEARTBEAT : " + Arrays.toString(arrby)));
-				this.handleHearBeat(arrby);
-			} else {
-				if (VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal() == by) return;
-				if (VLPacketType.PACKET_TYPE_NOTE_STORE_FOREIGN.ordinal() == by || VLPacketType.PACKET_TYPE_NOTE_STORE_LOCAL.ordinal() == by) {
-					int n2 = PacketsByteValuesReader.getStoreLocalBio(arrby);
-					Log.w("com.resmed.refresh.ui", ("PACKET_TYPE_NOTE_STORE!!! = " + by + " NUMBER OF SAMPLES : " + n2));
-					if (n2 >= 32) {
-						this.updateDataStoredFlag((int)by);
+			} else if (VLPacketType.PACKET_TYPE_NOTE_HEARTBEAT.ordinal() == packetType) {
+				Log.d(LOGGER.TAG_UI, "BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_NOTE_HEARTBEAT : " + Arrays.toString(bytes));
+				handleHearBeat(bytes);
+			} else if (VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal() != packetType) {
+				if (VLPacketType.PACKET_TYPE_NOTE_STORE_FOREIGN.ordinal() == packetType || VLPacketType.PACKET_TYPE_NOTE_STORE_LOCAL.ordinal() == packetType) {
+					int storeLocal = PacketsByteValuesReader.getStoreLocalBio(bytes);
+					Log.w(LOGGER.TAG_UI, "PACKET_TYPE_NOTE_STORE!!! = " + packetType + " NUMBER OF SAMPLES : " + storeLocal);
+					if (storeLocal >= 32) {
+						updateDataStoredFlag(packetType);
 					} else {
-						AppFileLog.addTrace(("Ignoring samples on BeD because : " + n2 + " samples < 32"));
+						AppFileLog.addTrace("Ignoring samples on BeD because : " + storeLocal + " samples < 32");
 					}
 				} else {
-					Log.d("com.resmed.refresh.ui", ("BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_" + by + " bytes : " + Arrays.toString(arrby)));
+					Log.d(LOGGER.TAG_UI, "BaseBluetoothActivity::handleStreamPacket() processed new bluetooth PACKET_TYPE_" + packetType + " bytes : " + Arrays.toString(bytes));
 				}
 			}
 		}
