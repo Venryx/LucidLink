@@ -536,7 +536,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 
 	public void onRm20RealTimeSleepState(int sleepState, int epochIndex) {
 		V.Log("Got sleep-state data!" + sleepState + ";" + epochIndex);
-		V.Toast("Got sleep-state data!" + sleepState + ";" + epochIndex);
+		//V.Toast("Got sleep-state data!" + sleepState + ";" + epochIndex);
 		Message localMessage = new Message();
 		localMessage.what = 17;
 		Bundle localBundle = new Bundle();

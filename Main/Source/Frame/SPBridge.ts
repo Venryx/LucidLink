@@ -34,7 +34,7 @@ export default class SPBridge {
 	listeners_onReceiveBreathValue = [];
 
 	status: "disconnected" | "connecting" | "connected" = "disconnected";
-	timer: Timer;
+	/*timer: Timer;
 	OnChangeStatus(status) {
 		this.status = status;
 
@@ -48,23 +48,12 @@ export default class SPBridge {
 			this.timer.Stop();
 			this.timer = null;
 		}
-	}
-
-	timer2: Timer; // temp
+	}*/
+	
 	Connect(age, gender: "male" | "female") {
 		core.Connect(age, gender == "male" ? 0 : 1);
-
-		// temp
-		Toast("ConnectingJS...");
-		this.timer2 = new Timer(10, async ()=> {
-			var stage = await this.GetSleepStage();
-			Toast(stage);
-			if (stage != 3)
-				alert("Got other result!" + stage);
-		}).Start();
 	}
 	Disconnect() {
-		this.timer2.Stop(); // temp
 		core.Disconnect();
 	}
 

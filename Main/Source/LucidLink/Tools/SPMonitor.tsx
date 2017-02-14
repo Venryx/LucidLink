@@ -1,4 +1,4 @@
-import {Global, JavaBridge, Log} from "../../Frame/Globals";
+import {Global, JavaBridge, Log, Toast} from "../../Frame/Globals";
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
@@ -15,6 +15,17 @@ import OptionsPanel from "./SPMonitor/OptionsPanel";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
 import SPBridge from "../../Frame/SPBridge";
 import {Timer} from "../../Frame/General/Timers";
+import {autorun} from "mobx";
+
+// for now, check for sleep-stage manually every 10 seconds (when "connect" and "monitor" are enabled)
+new Timer(10, async ()=> {
+	if (LL.tools.spMonitor.connect && LL.tools.spMonitor.monitor) {
+		var stage = await LL.spBridge.GetSleepStage();
+		Toast("SleepStage:" + stage);
+		if (stage != 3)
+			alert("Got other result!" + stage);
+	}
+}).Start();
 
 @Global
 export class SPMonitor extends Node {
