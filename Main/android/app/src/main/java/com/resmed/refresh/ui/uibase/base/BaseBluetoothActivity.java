@@ -227,19 +227,17 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	private void sendMessageToService(final int paramInt, final Bundle paramBundle) {
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(1000L);
-					Message localMessage = new Message();
-					localMessage.what = paramInt;
-					localMessage.setData(paramBundle);
-					BaseBluetoothActivity.this.sendMsgBluetoothService(localMessage);
-					return;
-				} catch (InterruptedException localInterruptedException) {
-					for (; ; ) {
-						localInterruptedException.printStackTrace();
-					}
+		new Thread(()-> {
+			try {
+				Thread.sleep(1000L);
+				Message localMessage = new Message();
+				localMessage.what = paramInt;
+				localMessage.setData(paramBundle);
+				BaseBluetoothActivity.this.sendMsgBluetoothService(localMessage);
+				return;
+			} catch (InterruptedException localInterruptedException) {
+				for (; ; ) {
+					localInterruptedException.printStackTrace();
 				}
 			}
 		}).start();

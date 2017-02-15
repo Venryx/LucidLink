@@ -33,6 +33,7 @@ import java.io.Reader;
 
 import v.lucidlink.V;
 
+// the app sends raw bio-data to this external library, and it sends back higher-level calculations (eg, sleep-stage, breathing-rate)
 public class RM20JNI {
 	public static final String rm20JniVer = "1.0.2";
 	private RM20Callbacks callbacks;

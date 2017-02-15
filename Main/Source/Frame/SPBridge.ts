@@ -65,7 +65,7 @@ export default class SPBridge {
 	}
 
 	async GetSleepStage() {
-		return await core.GetSleepStage();
+		return await core.GetSleepStage() as number;
 	}
 	StartRealTimeStream() {
 		core.StartRealTimeStream();

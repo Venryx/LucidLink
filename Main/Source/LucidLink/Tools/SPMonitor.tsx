@@ -17,11 +17,43 @@ import SPBridge from "../../Frame/SPBridge";
 import {Timer} from "../../Frame/General/Timers";
 import {autorun} from "mobx";
 
+// keep order, since must match with Java
+enum SleepState_Detailed {
+    Wake = 1, // -> Simple.Wake
+    Absent = 2, Unknown = 3, Break = 4, // -> Simple.Other
+    LightSleep = 5, // -> Simple.Light
+    DeepSleep = 6, // -> Simple.Deep
+    RemSleep = 7, // -> Simple.REM
+}
+// keep order, since must match with Java
+enum SleepState_Simple {
+    Other = 0,
+    Wake = -1,
+    REM = 1,
+    Light = 2,
+    Deep = 3,
+}
+function ConvertDetailedSleepStateToSimpleSleepState(detailedState: SleepState_Detailed) {
+	if ([SleepState_Detailed.Absent, SleepState_Detailed.Unknown, SleepState_Detailed.Break].Contains(detailedState))
+		return SleepState_Simple.Other;
+	if (detailedState == SleepState_Detailed.Wake)
+		return SleepState_Simple.Wake;
+	if (detailedState == SleepState_Detailed.RemSleep)
+		return SleepState_Simple.REM;
+	if (detailedState == SleepState_Detailed.LightSleep)
+		return SleepState_Simple.Light;
+	//if (detailedState == SleepState_Detailed.DeepSleep)
+	return SleepState_Simple.Deep;
+}
+
 // for now, check for sleep-stage manually every 10 seconds (when "connect" and "monitor" are enabled)
 new Timer(10, async ()=> {
 	if (LL.tools.spMonitor.connect && LL.tools.spMonitor.monitor) {
-		var stage = await LL.spBridge.GetSleepStage();
-		Toast("SleepStage:" + stage);
+		var stageValue = await LL.spBridge.GetSleepStage();
+		var stageEnum_detailed_name =  SleepState_Detailed[stageValue];
+		var stageEnum_detailed: SleepState_Detailed = SleepState_Detailed[stageEnum_detailed_name];
+		var stageEnum_simple = ConvertDetailedSleepStateToSimpleSleepState(stageEnum_detailed);
+		Toast("SleepStage:" + stageValue + ";" + stageEnum_detailed_name);
 		/*if (stage != 3)
 			alert("Got other result!" + stage);*/
 	}
