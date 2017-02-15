@@ -189,7 +189,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		BaseBluetoothActivity.IN_SLEEP_SESSION = true;*/
 	}
 	@ReactMethod public void Disconnect() {
-		if (!RefreshBluetoothService.main.sleepSessionManager.isActive) return;
+		if (RefreshBluetoothService.main.sleepSessionManager == null || !RefreshBluetoothService.main.sleepSessionManager.isActive) return;
 		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		//baseManager.stop();
 
