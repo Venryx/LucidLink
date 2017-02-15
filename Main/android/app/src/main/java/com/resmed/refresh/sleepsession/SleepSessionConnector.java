@@ -24,6 +24,7 @@ import com.resmed.refresh.bed.BedCommandsRPCMapper;
 import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
+import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
@@ -35,6 +36,7 @@ import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.KillableRunnable;
 import com.resmed.refresh.utils.KillableRunnable.KillableRunner;
+import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.SortedList;
@@ -269,10 +271,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			public void execute() {
 				SleepSessionConnector.this.requestSamples(65535, 65535);
 			}
-
 			public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
 			}
-
 			public void preExecute() {
 			}
 		});
@@ -366,7 +366,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	public void handleSleepSessionStopped(final Bundle bundle) {
 		Log.d("com.resmed.refresh.finish", "handleSleepSessionStopped() ");
 		AppFileLog.addTrace("STOP handleSleepSessionStopped ");
-		this.bAct.getWindow().clearFlags(128);
+		//this.bAct.getWindow().clearFlags(128);
 		int int1 = 0;
 		boolean b = false;
 		if (bundle != null) {
@@ -417,20 +417,22 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
 	}
 
-	public void init(final boolean b) {
-		//this.bAct.registerReceiver(this.reconnectReceiver, new IntentFilter("BLUETOOTH_SERVICE_INTENT_RESTART"));
+	public void init(boolean didUserPressedBackToSleep) {
+		//this.lastState = RefreshApplication.getInstance().getCurrentConnectionState();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext());
+		int nightState = prefs.getInt(Consts.PREF_NIGHT_TRACK_STATE, -1);
+		AppFileLog.addTrace("SleepSessionConnector recovering state " + nightState + " for session id : " + prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1));
+		//this.bAct.registerReceiver(this.reconnectReceiver, new IntentFilter(RefreshBluetoothServiceClient.BLUETOOTH_SERVICE_INTENT_RESTART));
 		if (this.isSyncAndStop) {
-			this.syncDataAndStop();
-		} else {
-			this.startSleepSession();
+			//recoverSleepSession(didUserPressedBackToSleep);
+			syncDataAndStop();
+		} /*else if (nightState == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
+			recoverSleepSession(true);
+			RegisterRepeatingAlarmWake(this.bAct);
+		}*/ else {
+			startSleepSession();
 		}
-		int sizeToStore;
-		if (this.isSyncAndStop) {
-			sizeToStore = 640;
-		} else {
-			sizeToStore = 2;
-		}
-		this.sizeToStore = sizeToStore;
+		this.sizeToStore = this.isSyncAndStop ? 640 : 2;
 	}
 
 	public boolean isRecovering() {
@@ -491,37 +493,35 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		edit.commit();
 		AppFileLog.deleteCurrentFile();
 		final Message message = new Message();
-		message.what = RefreshBluetoothService.MessageType.StartSession;
+		message.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_START;
 		message.getData().putLong("sessionId", 1); // todo: make not hard-coded
-		message.getData().putInt("age", 18); // todo: make not hard-coded
+		message.getData().putInt("age", 20); // todo: make not hard-coded
 		message.getData().putInt("gender", 0); // 0 = male, 1 = female // todo: make not hard-coded
 		this.bAct.sendMsgBluetoothService(message);
 		this.setupController();
 	}
 
 	public void stopSleepSession() {
-		try {
-			AppFileLog.addTrace("STOP SLEEP SESSION");
-			Object localObject1 = new StringBuilder("SleepTrackFragment stopSleepSession isClosingSession? ");
-			Log.d("com.resmed.refresh.finish", "Closing:" + this.isClosingSession);
-			this.bAct.getWindow().addFlags(128);
-			if (!this.isClosingSession) {
-				this.isClosingSession = true;
-				Log.d("com.resmed.refresh.finish", "SleepTrackFragment stopSleepSession()");
-				if ((!this.isHandlingHeartBeat) || (this.isSyncAndStop)) {
-					this.pendingBioSamplesRpc = null;
-					this.pendingEnvSamplesRpc = null;
-					localObject1 = new StringBuilder("stopStreamAndRequestAllSamples Conditions");
-					Log.d("com.resmed.refresh.finish", this.isHandlingHeartBeat + ":" + this.isSyncAndStop);
-					stopStreamAndRequestAllSamples();
-				}
-				localObject1 = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-				((SharedPreferences.Editor) localObject1).putInt("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal());
-				((SharedPreferences.Editor) localObject1).commit();
-				localObject1 = this.bAct;
+		AppFileLog.addTrace("STOP SLEEP SESSION");
+		//preSleepLog.addTrace("STOP SLEEP SESSION");
+		Log.d(LOGGER.TAG_FINISH_SESSION, "SleepTrackFragment stopSleepSession isClosingSession? " + this.isClosingSession);
+		//this.bAct.getWindow().addFlags(128);
+		if (!this.isClosingSession) {
+			this.isClosingSession = true;
+			Log.d(LOGGER.TAG_FINISH_SESSION, "SleepTrackFragment stopSleepSession()");
+			if (!this.isHandlingHeartBeat || this.isSyncAndStop) {
+				this.pendingBioSamplesRpc = null;
+				this.pendingEnvSamplesRpc = null;
+				Log.d(LOGGER.TAG_FINISH_SESSION, "stopStreamAndRequestAllSamples Conditions" + this.isHandlingHeartBeat + ":" + this.isSyncAndStop);
+				stopStreamAndRequestAllSamples();
 			}
-			return;
-		} finally {
+			Editor editor = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
+			editor.putInt(Consts.PREF_NIGHT_TRACK_STATE, CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal());
+			editor.commit();
+			/*this.countTimeout = 0;
+			this.bAct.showBlockingDialog(new CustomDialogBuilder(this.bAct).title((int) R.string.sleep_time_session_end_title).description((int) R.string.sleep_time_session_end_desc).useProgressBar());
+			this.processRecord.start();
+			CancelRepeatingAlarmWake(this.bAct);*/
 		}
 	}
 }

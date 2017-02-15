@@ -127,41 +127,41 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			if (msg.what != 19 && msg.what != 20)
 				V.Log("BaseBluetoothActivity.handler.handleMessage(meaningful)..." + msg.what);
 			switch (msg.what) {
-				case 5:
+				case RefreshBluetoothService.MessageType.BeD_STREAM_PACKET:
 					BaseBluetoothActivity.this.handleStreamPacket(msg.getData());
 					return;
-				case 6:
+				case RefreshBluetoothService.MessageType.BeD_CONNECTION_STATUS:
 					CONNECTION_STATE state = (CONNECTION_STATE) msg.getData().get(RefreshBluetoothService.REFRESH_BED_NEW_CONN_STATUS);
 					Log.d(LOGGER.TAG_PAIR, "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + CONNECTION_STATE.toString(state));
 					BaseBluetoothActivity.this.handleConnectionStatus(state);
 					return;
-				case 8:
+				case RefreshBluetoothService.MessageType.BeD_UNPAIR:
 					BluetoothDataSerializeUtil.deleteJsonFile(BaseBluetoothActivity.this.getApplicationContext());
 					Log.d(LOGGER.TAG_DIALOG, "MSG_UNPAIR showBeDPickerDialog()");
 					BaseBluetoothActivity.this.showBeDPickerDialog();
 					return;
-				case 14:
+				case RefreshBluetoothService.MessageType.SLEEP_SESSION_STOP:
 					BaseBluetoothActivity.this.handleSleepSessionStopped(msg.getData());
 					return;
-				case 15:
+				case RefreshBluetoothService.MessageType.SLEEP_ENV_SAMPLE:
 					BaseBluetoothActivity.this.handleEnvSample(msg.getData());
 					return;
-				case 17:
+				case RefreshBluetoothService.MessageType.SLEEP_USER_SLEEP_STATE:
 					BaseBluetoothActivity.this.handleUserSleepState(msg.getData());
 					return;
-				case 18:
+				case RefreshBluetoothService.MessageType.SLEEP_BREATHING_RATE:
 					BaseBluetoothActivity.this.handleBreathingRate(msg.getData());
 					return;
-				case 19:
+				case RefreshBluetoothService.MessageType.BeD_STREAM_PACKET_PARTIAL:
 					handlePartialStreamPacket(msg.getData());
 					return;
-				case 20:
+				case RefreshBluetoothService.MessageType.BeD_STREAM_PACKET_PARTIAL_END:
 					handlePartialStreamPacketEnd(msg.getData());
 					return;
-				case 21:
+				case RefreshBluetoothService.MessageType.SLEEP_SESSION_RECOVER:
 					BaseBluetoothActivity.this.handleSessionRecovered(msg.getData());
 					return;
-				case RefreshBluetoothServiceClient.MSG_REQUEST_BeD_AVAILABLE_DATA /*27*/:
+				case RefreshBluetoothService.MessageType.REQUEST_BeD_AVAILABLE_DATA /*27*/:
 					Bundle bData = msg.getData();
 					if (bData != null) {
 						BaseBluetoothActivity.this.updateDataStoredFlag(bData.getInt(Consts.BUNDLE_BED_AVAILABLE_DATA, -1));

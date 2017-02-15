@@ -45,12 +45,34 @@ import v.lucidlink.V;
 
 public class RefreshBluetoothService extends Service implements RefreshBluetoothServiceClient {
 	public final class MessageType {
-		public static final int DiscoverDevices_TypeA = 1;
-		public static final int SendBluetoothMessage = 2;
-		public static final int DisableBluetoothManager = 7;
-		public static final int DiscoverDevices_TypeB = 10;
-		public static final int StartSession = 12;
-		public static final int RecoverSession = 21;
+		public static final int DISCOVER_PAIR_CONNECT_RESMED = 1;
+		public static final int SEND_BYTES = 2;
+		public static final int START_DISCOVERY = 3;
+		public static final int REGISTER_CLIENT = 4;
+		public static final int BeD_STREAM_PACKET = 5;
+		public static final int BeD_CONNECTION_STATUS = 6;
+		public static final int BeD_DISCONNECT = 7;
+		public static final int BeD_UNPAIR = 8;
+		public static final int UNREGISTER_CLIENT = 9;
+		public static final int DISCOVER_RESMED_DEVICES = 10;
+		public static final int BeD_CONNECT_TO_DEVICE = 11;
+		public static final int SLEEP_SESSION_START = 12;
+		public static final int SLEEP_SESSION_STOP = 14;
+		public static final int SLEEP_ENV_SAMPLE = 15;
+		public static final int SLEEP_SET_SMART_ALARM = 16;
+		public static final int SLEEP_USER_SLEEP_STATE = 17;
+		public static final int SLEEP_BREATHING_RATE = 18;
+		public static final int BeD_STREAM_PACKET_PARTIAL = 19;
+		public static final int BeD_STREAM_PACKET_PARTIAL_END = 20;
+		public static final int SLEEP_SESSION_RECOVER = 21;
+		public static final int CANCEL_DISCOVERY = 22;
+		public static final int BeD_UNPAIR_ALL = 23;
+		public static final int BLUETOOTH_BULK_TRANSFER_START = 24;
+		public static final int BLUETOOTH_BULK_TRANSFER_STOP = 25;
+		public static final int SMARTALARM_UPDATE = 26;
+		public static final int REQUEST_BeD_AVAILABLE_DATA = 27;
+		public static final int RESET_BeD_AVAILABLE_DATA = 28;
+		public static final int BLUETOOTH_RADIO_RESET = 29;
 	}
 
 	public static final String ACTION_ALREADY_PAIRED = "ACTION_ALREADY_PAIRED";
@@ -82,7 +104,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	final Messenger mMessenger;
 	private SharedPreferences prefs;
 	public boolean sessionToBeStopped;
-	private SleepSessionManager sleepSessionManager;
+	public SleepSessionManager sleepSessionManager;
 
 	public class BluetoothRequestsHandler extends Handler {
 		public void handleMessage(Message msg) {
@@ -90,10 +112,10 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			RefreshBluetoothService.this.checkManager();
 			Bundle b;
 			switch (msg.what) {
-				case MessageType.DiscoverDevices_TypeA:
+				case MessageType.DISCOVER_PAIR_CONNECT_RESMED:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(true);
 					return;
-				case MessageType.SendBluetoothMessage:
+				case MessageType.SEND_BYTES:
 					Bundle bundle1 = msg.getData();
 					if (bundle1 != null && RefreshBluetoothService.this.bluetoothManager != null) {
 						byte[] toSend = bundle1.getByteArray("bytes");
@@ -103,7 +125,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 						return;
 					}
 					return;
-				case 4:
+				case MessageType.REGISTER_CLIENT:
 					/*RefreshBluetoothService.this.mClient = msg.replyTo;
 					V.Log("Registered client:" + RefreshBluetoothService.this.mClient);*/
 					Message message = new Message();
@@ -116,19 +138,19 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					}
 					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
 					return;
-				case 6:
+				case MessageType.BeD_CONNECTION_STATUS:
 					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
 					return;
-				case MessageType.DisableBluetoothManager:
+				case MessageType.BeD_DISCONNECT:
 					RefreshBluetoothService.this.bluetoothManager.disable();
 					return;
-				case 9:
+				case MessageType.UNREGISTER_CLIENT:
 					//RefreshBluetoothService.this.mClient = null;
 					return;
-				case MessageType.DiscoverDevices_TypeB:
+				case MessageType.DISCOVER_RESMED_DEVICES:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(false);
 					return;
-				case 11:
+				case MessageType.BeD_CONNECT_TO_DEVICE:
 					Bundle bundle = msg.getData();
 					Parcelable deviceInfo = bundle.getParcelable("deviceInfo");
 					boolean makePaired = bundle.getBoolean("makePaired");
@@ -148,7 +170,8 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					message4.what = 8;
 					RefreshBluetoothService.this.sendMessageToClient(message4);
 					return;
-				case MessageType.StartSession:
+				case MessageType.SLEEP_SESSION_START:
+					V.Log("Starting session the correct way!");
 					//RefreshBluetoothService.this.changeToForeground();
 					RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
 					long sessionId = -1;
@@ -162,6 +185,10 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					}
 					RefreshBluetoothService.this.sleepSessionManager.start(sessionId, age, gender);
 					RefreshBluetoothService.this.bluetoothManager.testStreamData(RefreshBluetoothService.this.sleepSessionManager);
+
+					if (RefreshBluetoothService.this.prefs == null) {
+						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(RefreshBluetoothService.this.getApplicationContext());
+					}
 					long stored = RefreshBluetoothService.this.prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					SharedPreferences.Editor editor = RefreshBluetoothService.this.prefs.edit();
 					editor.putLong(Consts.PREF_NIGHT_LAST_SESSION_ID, sessionId);
@@ -172,12 +199,12 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					AppFileLog.addTrace("MSG_SLEEP_SESSION_START PREF_NIGHT_LAST_SESSION_ID was " + stored + " and now is " + sessionId);
 					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionId + " stored : " + stored);
 					return;
-				case 14:
+				case MessageType.SLEEP_SESSION_STOP:
 					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service isHandleBulkTransfer : " + RefreshBluetoothService.this.isHandleBulkTransfer);
 					RefreshBluetoothService.this.stopCurrentSession();
 					RefreshBluetoothService.this.isDataAvailableOnDevice = -1;
 					return;
-				case 16:
+				case MessageType.SLEEP_SET_SMART_ALARM:
 					Bundle bAlarm = msg.getData();
 					if (bAlarm != null) {
 						long alarmTs = bAlarm.getLong(Consts.BUNDLE_SMART_ALARM_TIMESTAMP);
@@ -190,13 +217,13 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 						return;
 					}
 					return;
-				case 17:
+				case MessageType.SLEEP_USER_SLEEP_STATE:
 					if (RefreshBluetoothService.this.sleepSessionManager != null) {
 						RefreshBluetoothService.this.sleepSessionManager.requestUserSleepState();
 						return;
 					}
 					return;
-				case MessageType.RecoverSession:
+				case MessageType.SLEEP_SESSION_RECOVER:
 					long sessionToRecover = msg.getData().getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					if (RefreshBluetoothService.this.prefs == null) {
 						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(RefreshBluetoothService.this.getApplicationContext());
@@ -217,21 +244,21 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
 					RefreshBluetoothService.this.sleepSessionManager.recoverSession(sessionToRecover, ageToRecover, genderToRecover);
 					return;
-				case 22:
+				case MessageType.CANCEL_DISCOVERY:
 					RefreshBluetoothService.this.bluetoothManager.cancelDiscovery();
 					return;
-				case RefreshBluetoothServiceClient.MSG_BeD_UNPAIR_ALL /*23*/:
+				case MessageType.BeD_UNPAIR_ALL /*23*/:
 					Log.d(LOGGER.TAG_BLUETOOTH, "RefreshBluetoothService::MSG_BeD_UNPAIR_ALL, unpairing all : ");
 					RefreshBluetoothService.this.bluetoothManager.unpairAll("S+");
 					return;
-				case RefreshBluetoothServiceClient.MSG_BLUETOOTH_BULK_TRANSFER_START /*24*/:
+				case MessageType.BLUETOOTH_BULK_TRANSFER_START /*24*/:
 					RefreshBluetoothService.this.isHandleBulkTransfer = true;
 					Log.d(LOGGER.TAG_BLUETOOTH, " RefreshBluetoothService isHandleBulkTransfer : " + RefreshBluetoothService.this.isHandleBulkTransfer);
 					return;
-				case RefreshBluetoothServiceClient.MSG_BLUETOOTH_BULK_TRANSFER_STOP /*25*/:
+				case MessageType.BLUETOOTH_BULK_TRANSFER_STOP /*25*/:
 					RefreshBluetoothService.this.isHandleBulkTransfer = false;
 					return;
-				case RefreshBluetoothServiceClient.MSG_SMARTALARM_UPDATE /*26*/:
+				case MessageType.SMARTALARM_UPDATE /*26*/:
 					if (RefreshBluetoothService.this.sleepSessionManager != null) {
 						Log.d(LOGGER.TAG_SMART_ALARM, "RefreshBluetoothService MSG_SMARTALARM_UPDATE");
 						b = msg.getData();
@@ -239,7 +266,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 						return;
 					}
 					return;
-				case RefreshBluetoothServiceClient.MSG_REQUEST_BeD_AVAILABLE_DATA /*27*/:
+				case MessageType.REQUEST_BeD_AVAILABLE_DATA /*27*/:
 					Message bedDataMessage = new Message();
 					bedDataMessage.what = 27;
 					Bundle data = new Bundle();
@@ -247,10 +274,10 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					bedDataMessage.setData(data);
 					RefreshBluetoothService.this.sendMessageToClient(bedDataMessage);
 					return;
-				case RefreshBluetoothServiceClient.MSG_RESET_BeD_AVAILABLE_DATA /*28*/:
+				case MessageType.RESET_BeD_AVAILABLE_DATA /*28*/:
 					RefreshBluetoothService.this.isDataAvailableOnDevice = -1;
 					return;
-				case RefreshBluetoothServiceClient.MSG_BLUETOOTH_RADIO_RESET /*29*/:
+				case MessageType.BLUETOOTH_RADIO_RESET /*29*/:
 					if (RefreshBluetoothService.this.bluetoothManager != null) {
 						RefreshBluetoothService.this.bluetoothManager.bluetoothOff();
 						return;
@@ -360,10 +387,10 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
 				}
 				// custom
-				else if (packet.packetType == VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal()) {
+				/*else if (packet.packetType == VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal()) {
 					V.Log("Adding packet PACKET_TYPE_NOTE_BIO_1!");
 					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
-				}
+				}*/
 			}
 			if (VLPacketType.PACKET_TYPE_NOTE_STORE_FOREIGN.ordinal() == packet.packetType || VLPacketType.PACKET_TYPE_NOTE_STORE_LOCAL.ordinal() == packet.packetType) {
 				int storeLocal = PacketsByteValuesReader.getStoreLocalBio(packet.buffer);

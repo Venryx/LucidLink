@@ -5,6 +5,7 @@ package SPlus;
 		import android.content.Intent;
 		import android.content.IntentFilter;
 		import android.content.SharedPreferences;
+		import android.os.Bundle;
 		import android.os.Environment;
 		import android.os.Message;
 		import android.preference.PreferenceManager;
@@ -27,6 +28,7 @@ package SPlus;
 		import com.resmed.refresh.packets.VLP;
 		import com.resmed.refresh.sleepsession.SleepSessionConnector;
 		import com.resmed.refresh.sleepsession.SleepSessionManager;
+		import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 		import com.resmed.rm20.IndexActivity;
 		import com.resmed.rm20.RM20Callbacks;
 		import com.resmed.rm20.RM20JNI;
@@ -114,136 +116,99 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		jsModuleEventEmitter.emit(eventName, argsList);
 	}
 
-	public SleepSessionManager baseManager;
-
+	SleepSessionConnector sessionConnector;
 	@ReactMethod public void Init() {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
 
-		/*RefreshApplication refreshApp = new RefreshApplication();
-		RefreshApplication.instance = refreshApp;*/
-
-
-
-
-		//RefreshBluetoothService bluetoothService = new RefreshBluetoothService();
-		/*Intent myIntent = new Intent(reactContext, RefreshBluetoothService.class);
-		reactContext.startService(myIntent);
-
-		RpcCommands.setContextBroadcaster(reactContext);
-		com.resmed.refresh.utils.Log.d("com.resmed.refresh.ui", ": bluetooth service is running : " + var2);
-		Intent intent = new Intent(reactContext, RefreshBluetoothService.class);
-		intent.putExtra("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_ON);
-		intent.putExtra("PREF_NIGHT_LAST_SESSION_ID", 0);
-		reactContext.startService(intent);
-
-		SharedPreferences var4 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-		int var5 = var4.getInt("PREF_CONNECTION_STATE", -1);
-		com.resmed.refresh.utils.Log.d("com.resmed.refresh.ui", " SleepTimeActivity::onResume conn state : " + var5);
-		if(var5 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
-			int var9 = var4.getInt("PREF_LAST_RPC_ID_USED", -1);
-			if(-1 != var9) {
-				RpcCommands.setRPCid(var9);
-			}
-		}
-
-		this.registerReceiver(this.connectionStatusReceiver, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
-		this.registerReceiver(this.bluetoothServiceRestartReceiver, new IntentFilter("BLUETOOTH_SERVICE_INTENT_RESTART"));*/
-
-
-
-
-		baseManager = new SleepSessionManager(new RefreshBluetoothServiceClient() {
-			@Override public Context getContext() {
-				//return bluetoothService.getContext();
-				return reactContext;
-			}
-			@Override public void handlePacket(VLP.VLPacket vlPacket) {
-				V.Log("in handlePacket...");
-				//bluetoothService.handlePacket(vlPacket);
-			}
-
-			@Override
-			public void sendConnectionStatus(CONNECTION_STATE paramCONNECTION_STATE) {
-				V.Log("in sendConnectionStatus");
-			}
-
-			@Override public void sendMessageToClient(Message message) {
-				V.Toast("Received message!" + message.getData());
-				MessageType type = MessageType.GetEntry(message.what);
-				if (type == MessageType.OnRm20RealTimeSleepState) {
-					V.Toast("Received OnRm20RealTimeSleepState message!" + message.getData());
-				}
-
-				//bluetoothService.sendMessageToClient(message);
-			}
-		});
-
-		/*this.rm20Lib = new RM20JNI(Environment.getExternalStorageDirectory(), new RM20Callbacks() {
-			@Override
-			public void onRm20RealTimeSleepState(int paramInt1, int paramInt2) {
-				V.Log("Received onRm20RealTimeSleepState data!" + paramInt1 + ";" + paramInt2);
-			}
-
-			@Override
-			public void onRm20ValidBreathingRate(float paramFloat, int paramInt) {
-				V.Log("Received onRm20ValidBreathingRate data!" + paramFloat + ";" + paramInt);
-			}
-		}, MainActivity.main.getApplicationContext());
-		this.rm20Lib.loadLibrary(MainActivity.main.getApplicationContext());
-		V.Log("Loading...");
-		V.WaitXThenRun(5000, ()-> {
-			V.Log("Starting...");
-			this.rm20Lib.startupLibrary(34, 1);
-			this.rm20Lib.setRespRateCallbacks(true);
-
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					Random var1 = new Random();
-
-					for(int var2 = 0; var2 < 10000; ++var2) {
-						int var3 = var1.nextInt(1000);
-						int var4 = var1.nextInt(1000);
-						SPlusModule.this.rm20Lib.writeSampleData(var3, var4);
-
-						try {
-							Thread.sleep(5L);
-						} catch (InterruptedException var10) {
-							var10.printStackTrace();
-						}
-					}
-
-					SPlusModule.this.rm20Lib.getEpochCount();
-					SPlusModule.this.rm20Lib.stopAndCalculate();
-					SleepParams var9 = SPlusModule.this.rm20Lib.resultsForSession();
-					V.Log(this.getClass().getName(), " results : " + var9);
-				}
-			}).start();
-		});*/
+		int bioOnBed = 0; // how many packets to buffer before sending from device to here?
+		boolean isSyncing = false;
+		this.sessionConnector = new SleepSessionConnector(MainActivity.main, bioOnBed, isSyncing);
+		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
 	}
-	//protected RM20JNI rm20Lib;
+	/*public void handleStreamPacket(Bundle data) {
+        if (this.sessionConnector != null) {
+            this.sessionConnector.handleStreamPacket(data);
+        }
+        byte[] decobbed = data.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
+        byte packetType = data.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
+        data.getInt(RefreshBluetoothService.REFRESH_BED_NEW_DATA_SIZE);
+        Log.d(LOGGER.TAG_UI, " SleepTrackFragment handleStreamPacket decobbed : " + Arrays.toString(decobbed) + " packetType : " + packetType);
+        if (VLPacketType.PACKET_TYPE_NOTE_ILLUMINANCE_CHANGE.ordinal() == packetType) {
+            handleEnvData(decobbed, false);
+        } else if (VLPacketType.PACKET_TYPE_NOTE_HEARTBEAT.ordinal() == packetType) {
+            handleHeartBeat(decobbed);
+        } else if (VLPacketType.PACKET_TYPE_ENV_1.ordinal() == packetType) {
+            handleEnvData(decobbed, true);
+        } else if (VLPacketType.PACKET_TYPE_ENV_60.ordinal() == packetType) {
+            handleEnvData(decobbed, true);
+        }
+    }
+    private void handleEnvData(byte[] decobbed, boolean persistData) {
+        int illumValue = PacketsByteValuesReader.readIlluminanceValue(decobbed);
+        float tempValue = PacketsByteValuesReader.readTemperatureValue(decobbed);
+        this.mLightLevelValueText.setText(new StringBuilder(String.valueOf(illumValue)).append(" Lux").toString());
+        String tempInScale = "";
+        if (RefreshModelController.getInstance().getUseMetricUnits()) {
+            tempInScale = Math.round(tempValue) + " " + getString(R.string.degrees_celsius);
+        } else {
+            tempInScale = new StringBuilder(String.valueOf(Math.round(MeasureManager.convertCelsiusToFahrenheit(tempValue)))).append(" ").append(getString(R.string.degrees_farenheit)).toString();
+        }
+        this.mTemperatureValueText.setText(tempInScale);
+    }
+    private void handleHeartBeat(byte[] decobbed) {
+    }
+    public void handleEnvSample(Bundle data) {
+        this.sessionConnector.handleEnvSample(data);
+    }
+    public void handleSleepSessionStopped(Bundle data) {
+        Log.d(LOGGER.TAG_FINISH_SESSION, "handleSleepSessionStopped() ");
+        AppFileLog.addTrace("STOP handleSleepSessionStopped ");
+        this.sessionConnector.handleSleepSessionStopped(data);
+    }
+    public void handleBreathingRate(Bundle data) {
+        Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
+        this.sessionConnector.handleBreathingRate(data);
+    }
+    public void handleUserSleepState(Bundle data) {
+        Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
+        Log.i(LOGGER.TAG_RELAX, "handleUserSleepState() SleepTrackFragment " + data);
+        this.sessionConnector.handleUserSleepState(data);
+    }*/
 
 	@ReactMethod public void Connect(int age, int gender) { // for gender: 0=male, 1=female
 		V.Log("Connecting..." + age + ";" + gender);
 
 		RefreshBluetoothService.main.StartListening();
 
-		int sessionID = 70;
+		//int sessionID = 70;
 		//baseManager.rm20Manager.rm20Lib.loadLibrary(reactContext);
-		baseManager.start(sessionID, age, gender);
+		//baseManager.start(sessionID, age, gender);
+
+		/*this.sessionConnector.init(false);
+		BaseBluetoothActivity.IN_SLEEP_SESSION = true;*/
 	}
 	@ReactMethod public void Disconnect() {
-		if (!baseManager.isActive) return;
+		if (!RefreshBluetoothService.main.sleepSessionManager.isActive) return;
 		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
-		baseManager.stop();
+		//baseManager.stop();
+
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+		this.sessionConnector.stopSleepSession();
+		BaseBluetoothActivity.IN_SLEEP_SESSION = false;
 	}
 
 	@ReactMethod public void GetSleepStage(Promise promise) {
+		if (RefreshBluetoothService.main.sleepSessionManager == null) {
+			promise.resolve(-1);
+			return;
+		}
+
 		/*int stage = baseManager.rm20Manager.getRealTimeSleepState();
 		promise.resolve(stage); // this is not actually the sleep-stage, but rather the success-flag (I think)*/
 		MainActivity.main.getSleepStage_currentWaiter = promise;
-		baseManager.rm20Manager.getRealTimeSleepState();
+		//baseManager.rm20Manager.getRealTimeSleepState();
+		RefreshBluetoothService.main.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 	}
 	@ReactMethod public void StartRealTimeStream() {
 		/*int stage = baseManager.rm20Manager.();
@@ -256,8 +221,10 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}
 	@ReactMethod public void StartSleep() {
 		V.Log("StartingSleep");
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+		/*MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());*/
+		this.sessionConnector.init(false);
+		BaseBluetoothActivity.IN_SLEEP_SESSION = true;
 	}
 }
