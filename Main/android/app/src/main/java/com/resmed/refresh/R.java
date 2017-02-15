@@ -2326,7 +2326,7 @@ public final class R
     public static final int auth_client_play_services_err_notification_msg = 2131165237;
     public static final int auth_client_requested_by_msg = 2131165238;
     public static final int auth_client_using_bad_version_title = 2131165233;
-    public static final int bluetooth_buffer_bulk_file = 2131165343;
+    //public static final int bluetooth_buffer_bulk_file = 2131165343;
     public static final int bluetooth_device_file_name = 2131165342;
     public static final int cancel = 2131165297;
     public static final int com_facebook_choose_friends = 2131165269;

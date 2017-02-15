@@ -1,48 +1,3 @@
-/*
- * Decompiled with CFR 0_115.
- *
- * Could not load the following classes:
- *  android.app.Notification
- *  android.app.PendingIntent
- *  android.app.Service
- *  android.bluetooth.BluetoothDevice
- *  android.content.Context
- *  android.content.Intent
- *  android.content.ServiceConnection
- *  android.content.SharedPreferences
- *  android.os.Bundle
- *  android.os.Handler
- *  android.os.IBinder
- *  android.os.Message
- *  android.os.Messenger
- *  android.os.RemoteException
- *  android.preference.PreferenceManager
- *  android.support.v4.app.NotificationCompat
- *  android.support.v4.app.NotificationCompat$Builder
- *  com.google.gson.Gson
- *  com.resmed.edflib.EdfLibJNI
- *  com.resmed.refresh.bluetooth.BluetoothSetup
- *  com.resmed.refresh.bluetooth.CONNECTION_STATE
- *  com.resmed.refresh.bluetooth.RefreshBluetoothService
- *  com.resmed.refresh.bluetooth.RefreshBluetoothService$1
- *  com.resmed.refresh.bluetooth.RefreshBluetoothService$BluetoothRequestsHandler
- *  com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient
- *  com.resmed.refresh.bluetooth.exception.BluetoohNotSupportedException
- *  com.resmed.refresh.model.json.JsonRPC
- *  com.resmed.refresh.model.json.ResultRPC
- *  com.resmed.refresh.packets.PacketsByteValuesReader
- *  com.resmed.refresh.packets.VLP
- *  com.resmed.refresh.packets.VLP$VLPacket
- *  com.resmed.refresh.packets.VLPacketType
- *  com.resmed.refresh.sleepsession.SleepSessionManager
- *  com.resmed.refresh.ui.activity.SleepTimeActivity
- *  com.resmed.refresh.utils.AppFileLog
- *  com.resmed.refresh.utils.BluetoothDataSerializeUtil
- *  com.resmed.refresh.utils.Log
- *  com.resmed.refresh.utils.RefreshBluetoothManager
- *  com.resmed.refresh.utils.RefreshTools
- *  com.resmed.rm20.RM20JNI
- */
 package com.resmed.refresh.bluetooth;
 
 import android.app.Service;
@@ -88,11 +43,16 @@ import v.lucidlink.MainActivity;
 import v.lucidlink.R;
 import v.lucidlink.V;
 
-final class MessageType {
-	static final int SendBluetoothMessage = 2;
-}
-
 public class RefreshBluetoothService extends Service implements RefreshBluetoothServiceClient {
+	public final class MessageType {
+		public static final int DiscoverDevices_TypeA = 1;
+		public static final int SendBluetoothMessage = 2;
+		public static final int DisableBluetoothManager = 7;
+		public static final int DiscoverDevices_TypeB = 10;
+		public static final int StartSession = 12;
+		public static final int RecoverSession = 21;
+	}
+
 	public static final String ACTION_ALREADY_PAIRED = "ACTION_ALREADY_PAIRED";
 	public static final String REFRESH_BED_NEW_CONN_STATUS = "REFRESH_BED_NEW_CONN_STATUS";
 	public static final String REFRESH_BED_NEW_DATA = "REFRESH_BED_NEW_DATA";
@@ -130,7 +90,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			RefreshBluetoothService.this.checkManager();
 			Bundle b;
 			switch (msg.what) {
-				case 1:
+				case MessageType.DiscoverDevices_TypeA:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(true);
 					return;
 				case MessageType.SendBluetoothMessage:
@@ -159,13 +119,13 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 				case 6:
 					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
 					return;
-				case 7:
+				case MessageType.DisableBluetoothManager:
 					RefreshBluetoothService.this.bluetoothManager.disable();
 					return;
 				case 9:
 					//RefreshBluetoothService.this.mClient = null;
 					return;
-				case 10:
+				case MessageType.DiscoverDevices_TypeB:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(false);
 					return;
 				case 11:
@@ -188,7 +148,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					message4.what = 8;
 					RefreshBluetoothService.this.sendMessageToClient(message4);
 					return;
-				case 12:
+				case MessageType.StartSession:
 					//RefreshBluetoothService.this.changeToForeground();
 					RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
 					long sessionId = -1;
@@ -236,7 +196,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 						return;
 					}
 					return;
-				case 21:
+				case MessageType.RecoverSession:
 					long sessionToRecover = msg.getData().getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					if (RefreshBluetoothService.this.prefs == null) {
 						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(RefreshBluetoothService.this.getApplicationContext());
@@ -354,6 +314,8 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	}
 
 	public void handlePacket(VLP.VLPacket packet) {
+		V.JavaLog("HandlePacket:" + packet.packetType);
+
 		Message newMessage;
 		Bundle data;
 		AppFileLog.addTrace(" _ ");
@@ -369,7 +331,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					if (payload.equalsIgnoreCase("TRUE")) {
 						Log.d(LOGGER.TAG_BLUETOOTH, " RefreshBluetoothService isRecovering : ");
 						if (this.sleepSessionManager != null) {
-							//this.sleepSessionManager.addSamplesMiMq(new File(RefreshTools.getFilesPath(), getString(R.string.bluetooth_buffer_bulk_file)));
+							this.sleepSessionManager.addSamplesMiMq(new File(RefreshTools.getFilesPath(), "bluetooth_buffer_bulk_file"));
 							AppFileLog.addTrace("Service handlePacket sleepSessionManager.addSamplesMiMq(filesDir)");
 						}
 						BluetoothDataSerializeUtil.deleteBulkDataBioFile(getApplicationContext());
@@ -386,21 +348,21 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					return;
 				}
 			}
+			V.Log("Checking..." + this.sleepSessionManager + ";" + (this.sleepSessionManager != null ? this.sleepSessionManager.isActive : false));
 			if (this.sleepSessionManager != null && this.sleepSessionManager.isActive) {
 				if (VLPacketType.PACKET_TYPE_BIO_64.ordinal() == packet.packetType) {
 					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
-				} else {
-					if (VLPacketType.PACKET_TYPE_ENV_60.ordinal() == packet.packetType) {
-						this.sleepSessionManager.addEnvData(packet.buffer, this.sleepSessionManager.isActive);
-					} else {
-						if (VLPacketType.PACKET_TYPE_ENV_1.ordinal() == packet.packetType) {
-							this.sleepSessionManager.addEnvData(packet.buffer, this.sleepSessionManager.isActive);
-						} else {
-							if (VLPacketType.PACKET_TYPE_BIO_32.ordinal() == packet.packetType) {
-								this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
-							}
-						}
-					}
+				} else if (VLPacketType.PACKET_TYPE_ENV_60.ordinal() == packet.packetType) {
+					this.sleepSessionManager.addEnvData(packet.buffer, this.sleepSessionManager.isActive);
+				} else if (VLPacketType.PACKET_TYPE_ENV_1.ordinal() == packet.packetType) {
+					this.sleepSessionManager.addEnvData(packet.buffer, this.sleepSessionManager.isActive);
+				} else if (VLPacketType.PACKET_TYPE_BIO_32.ordinal() == packet.packetType) {
+					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
+				}
+				// custom
+				else if (packet.packetType == VLPacketType.PACKET_TYPE_NOTE_BIO_1.ordinal()) {
+					V.Log("Adding packet PACKET_TYPE_NOTE_BIO_1!");
+					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);
 				}
 			}
 			if (VLPacketType.PACKET_TYPE_NOTE_STORE_FOREIGN.ordinal() == packet.packetType || VLPacketType.PACKET_TYPE_NOTE_STORE_LOCAL.ordinal() == packet.packetType) {
@@ -482,10 +444,6 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		listening = true;
 
 		V.JavaLog("Start listening;" + MainActivity.main + ";" + this.getApplicationContext() + ";" + LL.main);
-
-		/*Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
-		EdfLibJNI.loadLibrary(this.getApplicationContext());
-		RM20JNI.loadLibrary(this.getApplicationContext());*/
 
 		try {
 			// rather than remember last one, just find first device and connect to it

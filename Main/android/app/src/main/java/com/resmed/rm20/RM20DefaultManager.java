@@ -4,6 +4,8 @@ import java.io.*;
 import android.content.*;
 import java.util.*;
 
+import v.lucidlink.V;
+
 public class RM20DefaultManager implements RM20Manager
 {
 	public RM20JNI rm20Lib;
@@ -113,6 +115,7 @@ public class RM20DefaultManager implements RM20Manager
 
 	public int writeSampleData(final int n, final int n2) {
 		synchronized (this) {
+			V.Log("Writing sample data!");
 			return this.rm20Lib.writeSampleData(n, n2);
 		}
 	}

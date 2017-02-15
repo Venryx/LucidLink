@@ -251,10 +251,12 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		V.Log("StartingRealTimeStream!!!");
 		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
 	}
 	@ReactMethod public void StartSleep() {
 		V.Log("StartingSleep");
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 	}

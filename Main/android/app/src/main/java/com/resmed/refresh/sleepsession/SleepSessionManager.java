@@ -14,8 +14,10 @@ import com.resmed.edflib.RstEdfMetaData.Enum_EDF_Meta;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
+import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
+import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.rm20.RM20Callbacks;
@@ -24,7 +26,12 @@ import com.resmed.rm20.RM20Manager;
 import com.resmed.rm20.SleepParams;
 import com.resmed.rm20.SmartAlarmInfo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,9 +199,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	}
 
 	public void addBioData(final byte[] array, final byte b) {
-		if (!this.isActive) {
-			return;
-		}
+		if (!this.isActive) return;
 		final int length = array.length;
 		Log.d("com.resmed.refresh.finish", "SleepTrackingFragment::handleBioData() size : " + length);
 		Log.d("com.resmed.refresh.ui", "SleepTrackingFragment::handleBioData() decobbed for readBioData : " + Arrays.toString(array));
@@ -227,280 +232,121 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	/* Error */
-	public void addSamplesMiMq(File paramFile) {
-		// Byte code:
-		//   0: aload_0
-		//   1: monitorenter
-		//   2: aconst_null
-		//   3: astore 7
-		//   5: aconst_null
-		//   6: astore 6
-		//   8: aconst_null
-		//   9: astore 8
-		//   11: aload 6
-		//   13: astore 5
-		//   15: new 431	java/io/FileInputStream
-		//   18: astore 9
-		//   20: aload 6
-		//   22: astore 5
-		//   24: aload 9
-		//   26: aload_1
-		//   27: invokespecial 433	java/io/FileInputStream:<init>	(Ljava/io/File;)V
-		//   30: aload 6
-		//   32: astore 5
-		//   34: new 435	java/io/BufferedReader
-		//   37: astore_1
-		//   38: aload 6
-		//   40: astore 5
-		//   42: new 437	java/io/InputStreamReader
-		//   45: astore 10
-		//   47: aload 6
-		//   49: astore 5
-		//   51: aload 10
-		//   53: aload 9
-		//   55: invokespecial 440	java/io/InputStreamReader:<init>	(Ljava/io/InputStream;)V
-		//   58: aload 6
-		//   60: astore 5
-		//   62: aload_1
-		//   63: aload 10
-		//   65: invokespecial 443	java/io/BufferedReader:<init>	(Ljava/io/Reader;)V
-		//   68: iconst_0
-		//   69: istore_2
-		//   70: aload_1
-		//   71: invokevirtual 446	java/io/BufferedReader:readLine	()Ljava/lang/String;
-		//   74: astore 5
-		//   76: aload 5
-		//   78: ifnonnull +14 -> 92
-		//   81: aload_1
-		//   82: ifnull +163 -> 245
-		//   85: aload_1
-		//   86: invokevirtual 449	java/io/BufferedReader:close	()V
-		//   89: aload_0
-		//   90: monitorexit
-		//   91: return
-		//   92: iinc 2 1
-		//   95: aload 5
-		//   97: invokevirtual 452	java/lang/String:trim	()Ljava/lang/String;
-		//   100: ldc_w 454
-		//   103: invokevirtual 458	java/lang/String:split	(Ljava/lang/String;)[Ljava/lang/String;
-		//   106: astore 5
-		//   108: aload 5
-		//   110: iconst_0
-		//   111: aaload
-		//   112: invokestatic 462	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-		//   115: istore_3
-		//   116: aload 5
-		//   118: iconst_1
-		//   119: aaload
-		//   120: invokestatic 462	java/lang/Integer:parseInt	(Ljava/lang/String;)I
-		//   123: istore 4
-		//   125: aload_0
-		//   126: iconst_1
-		//   127: newarray <illegal type>
-		//   129: dup
-		//   130: iconst_0
-		//   131: iload_3
-		//   132: iastore
-		//   133: iconst_1
-		//   134: newarray <illegal type>
-		//   136: dup
-		//   137: iconst_0
-		//   138: iload 4
-		//   140: iastore
-		//   141: invokevirtual 385	com/resmed/refresh/sleepsession/SleepSessionManager:addSamplesMiMq	([I[I)V
-		//   144: goto -74 -> 70
-		//   147: astore 6
-		//   149: aload_1
-		//   150: astore 5
-		//   152: aload 6
-		//   154: invokevirtual 465	java/io/FileNotFoundException:printStackTrace	()V
-		//   157: aload_1
-		//   158: ifnull -69 -> 89
-		//   161: aload_1
-		//   162: invokevirtual 449	java/io/BufferedReader:close	()V
-		//   165: goto -76 -> 89
-		//   168: astore_1
-		//   169: aload_1
-		//   170: invokevirtual 466	java/io/IOException:printStackTrace	()V
-		//   173: goto -84 -> 89
-		//   176: astore_1
-		//   177: aload_0
-		//   178: monitorexit
-		//   179: aload_1
-		//   180: athrow
-		//   181: astore 6
-		//   183: aload 7
-		//   185: astore_1
-		//   186: aload_1
-		//   187: astore 5
-		//   189: aload 6
-		//   191: invokevirtual 466	java/io/IOException:printStackTrace	()V
-		//   194: aload_1
-		//   195: ifnull -106 -> 89
-		//   198: aload_1
-		//   199: invokevirtual 449	java/io/BufferedReader:close	()V
-		//   202: goto -113 -> 89
-		//   205: astore_1
-		//   206: aload_1
-		//   207: invokevirtual 466	java/io/IOException:printStackTrace	()V
-		//   210: goto -121 -> 89
-		//   213: astore_1
-		//   214: aload 5
-		//   216: astore 6
-		//   218: aload 6
-		//   220: ifnull +8 -> 228
-		//   223: aload 6
-		//   225: invokevirtual 449	java/io/BufferedReader:close	()V
-		//   228: aload_1
-		//   229: athrow
-		//   230: astore 5
-		//   232: aload 5
-		//   234: invokevirtual 466	java/io/IOException:printStackTrace	()V
-		//   237: goto -9 -> 228
-		//   240: astore_1
-		//   241: aload_1
-		//   242: invokevirtual 466	java/io/IOException:printStackTrace	()V
-		//   245: goto -156 -> 89
-		//   248: astore 5
-		//   250: aload_1
-		//   251: astore 6
-		//   253: aload 5
-		//   255: astore_1
-		//   256: goto -38 -> 218
-		//   259: astore 5
-		//   261: aload 5
-		//   263: astore 6
-		//   265: goto -79 -> 186
-		//   268: astore 6
-		//   270: aload 8
-		//   272: astore_1
-		//   273: goto -124 -> 149
-		//   276: astore_1
-		//   277: goto -100 -> 177
-		// Local variable table:
-		//   start	length	slot	name	signature
-		//   0	280	0	this	SleepSessionManager
-		//   0	280	1	paramFile	File
-		//   69	24	2	i	int
-		//   115	17	3	j	int
-		//   123	16	4	k	int
-		//   13	202	5	localObject1	Object
-		//   230	3	5	localIOException1	java.io.IOException
-		//   248	6	5	localObject2	Object
-		//   259	3	5	localIOException2	java.io.IOException
-		//   6	53	6	localObject3	Object
-		//   147	6	6	localFileNotFoundException1	java.io.FileNotFoundException
-		//   181	9	6	localIOException3	java.io.IOException
-		//   216	48	6	localObject4	Object
-		//   268	1	6	localFileNotFoundException2	java.io.FileNotFoundException
-		//   3	181	7	localObject5	Object
-		//   9	262	8	localObject6	Object
-		//   18	36	9	localFileInputStream	java.io.FileInputStream
-		//   45	19	10	localInputStreamReader	java.io.InputStreamReader
-		// Exception table:
-		//   from	to	target	type
-		//   70	76	147	java/io/FileNotFoundException
-		//   95	144	147	java/io/FileNotFoundException
-		//   161	165	168	java/io/IOException
-		//   161	165	176	finally
-		//   169	173	176	finally
-		//   198	202	176	finally
-		//   206	210	176	finally
-		//   223	228	176	finally
-		//   228	230	176	finally
-		//   232	237	176	finally
-		//   15	20	181	java/io/IOException
-		//   24	30	181	java/io/IOException
-		//   34	38	181	java/io/IOException
-		//   42	47	181	java/io/IOException
-		//   51	58	181	java/io/IOException
-		//   62	68	181	java/io/IOException
-		//   198	202	205	java/io/IOException
-		//   15	20	213	finally
-		//   24	30	213	finally
-		//   34	38	213	finally
-		//   42	47	213	finally
-		//   51	58	213	finally
-		//   62	68	213	finally
-		//   152	157	213	finally
-		//   189	194	213	finally
-		//   223	228	230	java/io/IOException
-		//   85	89	240	java/io/IOException
-		//   70	76	248	finally
-		//   95	144	248	finally
-		//   70	76	259	java/io/IOException
-		//   95	144	259	java/io/IOException
-		//   15	20	268	java/io/FileNotFoundException
-		//   24	30	268	java/io/FileNotFoundException
-		//   34	38	268	java/io/FileNotFoundException
-		//   42	47	268	java/io/FileNotFoundException
-		//   51	58	268	java/io/FileNotFoundException
-		//   62	68	268	java/io/FileNotFoundException
-		//   85	89	276	finally
-		//   241	245	276	finally
+	public void addSamplesMiMq(File bulkDataFile) {
+		FileNotFoundException e;
+		IOException e2;
+		Throwable th;
+		BufferedReader br = null;
+		try {
+			BufferedReader br2 = new BufferedReader(new InputStreamReader(new FileInputStream(bulkDataFile)));
+			int n = 0;
+			while (true) {
+				try {
+					String strLine = br2.readLine();
+					if (strLine == null) {
+						break;
+					}
+					n++;
+					String[] tokens = strLine.trim().split("\\s+");
+					int mi = Integer.parseInt(tokens[0]);
+					int mq = Integer.parseInt(tokens[1]);
+					addSamplesMiMq(new int[]{mi}, new int[]{mq});
+				} catch (FileNotFoundException e3) {
+					e = e3;
+					br = br2;
+				} catch (IOException e4) {
+					e2 = e4;
+					br = br2;
+				} catch (Throwable th2) {
+					th = th2;
+					br = br2;
+				}
+			}
+			if (br2 != null) {
+				try {
+					br2.close();
+					br = br2;
+				} catch (IOException e22) {
+					e22.printStackTrace();
+				} catch (Throwable th3) {
+					th = th3;
+					br = br2;
+					throw new Error(th);
+				}
+			}
+			br = br2;
+		} catch (FileNotFoundException e5) {
+			e = e5;
+			try {
+				e.printStackTrace();
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e222) {
+						e222.printStackTrace();
+					} catch (Throwable th4) {
+						th = th4;
+						throw th;
+					}
+				}
+			} catch (Throwable th5) {
+				th = th5;
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e2222) {
+						e2222.printStackTrace();
+					}
+				}
+				throw new Error(th);
+			}
+		} /*catch (IOException e6) {
+			e6.printStackTrace();
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e7) {
+					e7.printStackTrace();
+				}
+			}
+		}*/
 	}
 
-	public void addSamplesMiMq(int[] paramArrayOfInt1, int[] paramArrayOfInt2) {
-	/*for (;;)
-    {
-      int[] arrayOfInt;
-      int j;
-		BioSample localObject2;
-      try
-      {
-        boolean bool = this.isActive;
-        if (!bool) {
-          return;
-        }
-        int i = 0;
-        if (i < paramArrayOfInt1.length)
-        {
-          if ((4095 < paramArrayOfInt1[i]) || (4095 < paramArrayOfInt2[i]))
-          {
-            Object localObject1 = new java.lang.StringBuilder("ignoring samples; mi=");
-            Log.d("com.resmed.refresh.mqmi", paramArrayOfInt1[i] + " mq=" + paramArrayOfInt2[i]);
-            i++;
-          }
-        }
-        else {
-          continue;
-        }
-        if (this.rm20Manager != null)
-        {
-          Log.d("com.resmed.refresh.sleepFragment", " SleepSessionManager::addSamplesMiMq RM20 writting samples!");
-          this.rm20Manager.writeSampleData(paramArrayOfInt1[i], paramArrayOfInt2[i]);
-        }
-		  BioSample localObject1 = new BioSample(paramArrayOfInt1[i], paramArrayOfInt2[i]);
-        this.sampleBuffer.add(localObject1);
-        if (this.sampleBuffer.size() < 16) {
-          continue;
-        }
-        this.nrOfBioSamples += 16;
-        arrayOfInt = new int[this.sampleBuffer.size()];
-		  int[] array = new int[this.sampleBuffer.size()];
-        j = 0;
-        Iterator localIterator = this.sampleBuffer.iterator();
-        if (!localIterator.hasNext())
-        {
-          this.nrOfBioSamples += 16;
-          if (this.edfManager != null) {
-            this.edfManager.writeDigitalSamples(arrayOfInt, (int[])array);
-          }
-          this.sampleBuffer.clear();
-          continue;
-        }
-		  localObject2 = (BioSample)localIterator.next();
-      }
-      finally {}
-      arrayOfInt[j] = ((BioSample)localObject2).getMiValue();
-      localObject1[j] = ((BioSample)localObject2).getMqValue();
-      String str1 = getHexString(arrayOfInt[j]);
-      String str2 = getHexString(localObject1[j]);
-      Object end = new java.lang.StringBuilder(String.valueOf(this.nrOfBioSamples + j));
-      Log.d("com.resmed.refresh.mqmi", "\tEDF cMiBuf[" + j + "]=" + arrayOfInt[j] + "(" + str1 + ")  cMqBuf[" + j + "]=" + localObject1[j] + "(" + str2 + ")");
-      j++;
-    }*/
+	public void addSamplesMiMq(int[] mi, int[] mq) {
+		if (!this.isActive) return;
+		int i = 0;
+		while (i < mi.length) {
+			if (4095 < mi[i] || 4095 < mq[i]) {
+				Log.d(LOGGER.TAG_MQMI, "ignoring samples; mi=" + mi[i] + " mq=" + mq[i]);
+			} else {
+				if (this.rm20Manager != null) {
+					Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionManager::addSamplesMiMq RM20 writting samples!");
+					this.rm20Manager.writeSampleData(mi[i], mq[i]);
+				}
+				this.sampleBuffer.add(new BioSample(mi[i], mq[i]));
+				if (this.sampleBuffer.size() >= 16) {
+					this.nrOfBioSamples += 16;
+					int[] cMiBuf = new int[this.sampleBuffer.size()];
+					int[] cMqBuf = new int[this.sampleBuffer.size()];
+					int j = 0;
+					for (BioSample aSample : this.sampleBuffer) {
+						cMiBuf[j] = aSample.getMiValue();
+						cMqBuf[j] = aSample.getMqValue();
+						String sMI = getHexString(cMiBuf[j]);
+						Log.d(LOGGER.TAG_MQMI, new StringBuilder(String.valueOf(this.nrOfBioSamples + j)).append("\tEDF cMiBuf[").append(j).append("]=").append(cMiBuf[j]).append("(").append(sMI).append(")  cMqBuf[").append(j).append("]=").append(cMqBuf[j]).append("(").append(getHexString(cMqBuf[j])).append(")").toString());
+						j++;
+					}
+					this.nrOfBioSamples += 16;
+					if (this.edfManager != null) {
+						this.edfManager.writeDigitalSamples(cMiBuf, cMqBuf);
+					}
+					this.sampleBuffer.clear();
+				} else {
+					continue;
+				}
+			}
+			i++;
+		}
 	}
 
 	public long getSessionId() {
@@ -677,16 +523,19 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.edfManager.openFileForMode("w");
 		this.rm20Manager.startupLibrary(age, gender);
 		this.rm20Manager.startRespRateCallbacks(true);
+
 		/*SmartAlarmDataManager smartAlarmManager = SmartAlarmDataManager.getInstance();
 		if (smartAlarmManager.getActiveAlarm()) {
 			setRM20AlarmTime(new Date(smartAlarmManager.getAlarmDateTime()), smartAlarmManager.getWindowValue() * 60);
 		}*/
+
 		/*String boardVersion = RefreshModelController.getInstance().getBoardVersion();
 		String firmwareVersion = RefreshModelController.getInstance().getFirmwareVersion();
 		RefreshModelController.getInstance().saveRM20LibraryVersion(rm20Version());
-		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::startSleepSession boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);
-		pMeta.addMetaField(Enum_EDF_Meta.unitVer, boardVersion);
-		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, firmwareVersion);*/
+		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::startSleepSession boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
+		pMeta.addMetaField(Enum_EDF_Meta.unitVer, BaseBluetoothActivity.boardVersion);
+		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, BaseBluetoothActivity.firmwareVersion);
+
 		AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel(context));
 		//RefreshModelController.getInstance().updateLocation();
 	}
@@ -740,9 +589,3 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 }
-
-
-/* Location:              [...]
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       0.7.1
- */

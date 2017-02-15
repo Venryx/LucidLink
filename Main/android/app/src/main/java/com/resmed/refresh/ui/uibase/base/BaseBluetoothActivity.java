@@ -421,6 +421,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	}
 
+	// hard-coded for now
+	public static String boardVersion = "1445024114";
+	public static String firmwareVersion = "Release1.1.7 0.0.0";
 	public void handleReceivedRpc(JsonRPC receivedRPC) {
 		if (receivedRPC != null) {
 			ResultRPC result = receivedRPC.getResult();
@@ -432,8 +435,12 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 					String boardVersion = payload.substring(0, indexSeparationChar);
 					final String firmwareVersion = payload.substring(indexSeparationChar + 1, payload.length() - 1);
 					Log.d(LOGGER.TAG_BLUETOOTH, "BaseBluetoothActivity::handlePayload, boardVersion : " + boardVersion + " firmwareVersion : " + firmwareVersion);
+
 					/*RefreshModelController.getInstance().saveBoardVersion(boardVersion);
 					RefreshModelController.getInstance().saveFirmwareVersion(firmwareVersion);*/
+					/*BaseBluetoothActivity.boardVersion = boardVersion;
+					BaseBluetoothActivity.firmwareVersion = firmwareVersion;*/
+
 					if (CORRECT_FIRMWARE_VERSION) {
 						/*editorPref.putString(getString(R.string.extra_bed_board_version), boardVersion);
 						editorPref.commit();

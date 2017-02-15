@@ -491,7 +491,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		edit.commit();
 		AppFileLog.deleteCurrentFile();
 		final Message message = new Message();
-		message.what = 12;
+		message.what = RefreshBluetoothService.MessageType.StartSession;
 		message.getData().putLong("sessionId", 1); // todo: make not hard-coded
 		message.getData().putInt("age", 18); // todo: make not hard-coded
 		message.getData().putInt("gender", 0); // 0 = male, 1 = female // todo: make not hard-coded
