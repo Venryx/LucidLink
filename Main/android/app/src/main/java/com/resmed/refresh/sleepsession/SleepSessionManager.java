@@ -313,7 +313,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}*/
 	}
 
-	public void addSamplesMiMq(int[] mi, int[] mq) {
+	/*public void addSamplesMiMq(int[] mi, int[] mq) {
 		if (!this.isActive) return;
 		int i = 0;
 		while (i < mi.length) {
@@ -347,6 +347,115 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 				}
 			}
 			i++;
+		}
+	}*/
+	/*public void addSamplesMiMq(int[] paramArrayOfInt1, int[] paramArrayOfInt2)
+	{
+		for (;;)
+		{
+			int[] buffer1;
+			int j;
+			try
+			{
+				boolean bool = this.isActive;
+				if (!bool) {
+					return;
+				}
+				int i = 0;
+				if (i < paramArrayOfInt1.length)
+				{
+					if ((4095 < paramArrayOfInt1[i]) || (4095 < paramArrayOfInt2[i]))
+					{
+						StringBuilder builder = new StringBuilder("ignoring samples; mi=");
+						Log.d("com.resmed.refresh.mqmi", paramArrayOfInt1[i] + " mq=" + paramArrayOfInt2[i]);
+						i++;
+					}
+				}
+				else {
+					continue;
+				}
+				if (this.rm20Manager != null)
+				{
+					Log.d("com.resmed.refresh.sleepFragment", " SleepSessionManager::addSamplesMiMq RM20 writting samples!");
+					this.rm20Manager.writeSampleData(paramArrayOfInt1[i], paramArrayOfInt2[i]);
+				}
+				BioSample sample = new BioSample(paramArrayOfInt1[i], paramArrayOfInt2[i]);
+				this.sampleBuffer.add(sample);
+				if (this.sampleBuffer.size() < 16) {
+					continue;
+				}
+				this.nrOfBioSamples += 16;
+				buffer1 = new int[this.sampleBuffer.size()];
+				int[] buffer2 = new int[this.sampleBuffer.size()];
+				j = 0;
+				Iterator localIterator = this.sampleBuffer.iterator();
+				if (!localIterator.hasNext())
+				{
+					this.nrOfBioSamples += 16;
+					if (this.edfManager != null) {
+						this.edfManager.writeDigitalSamples(buffer1, buffer2);
+					}
+					this.sampleBuffer.clear();
+					continue;
+				}
+				BioSample sample2 = (BioSample)localIterator.next();
+
+				buffer1[j] = sample2.getMiValue();
+				buffer2[j] = sample2.getMqValue();
+				String str1 = getHexString(buffer1[j]);
+				String str2 = getHexString(buffer2[j]);
+				Object localObject2 = new StringBuilder(String.valueOf(this.nrOfBioSamples + j));
+				Log.d("com.resmed.refresh.mqmi", "\tEDF cMiBuf[" + j + "]=" + buffer1[j] + "(" + str1 + ")  cMqBuf[" + j + "]=" + buffer2[j] + "(" + str2 + ")");
+				j++;
+			}
+			finally {}
+		}
+	}*/
+	public void addSamplesMiMq(int[] mi, int[] mq) {
+		synchronized (this) {
+			boolean bl = this.isActive;
+			if (!bl) {
+				return;
+			}
+			int n = 0;
+			while (n < mi.length) {
+				if (4095 < mi[n] || 4095 < mq[n]) {
+					Log.d("com.resmed.refresh.mqmi", "ignoring samples; mi=" + mi[n] + " mq=" + mq[n]);
+				} else {
+					if (this.rm20Manager != null) {
+						//Log.d("com.resmed.refresh.sleepFragment", " SleepSessionManager::addSamplesMiMq RM20 writing samples!");
+						this.rm20Manager.writeSampleData(mi[n], mq[n]);
+					}
+					BioSample bioSample = new BioSample(mi[n], mq[n]);
+					this.sampleBuffer.add(bioSample);
+					if (this.sampleBuffer.size() >= 16) {
+						this.nrOfBioSamples = 16 + this.nrOfBioSamples;
+						int[] cMiBuf = new int[this.sampleBuffer.size()];
+						int[] cMqBuf = new int[this.sampleBuffer.size()];
+						int n2 = 0;
+						Iterator iterator = this.sampleBuffer.iterator();
+						do {
+							if (!iterator.hasNext()) {
+								this.nrOfBioSamples = 16 + this.nrOfBioSamples;
+								if (this.edfManager != null) {
+									this.edfManager.writeDigitalSamples(cMiBuf, cMqBuf);
+								}
+								this.sampleBuffer.clear();
+								break;
+							}
+							BioSample bioSample2 = (BioSample)iterator.next();
+							cMiBuf[n2] = bioSample2.getMiValue();
+							cMqBuf[n2] = bioSample2.getMqValue();
+							String string = SleepSessionManager.getHexString(cMiBuf[n2]);
+							String string2 = SleepSessionManager.getHexString(cMqBuf[n2]);
+							Log.d("com.resmed.refresh.mqmi", (String.valueOf(n2 + this.nrOfBioSamples) + "\tEDF cMiBuf[" + n2 + "]=" + cMiBuf[n2] + "(" + string + ")  cMqBuf[" + n2 + "]=" + cMqBuf[n2] + "(" + string2 + ")"));
+							++n2;
+						} while (true);
+					}
+				}
+				++n;
+			}
+			return;
 		}
 	}
 
