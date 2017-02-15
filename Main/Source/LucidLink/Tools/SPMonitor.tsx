@@ -22,8 +22,8 @@ new Timer(10, async ()=> {
 	if (LL.tools.spMonitor.connect && LL.tools.spMonitor.monitor) {
 		var stage = await LL.spBridge.GetSleepStage();
 		Toast("SleepStage:" + stage);
-		if (stage != 3)
-			alert("Got other result!" + stage);
+		/*if (stage != 3)
+			alert("Got other result!" + stage);*/
 	}
 }).Start();
 

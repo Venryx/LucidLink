@@ -115,7 +115,7 @@ public class RM20DefaultManager implements RM20Manager
 
 	public int writeSampleData(final int n, final int n2) {
 		synchronized (this) {
-			V.Log("Writing sample data!");
+			V.JavaLog("Writing sample data!" + n + ";" + n2);
 			return this.rm20Lib.writeSampleData(n, n2);
 		}
 	}

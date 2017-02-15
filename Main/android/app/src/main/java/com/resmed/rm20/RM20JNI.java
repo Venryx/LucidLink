@@ -135,7 +135,7 @@ public class RM20JNI {
 	}
 
 	public void onWroteSample(int n) {
-		V.Log("Test3: " + n);
+		//V.Log("WroteData to RM20JNI for processing: " + n);
 	}
 
 	public native SleepParams resultsForSession();

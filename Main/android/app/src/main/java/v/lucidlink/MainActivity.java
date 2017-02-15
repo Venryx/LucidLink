@@ -116,6 +116,8 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		if (LL.main == null) super.onKeyDown(keyCode, event);
+
 		char keyChar = (char)event.getUnicodeChar();
 		LL.main.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
 		if (LL.main.blockUnusedKeys)
@@ -123,6 +125,8 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		return super.onKeyDown(keyCode, event);
 	}
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (LL.main == null) super.onKeyUp(keyCode, event);
+
 		char keyChar = (char)event.getUnicodeChar();
 		LL.main.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
 		if (LL.main.blockUnusedKeys)

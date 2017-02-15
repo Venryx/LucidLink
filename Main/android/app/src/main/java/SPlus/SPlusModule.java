@@ -116,7 +116,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		jsModuleEventEmitter.emit(eventName, argsList);
 	}
 
-	SleepSessionConnector sessionConnector;
+	public SleepSessionConnector sessionConnector;
 	@ReactMethod public void Init() {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");

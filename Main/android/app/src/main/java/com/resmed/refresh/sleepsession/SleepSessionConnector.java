@@ -28,6 +28,7 @@ import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
+import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
@@ -41,6 +42,8 @@ import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.SortedList;
 import com.resmed.rm20.SleepParams;
+
+import org.acra.ACRAConstants;
 
 import de.greenrobot.dao.DaoException;
 import v.lucidlink.LL;
@@ -87,32 +90,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.myHeartbeatHandler = new Handler();
 	}
 
-	private void checkReceivingHeartBeat(final int n, final int n2) {
-		int n3;
-		if (n2 < 5000) {
-			n3 = 15000;
-		} else if (n2 < 50000) {
-			n3 = 100000;
-		} else if (n2 < 500000) {
-			n3 = 400000;
-		} else {
-			n3 = 900000;
-		}
-		Log.d("com.resmed.refresh.sleepFragment", "Heartbeat time to be completed : " + n3);
-		AppFileLog.addTrace("Heartbeat time to be completed : " + n3);
-		this.heartbeatTimeoutRunnable = () -> {
-			AppFileLog.addTrace("Checking HeartBeat lastBioCount=" + n + " bioTotalCount=" + SleepSessionConnector.this.bioCurrentTotalCount);
-			if ((SleepSessionConnector.this.bAct != null) && (!SleepSessionConnector.this.isWaitLastSamples) && (SleepSessionConnector.this.bioCurrentTotalCount == n)) {
-				AppFileLog.addTrace("Timeout waiting for HeartBeat => Binding the service");
-				SleepSessionConnector.this.bAct.bindToService();
-				SleepSessionConnector.this.pendingBioSamplesRpc = null;
-				SleepSessionConnector.this.pendingEnvSamplesRpc = null;
-				SleepSessionConnector.this.isHandlingHeartBeat = false;
-			}
-		};
-		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) n3);
-	}
-
 	private void closeSession() {
 		AppFileLog.addTrace("CLOSING SLEEP SESSION, isHandlingHeartBeat :" + this.isHandlingHeartBeat);
 		CONNECTION_STATE state = LL.main.connectionState;
@@ -151,6 +128,56 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.isHandlingHeartBeat = false;
 	}
 
+	private void handleSamplesTransmissionCompleteForRPC(JsonRPC receivedRPC) {
+		AppFileLog.addTrace("IN : " + receivedRPC.getId() + "  Tx completed " + ("pendingBio is " + (this.pendingBioSamplesRpc == null ? "null" : "NOT null")) + "  " + ("pendingEnv is " + (this.pendingEnvSamplesRpc == null ? "null" : "NOT null")) + " isWaitLastSamples=" + this.isWaitLastSamples);
+		if (this.pendingBioSamplesRpc != null && this.pendingBioSamplesRpc.getId() == receivedRPC.getId()) {
+			if (!(this.pendingEnvSamplesRpc == null || this.bAct == null)) {
+				AppFileLog.addTrace("IN=>OUT : Requesting ENV ID : " + this.pendingEnvSamplesRpc.getId());
+				this.bAct.sendRpcToBed(this.pendingEnvSamplesRpc);
+			}
+			this.pendingBioSamplesRpc = null;
+		}
+		if (this.pendingEnvSamplesRpc != null && this.pendingEnvSamplesRpc.getId() == receivedRPC.getId()) {
+			this.pendingEnvSamplesRpc = null;
+			this.isHandlingHeartBeat = false;
+			AppFileLog.addTrace("");
+			this.myHeartbeatHandler.removeCallbacks(this.heartbeatTimeoutRunnable);
+			if (this.isRecovering) {
+				this.isRecovering = false;
+			}
+			this.lastHeartBeatTimestamp = Long.valueOf(System.currentTimeMillis());
+			//this.sleepSessionListener.onSessionOk();
+			if (this.isClosingSession) {
+				this.isWaitLastSamples = true;
+				this.bAct.updateDataStoredFlag(0);
+			}
+		}
+		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null && this.isClosingSession) {
+			JsonRPC stopSampleRpc = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
+			stopSampleRpc.setRPCallback(new RPCallback() {
+				public void preExecute() {
+				}
+
+				public void onError(ErrorRpc errRpc) {
+				}
+
+				public void execute() {
+					if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.bAct.isFinishing()) {
+						SleepSessionConnector.this.bAct.sendRpcToBed(BaseBluetoothActivity.getRpcCommands().clearBuffers());
+					}
+				}
+			});
+			AppFileLog.addTrace(" SleepSessionConnector last samples! -> stop & clear");
+			this.bAct.sendRpcToBed(stopSampleRpc);
+			Message msg = new Message();
+			msg.what = 14;
+			if (this.bAct != null) {
+				this.bAct.sendMsgBluetoothService(msg);
+				Log.d(LOGGER.TAG_FINISH_SESSION, "MSG_SLEEP_SESSION_STOP BaseBluetoothActivty");
+			}
+		}
+	}
+
 	private void handleHeartBeat(final byte[] array) {
 		if (this.bAct != null) {
 			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
@@ -165,6 +192,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			this.isHandlingHeartBeat = true;
 			final int storeLocalBio = PacketsByteValuesReader.getStoreLocalBio(array);
 			final int storeLocalEnv = PacketsByteValuesReader.getStoreLocalEnv(array);
+			V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
 			this.setBioOnBeD(storeLocalBio);
 			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
 			AppFileLog.addTrace("");
@@ -173,89 +201,50 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		}
 	}
 
-	private void handleSamplesTransmissionCompleteForRPC(final JsonRPC jsonRPC) {
-		final StringBuilder sb = new StringBuilder("pendingBio is ");
-		String s;
-		if (this.pendingBioSamplesRpc == null) {
-			s = "null";
+	private void checkReceivingHeartBeat(final int totalBioCountAtHeartBeat, int bioCountForHeartbeat) {
+		int delayTime;
+		if (bioCountForHeartbeat < ACRAConstants.DEFAULT_SOCKET_TIMEOUT) {
+			delayTime = 15000;
+		} else if (bioCountForHeartbeat < 50000) {
+			delayTime = 100000;
+		} else if (bioCountForHeartbeat < 500000) {
+			delayTime = 400000;
 		} else {
-			s = "NOT null";
+			delayTime = 900000;
 		}
-		final String string = sb.append(s).toString();
-		final StringBuilder sb2 = new StringBuilder("pendingEnv is ");
-		String s2;
-		if (this.pendingEnvSamplesRpc == null) {
-			s2 = "null";
-		} else {
-			s2 = "NOT null";
-		}
-		AppFileLog.addTrace("IN : " + jsonRPC.getId() + "  Tx completed " + string + "  " + sb2.append(s2).toString() + " isWaitLastSamples=" + this.isWaitLastSamples);
-		if (this.pendingBioSamplesRpc != null && this.pendingBioSamplesRpc.getId() == jsonRPC.getId()) {
-			if (this.pendingEnvSamplesRpc != null && this.bAct != null) {
-				AppFileLog.addTrace("IN=>OUT : Requesting ENV ID : " + this.pendingEnvSamplesRpc.getId());
-				this.bAct.sendRpcToBed(this.pendingEnvSamplesRpc);
+		Log.d(LOGGER.TAG_SLEEP_FRAGMENT, "Heartbeat time to be completed : " + delayTime);
+		AppFileLog.addTrace("Heartbeat time to be completed : " + delayTime);
+		this.heartbeatTimeoutRunnable = () -> {
+			AppFileLog.addTrace("Checking HeartBeat lastBioCount=" + totalBioCountAtHeartBeat + " bioTotalCount=" + SleepSessionConnector.this.bioCurrentTotalCount);
+			if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.isWaitLastSamples && SleepSessionConnector.this.bioCurrentTotalCount == totalBioCountAtHeartBeat) {
+				AppFileLog.addTrace("Timeout waiting for HeartBeat => Binding the service");
+				SleepSessionConnector.this.bAct.bindToService();
+				SleepSessionConnector.this.pendingBioSamplesRpc = null;
+				SleepSessionConnector.this.pendingEnvSamplesRpc = null;
+				SleepSessionConnector.this.isHandlingHeartBeat = false;
 			}
-			this.pendingBioSamplesRpc = null;
-		}
-		if (this.pendingEnvSamplesRpc != null && this.pendingEnvSamplesRpc.getId() == jsonRPC.getId()) {
-			this.pendingEnvSamplesRpc = null;
-			this.isHandlingHeartBeat = false;
-			AppFileLog.addTrace("");
-			this.myHeartbeatHandler.removeCallbacks(this.heartbeatTimeoutRunnable);
-			if (this.isRecovering) {
-				this.isRecovering = false;
-			}
-			this.lastHeartBeatTimestamp = System.currentTimeMillis();
-			V.Log("Caught up with external-only buffered data");
-			if (this.isClosingSession) {
-				this.isWaitLastSamples = true;
-				this.bAct.updateDataStoredFlag(0);
-			}
-		}
-		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null && this.isClosingSession) {
-			final JsonRPC stopNightTimeTracking = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
-			stopNightTimeTracking.setRPCallback(new JsonRPC.RPCallback() {
-				public void execute() {
-					if ((SleepSessionConnector.this.bAct != null) && (!SleepSessionConnector.this.bAct.isFinishing())) {
-						JsonRPC localJsonRPC = BaseBluetoothActivity.getRpcCommands().clearBuffers();
-						SleepSessionConnector.this.bAct.sendRpcToBed(localJsonRPC);
-					}
-				}
-
-				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
-			});
-			AppFileLog.addTrace(" SleepSessionConnector last samples! -> stop & clear");
-			this.bAct.sendRpcToBed(stopNightTimeTracking);
-			final Message message = new Message();
-			message.what = 14;
-			if (this.bAct != null) {
-				this.bAct.sendMsgBluetoothService(message);
-				Log.d("com.resmed.refresh.finish", "MSG_SLEEP_SESSION_STOP BaseBluetoothActivty");
-			}
-		}
+		};
+		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) delayTime);
 	}
 
-	private void requestSamples(final int n, final int n2) {
-		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::requestSamples(" + n + ", " + n2 + ") pendingBioSamplesRpc : " + this.pendingBioSamplesRpc + " pendingEnvSamplesRpc : " + this.pendingEnvSamplesRpc);
+
+	private void requestSamples(int countBio, int countEnv) {
+		Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionConnector::requestSamples(" + countBio + ", " + countEnv + ") pendingBioSamplesRpc : " + this.pendingBioSamplesRpc + " pendingEnvSamplesRpc : " + this.pendingEnvSamplesRpc);
 		if (this.bAct != null) {
-			int n3 = 65535;
-			int n4 = 65535;
-			if (n > 50000) {
-				final Message message = new Message();
-				message.what = 24;
-				this.bAct.sendMsgBluetoothService(message);
-			} else if (n < 1000) {
-				n3 = n;
-				n4 = n2;
+			int nrBioRequest = 65535;
+			int nrEnvRequest = 65535;
+			if (countBio > 50000) {
+				Message msg = new Message();
+				msg.what = 24;
+				this.bAct.sendMsgBluetoothService(msg);
+			} else if (countBio < 1000) {
+				nrBioRequest = countBio;
+				nrEnvRequest = countEnv;
 			}
 			if (this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null) {
-				this.pendingBioSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(n3, false, false);
-				this.pendingEnvSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(n4, true, false);
-				AppFileLog.addTrace("OUT : Requesting BIO : " + n + " ENV : " + n2);
+				this.pendingBioSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(nrBioRequest, false, false);
+				this.pendingEnvSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(nrEnvRequest, true, false);
+				AppFileLog.addTrace("OUT : Requesting BIO : " + countBio + " ENV : " + countEnv);
 				this.bAct.sendRpcToBed(this.pendingBioSamplesRpc);
 			}
 		}
@@ -359,9 +348,36 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	@Override
-	public void handleReceivedRpc(final JsonRPC jsonRPC) {
-		Log.d("com.resmed.refresh.ui", " SleepSessionConnector::handleReceivedRpc() receivedRPC:" + jsonRPC);
+	public void handleReceivedRpc(JsonRPC receivedRPC) {
+		Log.d(LOGGER.TAG_UI, " SleepSessionConnector::handleReceivedRpc() receivedRPC:" + receivedRPC);
+		if (receivedRPC != null) {
+			ResultRPC result = receivedRPC.getResult();
+			Log.d(LOGGER.TAG_UI, " SleepSessionConnector::handleReceivedRpc() result:" + result);
+			if (result != null) {
+				//this.countTimeout++;
+				String payload = result.getPayload();
+				Log.d(LOGGER.TAG_UI, " SleepSessionConnector::handleReceivedRpc() payload:" + payload);
+				if (payload.contains("TRUE")) {
+					AppFileLog.addTrace("IN : " + receivedRPC.getId() + " PAYLOAD : TERM(TRUE)");
+				} else {
+					AppFileLog.addTrace("IN : " + receivedRPC.getId() + " PAYLOAD ACK");
+				}
+				if (payload != null && payload.contains("TRUE")) {
+					handleSamplesTransmissionCompleteForRPC(receivedRPC);
+					return;
+				}
+				return;
+			}
+			ErrorRpc errorRpc = receivedRPC.getError();
+			if (errorRpc == null) {
+				return;
+			}
+			if (errorRpc.getCode().intValue() == -12 || errorRpc.getCode().intValue() == -11) {
+				handleSamplesTransmissionCompleteForRPC(receivedRPC);
+			}
+		}
 	}
+
 
 	public void handleSleepSessionStopped(final Bundle bundle) {
 		Log.d("com.resmed.refresh.finish", "handleSleepSessionStopped() ");

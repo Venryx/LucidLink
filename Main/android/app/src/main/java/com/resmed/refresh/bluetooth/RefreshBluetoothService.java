@@ -106,6 +106,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	public boolean sessionToBeStopped;
 	public SleepSessionManager sleepSessionManager;
 
+	// handles requests from our code, concerning bluetooth things (so some send commands to device)
 	public class BluetoothRequestsHandler extends Handler {
 		public void handleMessage(Message msg) {
 			RefreshTools.writeTimeStampToFile(RefreshBluetoothService.this.getApplicationContext(), System.currentTimeMillis());
@@ -129,7 +130,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					/*RefreshBluetoothService.this.mClient = msg.replyTo;
 					V.Log("Registered client:" + RefreshBluetoothService.this.mClient);*/
 					Message message = new Message();
-					message.what = 4;
+					message.what = MessageType.REGISTER_CLIENT;
 					try {
 						//RefreshBluetoothService.this.mClient.send(message);
 						mClient_send(message);
@@ -167,7 +168,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					}
 					Log.d("com.resmed.refresh.pair", (" RefreshBluetoothService the device : " + (Object) bluetoothDevice + " has been unpair"));
 					Message message4 = new Message();
-					message4.what = 8;
+					message4.what = MessageType.BeD_UNPAIR;
 					RefreshBluetoothService.this.sendMessageToClient(message4);
 					return;
 				case MessageType.SLEEP_SESSION_START:
@@ -237,7 +238,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					}
 					if ((RefreshBluetoothService.this.sleepSessionManager == null || RefreshBluetoothService.this.sleepSessionManager.getSessionId() == sessionToRecover || RefreshBluetoothService.this.sleepSessionManager.isActive) && RefreshBluetoothService.this.sleepSessionManager != null) {
 						Message recoverMsg = new Message();
-						recoverMsg.what = 21;
+						recoverMsg.what = MessageType.SLEEP_SESSION_RECOVER;
 						RefreshBluetoothService.this.sendMessageToClient(recoverMsg);
 						return;
 					}
@@ -267,8 +268,9 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					}
 					return;
 				case MessageType.REQUEST_BeD_AVAILABLE_DATA /*27*/:
+					V.Log("Requesting bed available data");
 					Message bedDataMessage = new Message();
-					bedDataMessage.what = 27;
+					bedDataMessage.what = MessageType.REQUEST_BeD_AVAILABLE_DATA;
 					Bundle data = new Bundle();
 					data.putInt(Consts.BUNDLE_BED_AVAILABLE_DATA, RefreshBluetoothService.this.isDataAvailableOnDevice);
 					bedDataMessage.setData(data);
@@ -357,10 +359,13 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					AppFileLog.addTrace("Service handlePacket payload: " + payload);
 					if (payload.equalsIgnoreCase("TRUE")) {
 						Log.d(LOGGER.TAG_BLUETOOTH, " RefreshBluetoothService isRecovering : ");
-						if (this.sleepSessionManager != null) {
+
+						// temp; do not recover data, for now (file-not-written problem)
+						/*if (this.sleepSessionManager != null) {
 							this.sleepSessionManager.addSamplesMiMq(new File(RefreshTools.getFilesPath(), "bluetooth_buffer_bulk_file"));
 							AppFileLog.addTrace("Service handlePacket sleepSessionManager.addSamplesMiMq(filesDir)");
-						}
+						}*/
+
 						BluetoothDataSerializeUtil.deleteBulkDataBioFile(getApplicationContext());
 						this.isHandleBulkTransfer = false;
 						AppFileLog.addTrace("Service handlePacket isHandleBulkTransfer = false");
@@ -368,7 +373,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 				}
 			}
 		} else {
-			AppFileLog.addTrace("Service handlePacket is NOT a PACKET_TYPE_RETURN isHandleBulkTransfer=" + this.isHandleBulkTransfer);
+			//AppFileLog.addTrace("Service handlePacket is NOT a PACKET_TYPE_RETURN isHandleBulkTransfer=" + this.isHandleBulkTransfer);
 			if (this.isHandleBulkTransfer) {
 				if (VLPacketType.PACKET_TYPE_BIO_64.ordinal() == packet.packetType || VLPacketType.PACKET_TYPE_BIO_32.ordinal() == packet.packetType) {
 					BluetoothDataSerializeUtil.writeBulkBioDataFile(getApplicationContext(), packet.buffer);
@@ -398,7 +403,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 				if (storeLocal >= 32) {
 					this.isDataAvailableOnDevice = packet.packetType;
 					Message mDataAvailableToClient = new Message();
-					mDataAvailableToClient.what = 27;
+					mDataAvailableToClient.what = MessageType.REQUEST_BeD_AVAILABLE_DATA;
 					mDataAvailableToClient.getData().putInt(Consts.BUNDLE_BED_AVAILABLE_DATA, this.isDataAvailableOnDevice);
 					sendMessageToClient(mDataAvailableToClient);
 				} else {
@@ -421,7 +426,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			AppFileLog.addTrace("Service handlePacket nrBytesRead=" + nrBytesRead);
 			if (-1 != nrBytesRead) {
 				newMessage = new Message();
-				newMessage.what = 19;
+				newMessage.what = MessageType.BeD_STREAM_PACKET_PARTIAL;
 				data = new Bundle();
 				data.putByteArray(REFRESH_BED_NEW_DATA, msgBuff);
 				data.putByte(REFRESH_BED_NEW_DATA_TYPE, packet.packetType);
@@ -433,7 +438,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		AppFileLog.addTrace("Service handlePacket Sending MSG_BeD_STREAM_PACKET_PARTIAL_END");
 		AppFileLog.addTrace(" _ ");
 		newMessage = new Message();
-		newMessage.what = 20;
+		newMessage.what = MessageType.BeD_STREAM_PACKET_PARTIAL_END;
 		data = new Bundle();
 		data.putByte(REFRESH_BED_NEW_DATA_TYPE, packet.packetType);
 		data.putInt(REFRESH_BED_NEW_DATA_SIZE, packet.packetSize);
@@ -528,8 +533,9 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		} catch (BluetoohNotSupportedException var5_10) {
 			var5_10.printStackTrace();
 		}
-		return 1;*/
-		return 1;
+		return Service.START_FLAG_REDELIVERY;*/
+		// don't restart service if it's killed (ie when app is closed)
+		return Service.START_NOT_STICKY;
 	}
 
 	public void ReactToFoundDevice(BluetoothDevice device) {
@@ -564,7 +570,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			return;
 		}*/
 		Message message = new Message();
-		message.what = 6;
+		message.what = MessageType.BeD_CONNECTION_STATUS;
 		Bundle bundle = new Bundle();
 		bundle.putSerializable("REFRESH_BED_NEW_CONN_STATUS", (Serializable) cONNECTION_STATE);
 		message.setData(bundle);

@@ -199,6 +199,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	}
 
 	public void addBioData(final byte[] array, final byte b) {
+		V.Log("addBioData:" + this.isActive);
 		if (!this.isActive) return;
 		final int length = array.length;
 		Log.d("com.resmed.refresh.finish", "SleepTrackingFragment::handleBioData() size : " + length);
@@ -210,6 +211,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	}
 
 	public void addEnvData(final byte[] array, final boolean b) {
+		V.Log("addEnvData:" + this.isActive + ";" + b);
 		if (b && this.isActive) {
 			final float[] temperatureValues = PacketsByteValuesReader.readTemperatureValues(array);
 			final int[] illuminanceValues = PacketsByteValuesReader.readIlluminanceValues(array);
@@ -320,7 +322,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 				Log.d(LOGGER.TAG_MQMI, "ignoring samples; mi=" + mi[i] + " mq=" + mq[i]);
 			} else {
 				if (this.rm20Manager != null) {
-					Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionManager::addSamplesMiMq RM20 writting samples!");
+					//Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionManager::addSamplesMiMq RM20 writting samples!");
 					this.rm20Manager.writeSampleData(mi[i], mq[i]);
 				}
 				this.sampleBuffer.add(new BioSample(mi[i], mq[i]));

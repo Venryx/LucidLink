@@ -377,6 +377,10 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void handleConnectionStatus(CONNECTION_STATE newState) {
+		// also transmit to connector
+		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleConnectionStatus(newState);
+
 		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " mBound : " + this.mBound + " isAvailable:" + this.isAvailable);
 		if (newState != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable) { // && LL.main.connectionState != newState) {
 			//this.currentState = newState;
@@ -425,6 +429,10 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	public static String boardVersion = "1445024114";
 	public static String firmwareVersion = "Release1.1.7 0.0.0";
 	public void handleReceivedRpc(JsonRPC receivedRPC) {
+		// also transmit to connector
+		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleReceivedRpc(receivedRPC);
+
 		if (receivedRPC != null) {
 			ResultRPC result = receivedRPC.getResult();
 			if (result != null) {
@@ -480,6 +488,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void handleSleepSessionStopped(Bundle var1) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleSleepSessionStopped(var1);
 	}
 
 	private void handleNoteEnv(byte[] decobbed) {
@@ -506,6 +517,10 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void handleStreamPacket(Bundle bundle) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleStreamPacket(bundle);
+
 		synchronized (this) {
 			byte[] decobbed = bundle.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
 			byte packetType = bundle.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
@@ -564,16 +579,28 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public void handleBreathingRate(Bundle var1) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleBreathingRate(var1);
+
 		V.Log("Breathing rate: " + var1);
 		V.Alert("Breathing rate: " + var1);
 	}
 
 	public void handleEnvSample(Bundle var1) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleEnvSample(var1);
+
 		Log.d("com.resmed.refresh.ui", "handleEnvSample() ");
 	}
 
 	public Promise getSleepStage_currentWaiter;
 	public void handleUserSleepState(Bundle bundle) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleUserSleepState(bundle);
+
 		int stage = bundle.getInt("BUNDLE_SLEEP_STATE");
 		V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
 			+ ";BUNDLE_SLEEP_EPOCH_INDEX:" + bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX"));
