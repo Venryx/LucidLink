@@ -92,6 +92,10 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();
 		for (Object arg : args) {
+			// for types that are invalid, but can easily be cast to a valid one, do so
+			/*if (arg instanceof Float)
+				arg = (double)(float)arg;
+
 			if (arg == null)
 				argsList.pushNull();
 			else if (arg instanceof Boolean)
@@ -109,7 +113,8 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 				if (!(arg instanceof WritableMap))
 					throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
 				argsList.pushMap((WritableMap) arg);
-			}
+			}*/
+			V.WritableArray_Add(argsList, arg);
 		}
 
 		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
@@ -198,18 +203,18 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		BaseBluetoothActivity.IN_SLEEP_SESSION = false;
 	}
 
-	@ReactMethod public void GetSleepStage(Promise promise) {
+	/*@ReactMethod public void GetSleepStage(Promise promise) {
 		if (RefreshBluetoothService.main.sleepSessionManager == null) {
 			promise.resolve(-1);
 			return;
 		}
 
 		/*int stage = baseManager.rm20Manager.getRealTimeSleepState();
-		promise.resolve(stage); // this is not actually the sleep-stage, but rather the success-flag (I think)*/
+		promise.resolve(stage); // this is not actually the sleep-stage, but rather the success-flag (I think)*#/
 		MainActivity.main.getSleepStage_currentWaiter = promise;
 		//baseManager.rm20Manager.getRealTimeSleepState();
 		RefreshBluetoothService.main.sleepSessionManager.rm20Manager.getRealTimeSleepState();
-	}
+	}*/
 	@ReactMethod public void StartRealTimeStream() {
 		/*int stage = baseManager.rm20Manager.();
 		promise.resolve(stage);*/

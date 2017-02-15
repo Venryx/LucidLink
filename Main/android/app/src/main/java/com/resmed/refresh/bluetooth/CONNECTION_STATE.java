@@ -88,7 +88,7 @@ public enum CONNECTION_STATE
 	public static String toString(final CONNECTION_STATE connection_STATE) {
 		switch ($SWITCH_TABLE$com$resmed$refresh$bluetooth$CONNECTION_STATE()[connection_STATE.ordinal()]) {
 			default: {
-				return "UNKNOW";
+				return "UNKNOWN";
 			}
 			case 9: {
 				return "SESSION_OPENING";

@@ -270,8 +270,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			RefreshUserPreferencesData var12 = new RefreshUserPreferencesData(this.getApplicationContext());
 			var12.setIntegerConfigValue("PREF_LAST_RPC_ID_USED", Integer.valueOf(var1.getId()));
 
-			V.Log("Service exists?:" + mService);
-
 			try {
 				if (mService != null) {
 					mService.send(var2);
@@ -491,27 +489,12 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			SPlusModule.main.sessionConnector.handleSleepSessionStopped(var1);
 	}
 
-	private void handleNoteEnv(byte[] decobbed) {
-		int illumValue = PacketsByteValuesReader.readIlluminanceValue(decobbed);
-		float tempValue = PacketsByteValuesReader.readTemperatureValue(decobbed);
-		this.setLightValue(illumValue);
-		this.setTempValue(tempValue);
-	}
-	public void setTempValue(float value) {
-		double degreesCelsuis = value;
-		double degreesFarenheit = Math.round(MeasureManager.convertCelsiusToFahrenheit(value));
-		//V.Log("TempVal:" + degreesCelsuis + " (" + degreesFarenheit + "f)");
-		SPlusModule.main.SendEvent("OnReceiveTempValue", degreesCelsuis, degreesFarenheit);
-	}
-	public void setLightValue(int value) {
-		//V.Log("LightLevel:" + value);
-		SPlusModule.main.SendEvent("OnReceiveLightValue", value);
-	}
-	private void handleBioToGraph(byte[] decobbed) {
-		if (decobbed.length == 0) return;
-		int[] bioData = PacketsByteValuesReader.readBioData(decobbed);
-		//V.Log("BreathVal:" + bioData[0]);
-		SPlusModule.main.SendEvent("OnReceiveBreathValue", bioData[0]);
+	public void handleEnvSample(Bundle var1) {
+		// also transmit to connector
+		if (SPlusModule.main.sessionConnector != null)
+			SPlusModule.main.sessionConnector.handleEnvSample(var1);
+
+		Log.d("com.resmed.refresh.ui", "handleEnvSample() ");
 	}
 
 	public void handleStreamPacket(Bundle bundle) {
@@ -576,36 +559,56 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	}
 
-	public void handleBreathingRate(Bundle var1) {
-		// also transmit to connector
-		if (SPlusModule.main.sessionConnector != null)
-			SPlusModule.main.sessionConnector.handleBreathingRate(var1);
-
-		V.Log("Breathing rate: " + var1);
-		V.Alert("Breathing rate: " + var1);
+	// raw data
+	private void handleNoteEnv(byte[] decobbed) {
+		int illumValue = PacketsByteValuesReader.readIlluminanceValue(decobbed);
+		float tempValue = PacketsByteValuesReader.readTemperatureValue(decobbed);
+		this.setLightValue(illumValue);
+		this.setTempValue(tempValue);
+	}
+	public void setTempValue(float value) {
+		double degreesCelsuis = value;
+		double degreesFarenheit = Math.round(MeasureManager.convertCelsiusToFahrenheit(value));
+		//V.Log("TempVal:" + degreesCelsuis + " (" + degreesFarenheit + "f)");
+		SPlusModule.main.SendEvent("OnReceiveTemp", degreesCelsuis, degreesFarenheit);
+	}
+	public void setLightValue(int value) {
+		//V.Log("LightLevel:" + value);
+		SPlusModule.main.SendEvent("OnReceiveLightValue", value);
+	}
+	private void handleBioToGraph(byte[] decobbed) {
+		if (decobbed.length == 0) return;
+		int[] bioData = PacketsByteValuesReader.readBioData(decobbed);
+		//V.Log("BreathVal:" + bioData[0]);
+		SPlusModule.main.SendEvent("OnReceiveBreathValue", bioData[0]);
 	}
 
-	public void handleEnvSample(Bundle var1) {
+	// calculated data
+	public void handleBreathingRate(Bundle data) {
 		// also transmit to connector
 		if (SPlusModule.main.sessionConnector != null)
-			SPlusModule.main.sessionConnector.handleEnvSample(var1);
+			SPlusModule.main.sessionConnector.handleBreathingRate(data);
 
-		Log.d("com.resmed.refresh.ui", "handleEnvSample() ");
+		/*V.Log("Breathing rate: " + var1);
+		V.Alert("Breathing rate: " + var1);*/
+		//int breathing_secIndex = data.getInt(Consts.BUNDLE_BREATHING_SECINDEX);
+		float breathing_rate = data.getFloat(Consts.BUNDLE_BREATHING_RATE);
+		SPlusModule.main.SendEvent("OnReceiveBreathingRate", breathing_rate);
 	}
-
-	public Promise getSleepStage_currentWaiter;
+	//public Promise getSleepStage_currentWaiter;
 	public void handleUserSleepState(Bundle bundle) {
 		// also transmit to connector
 		if (SPlusModule.main.sessionConnector != null)
 			SPlusModule.main.sessionConnector.handleUserSleepState(bundle);
 
-		int stage = bundle.getInt("BUNDLE_SLEEP_STATE");
-		V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
+		int stageValue = bundle.getInt("BUNDLE_SLEEP_STATE");
+		/*V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
 			+ ";BUNDLE_SLEEP_EPOCH_INDEX:" + bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX"));
 		if (getSleepStage_currentWaiter != null) {
 			getSleepStage_currentWaiter.resolve(stage);
 			getSleepStage_currentWaiter = null;
-		}
+		}*/
+		SPlusModule.main.SendEvent("OnReceiveSleepStage", stageValue);
 	}
 
 	protected boolean isBluetoothServiceRunning() {

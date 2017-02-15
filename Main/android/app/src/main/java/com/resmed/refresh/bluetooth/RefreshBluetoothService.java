@@ -380,7 +380,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					return;
 				}
 			}
-			V.Log("Checking..." + this.sleepSessionManager + ";" + (this.sleepSessionManager != null ? this.sleepSessionManager.isActive : false));
+			//V.Log("Checking..." + this.sleepSessionManager + ";" + (this.sleepSessionManager != null ? this.sleepSessionManager.isActive : false));
 			if (this.sleepSessionManager != null && this.sleepSessionManager.isActive) {
 				if (VLPacketType.PACKET_TYPE_BIO_64.ordinal() == packet.packetType) {
 					this.sleepSessionManager.addBioData(packet.buffer, packet.packetNo);

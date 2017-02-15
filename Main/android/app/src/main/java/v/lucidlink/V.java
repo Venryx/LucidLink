@@ -187,24 +187,28 @@ public class V {
 		return result;
 	}
 
-	public static void WritableArray_Add(WritableArray array, Object obj) {
-		if (obj == null)
+	public static void WritableArray_Add(WritableArray array, Object item) {
+		// for types that are invalid, but can easily be cast to a valid one, do so
+		if (item instanceof Float)
+			item = (double)(float)item;
+
+		if (item == null)
 			array.pushNull();
-		else if (obj instanceof Boolean)
-			array.pushBoolean((Boolean)obj);
-		else if (obj instanceof Integer)
-			array.pushInt((Integer)obj);
-		else if (obj instanceof Double)
-			array.pushDouble((Double)obj);
-		else if (obj instanceof String)
-			array.pushString((String)obj);
-		else if (obj instanceof WritableArray)
-			array.pushArray((WritableArray)obj);
+		else if (item instanceof Boolean)
+			array.pushBoolean((Boolean)item);
+		else if (item instanceof Integer)
+			array.pushInt((Integer)item);
+		else if (item instanceof Double)
+			array.pushDouble((Double)item);
+		else if (item instanceof String)
+			array.pushString((String)item);
+		else if (item instanceof WritableArray)
+			array.pushArray((WritableArray)item);
 		else {
 			//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
-			if (!(obj instanceof WritableMap))
-				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap (not " + obj.getClass().getSimpleName() + ")");
-			array.pushMap((WritableMap)obj);
+			if (!(item instanceof WritableMap))
+				throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap (not " + item.getClass().getSimpleName() + ")");
+			array.pushMap((WritableMap)item);
 		}
 	}
 	public static void WritableMap_Add(WritableMap map, String key, Object obj) {

@@ -1,137 +1,91 @@
 package com.resmed.rm20;
 
-import java.io.*;
-import android.content.*;
-import java.util.*;
+import android.content.Context;
+import java.io.File;
+import java.util.Date;
 
-import v.lucidlink.V;
-
-public class RM20DefaultManager implements RM20Manager
-{
-	public RM20JNI rm20Lib;
+public class RM20DefaultManager implements RM20Manager {
+	private RM20JNI rm20Lib;
 	private Thread writerThread;
 
-	public RM20DefaultManager(final File file, final RM20Callbacks rm20Callbacks, final Context context) {
-		this.rm20Lib = new RM20JNI(file, rm20Callbacks, context);
+	public RM20DefaultManager(File filesFolder, RM20Callbacks callbacks, Context context) {
+		this.rm20Lib = new RM20JNI(filesFolder, callbacks, context);
 	}
 
-	public int disableSmartAlarm() {
-		synchronized (this) {
-			return this.rm20Lib.disableSmartAlarm();
-		}
+	public synchronized String getLibVersion() {
+		return this.rm20Lib.getLibVersion();
 	}
 
-	public int getEpochCount() {
-		synchronized (this) {
-			return this.rm20Lib.getEpochCount();
-		}
+	public synchronized int getRealTimeSleepState() {
+		return this.rm20Lib.getRealTimeSleepState();
 	}
 
-	public String getLibVersion() {
-		synchronized (this) {
-			return this.rm20Lib.getLibVersion();
-		}
+	public synchronized int writeSampleData(int uiMI, int uiMQ) {
+		return this.rm20Lib.writeSampleData(uiMI, uiMQ);
 	}
 
-	public int getRealTimeSleepState() {
-		synchronized (this) {
-			return this.rm20Lib.getRealTimeSleepState();
+	public synchronized int writeSamples(int[] uiMI, int[] uiMQ) {
+		for (int i = 0; i < uiMQ.length; i++) {
+			writeSampleData(uiMI[i], uiMQ[i]);
 		}
+		return 0;
 	}
 
-	public SmartAlarmInfo getSmartAlarm() {
-		synchronized (this) {
-			return this.rm20Lib.getSmartAlarm();
-		}
+	public synchronized int stopAndCalculate() {
+		return this.rm20Lib.stopAndCalculate();
 	}
 
-	public UserInfo getUserInfo() {
-		synchronized (this) {
-			return this.rm20Lib.getUserInfo();
-		}
+	public synchronized int getEpochCount() {
+		return this.rm20Lib.getEpochCount();
 	}
 
-	public SleepParams resultsForSession() {
-		synchronized (this) {
-			return this.rm20Lib.resultsForSession();
-		}
+	public synchronized SmartAlarmInfo getSmartAlarm() {
+		return this.rm20Lib.getSmartAlarm();
 	}
 
-	public int setSmartAlarm(final Date date, final int n, final boolean b) {
-		// monitorenter(this)
-		int n2 = 65535;
-		int n3 = 65535;
-		while (true) {
-			Label_0082: {
-				if (n < 0) {
-					break Label_0082;
-				}
-				try {
-					n3 = (int)(date.getTime() - System.currentTimeMillis()) / 1000 / 30 + this.rm20Lib.getEpochCount();
-					n2 = n3 - n / 30;
-					//break Label_0082;
-					return this.rm20Lib.setSmartAlarm(n2, n3, b);
-				}
-				finally {
-				}
-				// monitorexit(this)
-			}
-			if (n2 < 0) {
-				n2 = 0;
-			}
-			if (n3 < 0) {
-				n2 = 65535;
-				n3 = 65535;
-			}
-			if (n2 > 65535) {
-				n2 = 65535;
-				n3 = 65535;
-			}
-			if (n3 > 65535) {
-				n3 = 65535;
-				continue;
-			}
-			continue;
+	public synchronized int setSmartAlarm(Date alarmDate, int alarmWindowSeconds, boolean enableCallbacks) {
+		int alarmWinStartEpc;
+		int alarmWinEndEpc;
+		alarmWinStartEpc = 65535;
+		alarmWinEndEpc = 65535;
+		if (alarmWindowSeconds >= 0) {
+			alarmWinEndEpc = ((((int) (alarmDate.getTime() - System.currentTimeMillis())) / 1000) / 30) + this.rm20Lib.getEpochCount();
+			alarmWinStartEpc = alarmWinEndEpc - (alarmWindowSeconds / 30);
 		}
+		if (alarmWinStartEpc < 0) {
+			alarmWinStartEpc = 0;
+		}
+		if (alarmWinEndEpc < 0) {
+			alarmWinStartEpc = 65535;
+			alarmWinEndEpc = 65535;
+		}
+		if (alarmWinStartEpc > 65535) {
+			alarmWinStartEpc = 65535;
+			alarmWinEndEpc = 65535;
+		}
+		if (alarmWinEndEpc > 65535) {
+			alarmWinEndEpc = 65535;
+		}
+		return this.rm20Lib.setSmartAlarm(alarmWinStartEpc, alarmWinEndEpc, enableCallbacks);
 	}
 
-	public int startRespRateCallbacks(final boolean respRateCallbacks) {
-		synchronized (this) {
-			return this.rm20Lib.setRespRateCallbacks(respRateCallbacks);
-		}
+	public synchronized int startRespRateCallbacks(boolean enableCallbacks) {
+		return this.rm20Lib.setRespRateCallbacks(enableCallbacks);
 	}
 
-	public int startupLibrary(final int age, final int gender) {
-		synchronized (this) {
-			return this.rm20Lib.startupLibrary(age, gender);
-		}
+	public synchronized SleepParams resultsForSession() {
+		return this.rm20Lib.resultsForSession();
 	}
 
-	public int stopAndCalculate() {
-		synchronized (this) {
-			return this.rm20Lib.stopAndCalculate();
-		}
+	public synchronized UserInfo getUserInfo() {
+		return this.rm20Lib.getUserInfo();
 	}
 
-	public int writeSampleData(final int n, final int n2) {
-		synchronized (this) {
-			V.JavaLog("Writing sample data!" + n + ";" + n2);
-			return this.rm20Lib.writeSampleData(n, n2);
-		}
+	public synchronized int startupLibrary(int age, int gender) {
+		return this.rm20Lib.startupLibrary(age, gender);
 	}
 
-	public int writeSamples(final int[] array, final int[] array2) {
-		// monitorenter(this)
-		int i = 0;
-		try {
-			while (i < array2.length) {
-				this.writeSampleData(array[i], array2[i]);
-				++i;
-			}
-			return 0;
-		}
-		finally {
-		}
-		// monitorexit(this)
+	public synchronized int disableSmartAlarm() {
+		return this.rm20Lib.disableSmartAlarm();
 	}
 }

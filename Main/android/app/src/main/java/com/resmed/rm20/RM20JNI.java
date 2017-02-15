@@ -116,27 +116,21 @@ public class RM20JNI {
 		V.Log("Library started: " + n);
 	}
 
+	public void onWroteSample(int n) {
+		//V.Log("WroteData to RM20JNI for processing: " + n);
+	}
+
 	public void onRealTimeSleepState(int n, int n2) {
-		V.Log("onRealTimeSleepState");
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20RealTimeSleepState(n, n2);
 	}
-
 	public void onRm20Alarm(int n) {
-		V.Log("onRm20Alarm");
 		/*if (this.callbacks == null) return;
 		this.callbacks.onRm20Alarm(n);*/
 	}
-
 	public void onValidBreathingRate(float f, int n) {
-		V.Log("On breath in jni:" + f + ";" + n);
-		V.Toast("Got \"valid\" breath data!" + f + ";" + n);
 		if (this.callbacks == null) return;
 		this.callbacks.onRm20ValidBreathingRate(f, n);
-	}
-
-	public void onWroteSample(int n) {
-		//V.Log("WroteData to RM20JNI for processing: " + n);
 	}
 
 	public native SleepParams resultsForSession();

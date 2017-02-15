@@ -45,6 +45,7 @@ import com.resmed.rm20.SleepParams;
 
 import org.acra.ACRAConstants;
 
+import SPlus.SPlusModule;
 import de.greenrobot.dao.DaoException;
 import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
@@ -130,13 +131,21 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 	private void handleSamplesTransmissionCompleteForRPC(JsonRPC receivedRPC) {
 		AppFileLog.addTrace("IN : " + receivedRPC.getId() + "  Tx completed " + ("pendingBio is " + (this.pendingBioSamplesRpc == null ? "null" : "NOT null")) + "  " + ("pendingEnv is " + (this.pendingEnvSamplesRpc == null ? "null" : "NOT null")) + " isWaitLastSamples=" + this.isWaitLastSamples);
+
+		// if we're receiving bio samples
 		if (this.pendingBioSamplesRpc != null && this.pendingBioSamplesRpc.getId() == receivedRPC.getId()) {
 			if (!(this.pendingEnvSamplesRpc == null || this.bAct == null)) {
 				AppFileLog.addTrace("IN=>OUT : Requesting ENV ID : " + this.pendingEnvSamplesRpc.getId());
+				// request env-samples next
 				this.bAct.sendRpcToBed(this.pendingEnvSamplesRpc);
 			}
 			this.pendingBioSamplesRpc = null;
+
+			// whenever a batch of raw bio-data is received, have the sleep-stage be calculated as well
+			if (RefreshBluetoothService.main.sleepSessionManager != null) // if this data was from a session we actually started this launch // temp fix
+				RefreshBluetoothService.main.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 		}
+		// if we're receiving env-samples
 		if (this.pendingEnvSamplesRpc != null && this.pendingEnvSamplesRpc.getId() == receivedRPC.getId()) {
 			this.pendingEnvSamplesRpc = null;
 			this.isHandlingHeartBeat = false;
@@ -152,15 +161,13 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.bAct.updateDataStoredFlag(0);
 			}
 		}
+
+		// if this is the last of the samples
 		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null && this.isClosingSession) {
 			JsonRPC stopSampleRpc = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
 			stopSampleRpc.setRPCallback(new RPCallback() {
-				public void preExecute() {
-				}
-
-				public void onError(ErrorRpc errRpc) {
-				}
-
+				public void preExecute() {}
+				public void onError(ErrorRpc errRpc) {}
 				public void execute() {
 					if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.bAct.isFinishing()) {
 						SleepSessionConnector.this.bAct.sendRpcToBed(BaseBluetoothActivity.getRpcCommands().clearBuffers());
@@ -170,7 +177,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			AppFileLog.addTrace(" SleepSessionConnector last samples! -> stop & clear");
 			this.bAct.sendRpcToBed(stopSampleRpc);
 			Message msg = new Message();
-			msg.what = 14;
+			msg.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_STOP;
 			if (this.bAct != null) {
 				this.bAct.sendMsgBluetoothService(msg);
 				Log.d(LOGGER.TAG_FINISH_SESSION, "MSG_SLEEP_SESSION_STOP BaseBluetoothActivty");
@@ -193,6 +200,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			final int storeLocalBio = PacketsByteValuesReader.getStoreLocalBio(array);
 			final int storeLocalEnv = PacketsByteValuesReader.getStoreLocalEnv(array);
 			V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
+
 			this.setBioOnBeD(storeLocalBio);
 			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
 			AppFileLog.addTrace("");
@@ -414,7 +422,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public void handleStreamPacket(Bundle paramBundle) {
-		V.Log("HandleStreamPacket:" + Arrays.toString(paramBundle.getByteArray("REFRESH_BED_NEW_DATA")));
+		//V.Log("HandleStreamPacket:" + Arrays.toString(paramBundle.getByteArray("REFRESH_BED_NEW_DATA")));
 		byte[] arrayOfByte = paramBundle.getByteArray("REFRESH_BED_NEW_DATA");
 		int i = paramBundle.getByte("REFRESH_BED_NEW_DATA_TYPE");
 		if (VLPacketType.PACKET_TYPE_NOTE_ILLUMINANCE_CHANGE.ordinal() == i) {
