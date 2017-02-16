@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.resmed.refresh.utils.RefreshBluetoothManager;
+import com.resmed.refresh.bluetooth.BluetoothSetup;
 
 public class BluetoothDeviceFoundReceiver
 		extends BroadcastReceiver {
-	private RefreshBluetoothManager bluetoothManager;
+	private BluetoothSetup bluetoothManager;
 
-	public BluetoothDeviceFoundReceiver(RefreshBluetoothManager paramRefreshBluetoothManager) {
+	public BluetoothDeviceFoundReceiver(BluetoothSetup paramRefreshBluetoothManager) {
 		this.bluetoothManager = paramRefreshBluetoothManager;
 	}
 

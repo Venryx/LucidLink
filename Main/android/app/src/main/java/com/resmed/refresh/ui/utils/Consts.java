@@ -67,8 +67,6 @@ public class Consts
 	public static final String PREF_DATA_ON_BED = "PREF_DATA_ON_BED_NOTIFICATION_ID";
 	public static final String PREF_GENDER = "PREF_GENDER";
 	public static final String PREF_LAST_RPC_ID_USED = "PREF_LAST_RPC_ID_USED";
-	public static final String PREF_NIGHT_LAST_SESSION_ID = "PREF_NIGHT_LAST_SESSION_ID";
-	public static final String PREF_NIGHT_LAST_TIMESTAMP = "PREF_NIGHT_LAST_TIMESTAMP_ID";
 	public static final String PREF_NIGHT_TRACK_STATE = "PREF_CONNECTION_STATE";
 	public static final String PREF_SESSION_BIO_COUNT = "PREF_SESSION_BIO_COUNT";
 	public static final String PREF_SYNC_DATA_PROCESS = "PREF_SYNC_DATA_PROCESS";

@@ -279,14 +279,14 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				break;
 			case SOCKET_CONNECTED:
 				Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment SESSION_OPENED, isWaitLastSamples : " + this.isWaitLastSamples + " isClosingSession:" + this.isClosingSession + " isSyncAndStop:" + this.isSyncAndStop);
-				if ((!this.isWaitLastSamples) && (!this.isClosingSession)) {
+				/*if ((!this.isWaitLastSamples) && (!this.isClosingSession)) {
 					localHandler.postDelayed(() -> {
 						//SleepSessionConnector.this.registerForSessionTimeout(localHandler);
 						JsonRPC localJsonRPC = BaseBluetoothActivity.getRpcCommands().startNightTracking();
 						SleepSessionConnector.this.bAct.sendRpcToBed(localJsonRPC);
 					}, 1000L);
 				}
-				this.isHandlingHeartBeat = false;
+				this.isHandlingHeartBeat = false;*/
 				break;
 			case SESSION_OPENED:
 				this.bAct.pairAndConnect(SPlusModule.main.sessionConnector.service.bluetoothManager.device);
@@ -390,26 +390,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
 	}
 
-	public void init() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext());
-		int nightState = prefs.getInt(Consts.PREF_NIGHT_TRACK_STATE, -1);
-		AppFileLog.addTrace("SleepSessionConnector recovering state " + nightState + " for session id : " + prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1));
-		if (this.isSyncAndStop) {
-			//recoverSleepSession(didUserPressedBackToSleep);
-			syncDataAndStop();
-		} /*else if (nightState == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
-			recoverSleepSession(true);
-			RegisterRepeatingAlarmWake(this.bAct);
-		}*/ else {
-			startSleepSession();
-		}
-		this.sizeToStore = this.isSyncAndStop ? 640 : 2;
-	}
-
-	public boolean isRecovering() {
-		return this.isRecovering;
-	}
-
 	public void resume() {
 		this.pendingBioSamplesRpc = null;
 		this.pendingEnvSamplesRpc = null;
@@ -439,10 +419,13 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		RST_SleepSession.getInstance().startSession(true);
 	}
 
-	protected void startSleepSession() {
-		final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-		edit.putInt("PREF_CONNECTION_STATE", CONNECTION_STATE.NIGHT_TRACK_ON.ordinal());
-		edit.commit();
+	public boolean sessionActive;
+	public void EnsureSleepSessionStarted() {
+		if (sessionActive) return;
+		sessionActive = true;
+
+		this.sizeToStore = this.isSyncAndStop ? 640 : 2;
+
 		AppFileLog.deleteCurrentFile();
 		final Message message = new Message();
 		message.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_START;
@@ -467,9 +450,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				Log.d(LOGGER.TAG_FINISH_SESSION, "stopStreamAndRequestAllSamples Conditions" + this.isHandlingHeartBeat + ":" + this.isSyncAndStop);
 				stopStreamAndRequestAllSamples();
 			}
-			Editor editor = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-			editor.putInt(Consts.PREF_NIGHT_TRACK_STATE, CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal());
-			editor.commit();
 		}
 	}
 }

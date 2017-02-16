@@ -70,8 +70,6 @@ import v.lucidlink.V;
 public class BaseBluetoothActivity extends BaseActivity implements BluetoothDataListener, BluetoothDataWriter {
 	public static boolean CORRECT_FIRMWARE_VERSION = true;
 	private static Map CommandStack = new LinkedHashMap();
-	public static boolean IN_SLEEP_SESSION = false;
-	protected static final int REQUEST_ENABLE_BT = 161;
 	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	public static boolean UPDATING_FIRMWARE = false;
 	private static boolean connectingToBeD = false;
@@ -83,10 +81,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			BaseBluetoothActivity.this.handleConnectionStatus(connectionState);
 		}
 	};
+
 	protected boolean mBound;
-	private BluetoothDevice mDevice;
 	public IncomingHandler mFromServiceHandler = new IncomingHandler();
-	public Messenger mFromService = new Messenger(mFromServiceHandler);
 	private List<BroadcastReceiver> receivers;
 
 	public class IncomingHandler extends Handler {
@@ -127,9 +124,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 				case RefreshBluetoothService.MessageType.BeD_STREAM_PACKET_PARTIAL_END:
 					handlePartialStreamPacketEnd(msg.getData());
 					return;
-				case RefreshBluetoothService.MessageType.SLEEP_SESSION_RECOVER:
+				/*case RefreshBluetoothService.MessageType.SLEEP_SESSION_RECOVER:
 					BaseBluetoothActivity.this.handleSessionRecovered(msg.getData());
-					return;
+					return;*/
 				case RefreshBluetoothService.MessageType.REQUEST_BeD_AVAILABLE_DATA /*27*/:
 					Bundle bData = msg.getData();
 					if (bData != null) {
@@ -224,9 +221,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 				var10.preExecute();
 			}
 
-			Bundle var11 = new Bundle();
-			var11.putByteArray("bytes", var9.array());
-			sendMessageToService(2, var11);
+			Bundle data = new Bundle();
+			data.putByteArray("bytes", var9.array());
+			sendMessageToService(RefreshBluetoothService.MessageType.SEND_BYTES, data);
 
 			RefreshUserPreferencesData var12 = new RefreshUserPreferencesData(this.getApplicationContext());
 			var12.setIntegerConfigValue("PREF_LAST_RPC_ID_USED", var1.getId());
@@ -589,12 +586,11 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public void pairAndConnect(BluetoothDevice deviceInfo) {
 		Log.d("com.resmed.refresh.pair", "connectAndPair");
-		this.mDevice = deviceInfo;
 		connectingToBeD = true;
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("deviceInfo", deviceInfo);
 		bundle.putBoolean("makePaired", true);
-		this.sendMessageToService(11, bundle);
+		this.sendMessageToService(RefreshBluetoothService.MessageType.BeD_CONNECT_TO_DEVICE, bundle);
 	}
 
 	public Intent registerReceiver(BroadcastReceiver var1, IntentFilter var2) {
@@ -603,16 +599,13 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return super.registerReceiver(var1, var2);
 	}
 
-	public boolean sendBytesToBeD(byte[] var1, VLPacketType var2) {
-		int var3 = 0;
-		if (var1 != null) {
-			var3 = var1.length;
-		}
+	public boolean sendBytesToBeD(byte[] bytes, VLPacketType var2) {
+		int bytesLength = bytes != null ? bytes.length : 0;
 
-		ByteBuffer var4 = VLP.getInstance().Packetize((byte) var2.ordinal(), (byte) 1, var3, 64, var1);
+		ByteBuffer var4 = VLP.getInstance().Packetize((byte) var2.ordinal(), (byte) 1, bytesLength, 64, bytes);
 		ByteBuffer var5 = ByteBuffer.wrap(COBS.getInstance().encode(var4.array()));
 		Message message = new Message();
-		message.what = 2;
+		message.what = RefreshBluetoothService.MessageType.SEND_BYTES;
 		Bundle var7 = new Bundle();
 		var7.putByteArray("bytes", var5.array());
 		message.setData(var7);
@@ -634,19 +627,16 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	protected void unregisterAll() {
 		Iterator var1 = this.receivers.iterator();
-
 		while (var1.hasNext()) {
-			BroadcastReceiver var2 = (BroadcastReceiver) var1.next();
-
+			BroadcastReceiver receiver = (BroadcastReceiver) var1.next();
 			try {
-				this.unregisterReceiver(var2);
-			} catch (IllegalArgumentException var8) {
-				var8.printStackTrace();
+				this.unregisterReceiver(receiver);
+			} catch (IllegalArgumentException ex) {
+				ex.printStackTrace();
 			} finally {
-				Log.d("com.resmed.refresh.ui", "unregistered receiver : " + var2);
+				Log.d("com.resmed.refresh.ui", "unregistered receiver : " + receiver);
 			}
 		}
-
 		this.receivers.clear();
 	}
 

@@ -1,23 +1,18 @@
 package SPlus;
 
-import android.app.Activity;
+		import android.app.Activity;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
-import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.sleepsession.SleepSessionConnector;
-import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
+		import com.facebook.react.bridge.Arguments;
+		import com.facebook.react.bridge.ReactApplicationContext;
+		import com.facebook.react.bridge.ReactContextBaseJavaModule;
+		import com.facebook.react.bridge.ReactMethod;
+		import com.facebook.react.bridge.WritableArray;
+		import com.facebook.react.modules.core.DeviceEventManagerModule;
+		import com.resmed.refresh.bed.BedDefaultRPCMapper;
+		import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import v.lucidlink.MainActivity;
-import v.lucidlink.V;
+		import v.lucidlink.MainActivity;
+		import v.lucidlink.V;
 
 /*enum MessageType {
 	None(0),
@@ -170,13 +165,13 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		BaseBluetoothActivity.IN_SLEEP_SESSION = true;*/
 	}
 	@ReactMethod public void Disconnect() {
-		if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null || !SPlusModule.main.sessionConnector.service.sleepSessionManager.isActive) return;
-		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
+		//if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null || !SPlusModule.main.sessionConnector.service.sleepSessionManager.isActive) return;
 		//baseManager.stop();
 
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
-		this.sessionConnector.stopSleepSession();
-		BaseBluetoothActivity.IN_SLEEP_SESSION = false;
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
+		//this.sessionConnector.stopSleepSession();
 	}
 
 	/*@ReactMethod public void GetSleepStage(Promise promise) {
@@ -192,20 +187,17 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 	}*/
 	@ReactMethod public void StartRealTimeStream() {
-		/*int stage = baseManager.rm20Manager.();
-		promise.resolve(stage);*/
 		V.Log("StartingRealTimeStream!!!");
-		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+		this.sessionConnector.EnsureSleepSessionStarted();
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
 	}
 	@ReactMethod public void StartSleep() {
 		V.Log("StartingSleep");
-		/*MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+		this.sessionConnector.EnsureSleepSessionStarted();
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());*/
-		this.sessionConnector.init();
-		BaseBluetoothActivity.IN_SLEEP_SESSION = true;
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 	}
 }

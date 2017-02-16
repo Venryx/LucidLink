@@ -125,17 +125,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	private boolean isValidWindow() {
-		long l2 = Calendar.getInstance().getTimeInMillis();
-		long l1 = this.rm20Alarmtime.getTime();
-		long l3 = this.rm20AlarmWindow * 60 * 1000;
-		if ((l2 < this.rm20Alarmtime.getTime()) && (l2 > l1 - l3)) {
-		}
-		for (boolean bool = true; ; bool = false) {
-			return bool;
-		}
-	}
-
 	private void setMetaData(final RstEdfMetaData rstEdfMetaData) {
 		rstEdfMetaData.addMetaField(RstEdfMetaData.Enum_EDF_Meta.startDateandTime, new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date()));
 		rstEdfMetaData.addMetaField(RstEdfMetaData.Enum_EDF_Meta.recordingId, new StringBuilder().append(this.sessionId).toString());
@@ -459,10 +448,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public long getSessionId() {
-		return this.sessionId;
-	}
-
 	public void onDigitalSamplesRead(int[] paramArrayOfInt1, int[] paramArrayOfInt2) {
 		for (int i = 0; ; i++) {
 			if (i >= paramArrayOfInt2.length) {
@@ -634,15 +619,10 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.rm20Manager.startupLibrary(age, gender);
 		this.rm20Manager.startRespRateCallbacks(true);
 
-		/*SmartAlarmDataManager smartAlarmManager = SmartAlarmDataManager.getInstance();
-		if (smartAlarmManager.getActiveAlarm()) {
-			setRM20AlarmTime(new Date(smartAlarmManager.getAlarmDateTime()), smartAlarmManager.getWindowValue() * 60);
-		}*/
-
 		/*String boardVersion = RefreshModelController.getInstance().getBoardVersion();
 		String firmwareVersion = RefreshModelController.getInstance().getFirmwareVersion();
 		RefreshModelController.getInstance().saveRM20LibraryVersion(rm20Version());
-		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::startSleepSession boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
+		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::EnsureSleepSessionStarted boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
 		pMeta.addMetaField(Enum_EDF_Meta.unitVer, BaseBluetoothActivity.boardVersion);
 		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, BaseBluetoothActivity.firmwareVersion);
 

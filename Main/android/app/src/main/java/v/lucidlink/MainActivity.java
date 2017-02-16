@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.resmed.refresh.bed.LedsState;
 import com.resmed.refresh.bluetooth.BluetoothDataWriter;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.model.json.JsonRPC;
@@ -21,7 +22,7 @@ import com.resmed.refresh.utils.Log;
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 
-public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener, BluetoothDataWriter {
+public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener {
 	public static MainActivity main;
 	public MainActivity() {
 		super();
@@ -54,14 +55,15 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		}
 	}
 
-    /**
-     * Returns the name of the main component registered from JavaScript.
-     * This is used to schedule rendering of the component.
-     */
-    @Override
-    protected String getMainComponentName() {
-        return "LucidLink";
-    }
+	@Override protected void onDestroy() {
+		SPlusModule.main.Disconnect();
+	}
+
+	// returns the name of the main component registered from JavaScript (used to schedule rendering of the component)
+	@Override
+	protected String getMainComponentName() {
+		return "LucidLink";
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -86,112 +88,22 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		return super.onKeyUp(keyCode, event);
 	}
 
-	// extra stuff
+	// S+ stuff
 	// ==========
 
-	private void disconnectFromBeD(final boolean b) {
-		Log.d("com.resmed.refresh.pair", "disconnectFromBeD(" + b + ")");
-		final BluetoothDevice jsonFile = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
-		Log.d("com.resmed.refresh.pair", " HomeActivity::last conn state : " + LL.main.connectionState);
-		if (LL.main.connectionState == CONNECTION_STATE.SESSION_OPENED || LL.main.connectionState == CONNECTION_STATE.SESSION_OPENING
-				|| LL.main.connectionState == CONNECTION_STATE.SOCKET_CONNECTED || LL.main.connectionState == CONNECTION_STATE.SOCKET_RECONNECTING) {
-			Log.d("com.resmed.refresh.pair", "CONNECTION_STATE = " + LL.main.connectionState);
-			final JsonRPC closeSession = getRpcCommands().closeSession();
-			if (b) {
-				closeSession.setRPCallback(new JsonRPC.RPCallback() {
-					public void execute() {
-						/*Log.d("com.resmed.refresh.pair", "jsonRPC.RPCallback.execute");
-						try {
-							if (jsonFile != null) {
-								MainActivity.this.sendRpcToBed(HomeActivity.getRpcCommands().openSession(RefreshModelController.getInstance().getUserSessionID()));
-								Log.d("com.resmed.refresh.pair", "jsonRPC.sendRpcToBed.openSession(" + RefreshModelController.getInstance().getUserSessionID() + ")");
-							}
-						}
-						catch (Exception ex) {
-							ex.printStackTrace();
-						}*/
-					}
+	public void handleConnectionStatus(final CONNECTION_STATE state) {
+		LL.main.connectionState = state;
+		V.Log("Connection status changed: " + state);
 
-				public void onError(final JsonRPC.ErrorRpc jsonRPC$ErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
-				});
-			}
-			this.sendRpcToBed(closeSession);
-		}
-	}
-
-	public void handleConnectionStatus(final CONNECTION_STATE newState) {
-		super.handleConnectionStatus(newState);
-		V.Log("Connection status changed: " + newState);
-		/*if (this.homeFragment instanceof BluetoothDataListener) {
-			((BluetoothDataListener)this.homeFragment).handleConnectionStatus(connection_STATE);
-		}*/
-	}
-
-	protected void onCreate(final Bundle bundle) {
-		super.onCreate(bundle);
-		/*if (Consts.USE_EXTERNAL_STORAGE) {
-			RefreshTools.exportDataBaseToSD();
-		}
-		//SleepSessionConnector.CancelRepeatingAlarmWake(this.getApplicationContext());
-		final RefreshModelController instance = RefreshModelController.getInstance();
-		instance.setupNotifications(this);
-		final int int1 = PreferenceManager.getDefaultSharedPreferences((Context)this).getInt("PREF_CONNECTION_STATE", -1);
-		if (!instance.isLoggedIn()) {
-			Log.d("com.resmed.refresh.pair", "Not logged in => Landing screen");
-			instance.setHasBeenLogout(true);
-			this.disconnectFromBeD(false);
-			this.startActivity(new Intent((Context)this, (Class)LandingActivty.class));
-			this.finish();
-			return;
-		}
-		if (int1 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
-			AppFileLog.addTrace("HomeActivty Recovering a NIGHT_TRACK_ON");
-			this.startActivity(new Intent((Context)this, (Class)SleepTimeActivity.class));
-			this.overridePendingTransition(2130968586, 2130968586);
-			return;
-		}
-		if (instance.getHasToValidateEmail()) {
-			final Intent intent = new Intent((Context)this, (Class)EmailNotValidatedActivity.class);
-			intent.setFlags(268468224);
-			this.startActivity(intent);
-			this.overridePendingTransition(2130968586, 2130968586);
-			return;
-		}
-		if (instance.getHasBeenLogout()) {
-			instance.setHasBeenLogout(false);
-			this.disconnectFromBeD(true);
-		}
-		this.setContentView(2130903074);
-		this.setTypeRefreshBar(BaseActivity$TypeBar.HOME_BAR);
-		this.setTitle(2131165945);
-		this.homeFragment = new HomeFragment();
-		final FragmentTransaction beginTransaction = this.getSupportFragmentManager().beginTransaction();
-		beginTransaction.replace(2131099795, (Fragment)this.homeFragment, "fragment_home");
-		beginTransaction.commit();*/
-	}
-
-	/*protected void onResume() {
-		super.onResume();
-		//this.connectToBeD(false);
-		//RefreshModelController.getInstance().setupNotifications(this);
-		final CONNECTION_STATE state = LL.main.connectionState;
-		if (state == CONNECTION_STATE.SESSION_OPENED || state == CONNECTION_STATE.SESSION_OPENING
-				|| state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING) {
-			final JsonRPC leds = BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN);
-			if (leds != null) {
-				this.sendRpcToBed(leds);
+		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null) {
+			if (state == CONNECTION_STATE.SESSION_OPENING || state == CONNECTION_STATE.SESSION_OPENED
+					|| state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING) {
+				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN));
+			} else if (state == CONNECTION_STATE.REAL_STREAM_ON || state == CONNECTION_STATE.NIGHT_TRACK_ON) {
+				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.OFF));
 			}
 		}
-	}*/
 
-	public void onStart() {
-		super.onStart();
-	}
-
-	public void showBeDPickerDialog() {
+		super.handleConnectionStatus(state);
 	}
 }

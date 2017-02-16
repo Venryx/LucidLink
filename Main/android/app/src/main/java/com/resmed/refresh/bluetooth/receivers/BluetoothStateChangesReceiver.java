@@ -4,9 +4,9 @@ import android.content.*;
 import com.resmed.refresh.bluetooth.*;
 
 public class BluetoothStateChangesReceiver extends BroadcastReceiver {
-	private RefreshBluetoothManager bluetoothManager;
+	private BluetoothSetup bluetoothManager;
 
-	public BluetoothStateChangesReceiver(final RefreshBluetoothManager bluetoothManager) {
+	public BluetoothStateChangesReceiver(final BluetoothSetup bluetoothManager) {
 		this.bluetoothManager = bluetoothManager;
 	}
 

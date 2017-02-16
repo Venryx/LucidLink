@@ -19,10 +19,10 @@ public class BedDefaultRPCMapper
 	private String lastGuid;
 	private int rpcId = 115;
 
-	private void broadcastState(CONNECTION_STATE paramCONNECTION_STATE) {
+	private void broadcastState(CONNECTION_STATE state) {
 		Intent localIntent = new Intent("ACTION_RESMED_CONNECTION_STATUS");
-		localIntent.putExtra("EXTRA_RESMED_CONNECTION_STATE", paramCONNECTION_STATE);
-		Log.d("com.resmed.refresh.pair", "broadcastState broadcastState : " + CONNECTION_STATE.toString(paramCONNECTION_STATE));
+		localIntent.putExtra("EXTRA_RESMED_CONNECTION_STATE", state);
+		Log.d("com.resmed.refresh.pair", "broadcastState broadcastState : " + CONNECTION_STATE.toString(state));
 		this.btContext.sendStickyOrderedBroadcast(localIntent, null, null, -1, null, null);
 	}
 
@@ -171,48 +171,6 @@ public class BedDefaultRPCMapper
 		this.rpcId = paramInt;
 	}
 
-	public JsonRPC startNightTracking() {
-		final Map map = new LinkedHashMap();
-		map.put("channels", "ALL");
-		map.put("src", "REAL");
-		map.put("nTicks", 3456000);
-		map.put("bandWidth", 8);
-		JsonRPC rpc = new JsonRPC("startSample", map, this.rpcId);
-		if (this.btContext != null) {
-			rpc.setRPCallback(new JsonRPC.RPCallback() {
-				public void execute() {
-					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.NIGHT_TRACK_ON);
-				}
-
-				public void onError(JsonRPC.ErrorRpc errorRpc) {
-					if (errorRpc == null) return;
-					if (-18 == errorRpc.getCode()) {
-						JsonRPC rpcToDevice = BedDefaultRPCMapper.this.openSession(BedDefaultRPCMapper.this.lastGuid);
-						rpcToDevice.setRPCallback(new JsonRPC.RPCallback() {
-							public void execute() {
-								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), BedDefaultRPCMapper.this.getRPCid());
-								BedDefaultRPCMapper.this.btContext.sendRpcToBed(localJsonRPC);
-							}
-
-							public void onError(JsonRPC.ErrorRpc paramAnonymous2ErrorRpc) {
-							}
-
-							public void preExecute() {
-							}
-						});
-						BedDefaultRPCMapper.this.btContext.sendRpcToBed(rpcToDevice);
-					} else if (-13 == errorRpc.getCode()) {
-						BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.NIGHT_TRACK_ON);
-					}
-				}
-
-				public void preExecute() {
-				}
-			});
-		}
-		return rpc;
-	}
-
 	public JsonRPC startRealTimeStream() {
 		final Map map = new LinkedHashMap();
 		map.put("src", "REAL");
@@ -250,27 +208,56 @@ public class BedDefaultRPCMapper
 		}
 		return rpc;
 	}
-
-	public JsonRPC stopNightTimeTracking() {
-		JsonRPC localJsonRPC = new JsonRPC("stopSample", null, this.rpcId);
+	public JsonRPC stopRealTimeStream() {
+		JsonRPC localJsonRPC = new JsonRPC("stopStream", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
+				public void preExecute() {}
 				public void execute() {
 					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SESSION_OPENED);
 				}
-
-				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
+				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {}
 			});
 		}
 		return localJsonRPC;
 	}
 
-	public JsonRPC stopRealTimeStream() {
-		JsonRPC localJsonRPC = new JsonRPC("stopStream", null, this.rpcId);
+	public JsonRPC startNightTracking() {
+		final Map map = new LinkedHashMap();
+		map.put("channels", "ALL");
+		map.put("src", "REAL");
+		map.put("nTicks", 3456000);
+		map.put("bandWidth", 8);
+		JsonRPC rpc = new JsonRPC("startSample", map, this.rpcId);
+		if (this.btContext != null) {
+			rpc.setRPCallback(new JsonRPC.RPCallback() {
+				public void preExecute() {}
+				public void execute() {
+					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.NIGHT_TRACK_ON);
+				}
+				public void onError(JsonRPC.ErrorRpc errorRpc) {
+					if (errorRpc == null) return;
+					if (-18 == errorRpc.getCode()) {
+						JsonRPC rpcToDevice = BedDefaultRPCMapper.this.openSession(BedDefaultRPCMapper.this.lastGuid);
+						rpcToDevice.setRPCallback(new JsonRPC.RPCallback() {
+							public void execute() {
+								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), BedDefaultRPCMapper.this.getRPCid());
+								BedDefaultRPCMapper.this.btContext.sendRpcToBed(localJsonRPC);
+							}
+							public void onError(JsonRPC.ErrorRpc paramAnonymous2ErrorRpc) {}
+							public void preExecute() {}
+						});
+						BedDefaultRPCMapper.this.btContext.sendRpcToBed(rpcToDevice);
+					} else if (-13 == errorRpc.getCode()) {
+						BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.NIGHT_TRACK_ON);
+					}
+				}
+			});
+		}
+		return rpc;
+	}
+	public JsonRPC stopNightTimeTracking() {
+		JsonRPC localJsonRPC = new JsonRPC("stopSample", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {

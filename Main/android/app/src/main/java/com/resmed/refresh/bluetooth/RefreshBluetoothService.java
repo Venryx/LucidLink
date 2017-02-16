@@ -48,12 +48,10 @@ public class RefreshBluetoothService {
 		public static final int SLEEP_SESSION_START = 12;
 		public static final int SLEEP_SESSION_STOP = 14;
 		public static final int SLEEP_ENV_SAMPLE = 15;
-		public static final int SLEEP_SET_SMART_ALARM = 16;
 		public static final int SLEEP_USER_SLEEP_STATE = 17;
 		public static final int SLEEP_BREATHING_RATE = 18;
 		public static final int BeD_STREAM_PACKET_PARTIAL = 19;
 		public static final int BeD_STREAM_PACKET_PARTIAL_END = 20;
-		public static final int SLEEP_SESSION_RECOVER = 21;
 		public static final int CANCEL_DISCOVERY = 22;
 		public static final int BeD_UNPAIR_ALL = 23;
 		public static final int BLUETOOTH_BULK_TRANSFER_START = 24;
@@ -154,38 +152,12 @@ public class RefreshBluetoothService {
 						gender = b.getInt("gender", 0);
 					}
 					RefreshBluetoothService.this.sleepSessionManager.start(sessionId, age, gender);
-					RefreshBluetoothService.this.bluetoothManager.testStreamData(RefreshBluetoothService.this.sleepSessionManager);
-
-					if (RefreshBluetoothService.this.prefs == null) {
-						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(LL.main.reactContext);
-					}
-					long stored = RefreshBluetoothService.this.prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
-					SharedPreferences.Editor editor = RefreshBluetoothService.this.prefs.edit();
-					editor.putLong(Consts.PREF_NIGHT_LAST_SESSION_ID, sessionId);
-					editor.putInt(Consts.PREF_NIGHT_TRACK_STATE, CONNECTION_STATE.NIGHT_TRACK_ON.ordinal());
-					editor.putInt(Consts.PREF_AGE, age);
-					editor.putInt(Consts.PREF_GENDER, gender);
-					editor.commit();
-					AppFileLog.addTrace("MSG_SLEEP_SESSION_START PREF_NIGHT_LAST_SESSION_ID was " + stored + " and now is " + sessionId);
-					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionId + " stored : " + stored);
+					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionId);
 					return;
 				case MessageType.SLEEP_SESSION_STOP:
 					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service isHandleBulkTransfer : " + RefreshBluetoothService.this.isHandleBulkTransfer);
 					RefreshBluetoothService.this.stopCurrentSession();
 					RefreshBluetoothService.this.isDataAvailableOnDevice = -1;
-					return;
-				case MessageType.SLEEP_SET_SMART_ALARM:
-					Bundle bAlarm = msg.getData();
-					if (bAlarm != null) {
-						long alarmTs = bAlarm.getLong(Consts.BUNDLE_SMART_ALARM_TIMESTAMP);
-						int alarmWindowSeconds = bAlarm.getInt(Consts.BUNDLE_SMART_ALARM_WINDOW);
-						Log.d(LOGGER.TAG_SMART_ALARM, "did RefreshBluetoothServiceClient::MSG_SLEEP_SET_SMART_ALARM ");
-						if (RefreshBluetoothService.this.sleepSessionManager != null) {
-							RefreshBluetoothService.this.sleepSessionManager.setRM20AlarmTime(new Date(alarmTs), alarmWindowSeconds);
-							return;
-						}
-						return;
-					}
 					return;
 				case MessageType.SLEEP_USER_SLEEP_STATE:
 					if (RefreshBluetoothService.this.sleepSessionManager != null) {
@@ -193,7 +165,7 @@ public class RefreshBluetoothService {
 						return;
 					}
 					return;
-				case MessageType.SLEEP_SESSION_RECOVER:
+				/*case MessageType.SLEEP_SESSION_RECOVER:
 					long sessionToRecover = msg.getData().getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					if (RefreshBluetoothService.this.prefs == null) {
 						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(LL.main.reactContext);
@@ -213,7 +185,7 @@ public class RefreshBluetoothService {
 					}
 					RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
 					RefreshBluetoothService.this.sleepSessionManager.recoverSession(sessionToRecover, ageToRecover, genderToRecover);
-					return;
+					return;*/
 				case MessageType.CANCEL_DISCOVERY:
 					RefreshBluetoothService.this.bluetoothManager.cancelDiscovery();
 					return;

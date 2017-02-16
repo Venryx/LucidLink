@@ -2,14 +2,15 @@ package com.resmed.refresh.bluetooth.receivers;
 
 import android.content.*;
 
+import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.utils.*;
 
 import android.bluetooth.*;
 
 public class BluetoothDevicePairedReceiver extends BroadcastReceiver {
-	private RefreshBluetoothManager bluetoothManager;
+	private BluetoothSetup bluetoothManager;
 
-	public BluetoothDevicePairedReceiver(final RefreshBluetoothManager bluetoothManager) {
+	public BluetoothDevicePairedReceiver(final BluetoothSetup bluetoothManager) {
 		this.bluetoothManager = bluetoothManager;
 	}
 
