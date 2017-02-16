@@ -1,30 +1,15 @@
 package com.resmed.refresh.sleepsession;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
 
 import com.google.gson.Gson;
-import com.resmed.refresh.bed.BedCommandsRPCMapper;
-import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
@@ -36,28 +21,16 @@ import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.KillableRunnable;
-import com.resmed.refresh.utils.KillableRunnable.KillableRunner;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
-import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.refresh.utils.SortedList;
 import com.resmed.rm20.SleepParams;
 
 import org.acra.ACRAConstants;
 
 import SPlus.SPlusModule;
-import de.greenrobot.dao.DaoException;
 import v.lucidlink.LL;
-import v.lucidlink.MainActivity;
 import v.lucidlink.V;
-
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 public class SleepSessionConnector implements BluetoothDataListener {
 	private static final int ALARM_REQUEST_CODE = 5123;
@@ -82,6 +55,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private int sizeToStore = 5;
 	private SortedList<Integer> soundTopAmplitudes;
 
+	public RefreshBluetoothService service;
+
 	public SleepSessionConnector(BaseBluetoothActivity paramBaseBluetoothActivity, int paramInt, boolean paramBoolean) {
 		this.isSyncAndStop = paramBoolean;
 		this.bAct = paramBaseBluetoothActivity;
@@ -89,6 +64,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.isClosingSession = false;
 		this.hasSessionStarted = false;
 		this.myHeartbeatHandler = new Handler();
+
+		service = new RefreshBluetoothService();
 	}
 
 	private void closeSession() {
@@ -142,8 +119,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			this.pendingBioSamplesRpc = null;
 
 			// whenever a batch of raw bio-data is received, have the sleep-stage be calculated as well
-			if (RefreshBluetoothService.main.sleepSessionManager != null) // if this data was from a session we actually started this launch // temp fix
-				RefreshBluetoothService.main.sleepSessionManager.rm20Manager.getRealTimeSleepState();
+			if (SPlusModule.main.sessionConnector.service.sleepSessionManager != null) // if this data was from a session we actually started this launch // temp fix
+				SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 		}
 		// if we're receiving env-samples
 		if (this.pendingEnvSamplesRpc != null && this.pendingEnvSamplesRpc.getId() == receivedRPC.getId()) {
@@ -179,7 +156,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			Message msg = new Message();
 			msg.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_STOP;
 			if (this.bAct != null) {
-				this.bAct.sendMsgBluetoothService(msg);
+				this.bAct.sendMessageToService(msg);
 				Log.d(LOGGER.TAG_FINISH_SESSION, "MSG_SLEEP_SESSION_STOP BaseBluetoothActivty");
 			}
 		}
@@ -226,7 +203,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			AppFileLog.addTrace("Checking HeartBeat lastBioCount=" + totalBioCountAtHeartBeat + " bioTotalCount=" + SleepSessionConnector.this.bioCurrentTotalCount);
 			if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.isWaitLastSamples && SleepSessionConnector.this.bioCurrentTotalCount == totalBioCountAtHeartBeat) {
 				AppFileLog.addTrace("Timeout waiting for HeartBeat => Binding the service");
-				SleepSessionConnector.this.bAct.bindToService();
 				SleepSessionConnector.this.pendingBioSamplesRpc = null;
 				SleepSessionConnector.this.pendingEnvSamplesRpc = null;
 				SleepSessionConnector.this.isHandlingHeartBeat = false;
@@ -244,7 +220,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			if (countBio > 50000) {
 				Message msg = new Message();
 				msg.what = 24;
-				this.bAct.sendMsgBluetoothService(msg);
+				this.bAct.sendMessageToService(msg);
 			} else if (countBio < 1000) {
 				nrBioRequest = countBio;
 				nrEnvRequest = countEnv;
@@ -338,7 +314,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				this.isHandlingHeartBeat = false;
 				break;
 			case SESSION_OPENED:
-				this.bAct.pairAndConnect(RefreshBluetoothService.main.bluetoothManager.device);
+				this.bAct.pairAndConnect(SPlusModule.main.sessionConnector.service.bluetoothManager.device);
 		}
 	}
 
@@ -461,20 +437,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		return this.isRecovering;
 	}
 
-	public void onClickStop() {
-		AppFileLog.addTrace("STOP SleepSessionConnector onClickStop");
-		if (this.bAct.checkBluetoothEnabled(true)) {
-			RST_SleepSession.getInstance().stopSession(true);
-			if (this.bAct == null || this.bAct.isBoundToBluetoothService()) {
-				this.closeSession();
-				return;
-			}
-			Log.d("com.resmed.refresh.bluetooth", " SleepTrackFragment::onViewCreate is isBoundToBluetoothService :" + this.bAct.isBoundToBluetoothService());
-			this.bAct.bindToService();
-			new Handler().postDelayed(() -> SleepSessionConnector.this.closeSession(), 200L);
-		}
-	}
-
 	public void resume() {
 		this.pendingBioSamplesRpc = null;
 		this.pendingEnvSamplesRpc = null;
@@ -519,7 +481,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		message.getData().putLong("sessionId", 1); // todo: make not hard-coded
 		message.getData().putInt("age", 20); // todo: make not hard-coded
 		message.getData().putInt("gender", 0); // 0 = male, 1 = female // todo: make not hard-coded
-		this.bAct.sendMsgBluetoothService(message);
+		this.bAct.sendMessageToService(message);
 		this.setupController();
 	}
 

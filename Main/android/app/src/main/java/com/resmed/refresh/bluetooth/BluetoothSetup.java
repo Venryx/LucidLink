@@ -1,7 +1,6 @@
 package com.resmed.refresh.bluetooth;
 
 import com.resmed.cobs.COBS;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bed.LedsState;
 import com.resmed.refresh.bluetooth.receivers.*;
 import com.resmed.refresh.bluetooth.exception.*;
@@ -12,7 +11,6 @@ import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.utils.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.*;
 import com.resmed.refresh.packets.*;
 import android.bluetooth.*;
@@ -147,7 +145,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 						this.isConnected = true;
 						BluetoothSetup.this.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_CONNECTED, true);
 						BluetoothSetup.count = 1;
-						BluetoothSetup.CancelRepeatingReconnectAlarmWake(BluetoothSetup.this.bluetoothService.getContext());
+						BluetoothSetup.CancelRepeatingReconnectAlarmWake(LL.main.reactContext);
 					}
 					Log.d(LOGGER.TAG_BLUETOOTH, " BluetoothSetup$ConnectedThread::run() available bytes : " + this.mmInStream.available());
 					int nrBytesRead = this.mmInStream.read(buffer);
@@ -298,7 +296,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 	public static int count;
 	private BroadcastReceiver alarmWakeReconnectReceiver;
 	private BluetoothAdapter bluetoothAdapter;
-	public RefreshBluetoothServiceClient bluetoothService;
+	public RefreshBluetoothService bluetoothService;
 	private BroadcastReceiver bluetoothStateChangesReceiver;
 	public BluetoothDevice device;
 	private BroadcastReceiver deviceFoundReceiver;
@@ -312,7 +310,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		BluetoothSetup.count = 1;
 	}
 
-	public BluetoothSetup(final RefreshBluetoothServiceClient bluetoothService) throws BluetoohNotSupportedException {
+	public BluetoothSetup(final RefreshBluetoothService bluetoothService) throws BluetoothNotSupportedException {
 		this.uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 		this.bluetoothService = bluetoothService;
 		this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -321,7 +319,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 		this.bluetoothStateChangesReceiver = new BluetoothStateChangesReceiver(this);
 		this.alarmWakeReconnectReceiver = new BluetoothSetup.AlarmReconnectReceiver(this, this);
 		if (this.bluetoothAdapter == null) {
-			throw new BluetoohNotSupportedException();
+			throw new BluetoothNotSupportedException();
 		}
 	}
 
@@ -360,7 +358,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 				this.mConnectThread.interrupt();
 				this.mConnectThread = null;
 			}
-			Context context = this.bluetoothService.getContext().getApplicationContext();
+			Context context = LL.main.reactContext;
 			if (!BeDConnectionStatus.getInstance().isSocketConnected()) {
 				AppFileLog.addTrace(("BluetoothSetup$AlarmReceiver alarm fired to RECONNECT ! Count : " + count + ":isSocketConnected:" + BeDConnectionStatus.getInstance().isSocketConnected()));
 				if (count >= 31) return;
@@ -393,7 +391,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			final BroadcastReceiver broadcastReceiver = array[i];
 			while (true) {
 				try {
-					this.bluetoothService.getContext().unregisterReceiver(broadcastReceiver);
+					LL.main.reactContext.unregisterReceiver(broadcastReceiver);
 					Log.d("com.resmed.refresh.bluetooth", "receivers unregistered");
 					++i;
 				}
@@ -422,7 +420,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 
 	public void cancelReconnection() {
 		BluetoothSetup.count = 1;
-		CancelRepeatingReconnectAlarmWake(this.bluetoothService.getContext());
+		CancelRepeatingReconnectAlarmWake(LL.main.reactContext);
 	}
 
 	public void connectDevice(final BluetoothDevice device) {
@@ -520,10 +518,10 @@ public class BluetoothSetup implements RefreshBluetoothManager
 
 
 	public void enable() {
-		this.bluetoothService.getContext().registerReceiver(this.deviceFoundReceiver, new IntentFilter("android.bluetooth.device.action.FOUND"));
-		this.bluetoothService.getContext().registerReceiver(this.bluetoothStateChangesReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
-		this.bluetoothService.getContext().registerReceiver(this.devicePairedReceiver, new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED"));
-		this.bluetoothService.getContext().registerReceiver(this.alarmWakeReconnectReceiver, new IntentFilter("BLUETOOTH_ALARM_RECONNECT"));
+		LL.main.reactContext.registerReceiver(this.deviceFoundReceiver, new IntentFilter("android.bluetooth.device.action.FOUND"));
+		LL.main.reactContext.registerReceiver(this.bluetoothStateChangesReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
+		LL.main.reactContext.registerReceiver(this.devicePairedReceiver, new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED"));
+		LL.main.reactContext.registerReceiver(this.alarmWakeReconnectReceiver, new IntentFilter("BLUETOOTH_ALARM_RECONNECT"));
 	}
 
 	public BluetoothAdapter getBluetoothAdapter() {
@@ -540,7 +538,7 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			intent.putExtra("RESMED_BED_INCOMING_DATA_TYPE_EXTRA", depacketize.packetType);
 			intent.putExtra("RESMED_BED_INCOMING_DATA_EXTRA", depacketize.buffer);
 			intent.putExtra("BeD_INCOMING_DATA_COBS", byteBuffer.array());
-			this.bluetoothService.getContext().sendOrderedBroadcast(intent, (String)null);
+			LL.main.reactContext.sendOrderedBroadcast(intent, (String)null);
 		}
 		this.bluetoothService.handlePacket(depacketize);
 	}
@@ -625,20 +623,20 @@ public class BluetoothSetup implements RefreshBluetoothManager
 			if (newState == CONNECTION_STATE.BLUETOOTH_ON) {
 				BluetoothSetup.count = 1;
 			}
-			if (newState == CONNECTION_STATE.SOCKET_CONNECTED && this.bluetoothService.getContext() != null) {
+			if (newState == CONNECTION_STATE.SOCKET_CONNECTED && LL.main.reactContext != null) {
 				BluetoothSetup.count = 1;
 			}
 			if (makeStickyBroadcast) {
 				final Intent intent = new Intent("ACTION_RESMED_CONNECTION_STATUS");
 				intent.putExtra("EXTRA_RESMED_CONNECTION_STATE", newState);
-				this.bluetoothService.getContext().sendStickyOrderedBroadcast(intent, null, null, -1, null, null);
+				LL.main.reactContext.sendStickyOrderedBroadcast(intent, null, null, -1, null, null);
 			}
 			if (newState == CONNECTION_STATE.SOCKET_BROKEN || newState == CONNECTION_STATE.BLUETOOTH_ON) {
 				this.reconnection();
 			}
 
 			if (this.device != null)
-				RefreshBluetoothService.main.ReactToFoundDevice(this.device);
+				SPlusModule.main.sessionConnector.service.ReactToFoundDevice(this.device);
 
 			if (newState == CONNECTION_STATE.SESSION_OPENED || newState == CONNECTION_STATE.SESSION_OPENING
 					|| newState == CONNECTION_STATE.SOCKET_CONNECTED || newState == CONNECTION_STATE.SOCKET_RECONNECTING) {

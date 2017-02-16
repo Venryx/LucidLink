@@ -1,49 +1,25 @@
 package SPlus;
 
-		import android.app.Activity;
-		import android.content.Context;
-		import android.content.Intent;
-		import android.content.IntentFilter;
-		import android.content.SharedPreferences;
-		import android.os.Bundle;
-		import android.os.Environment;
-		import android.os.Message;
-		import android.preference.PreferenceManager;
-		import android.util.Log;
+import android.app.Activity;
 
-		import com.facebook.react.bridge.Arguments;
-		import com.facebook.react.bridge.Promise;
-		import com.facebook.react.bridge.ReactApplicationContext;
-		import com.facebook.react.bridge.ReactContextBaseJavaModule;
-		import com.facebook.react.bridge.ReactMethod;
-		import com.facebook.react.bridge.WritableArray;
-		import com.facebook.react.bridge.WritableMap;
-		import com.facebook.react.modules.core.DeviceEventManagerModule;
-		import com.resmed.refresh.bed.BedCommandsRPCMapper;
-		import com.resmed.refresh.bed.BedDefaultRPCMapper;
-		import com.resmed.refresh.bluetooth.BluetoothSetup;
-		import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-		import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-		import com.resmed.refresh.bluetooth.RefreshBluetoothServiceClient;
-		import com.resmed.refresh.packets.VLP;
-		import com.resmed.refresh.sleepsession.SleepSessionConnector;
-		import com.resmed.refresh.sleepsession.SleepSessionManager;
-		import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
-		import com.resmed.rm20.IndexActivity;
-		import com.resmed.rm20.RM20Callbacks;
-		import com.resmed.rm20.RM20JNI;
-		import com.resmed.rm20.SleepParams;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.resmed.refresh.bed.BedDefaultRPCMapper;
+import com.resmed.refresh.bluetooth.RefreshBluetoothService;
+import com.resmed.refresh.sleepsession.SleepSessionConnector;
+import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 
-		import java.util.ArrayList;
-		import java.util.HashMap;
-		import java.util.Map;
-		import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
-		import v.lucidlink.LL;
-		import v.lucidlink.MainActivity;
-		import v.lucidlink.V;
+import v.lucidlink.MainActivity;
+import v.lucidlink.V;
 
-enum MessageType {
+/*enum MessageType {
 	None(0),
 	DidFinishEdfRecovery(21),
 	StopCalculateAndSendResults(14),
@@ -61,7 +37,7 @@ enum MessageType {
 				return entries[i];
 		}
 		return MessageType.None;
-	}*/
+	}*#/
 	private static final Map<Integer, MessageType> intToTypeMap = new HashMap<>();
 	static {
 		for (MessageType type : MessageType.values()) {
@@ -74,7 +50,7 @@ enum MessageType {
 			return MessageType.None;
 		return type;
 	}
-}
+}*/
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	public static Activity mainActivity;
@@ -184,7 +160,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	@ReactMethod public void Connect(int age, int gender) { // for gender: 0=male, 1=female
 		V.Log("Connecting..." + age + ";" + gender);
 
-		RefreshBluetoothService.main.StartListening();
+		SPlusModule.main.sessionConnector.service.StartListening();
 
 		//int sessionID = 70;
 		//baseManager.rm20Manager.rm20Lib.loadLibrary(reactContext);
@@ -194,7 +170,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		BaseBluetoothActivity.IN_SLEEP_SESSION = true;*/
 	}
 	@ReactMethod public void Disconnect() {
-		if (RefreshBluetoothService.main.sleepSessionManager == null || !RefreshBluetoothService.main.sleepSessionManager.isActive) return;
+		if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null || !SPlusModule.main.sessionConnector.service.sleepSessionManager.isActive) return;
 		//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		//baseManager.stop();
 
@@ -204,7 +180,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}
 
 	/*@ReactMethod public void GetSleepStage(Promise promise) {
-		if (RefreshBluetoothService.main.sleepSessionManager == null) {
+		if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null) {
 			promise.resolve(-1);
 			return;
 		}
@@ -213,7 +189,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		promise.resolve(stage); // this is not actually the sleep-stage, but rather the success-flag (I think)*#/
 		MainActivity.main.getSleepStage_currentWaiter = promise;
 		//baseManager.rm20Manager.getRealTimeSleepState();
-		RefreshBluetoothService.main.sleepSessionManager.rm20Manager.getRealTimeSleepState();
+		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 	}*/
 	@ReactMethod public void StartRealTimeStream() {
 		/*int stage = baseManager.rm20Manager.();

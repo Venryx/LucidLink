@@ -1,23 +1,17 @@
 package com.resmed.refresh.bluetooth;
 
-import android.app.Service;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibJNI;
-import com.resmed.refresh.bluetooth.exception.BluetoohNotSupportedException;
+import com.resmed.refresh.bluetooth.exception.BluetoothNotSupportedException;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
@@ -29,21 +23,18 @@ import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
-import com.resmed.refresh.utils.RefreshBluetoothManager;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.rm20.RM20JNI;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
 import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
-import v.lucidlink.R;
 import v.lucidlink.V;
 
-public class RefreshBluetoothService extends Service implements RefreshBluetoothServiceClient {
+public class RefreshBluetoothService {
 	public final class MessageType {
 		public static final int DISCOVER_PAIR_CONNECT_RESMED = 1;
 		public static final int SEND_BYTES = 2;
@@ -81,27 +72,24 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	public static final String REFRESH_BED_NEW_DATA_SIZE = "REFRESH_BED_NEW_DATA_SIZE";
 	public static final String REFRESH_BED_NEW_DATA_TYPE = "REFRESH_BED_NEW_DATA_TYPE";
 	public static final String REFRESH_BT_SERVICE_RUNNING = "REFRESH_BT_SERVICE_RUNNING";
+
+	public RefreshBluetoothService() {
+		V.JavaLog("Starting bluetooth service!");
+		this.mMessageHandler = new BluetoothRequestsHandler();
+		this.isHandleBulkTransfer = false;
+		this.sessionToBeStopped = false;
+
+		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
+		EdfLibJNI.loadLibrary(LL.main.reactContext);
+		RM20JNI.loadLibrary(LL.main.reactContext);
+	}
+
 	//public RefreshBluetoothManager bluetoothManager;
 	public BluetoothSetup bluetoothManager;
-	private boolean isBindToClient;
 	private int isDataAvailableOnDevice;
 	private boolean isHandleBulkTransfer;
 
-	//private Messenger mClient;
-	public void mClient_send(Message message) {
-		//mClient.send(message);
-
-		// for some reason the above is not working atm, so just call the method directly
-		try {
-			//MainActivity.main.mFromService.send(message);
-			MainActivity.main.mFromServiceHandler.handleMessage(message);
-		} catch (Exception e) {
-			//e.printStackTrace();
-			throw new Error(e);
-		}
-	}
-
-	final Messenger mMessenger;
+	public BluetoothRequestsHandler mMessageHandler;
 	private SharedPreferences prefs;
 	public boolean sessionToBeStopped;
 	public SleepSessionManager sleepSessionManager;
@@ -109,7 +97,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	// handles requests from our code, concerning bluetooth things (so some send commands to device)
 	public class BluetoothRequestsHandler extends Handler {
 		public void handleMessage(Message msg) {
-			RefreshTools.writeTimeStampToFile(RefreshBluetoothService.this.getApplicationContext(), System.currentTimeMillis());
+			RefreshTools.writeTimeStampToFile(LL.main.reactContext, System.currentTimeMillis());
 			RefreshBluetoothService.this.checkManager();
 			Bundle b;
 			switch (msg.what) {
@@ -122,7 +110,6 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 						byte[] toSend = bundle1.getByteArray("bytes");
 						Log.d(LOGGER.TAG_BLUETOOTH, " bytes sending : " + toSend);
 						RefreshBluetoothService.this.bluetoothManager.writeData(toSend);
-						RefreshBluetoothService.this.isBindToClient = true;
 						return;
 					}
 					return;
@@ -133,7 +120,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					message.what = MessageType.REGISTER_CLIENT;
 					try {
 						//RefreshBluetoothService.this.mClient.send(message);
-						mClient_send(message);
+						sendMessageToClient(message);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -188,7 +175,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 					RefreshBluetoothService.this.bluetoothManager.testStreamData(RefreshBluetoothService.this.sleepSessionManager);
 
 					if (RefreshBluetoothService.this.prefs == null) {
-						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(RefreshBluetoothService.this.getApplicationContext());
+						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(LL.main.reactContext);
 					}
 					long stored = RefreshBluetoothService.this.prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					SharedPreferences.Editor editor = RefreshBluetoothService.this.prefs.edit();
@@ -227,7 +214,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 				case MessageType.SLEEP_SESSION_RECOVER:
 					long sessionToRecover = msg.getData().getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1);
 					if (RefreshBluetoothService.this.prefs == null) {
-						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(RefreshBluetoothService.this.getApplicationContext());
+						RefreshBluetoothService.this.prefs = PreferenceManager.getDefaultSharedPreferences(LL.main.reactContext);
 					}
 					int ageToRecover = RefreshBluetoothService.this.prefs.getInt(Consts.PREF_AGE, 44);
 					int genderToRecover = RefreshBluetoothService.this.prefs.getInt(Consts.PREF_GENDER, 0);
@@ -291,34 +278,16 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		}
 	}
 
-
-	public static RefreshBluetoothService main;
-
-	public RefreshBluetoothService() {
-		main = this;
-
-		V.JavaLog("Starting bluetooth service!");
-		this.mMessenger = new Messenger(new BluetoothRequestsHandler());
-		this.isBindToClient = true;
-		this.isHandleBulkTransfer = false;
-		this.sessionToBeStopped = false;
-	}
-
 	private void checkManager() {
 		if (this.bluetoothManager != null) return;
 		try {
 			this.bluetoothManager = new BluetoothSetup(this);
 			this.bluetoothManager.enable();
 			return;
-		} catch (BluetoohNotSupportedException var1_1) {
+		} catch (BluetoothNotSupportedException var1_1) {
 			var1_1.printStackTrace();
 			return;
 		}
-	}
-
-	private void checkNightTrack() {
-		this.isBindToClient = false;
-		//new Handler().postDelayed((Runnable) new RefreshBluetoothService(), 120000L);
 	}
 
 	private void recoverSleepSession(long l) {
@@ -335,11 +304,6 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		}
 		this.sleepSessionManager = null;
 		this.bluetoothManager.cancelReconnection();
-		this.stopForeground(true);
-	}
-
-	public Context getContext() {
-		return this;
 	}
 
 	public void handlePacket(VLP.VLPacket packet) {
@@ -366,7 +330,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 							AppFileLog.addTrace("Service handlePacket sleepSessionManager.addSamplesMiMq(filesDir)");
 						}*/
 
-						BluetoothDataSerializeUtil.deleteBulkDataBioFile(getApplicationContext());
+						BluetoothDataSerializeUtil.deleteBulkDataBioFile(LL.main.reactContext);
 						this.isHandleBulkTransfer = false;
 						AppFileLog.addTrace("Service handlePacket isHandleBulkTransfer = false");
 					}
@@ -376,7 +340,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 			//AppFileLog.addTrace("Service handlePacket is NOT a PACKET_TYPE_RETURN isHandleBulkTransfer=" + this.isHandleBulkTransfer);
 			if (this.isHandleBulkTransfer) {
 				if (VLPacketType.PACKET_TYPE_BIO_64.ordinal() == packet.packetType || VLPacketType.PACKET_TYPE_BIO_32.ordinal() == packet.packetType) {
-					BluetoothDataSerializeUtil.writeBulkBioDataFile(getApplicationContext(), packet.buffer);
+					BluetoothDataSerializeUtil.writeBulkBioDataFile(LL.main.reactContext, packet.buffer);
 					return;
 				}
 			}
@@ -446,96 +410,21 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 		sendMessageToClient(newMessage);
 	}
 
-
-	public IBinder onBind(Intent intent) {
-		AppFileLog.addTrace("SERVICE onBind");
-		Log.d("com.resmed.refresh.bluetooth", " onBind! ");
-		return this.mMessenger.getBinder();
-	}
-
-	public void onDestroy() {
-		AppFileLog.addTrace("SERVICE onDestroy called");
-		Log.d("com.resmed.refresh.bluetooth", "::onDestroy, bluetooth");
-		super.onDestroy();
-	}
-
-	public void onLowMemory() {
-		super.onLowMemory();
-		AppFileLog.addTrace("SERVICE onLowMemory called");
-	}
-
-	public void onRebind(Intent intent) {
-		AppFileLog.addTrace("SERVICE onRebind");
-		Log.d("com.resmed.refresh.bluetooth", " onRebind! ");
-		super.onRebind(intent);
-	}
-
 	boolean listening;
 	public void StartListening() {
 		if (listening) return;
 		listening = true;
 
-		V.JavaLog("Start listening;" + MainActivity.main + ";" + this.getApplicationContext() + ";" + LL.main);
+		V.JavaLog("Start listening;" + MainActivity.main + ";" + LL.main.reactContext + ";" + LL.main);
 
 		try {
 			// rather than remember last one, just find first device and connect to it
-			main.bluetoothManager = new BluetoothSetup(main);
-			main.bluetoothManager.enable();
-			main.bluetoothManager.discoverResMedDevices(true);
+			bluetoothManager = new BluetoothSetup(this);
+			bluetoothManager.enable();
+			bluetoothManager.discoverResMedDevices(true);
 		} catch (Exception ex) {
 			throw new Error(ex);
 		}
-	}
-
-	public int onStartCommand(Intent intent, int n, int n2) {
-		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
-		EdfLibJNI.loadLibrary(this.getApplicationContext());
-		RM20JNI.loadLibrary(this.getApplicationContext());
-
-		/*V.WaitXThenRun(1000, ()-> {
-			if (LL.main == null) return;
-			StartListening();
-		});*/
-
-		/*try {
-			this.bluetoothManager = new BluetoothSetup(this);
-			this.bluetoothManager.enable();
-			this.prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-			int n3 = this.prefs.getInt("PREF_CONNECTION_STATE", -1);
-			long l = this.prefs.getLong("PREF_NIGHT_LAST_SESSION_ID", -1);
-			AppFileLog.addTrace(("SERVICE onStartCommand LastState: " + n3 + " Last sessionID : " + l + " state : " + n3));
-			Log.d("com.resmed.refresh.ui", (" RefreshBluetoothService::onStartCommand conn state : " + n3 + " session id :" + l));
-			if (CONNECTION_STATE.NIGHT_TRACK_ON.ordinal() == n3) {
-				this.checkNightTrack();
-				AppFileLog.addTrace("SERVICE onStartCommand overnight in progress");
-				Log.d("com.resmed.refresh.ui", " RefreshBluetoothService::onStartCommand overnight in progress");
-				this.recoverSleepSession(l);
-				BluetoothDevice bluetoothDevice = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
-				this.bluetoothManager.connectDevice(bluetoothDevice);
-
-				/*Intent intent2 = new Intent(this, SleepTimeActivity.class);
-				intent2.setFlags(268468224);
-				intent2.putExtra("com.resmed.refresh.consts.recovering_app_from_service", true);
-				this.startActivity(intent2);*#/
-
-				Intent intent3 = new Intent("BLUETOOTH_SERVICE_INTENT_RESTART");
-				intent3.putExtra("BUNDLE_LAST_CONN_STATE", n3);
-				this.getApplicationContext().sendStickyBroadcast(intent3);
-				//this.changeToForeground();
-				return 1;
-			}
-			if (CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal() != n3) return 1;
-			Intent intent4 = new Intent("BLUETOOTH_SERVICE_INTENT_RESTART");
-			intent4.putExtra("BUNDLE_LAST_CONN_STATE", n3);
-			this.getApplicationContext().sendStickyBroadcast(intent4);
-			AppFileLog.addTrace("SERVICE RESTARTED AFTER SLEEP SESSION WAS STOPPED. How to recover ?");
-			return 1;
-		} catch (BluetoohNotSupportedException var5_10) {
-			var5_10.printStackTrace();
-		}
-		return Service.START_FLAG_REDELIVERY;*/
-		// don't restart service if it's killed (ie when app is closed)
-		return Service.START_NOT_STICKY;
 	}
 
 	public void ReactToFoundDevice(BluetoothDevice device) {
@@ -578,21 +467,7 @@ public class RefreshBluetoothService extends Service implements RefreshBluetooth
 	}
 
 	public void sendMessageToClient(Message message) {
-		//V.Log("Sending message to client;" + this.mClient + ";" + message.what);
 		//V.Log("Sending message to client;" + message.what);
-
-		/*if (this.mClient == null) return;
-		try {
-			this.mClient.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}*/
-		mClient_send(message);
-	}
-
-	public void unbindService(ServiceConnection serviceConnection) {
-		AppFileLog.addTrace("SERVICE onBind");
-		Log.d("com.resmed.refresh.bluetooth", " unBind! ");
-		super.unbindService(serviceConnection);
+		MainActivity.main.mFromServiceHandler.handleMessage(message);
 	}
 }

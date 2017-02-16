@@ -1,73 +1,25 @@
 package v.lucidlink;
 
 import android.Manifest;
-import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.PowerManager;
-import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.widget.Toast;
 
-import com.facebook.react.ReactActivity;
-import com.google.gson.Gson;
-import com.resmed.cobs.COBS;
-import com.resmed.refresh.bed.BedCommandsRPCMapper;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
-import com.resmed.refresh.bed.LedsState;
 import com.resmed.refresh.bluetooth.BluetoothDataWriter;
-import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
-import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.model.json.JsonRPC;
-import com.resmed.refresh.model.json.ResultRPC;
-import com.resmed.refresh.packets.PacketsByteValuesReader;
-import com.resmed.refresh.packets.VLP;
-import com.resmed.refresh.packets.VLPacketType;
-import com.resmed.refresh.sleepsession.SleepSessionConnector;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
-import com.resmed.refresh.ui.utils.Consts;
-import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.Log;
-import com.resmed.refresh.utils.RefreshTools;
-import com.resmed.refresh.utils.RefreshUserPreferencesData;
-
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import SPlus.SPlusModule;
-import SPlus.SPlusPackage;
 import v.LibMuse.LibMuseModule;
-
-import static android.os.Build.VERSION.SDK;
 
 public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener, BluetoothDataWriter {
 	public static MainActivity main;
