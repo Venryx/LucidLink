@@ -45,7 +45,7 @@ public class BedDefaultRPCMapper
 	}
 
 	public JsonRPC clearBuffers() {
-		JsonRPC localJsonRPC = new JsonRPC("clearBuffers", null, Integer.valueOf(this.rpcId));
+		JsonRPC localJsonRPC = new JsonRPC("clearBuffers", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -63,7 +63,7 @@ public class BedDefaultRPCMapper
 	}
 
 	public JsonRPC closeSession() {
-		JsonRPC localJsonRPC = new JsonRPC("closeSession", null, Integer.valueOf(this.rpcId));
+		JsonRPC localJsonRPC = new JsonRPC("closeSession", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -82,16 +82,16 @@ public class BedDefaultRPCMapper
 
 	public JsonRPC fillBuffer(int paramInt) {
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
-		localLinkedHashMap.put("timeInSecs", Integer.valueOf(paramInt));
-		return new JsonRPC("fillBuffer", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		localLinkedHashMap.put("timeInSecs", paramInt);
+		return new JsonRPC("fillBuffer", localLinkedHashMap, this.rpcId);
 	}
 
 	public JsonRPC getBioSensorSerialNumber() {
-		return new JsonRPC("getSerialNumberSensor", null, Integer.valueOf(this.rpcId));
+		return new JsonRPC("getSerialNumberSensor", null, this.rpcId);
 	}
 
 	public JsonRPC getOperationalStatus() {
-		return new JsonRPC("getOperationalStatus", null, Integer.valueOf(this.rpcId));
+		return new JsonRPC("getOperationalStatus", null, this.rpcId);
 	}
 
 	public int getRPCid() {
@@ -105,25 +105,25 @@ public class BedDefaultRPCMapper
 			str = "BUFF_BIO";
 		}
 		localLinkedHashMap.put("buffID", str);
-		return new JsonRPC("getSampleNumUnsent", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC("getSampleNumUnsent", localLinkedHashMap, this.rpcId);
 	}
 
 	public JsonRPC getSerialNumber() {
-		return new JsonRPC("getSerialNumberBeD", null, Integer.valueOf(this.rpcId));
+		return new JsonRPC("getSerialNumberBeD", null, this.rpcId);
 	}
 
 	public JsonRPC leds(LedsState paramLedsState) {
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
 		localLinkedHashMap.put("ledName", "LED_STATUS");
 		localLinkedHashMap.put("state", paramLedsState.toString());
-		return new JsonRPC("leds", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC("leds", localLinkedHashMap, this.rpcId);
 	}
 
 	public JsonRPC openSession(String paramString) {
 		this.lastGuid = paramString;
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
 		localLinkedHashMap.put("guid", paramString);
-		JsonRPC rpc = new JsonRPC("requestSession", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		JsonRPC rpc = new JsonRPC("requestSession", localLinkedHashMap, this.rpcId);
 		rpc.setRPCallback(new JsonRPC.RPCallback() {
 			public void execute() {
 				BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SESSION_OPENED);
@@ -146,21 +146,21 @@ public class BedDefaultRPCMapper
 	public JsonRPC putSerialNumber(String paramString) {
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
 		localLinkedHashMap.put("serialID", paramString);
-		return new JsonRPC("putSerialNumber", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC("putSerialNumber", localLinkedHashMap, this.rpcId);
 	}
 
 	public JsonRPC reset() {
-		return new JsonRPC("reset", null, Integer.valueOf(this.rpcId));
+		return new JsonRPC("reset", null, this.rpcId);
 	}
 
 	public JsonRPC resetEngineeringMode() {
-		return new JsonRPC("resetEngineering", null, Integer.valueOf(this.rpcId));
+		return new JsonRPC("resetEngineering", null, this.rpcId);
 	}
 
 	public JsonRPC setBioSensorSerialNumber(String paramString) {
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
 		localLinkedHashMap.put("serialSensorID", paramString);
-		return new JsonRPC("setSerialNumberSensor", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC("setSerialNumberSensor", localLinkedHashMap, this.rpcId);
 	}
 
 	public void setContextBroadcaster(BaseBluetoothActivity paramBaseBluetoothActivity) {
@@ -175,9 +175,9 @@ public class BedDefaultRPCMapper
 		final Map map = new LinkedHashMap();
 		map.put("channels", "ALL");
 		map.put("src", "REAL");
-		map.put("nTicks", Integer.valueOf(3456000));
-		map.put("bandWidth", Integer.valueOf(8));
-		JsonRPC rpc = new JsonRPC("startSample", map, Integer.valueOf(this.rpcId));
+		map.put("nTicks", 3456000);
+		map.put("bandWidth", 8);
+		JsonRPC rpc = new JsonRPC("startSample", map, this.rpcId);
 		if (this.btContext != null) {
 			rpc.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -186,11 +186,11 @@ public class BedDefaultRPCMapper
 
 				public void onError(JsonRPC.ErrorRpc errorRpc) {
 					if (errorRpc == null) return;
-					if (-18 == errorRpc.getCode().intValue()) {
+					if (-18 == errorRpc.getCode()) {
 						JsonRPC rpcToDevice = BedDefaultRPCMapper.this.openSession(BedDefaultRPCMapper.this.lastGuid);
 						rpcToDevice.setRPCallback(new JsonRPC.RPCallback() {
 							public void execute() {
-								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), Integer.valueOf(BedDefaultRPCMapper.this.getRPCid()));
+								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), BedDefaultRPCMapper.this.getRPCid());
 								BedDefaultRPCMapper.this.btContext.sendRpcToBed(localJsonRPC);
 							}
 
@@ -201,7 +201,7 @@ public class BedDefaultRPCMapper
 							}
 						});
 						BedDefaultRPCMapper.this.btContext.sendRpcToBed(rpcToDevice);
-					} else if (-13 == errorRpc.getCode().intValue()) {
+					} else if (-13 == errorRpc.getCode()) {
 						BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.NIGHT_TRACK_ON);
 					}
 				}
@@ -216,8 +216,8 @@ public class BedDefaultRPCMapper
 	public JsonRPC startRealTimeStream() {
 		final Map map = new LinkedHashMap();
 		map.put("src", "REAL");
-		map.put("nTicks", Integer.valueOf(100000));
-		JsonRPC rpc = new JsonRPC("startStream", map, Integer.valueOf(this.rpcId));
+		map.put("nTicks", 100000);
+		JsonRPC rpc = new JsonRPC("startStream", map, this.rpcId);
 		if (this.btContext != null) {
 			rpc.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -226,11 +226,11 @@ public class BedDefaultRPCMapper
 
 				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
 					if (paramAnonymousErrorRpc == null) return;
-					if (-18 == paramAnonymousErrorRpc.getCode().intValue()) {
+					if (-18 == paramAnonymousErrorRpc.getCode()) {
 						JsonRPC rpcToDevice = BedDefaultRPCMapper.this.openSession(BedDefaultRPCMapper.this.lastGuid);
 						rpcToDevice.setRPCallback(new JsonRPC.RPCallback() {
 							public void execute() {
-								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), Integer.valueOf(BedDefaultRPCMapper.this.getRPCid()));
+								JsonRPC localJsonRPC = new JsonRPC(rpc.getMethod(), rpc.getParams(), BedDefaultRPCMapper.this.getRPCid());
 								BedDefaultRPCMapper.this.btContext.sendRpcToBed(localJsonRPC);
 							}
 
@@ -252,7 +252,7 @@ public class BedDefaultRPCMapper
 	}
 
 	public JsonRPC stopNightTimeTracking() {
-		JsonRPC localJsonRPC = new JsonRPC("stopSample", null, Integer.valueOf(this.rpcId));
+		JsonRPC localJsonRPC = new JsonRPC("stopSample", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -270,7 +270,7 @@ public class BedDefaultRPCMapper
 	}
 
 	public JsonRPC stopRealTimeStream() {
-		JsonRPC localJsonRPC = new JsonRPC("stopStream", null, Integer.valueOf(this.rpcId));
+		JsonRPC localJsonRPC = new JsonRPC("stopStream", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
 				public void execute() {
@@ -293,13 +293,13 @@ public class BedDefaultRPCMapper
 			str = "BUF_BIO";
 		}
 		LinkedHashMap localLinkedHashMap = new LinkedHashMap();
-		localLinkedHashMap.put("nSamples", Integer.valueOf(paramInt));
+		localLinkedHashMap.put("nSamples", paramInt);
 		localLinkedHashMap.put("buffID", str);
 		str = "transmitPacket";
 		if (paramBoolean2) {
 			str = "transmitPacketOldest";
 		}
-		return new JsonRPC(str, localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC(str, localLinkedHashMap, this.rpcId);
 	}
 
 	public JsonRPC upgradeFirmware(byte[] paramArrayOfByte, int paramInt, boolean paramBoolean) {
@@ -312,10 +312,10 @@ public class BedDefaultRPCMapper
 		if (!paramBoolean) {
 			paramInt = calculateChecksum(paramArrayOfByte);
 		}
-		localLinkedHashMap.put("checksum", Integer.valueOf(paramInt));
+		localLinkedHashMap.put("checksum", paramInt);
 		if (1 == paramInt) {
 			localLinkedHashMap.put("src", "image2");
 		}
-		return new JsonRPC("putApplication", localLinkedHashMap, Integer.valueOf(this.rpcId));
+		return new JsonRPC("putApplication", localLinkedHashMap, this.rpcId);
 	}
 }

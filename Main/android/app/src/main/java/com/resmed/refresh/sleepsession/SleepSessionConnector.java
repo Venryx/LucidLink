@@ -154,7 +154,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			if (this.isRecovering) {
 				this.isRecovering = false;
 			}
-			this.lastHeartBeatTimestamp = Long.valueOf(System.currentTimeMillis());
+			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			//this.sleepSessionListener.onSessionOk();
 			if (this.isClosingSession) {
 				this.isWaitLastSamples = true;
@@ -190,7 +190,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
 			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", (long) this.lastHeartBeatTimestamp);
+			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", this.lastHeartBeatTimestamp);
 			edit.commit();
 			if (this.isWaitLastSamples || this.isHandlingHeartBeat) {
 				AppFileLog.addTrace("IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
@@ -285,17 +285,15 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 	public void handleAudioAmplitude(final int audioAmplitude) {
 		if (this.bAct != null) {
-			this.bAct.runOnUiThread(new Runnable() {
-				public void run() {
-					float f2 = (float) (20.0D * Math.log10(audioAmplitude));
-					float f1 = f2;
-					if (f2 == Float.NEGATIVE_INFINITY) {
-						f1 = 0.0F;
-					}
-					Log.d("com.resmed.refresh.sound", "SleepSessionConnector::handleAudioAmplitude() amplitude : " + audioAmplitude + " db : " + f1);
-					boolean bool = SleepSessionConnector.this.soundTopAmplitudes.insert(Integer.valueOf(audioAmplitude));
-					Log.d("com.resmed.refresh.sound", " SleepSessionConnector::handleAudioAmplitude() sound wasInserted : " + bool);
+			this.bAct.runOnUiThread(() -> {
+				float f2 = (float) (20.0D * Math.log10(audioAmplitude));
+				float f1 = f2;
+				if (f2 == Float.NEGATIVE_INFINITY) {
+					f1 = 0.0F;
 				}
+				Log.d("com.resmed.refresh.sound", "SleepSessionConnector::handleAudioAmplitude() amplitude : " + audioAmplitude + " db : " + f1);
+				boolean bool = SleepSessionConnector.this.soundTopAmplitudes.insert(audioAmplitude);
+				Log.d("com.resmed.refresh.sound", " SleepSessionConnector::handleAudioAmplitude() sound wasInserted : " + bool);
 			});
 		}
 	}
@@ -380,7 +378,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			if (errorRpc == null) {
 				return;
 			}
-			if (errorRpc.getCode().intValue() == -12 || errorRpc.getCode().intValue() == -11) {
+			if (errorRpc.getCode() == -12 || errorRpc.getCode() == -11) {
 				handleSamplesTransmissionCompleteForRPC(receivedRPC);
 			}
 		}
