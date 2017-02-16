@@ -205,7 +205,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		/*MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());*/
-		this.sessionConnector.init(false);
+		this.sessionConnector.init();
 		BaseBluetoothActivity.IN_SLEEP_SESSION = true;
 	}
 }

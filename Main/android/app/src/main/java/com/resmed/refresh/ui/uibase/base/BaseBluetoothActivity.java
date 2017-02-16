@@ -215,7 +215,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			AppFileLog.addTrace("OUT NEW RPC ID : " + getRpcCommands().getRPCid() + " METHOD :" + var1.getMethod() + " PARAMS : " + var1.getParams());
 			String var4 = var3.toJson(var1);
 			Log.d("com.resmed.refresh.ui", "bluetooth json rpc : " + var4);
-			ByteBuffer var6 = VLP.getInstance().Packetize((byte) VLPacketType.PACKET_TYPE_CALL.ordinal(), (new Integer(var1.getId())).byteValue(), var4.getBytes().length, 64, var4.getBytes());
+			ByteBuffer var6 = VLP.getInstance().Packetize((byte) VLPacketType.PACKET_TYPE_CALL.ordinal(), Integer.valueOf(var1.getId()).byteValue(), var4.getBytes().length, 64, var4.getBytes());
 			byte[] var7 = COBS.getInstance().encode(var6.array());
 			Log.d("com.resmed.refresh.bluetooth", " COBSJNI, encodedByteBuff : " + Arrays.toString(var7));
 			ByteBuffer var9 = ByteBuffer.wrap(var7);
@@ -263,43 +263,10 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return needsUpdate;
 	}
 
-	/*public boolean connectToBeD(boolean var1) {
-		Log.d("com.resmed.refresh.pair", "connectToBeD(" + var1 + ")");
-		BluetoothDevice deviceInfo = BluetoothDataSerializeUtil.readJsonFile(this.getApplicationContext());
-		Log.d("com.resmed.refresh.pair", "connectToBeD mDevice : " + deviceInfo);
-		if (deviceInfo == null) {
-			Log.d("com.resmed.refresh.pair", "connectToBeD no mDevice stored");
-			if (var1) {
-				Log.d("com.resmed.refresh.dialog", "connectToBeD showBeDPickerDialog()");
-				this.showBeDPickerDialog();
-			}
-
-			return false;
-		} else {
-			Log.d("com.resmed.refresh.pair", "connectToBeD sending message to service : ");
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(this.getString(2131165303), deviceInfo);
-			bundle.putBoolean(this.getString(2131165304), false); // makePaired
-			//this.sendMessageToService(11, bundle);
-			int pairAndConnect = 11;
-			this.sendMessageToService(pairAndConnect, bundle);
-			if (var1) {
-				this.showConnectionProgress();
-			}
-
-			return true;
-		}
-	}*/
-
 	public void disconnectBluetoothConn() {
 		Message message1 = new Message();
 		message1.what = RefreshBluetoothService.MessageType.BeD_DISCONNECT;
 		sendMessageToService(message1);
-
-		Message message2 = new Message();
-		message2.what = RefreshBluetoothService.MessageType.UNREGISTER_CLIENT;
-		sendMessageToService(message2);
-
 		this.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
 	}
 
@@ -599,19 +566,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		this.unregisterAll();
 	}
 
-	protected void onPause() {
-		super.onPause();
-		boolean var1 = ((PowerManager) this.getSystemService("power")).isScreenOn();
-		Log.d("com.resmed.refresh.ui", " BaseBluetoothActivity::onPause() isScreenOn : " + var1);
-		if (!var1 && IN_SLEEP_SESSION) {
-			Calendar var3 = Calendar.getInstance();
-			var3.add(13, 600);
-			Long var4 = var3.getTimeInMillis();
-			Intent var5 = new Intent(this.getApplicationContext(), AlarmReceiver.class);
-			((AlarmManager) this.getApplicationContext().getSystemService("alarm")).set(0, var4.longValue(), PendingIntent.getBroadcast(this.getApplicationContext(), 0, var5, 134217728));
-		}
-	}
-
 	/*public void onPickedDevice(BluetoothDevice var1) {
 		Log.d("com.resmed.refresh.pair", "onPickedDevice");
 		Log.d("com.resmed.refresh.dialog", "onPickedDevice() connectionProgressDisplayed = true");
@@ -633,10 +587,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		Log.d("com.resmed.refresh.ui", " BaseBluetoothActivity::onStop() ");
 	}
 
-	public void onTimeoutConnectingDialog() {
-		V.Log("Gone: this.showReconnectionScreen();");
-	}
-
 	public void pairAndConnect(BluetoothDevice deviceInfo) {
 		Log.d("com.resmed.refresh.pair", "connectAndPair");
 		this.mDevice = deviceInfo;
@@ -648,26 +598,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	public Intent registerReceiver(BroadcastReceiver var1, IntentFilter var2) {
-		if (!this.receivers.contains(var1)) {
-			this.receivers.add(var1);
-			return super.registerReceiver(var1, var2);
-		} else {
-			return null;
-		}
-	}
-
-	protected void registerToService() {
-		Log.d("com.resmed.refresh.bluetooth", " registerToService : ");
-
-		Message message1 = Message.obtain(null, 4);
-		message1.replyTo = this.mFromService;
-		sendMessageToService(message1);
-
-		//this.handleConnectionStatus(RefreshApplication.getInstance().getCurrentConnectionState());
-		Message message2 = new Message();
-		message2.what = 27;
-		sendMessageToService(message2);
-		V.Log("Send message;" + message2.what);
+		if (this.receivers.contains(var1)) return null;
+		this.receivers.add(var1);
+		return super.registerReceiver(var1, var2);
 	}
 
 	public boolean sendBytesToBeD(byte[] var1, VLPacketType var2) {

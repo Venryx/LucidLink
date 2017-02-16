@@ -53,7 +53,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private JsonRPC pendingBioSamplesRpc;
 	private JsonRPC pendingEnvSamplesRpc;
 	private int sizeToStore = 5;
-	private SortedList<Integer> soundTopAmplitudes;
 
 	public RefreshBluetoothService service;
 
@@ -66,15 +65,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.myHeartbeatHandler = new Handler();
 
 		service = new RefreshBluetoothService();
-	}
-
-	private void closeSession() {
-		AppFileLog.addTrace("CLOSING SLEEP SESSION, isHandlingHeartBeat :" + this.isHandlingHeartBeat);
-		CONNECTION_STATE state = LL.main.connectionState;
-		if ((state == CONNECTION_STATE.SOCKET_NOT_CONNECTED) || (state == CONNECTION_STATE.BLUETOOTH_OFF)
-				|| (state == CONNECTION_STATE.SOCKET_BROKEN) || (state == CONNECTION_STATE.SOCKET_RECONNECTING))
-			return;
-		stopSleepSession();
 	}
 
 	private int decompressLight(final int n) {
@@ -259,21 +249,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		stopSleepSession();
 	}
 
-	public void handleAudioAmplitude(final int audioAmplitude) {
-		if (this.bAct != null) {
-			this.bAct.runOnUiThread(() -> {
-				float f2 = (float) (20.0D * Math.log10(audioAmplitude));
-				float f1 = f2;
-				if (f2 == Float.NEGATIVE_INFINITY) {
-					f1 = 0.0F;
-				}
-				Log.d("com.resmed.refresh.sound", "SleepSessionConnector::handleAudioAmplitude() amplitude : " + audioAmplitude + " db : " + f1);
-				boolean bool = SleepSessionConnector.this.soundTopAmplitudes.insert(audioAmplitude);
-				Log.d("com.resmed.refresh.sound", " SleepSessionConnector::handleAudioAmplitude() sound wasInserted : " + bool);
-			});
-		}
-	}
-
 	public void handleBreathingRate(Bundle paramBundle) {
 		Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
 	}
@@ -344,7 +319,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				} else {
 					AppFileLog.addTrace("IN : " + receivedRPC.getId() + " PAYLOAD ACK");
 				}
-				if (payload != null && payload.contains("TRUE")) {
+				if (payload.contains("TRUE")) {
 					handleSamplesTransmissionCompleteForRPC(receivedRPC);
 					return;
 				}
@@ -415,12 +390,10 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
 	}
 
-	public void init(boolean didUserPressedBackToSleep) {
-		//this.lastState = RefreshApplication.getInstance().getCurrentConnectionState();
+	public void init() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext());
 		int nightState = prefs.getInt(Consts.PREF_NIGHT_TRACK_STATE, -1);
 		AppFileLog.addTrace("SleepSessionConnector recovering state " + nightState + " for session id : " + prefs.getLong(Consts.PREF_NIGHT_LAST_SESSION_ID, -1));
-		//this.bAct.registerReceiver(this.reconnectReceiver, new IntentFilter(RefreshBluetoothServiceClient.BLUETOOTH_SERVICE_INTENT_RESTART));
 		if (this.isSyncAndStop) {
 			//recoverSleepSession(didUserPressedBackToSleep);
 			syncDataAndStop();
@@ -460,14 +433,9 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		}*/
 	}
 
-	public void setSyncing(boolean paramBoolean) {
-		this.isSyncAndStop = paramBoolean;
-	}
-
 	protected void setupController() {
 		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController()");
 		this.isWaitLastSamples = false;
-		this.soundTopAmplitudes = new SortedList(5);
 		RST_SleepSession.getInstance().startSession(true);
 	}
 
@@ -502,10 +470,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			Editor editor = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
 			editor.putInt(Consts.PREF_NIGHT_TRACK_STATE, CONNECTION_STATE.NIGHT_TRACK_OFF.ordinal());
 			editor.commit();
-			/*this.countTimeout = 0;
-			this.bAct.showBlockingDialog(new CustomDialogBuilder(this.bAct).title((int) R.string.sleep_time_session_end_title).description((int) R.string.sleep_time_session_end_desc).useProgressBar());
-			this.processRecord.start();
-			CancelRepeatingAlarmWake(this.bAct);*/
 		}
 	}
 }

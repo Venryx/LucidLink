@@ -39,12 +39,10 @@ public class RefreshBluetoothService {
 		public static final int DISCOVER_PAIR_CONNECT_RESMED = 1;
 		public static final int SEND_BYTES = 2;
 		public static final int START_DISCOVERY = 3;
-		public static final int REGISTER_CLIENT = 4;
 		public static final int BeD_STREAM_PACKET = 5;
 		public static final int BeD_CONNECTION_STATUS = 6;
 		public static final int BeD_DISCONNECT = 7;
 		public static final int BeD_UNPAIR = 8;
-		public static final int UNREGISTER_CLIENT = 9;
 		public static final int DISCOVER_RESMED_DEVICES = 10;
 		public static final int BeD_CONNECT_TO_DEVICE = 11;
 		public static final int SLEEP_SESSION_START = 12;
@@ -113,27 +111,11 @@ public class RefreshBluetoothService {
 						return;
 					}
 					return;
-				case MessageType.REGISTER_CLIENT:
-					/*RefreshBluetoothService.this.mClient = msg.replyTo;
-					V.Log("Registered client:" + RefreshBluetoothService.this.mClient);*/
-					Message message = new Message();
-					message.what = MessageType.REGISTER_CLIENT;
-					try {
-						//RefreshBluetoothService.this.mClient.send(message);
-						sendMessageToClient(message);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
-					return;
 				case MessageType.BeD_CONNECTION_STATUS:
 					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
 					return;
 				case MessageType.BeD_DISCONNECT:
 					RefreshBluetoothService.this.bluetoothManager.disable();
-					return;
-				case MessageType.UNREGISTER_CLIENT:
-					//RefreshBluetoothService.this.mClient = null;
 					return;
 				case MessageType.DISCOVER_RESMED_DEVICES:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(false);
