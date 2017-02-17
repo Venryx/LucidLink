@@ -651,6 +651,7 @@ Array.prototype._AddFunction_Inline = function SelectMany(selectFunc) {
 //Array.prototype._AddFunction_Inline = function Count(matchFunc) { return this.Where(matchFunc).length; };
 //Array.prototype._AddFunction_Inline = function Count(matchFunc) { return this.Where(matchFunc).length; }; // needed for items to be added properly to custom classes that extend Array
 Array.prototype._AddGetter_Inline = function Count() { return this.length; }; // needed for items to be added properly to custom classes that extend Array
+interface Array<T> { VCount(matchFunc: (item: T)=>boolean): number; }
 Array.prototype._AddFunction_Inline = function VCount(matchFunc) { return this.Where(matchFunc).length; };
 Array.prototype._AddFunction_Inline = function Clear() {
 	/*while (this.length > 0)
@@ -730,10 +731,12 @@ Array.prototype._AddFunction_Inline = function TakeLast(count) {
 		result.push(this[(this.length - 1) - i]);
 	return result;
 };
+interface Array<T> { FindIndex(matchFunc?: (item: T, index: number)=>boolean): number; }
 Array.prototype._AddFunction_Inline = function FindIndex(matchFunc) {
-	for (var i in this)
-		if (matchFunc.call(this[i], this[i])) // call, having the item be "this", as well as the first argument
-			return i;
+	for (let [index, item] of this.entries()) {
+		if (matchFunc.call(item, item, index)) // call, having the item be "this", as well as the first argument
+			return index;
+	}
 	return -1;
 };
 /*Array.prototype._AddFunction_Inline = function FindIndex(matchFunc) {
@@ -749,6 +752,7 @@ Array.prototype._AddFunction_Inline = function OrderBy(valFunc = a=>a) {
 	return temp;*/
     return V.StableSort(this, (a, b)=>V.Compare(valFunc(a), valFunc(b)));
 };
+interface Array<T> { Distinct(): T[]; }
 Array.prototype._AddFunction_Inline = function Distinct() {
 	var result = [];
 	for (var i in this)
@@ -757,16 +761,10 @@ Array.prototype._AddFunction_Inline = function Distinct() {
 	return result;
 };
 interface Array<T> {
-	Except(item: T): T[];
-	Except(array: T[]): T[];
+	Except(...excludeItems: T[]): T[];
 }
-Array.prototype._AddFunction_Inline = function Except(...args) {
-	if (!(args[0] instanceof Array)) var [item] = args;
-	else var [array] = args;
-
-	if (item !== undefined)
-		return this.Where(a=>a !== item);
-	return this.Where(a=>!array.Contains(a));
+Array.prototype._AddFunction_Inline = function Except(...excludeItems) {
+	return this.Where(a=>!excludeItems.Contains(a));
 };
 
 //Array.prototype._AddFunction_Inline = function JoinUsing(separator) { return this.join(separator);};

@@ -1,4 +1,4 @@
-import {BaseComponent, Column, Panel, Row, VButton} from "../../Frame/ReactGlobals";
+import {BaseComponent, Column, Panel, Row, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {Log, DN} from "../../Frame/Globals";
 import {NativeModules} from "react-native";
@@ -6,7 +6,7 @@ import {TextInput} from "react-native";
 import {LL} from "../../LucidLink";
 var FilePickerManager = NativeModules.FilePickerManager;
 
-export default class AudiosUI extends BaseComponent<any, {}> {
+export default class AudiosUI extends BaseComponent<{} & BaseProps, {}> {
 	render() {
 		var node = LL.settings;
 		return (

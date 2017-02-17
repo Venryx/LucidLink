@@ -36,7 +36,7 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 
 	render() {
 		var node = LL.tools.spMonitor;
-		var bridge = LL.spBridge;
+		var bridge = SPBridge;
 		
 		const drawerStyles = {
 			drawer: {shadowColor: "#000000", shadowOpacity: .8, shadowRadius: 3},
@@ -50,7 +50,7 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 					closedDrawerOffset={-3} styles={drawerStyles}>
 				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
-						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+						<VButton text="Options" plr={10} onPress={this.ToggleSidePanelOpen}/>
 						<Panel style={{flex: 1}}/>
 
 						{["unknown", "disconnected", "needs_update"].Contains(bridge.status) && node.connect &&
@@ -59,18 +59,18 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connecting...</Text>}
 						{bridge.status == "connected" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connected</Text>}
-						<VSwitch_Auto mt={8} path={()=>node.p.connect}/>
-						<VSwitch_Auto text="Monitor" ml={5} mt={8} path={()=>node.p.monitor}/>
-						<VSwitch_Auto text="Process" ml={5} mt={8} path={()=>node.p.process}/>
+						<VSwitch_Auto mt={6} path={()=>node.p.connect}/>
+						<VSwitch_Auto text="Monitor" ml={5} mt={6} path={()=>node.p.monitor}/>
+						<VSwitch_Auto text="Process" ml={5} mt={6} path={()=>node.p.process}/>
 
 						{/*<VButton text="Get stage" onPress={async ()=> {
-							alert(await LL.spBridge.GetSleepStage());
+							alert(await SPBridge.GetSleepStage());
 						}}/>*/}
-						<VButton text="RealTime" onPress={()=> {
-							LL.spBridge.StartRealTimeStream();
+						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
+							SPBridge.StartRealTimeStream();
 						}}/>
-						<VButton text="Sleep" onPress={()=> {
-							LL.spBridge.StartSleep();
+						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
+							SPBridge.StartSleep();
 						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
@@ -94,21 +94,21 @@ class GraphUI extends Component<{}, {}> {
 class GraphOverlayUI extends Component<{}, {}> {
 	timer: Timer;
 	componentDidMount() {
-		LL.spBridge.listeners_onReceiveTemp.push(this.OnReceiveTemp);
-		LL.spBridge.listeners_onReceiveLightValue.push(this.OnReceiveLightValue);
-		LL.spBridge.listeners_onReceiveBreathValue.push(this.OnReceiveBreathValue);
-		LL.spBridge.listeners_onReceiveBreathingRate.push(this.OnReceiveBreathingRate);
-		LL.spBridge.listeners_onReceiveSleepStage.push(this.OnReceiveSleepStage);
+		SPBridge.listeners_onReceiveTemp.push(this.OnReceiveTemp);
+		SPBridge.listeners_onReceiveLightValue.push(this.OnReceiveLightValue);
+		SPBridge.listeners_onReceiveBreathValue.push(this.OnReceiveBreathValue);
+		SPBridge.listeners_onReceiveBreathingRate.push(this.OnReceiveBreathingRate);
+		SPBridge.listeners_onReceiveSleepStage.push(this.OnReceiveSleepStage);
 		this.timer = new Timer(1, ()=> {
 			this.forceUpdate();
 		}).Start();
 	}
 	componentWillUnmount() {
-		LL.spBridge.listeners_onReceiveTemp.Remove(this.OnReceiveTemp);
-		LL.spBridge.listeners_onReceiveLightValue.Remove(this.OnReceiveLightValue);
-		LL.spBridge.listeners_onReceiveBreathValue.Remove(this.OnReceiveBreathValue);
-		LL.spBridge.listeners_onReceiveBreathingRate.Remove(this.OnReceiveBreathingRate);
-		LL.spBridge.listeners_onReceiveSleepStage.Remove(this.OnReceiveSleepStage);
+		SPBridge.listeners_onReceiveTemp.Remove(this.OnReceiveTemp);
+		SPBridge.listeners_onReceiveLightValue.Remove(this.OnReceiveLightValue);
+		SPBridge.listeners_onReceiveBreathValue.Remove(this.OnReceiveBreathValue);
+		SPBridge.listeners_onReceiveBreathingRate.Remove(this.OnReceiveBreathingRate);
+		SPBridge.listeners_onReceiveSleepStage.Remove(this.OnReceiveSleepStage);
 		this.timer.Stop();
 	}
 

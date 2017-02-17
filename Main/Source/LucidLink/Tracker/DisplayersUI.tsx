@@ -1,5 +1,5 @@
 import {Text, TextInput} from "react-native";
-import {BaseComponent as Component, Panel, VButton, VTextInput} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, VButton} from "../../Frame/ReactGlobals";
 import {colors, styles} from '../../Frame/Styles';
 import {E} from '../../Frame/Globals';
 import {Observer, observer} from "mobx-react/native";
@@ -8,6 +8,7 @@ import Drawer from "react-native-drawer";
 
 import DisplayerScriptsPanel from "./DisplayersUI/DisplayerScriptsPanel";
 import {LL} from "../../LucidLink";
+import {VTextInput} from "../../Packages/ReactNativeComponents/VTextInput";
 
 @observer
 export default class DisplayersUI extends Component<any, any> {

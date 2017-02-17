@@ -73,9 +73,9 @@ export class MonitorUI extends Component<any, any> {
 					closedDrawerOffset={-3} styles={drawerStyles}>
 				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
-						<VButton text="Options" style={{width: 100}} onPress={this.ToggleSidePanelOpen}/>
+						<VButton text="Options" plr={10} onPress={this.ToggleSidePanelOpen}/>
 						{/*temp*/}
-						<VButton text="Center" ml={10} mt={3} style={{width: 100, height: 35}}
+						<VButton text="Center" ml={10} mt={3} plr={10} style={{height: 35}}
 							enabled={MuseBridge.status == "connected"} onPress={()=>JavaBridge.Main.CenterEyeTracker()}/>
 						<Panel style={{flex: 1}}/>
 
@@ -85,9 +85,9 @@ export class MonitorUI extends Component<any, any> {
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connecting...</Text>}
 						{MuseBridge.status == "connected" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connected</Text>}
-						<VSwitch_Auto mt={8} path={()=>node.p.connect}/>
-						<VSwitch_Auto text="Monitor" ml={5} mt={8} path={()=>node.p.monitor}/>
-						<VSwitch_Auto text="Pattern match" ml={5} mt={8} path={()=>node.p.patternMatch}/>
+						<VSwitch_Auto mt={6} path={()=>node.p.connect}/>
+						<VSwitch_Auto text="Monitor" ml={5} mt={6} path={()=>node.p.monitor}/>
+						<VSwitch_Auto text="Pattern match" ml={5} mt={6} path={()=>node.p.patternMatch}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<ChannelsUI/>

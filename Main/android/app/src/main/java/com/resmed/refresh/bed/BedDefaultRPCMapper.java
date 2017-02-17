@@ -12,8 +12,7 @@ import java.util.Map;
 
 import v.lucidlink.LL;
 
-public class BedDefaultRPCMapper
-		implements BedCommandsRPCMapper {
+public class BedDefaultRPCMapper implements BedCommandsRPCMapper {
 	private static BedDefaultRPCMapper Instance = null;
 	private BaseBluetoothActivity btContext;
 	private String lastGuid;
@@ -48,15 +47,11 @@ public class BedDefaultRPCMapper
 		JsonRPC localJsonRPC = new JsonRPC("clearBuffers", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
+				public void preExecute() {}
 				public void execute() {
 					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SESSION_OPENED);
 				}
-
-				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
+				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {}
 			});
 		}
 		return localJsonRPC;
@@ -66,15 +61,11 @@ public class BedDefaultRPCMapper
 		JsonRPC localJsonRPC = new JsonRPC("closeSession", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
+				public void preExecute() {}
 				public void execute() {
 					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SOCKET_CONNECTED);
 				}
-
-				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
+				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {}
 			});
 		}
 		return localJsonRPC;
@@ -260,15 +251,11 @@ public class BedDefaultRPCMapper
 		JsonRPC localJsonRPC = new JsonRPC("stopSample", null, this.rpcId);
 		if (this.btContext != null) {
 			localJsonRPC.setRPCallback(new JsonRPC.RPCallback() {
+				public void preExecute() {}
 				public void execute() {
 					BedDefaultRPCMapper.this.broadcastState(CONNECTION_STATE.SESSION_OPENED);
 				}
-
-				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-				}
-
-				public void preExecute() {
-				}
+				public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {}
 			});
 		}
 		return localJsonRPC;

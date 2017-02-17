@@ -21,7 +21,7 @@ export class VSwitch extends Component<{text?, value?, onChange?, style?, contai
 				{text && <Text style={{marginLeft: 5, height: 20}}>{text}</Text>}
 				<Switch {...rest} {...{value, onValueChange: onChange}}
 					style={E(
-						{height: 20},
+						{height: 20, marginBottom: 3},
 						style
 					)}/>
 			</Row>

@@ -1,6 +1,5 @@
 package com.resmed.refresh.utils;
 
-import com.resmed.refresh.sleepsession.RST_SleepSession;
 import com.resmed.refresh.ui.utils.Consts;
 
 import java.io.File;
@@ -124,8 +123,8 @@ public final class Log {
 	}
 
 	private static void write(String paramString1, String paramString2, Throwable paramThrowable) {
-		if (!RST_SleepSession.getInstance().isSessionRunning()) {
-		}
+		/*if (!RST_SleepSession.getInstance().isSessionRunning()) {
+		}*/
 		try {
 			StringBuffer localStringBuffer = new java.lang.StringBuffer();
 			Calendar localCalendar = Calendar.getInstance();

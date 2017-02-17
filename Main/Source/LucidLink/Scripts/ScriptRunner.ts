@@ -19,12 +19,6 @@ export default class ScriptRunner {
 	patterns: Pattern[] = []; // func-based patterns
 
 	timers = [];
-	listeners_whenChangeMuseConnectStatus = [];
-	listeners_whenMusePacketReceived = [];
-	/*listeners_whenViewDirectionUpdated = [];
-	listeners_whenViewDistanceUpdated = [];*/
-	listeners_onUpdatePatternMatchProbabilities = [];
-
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {
 		for (let listener of this.keyDownListeners) {
@@ -40,6 +34,13 @@ export default class ScriptRunner {
 				listener.func(keyCode);
 		}
 	}
+	
+	listeners_whenChangeMuseConnectStatus = [];
+	listeners_whenMusePacketReceived = [];
+	/*listeners_whenViewDirectionUpdated = [];
+	listeners_whenViewDistanceUpdated = [];*/
+	listeners_onUpdatePatternMatchProbabilities = [];
+	listeners_whenChangeSleepStage = [];
 
 	Reset() {
 		this.patterns = [];
@@ -51,11 +52,13 @@ export default class ScriptRunner {
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
+		this.keyDownListeners = [];
+		this.keyUpListeners = [];
+
 		this.listeners_whenChangeMuseConnectStatus = [];
 		this.listeners_whenMusePacketReceived = [LL.tools.monitor.eegProcessor.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
-		this.keyDownListeners = [];
-		this.keyUpListeners = [];
+		this.listeners_whenChangeSleepStage = [];
 	}
 	//currentExecutionScope = {};
 	Apply(scripts) {

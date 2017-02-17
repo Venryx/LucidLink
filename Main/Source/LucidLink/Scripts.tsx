@@ -1,5 +1,5 @@
 import {Script} from "./Scripts/Script";
-import {BaseComponent as Component, Panel, VButton, VTextInput} from "../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, VButton} from "../Frame/ReactGlobals";
 import {colors, styles} from "../Frame/Styles";
 import RNFS from "react-native-fs";
 import ScrollableTabView from "react-native-scrollable-tab-view";
@@ -24,6 +24,7 @@ import {observer} from "mobx-react/native";
 import {autorun, transaction} from "mobx";
 import {P, _VDFPreSerialize} from "../Packages/VDF/VDFTypeInfo";
 import {AssertWarn, Assert} from "../Frame/General/Assert";
+import {VTextInput} from "../Packages/ReactNativeComponents/VTextInput";
 
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {
@@ -118,7 +119,7 @@ This will permanently remove all custom code from the script.`,
 				let script = this.scripts.First(a=>a.file.Name == scriptFileName);
 				if (script == null) {
 					let file = LL.RootFolder.GetFolder("Scripts").GetFile(scriptFileName);
-					let script = new Script(file, `Log("Hello world!");`);
+					script = new Script(file, "");
 					script.index = LL.scripts.scripts.length;
 					LL.scripts.scripts.push(script);
 				}

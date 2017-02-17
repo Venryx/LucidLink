@@ -2,10 +2,25 @@ import {FromJSON, Log, ToJSON} from "../../Frame/Globals";
 import DialogAndroid from "react-native-dialogs";
 import {LL} from "../../LucidLink";
 import {A} from "../../Frame/General/Assert";
+import {File} from "../../Packages/V/VFile";
+
+import scriptDefaultText_BuiltInHelpers from "./UserScriptDefaults/BuiltInHelpers";
+/*import scriptDefaultText_BuiltInScript from "./UserScriptDefaults/BuiltInScript";
+import scriptDefaultText_FakeDataProvider from "./UserScriptDefaults/FakeDataProvider";
+import scriptDefaultText_CustomHelpers from "./UserScriptDefaults/CustomHelpers";
+import scriptDefaultText_CustomScript from "./UserScriptDefaults/CustomScript";
+import scriptDefaultText_CustomPatterns from "./UserScriptDefaults/CustomPatterns";*/
 
 export class Script {
-	static async Load(file) {
-		let scriptText = await file.ReadAllText();
+	static async Load(file: File) {
+		//let scriptText = await file.ReadAllText();
+		let scriptText;
+		// maybe temp; always get text of "Built-in-helpers" script from built-in copy
+		if (file.Name == "Built-in helpers.js")
+			scriptText = scriptDefaultText_BuiltInHelpers;
+		else
+			scriptText = await file.ReadAllText();
+		
 		var result = new Script(file, scriptText);
 		await result.LoadMeta();
 		return result;

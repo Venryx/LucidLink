@@ -45,7 +45,6 @@ public class RefreshBluetoothService {
 		public static final int BeD_UNPAIR = 8;
 		public static final int DISCOVER_RESMED_DEVICES = 10;
 		public static final int BeD_CONNECT_TO_DEVICE = 11;
-		public static final int SLEEP_SESSION_START = 12;
 		public static final int SLEEP_SESSION_STOP = 14;
 		public static final int SLEEP_ENV_SAMPLE = 15;
 		public static final int SLEEP_USER_SLEEP_STATE = 17;
@@ -138,22 +137,6 @@ public class RefreshBluetoothService {
 					message4.what = MessageType.BeD_UNPAIR;
 					RefreshBluetoothService.this.sendMessageToClient(message4);
 					return;
-				case MessageType.SLEEP_SESSION_START:
-					V.Log("Starting session the correct way!");
-					//RefreshBluetoothService.this.changeToForeground();
-					RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
-					long sessionId = -1;
-					int age = 44;
-					int gender = 0;
-					b = msg.getData();
-					if (b != null) {
-						sessionId = b.getLong("sessionId");
-						age = b.getInt("age", 44);
-						gender = b.getInt("gender", 0);
-					}
-					RefreshBluetoothService.this.sleepSessionManager.start(sessionId, age, gender);
-					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionId);
-					return;
 				case MessageType.SLEEP_SESSION_STOP:
 					Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service isHandleBulkTransfer : " + RefreshBluetoothService.this.isHandleBulkTransfer);
 					RefreshBluetoothService.this.stopCurrentSession();
@@ -244,12 +227,21 @@ public class RefreshBluetoothService {
 		}
 	}
 
-	private void recoverSleepSession(long l) {
+	public void StartSleepSession(long sessionID, int age, int gender) {
+		//V.Log("Starting sleep session...");
+		//RefreshBluetoothService.this.changeToForeground();
+		RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
+		RefreshBluetoothService.this.sleepSessionManager.start(sessionID, age, gender);
+		Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionID);
+		return;
+	}
+
+	/*private void recoverSleepSession(long l) {
 		this.sleepSessionManager = new SleepSessionManager(this);
 		int n = this.prefs.getInt("PREF_AGE", 44);
 		int n2 = this.prefs.getInt("PREF_GENDER", 0);
 		this.sleepSessionManager.recoverSession(l, n, n2);
-	}
+	}*/
 
 	private void stopCurrentSession() {
 		AppFileLog.addTrace("MSG_SLEEP_SESSION_STOP Service received.");

@@ -96,8 +96,8 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		V.Log("Connection status changed: " + state);
 
 		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null) {
-			if (state == CONNECTION_STATE.SESSION_OPENING || state == CONNECTION_STATE.SESSION_OPENED
-					|| state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING) {
+			if (state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING
+				|| state == CONNECTION_STATE.SESSION_OPENING || state == CONNECTION_STATE.SESSION_OPENED) {
 				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN));
 			} else if (state == CONNECTION_STATE.REAL_STREAM_ON || state == CONNECTION_STATE.NIGHT_TRACK_ON) {
 				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.OFF));

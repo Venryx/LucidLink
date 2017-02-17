@@ -198,18 +198,17 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.addSamplesMiMq(bioData[0], bioData[1]);
 	}
 
-	public void addEnvData(final byte[] array, final boolean b) {
-		V.Log("addEnvData:" + this.isActive + ";" + b);
-		if (b && this.isActive) {
-			final float[] temperatureValues = PacketsByteValuesReader.readTemperatureValues(array);
-			final int[] illuminanceValues = PacketsByteValuesReader.readIlluminanceValues(array);
+	public void addEnvData(final byte[] decobbed, final boolean persistData) {
+		if (persistData && this.isActive) {
+			final float[] temperatureValues = PacketsByteValuesReader.readTemperatureValues(decobbed);
+			final int[] illuminanceValues = PacketsByteValuesReader.readIlluminanceValues(decobbed);
 			for (int i = 0; i < illuminanceValues.length; ++i) {
 				++this.nrOfEnvSamples;
 				Log.d("com.resmed.refresh.env", "SleepSessionManager::handleEnvData() temp[" + i + "]=" + temperatureValues[i] + "  light[" + i + "]=" + illuminanceValues[i]);
 				if (this.nrOfEnvSamples % 30 == 0) {
 					Log.d("com.resmed.refresh.bluetooth", "SleepSessionManager nrOfEnvSamples = " + this.nrOfEnvSamples + " temp = " + temperatureValues[i] + "  light = " + illuminanceValues[i]);
 					final Message message = new Message();
-					message.what = 15;
+					message.what = RefreshBluetoothService.MessageType.SLEEP_ENV_SAMPLE;
 					final Bundle data = new Bundle();
 					data.putFloat("tempArray", temperatureValues[i]);
 					data.putInt("lightArray", illuminanceValues[i]);
@@ -476,10 +475,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	}
 
 	public void onRm20RealTimeSleepState(int sleepState, int epochIndex) {
-		V.Log("Got sleep-state data!" + sleepState + ";" + epochIndex);
-		//V.Toast("Got sleep-state data!" + sleepState + ";" + epochIndex);
 		Message localMessage = new Message();
-		localMessage.what = 17;
+		localMessage.what = RefreshBluetoothService.MessageType.SLEEP_USER_SLEEP_STATE;
 		Bundle localBundle = new Bundle();
 		localBundle.putInt("BUNDLE_SLEEP_STATE", sleepState);
 		localBundle.putInt("BUNDLE_SLEEP_EPOCH_INDEX", epochIndex);
@@ -488,23 +485,20 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		SPlusModule.main.sessionConnector.service.sendMessageToClient(localMessage);
 	}
 
-	public void onRm20ValidBreathingRate(float paramFloat, int paramInt) {
-		V.Log("Got breathing-rate data!" + paramFloat + ";" + paramInt);
+	public void onRm20ValidBreathingRate(float rate, int secIndex) {
+		V.Log("Got breathing-rate: " + rate + " @secIndex:" + secIndex);
 		Message localMessage = new Message();
-		localMessage.what = 18;
+		localMessage.what = RefreshBluetoothService.MessageType.SLEEP_BREATHING_RATE;
 		Bundle localBundle = new Bundle();
-		localBundle.putFloat("BUNDLE_BREATHING_RATE", paramFloat);
-		localBundle.putInt("BUNDLE_BREATHING_SECINDEX", paramInt);
+		localBundle.putFloat("BUNDLE_BREATHING_RATE", rate);
+		localBundle.putInt("BUNDLE_BREATHING_SECINDEX", secIndex);
 		localMessage.setData(localBundle);
 		//this.serviceHandler.sendMessageToClient(localMessage);
 		SPlusModule.main.sessionConnector.service.sendMessageToClient(localMessage);
 	}
 
-	public void onWroteDigitalSamples() {
-	}
-
-	public void onWroteMetadata() {
-	}
+	public void onWroteDigitalSamples() {}
+	public void onWroteMetadata() {}
 
 	public void recoverSession(final long sessionId, final int n, final int n2) {
 		this.nrOfBioSamples = 0;

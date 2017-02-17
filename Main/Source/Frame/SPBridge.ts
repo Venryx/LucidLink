@@ -42,7 +42,7 @@ export enum SleepStage {
 }
 
 var core = NativeModules.SPlus;
-export default class SPBridge {
+export class SPBridgeClass {
 	initialized = false;
 	Init() {
 		core.Init();
@@ -106,11 +106,15 @@ export default class SPBridge {
 		}
 	}*/
 	
-	Connect(age, gender: "male" | "female") {
-		core.Connect(age, gender == "male" ? 0 : 1);
+	Connect() {
+		core.Connect();
 	}
 	Disconnect() {
 		core.Disconnect();
+	}
+
+	SetUserInfo(age, gender: "male" | "female") {
+		core.SetUserInfo(age, gender);
 	}
 
 	StartSession() {
@@ -130,3 +134,6 @@ export default class SPBridge {
 		core.StartSleep();
 	}
 }
+
+var SPBridge = new SPBridgeClass();
+export default SPBridge;

@@ -14,7 +14,7 @@ AddEvent("special event", "First piece of extra data (argument).", "Second piece
 // ==========
 
 WaitXThenRun(1000, function() {
-	// this code runs after a delay of 1 second (1000 milliseconds)
+	// code here runs after a delay of 1 second (1000 milliseconds)
 })
 var randomNumber = GetRandomNumber({min: 1, max: 10, mustBeInteger: true})
 
@@ -25,10 +25,21 @@ var randomNumber = GetRandomNumber({min: 1, max: 10, mustBeInteger: true})
 // (you can also just press the key you want, then see its keycode in the Logs panel)
 var keyCodeForTheLetterA = 29
 AddKeyDownListener(keyCodeForTheLetterA, function() {
-	// this code runs whenever the user presses the letter A
+	// code here runs whenever the user presses the letter A
 })
 AddKeyUpListener(keyCodeForTheLetterA, function() {
-	// this code runs whenever the user releases the letter A
+	// code here runs whenever the user releases the letter A
+})
+
+// S+ sleep tracker
+// ==========
+
+// list of sleep stages: "absent", "awake", "light", "deep", "rem"
+WhenChangeSleepStageDo(function(stage, rawStage) {
+	// code here runs whenever you transition into a different sleep stage
+})
+WhenXMinutesIntoSleepStageYDo(5, "rem", function() {
+	// code here runs whenever you reach 5 minutes into a rem-sleep segment
 })
 
 // muse

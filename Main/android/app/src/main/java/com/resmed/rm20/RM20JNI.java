@@ -112,12 +112,12 @@ public class RM20JNI {
 
 	public native UserInfo getUserInfo();
 
-	public void onLibraryStarted(int n) {
-		V.Log("Library started: " + n);
+	public void onLibraryStarted(int result) {
+		V.Log("RM20JNI library started: " + result);
 	}
 
-	public void onWroteSample(int n) {
-		//V.Log("WroteData to RM20JNI for processing: " + n);
+	public void onWroteSample(int result) {
+		//V.Log("WroteData to RM20JNI for processing: " + result);
 	}
 
 	public void onRealTimeSleepState(int n, int n2) {
@@ -144,13 +144,13 @@ public class RM20JNI {
 
 	public native int stopAndCalculate();
 
-	public native int writeSampleData(int var1, int var2);
+	public native int writeSampleData(int i, int i2);
 
-	public int writeSamples(int[] arrn, int[] arrn2) {
+	public int writeSamples(int[] uiMI, int[] uiMQ) {
 		int n = -1;
 		int n2 = 0;
-		while (n2 < arrn2.length) {
-			n = this.writeSampleData(arrn[n2], arrn2[n2]);
+		while (n2 < uiMQ.length) {
+			n = this.writeSampleData(uiMI[n2], uiMQ[n2]);
 			if (n != 0) return n;
 			++n2;
 		}

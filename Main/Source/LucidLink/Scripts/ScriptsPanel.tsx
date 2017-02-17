@@ -68,7 +68,7 @@ export default class ScriptsPanel extends Component<any, any> {
 		}
 
 		var file = LL.RootFolder.GetFolder("Scripts").GetFile(fileName);
-		var script = new Script(file, `Log("Hello world!");`);
+		var script = new Script(file, `Toast("Hello world!");`);
 		script.index = LL.scripts.scripts.length;
 		LL.scripts.scripts.push(script);
 

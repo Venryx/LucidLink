@@ -15,26 +15,28 @@ export default class NumberPicker extends Component<
 	render() {
 	    var {min, max, step, values, precision, format,
 			value, enabled, style, dialogTitle, dialogMessage, onChange, onFocus} = this.props;
+
+		format = format || (val=>val.toFixed(precision));
 		if (values == null) {
 			values = [];
 			//for (let val = min; val <= max; val += step)
 			for (let val = min; val.RoundToMultipleOf(step) <= max; val += step)
 				values.push(val);
 		}
+		var names = values.Select(format);
 		value = value || values[0];
-		format = format || (val=>val.toFixed(precision));
+
 	    return (
 			<VButton text={format(value)}
 				style={E({width: 100, height: 32}, style)}
 				onPress={async ()=> {
-					
 					var id = await NumberPickerDialog.show({
 						title: dialogTitle,
 						message: dialogMessage || "",
-						values: values.Select(format),
+						values: names,
 						//selectedValueIndex: values.indexOf(value),
 						// pre-select current value by text, rather than raw actual-number
-						selectedValueIndex: values.Select(format).indexOf(format(value)),
+						selectedValueIndex: names.indexOf(format(value)),
 						positiveButtonLabel: "Ok", negativeButtonLabel: "Cancel",
 					});
 

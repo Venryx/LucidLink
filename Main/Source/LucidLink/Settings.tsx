@@ -8,12 +8,28 @@ import GeneralUI from "./Settings/GeneralUI";
 import AudiosUI from "./Settings/AudiosUI";
 import {LL} from "../LucidLink";
 import {P, T} from "../Packages/VDF/VDFTypeInfo";
+import MuseUI from "./Settings/Muse";
+import {_Enum, Enum} from "../Frame/General/Enums";
+
+/*export enum Gender {
+	Male,
+	Female
+}*/
+@_Enum export class Gender extends Enum { static V: Gender;
+	Male = this
+	Female = this
+}
 
 export class Settings extends Node {	
+	// general
 	@O @P() applyScriptsOnLaunch = false;
 	@O @P() blockUnusedKeys = false;
 	//@P() captureSpecialKeys = false;
 	@O @P() keepDeviceAwake = true;
+	@O @P() age = 20;
+	@O @P() gender = Gender.V.Male;
+
+	// muse
 	@O @P() museEEGPacketBufferSize = 30;
 	@O @P() eyeTracker_horizontalSensitivity = .5;
 	@O @P() eyeTracker_verticalSensitivity = .3;
@@ -25,6 +41,7 @@ export class Settings extends Node {
 	@O @P() reconnectAttemptInterval = 10;
 	@O @P() sessionSaveInterval = 5;
 
+	// audio
 	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
 
 	ui = null;
@@ -46,6 +63,7 @@ export class SettingsUI extends BaseComponent<any, any> {
 		return (
 			<ScrollableTabView style={{flex: 1}}>
 				<GeneralUI tabLabel="General"/>
+				<MuseUI tabLabel="Muse"/>
 				<AudiosUI tabLabel="Audios"/>
 			</ScrollableTabView>
 		);

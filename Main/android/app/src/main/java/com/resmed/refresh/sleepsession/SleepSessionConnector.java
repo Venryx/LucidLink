@@ -40,7 +40,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private int bioOnBeD;
 	private KillableRunnable cancelSleepSessionRunnable;
 	private boolean closeSleepSession;
-	private int envTotalCount;
 	private boolean hasSessionStarted;
 	private Runnable heartbeatTimeoutRunnable;
 	private boolean isClosingSession;
@@ -52,7 +51,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private Handler myHeartbeatHandler;
 	private JsonRPC pendingBioSamplesRpc;
 	private JsonRPC pendingEnvSamplesRpc;
-	private int sizeToStore = 5;
 
 	public RefreshBluetoothService service;
 
@@ -154,19 +152,19 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 	private void handleHeartBeat(final byte[] array) {
 		if (this.bAct != null) {
-			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
+			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored because : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
 			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
 			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", this.lastHeartBeatTimestamp);
 			edit.commit();
 			if (this.isWaitLastSamples || this.isHandlingHeartBeat) {
-				AppFileLog.addTrace("IN HeartBeat ignored beacuse : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
+				AppFileLog.addTrace("IN HeartBeat ignored because : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
 				return;
 			}
 			this.isHandlingHeartBeat = true;
 			final int storeLocalBio = PacketsByteValuesReader.getStoreLocalBio(array);
 			final int storeLocalEnv = PacketsByteValuesReader.getStoreLocalEnv(array);
-			V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
+			V.JavaLog("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
 
 			this.setBioOnBeD(storeLocalBio);
 			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
@@ -297,8 +295,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		if (bundle != null) {
 			final float temp = bundle.getFloat("tempArray");
 			final int light_compressed = bundle.getInt("lightArray");
-			final float light = (float) this.decompressLight(light_compressed);
-			++this.envTotalCount;
+			final float light = (float)this.decompressLight(light_compressed);
 			AppFileLog.addTrace("IN handleEnvSample light : " + light + "  temp : " + temp);
 			Log.d("com.resmed.refresh.env", "handleEnvSample light : " + light + "  temp : " + temp);
 		}
@@ -413,27 +410,17 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		}*/
 	}
 
-	protected void setupController() {
-		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController()");
-		this.isWaitLastSamples = false;
-		RST_SleepSession.getInstance().startSession(true);
-	}
-
 	public boolean sessionActive;
 	public void EnsureSleepSessionStarted() {
 		if (sessionActive) return;
 		sessionActive = true;
 
-		this.sizeToStore = this.isSyncAndStop ? 640 : 2;
-
 		AppFileLog.deleteCurrentFile();
-		final Message message = new Message();
-		message.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_START;
-		message.getData().putLong("sessionId", 1); // todo: make not hard-coded
-		message.getData().putInt("age", 20); // todo: make not hard-coded
-		message.getData().putInt("gender", 0); // 0 = male, 1 = female // todo: make not hard-coded
-		this.bAct.sendMessageToService(message);
-		this.setupController();
+		// fake session-id (we don't care about (or even want) the on-device data-recording)
+		SPlusModule.main.sessionConnector.service.StartSleepSession(1, SPlusModule.main.age, SPlusModule.main.GenderInt());
+
+		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController()");
+		this.isWaitLastSamples = false;
 	}
 
 	public void stopSleepSession() {

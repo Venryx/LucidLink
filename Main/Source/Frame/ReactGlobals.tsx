@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Component} from "react";
-import {E, IsString} from "./Globals";
+import {E, IsString, Toast} from "./Globals";
 import {colors, styles} from "./Styles";
 import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
@@ -57,7 +57,7 @@ EStyleSheet.build();
 import autoBind from "react-autobind";
 import {Assert} from "./General/Assert";
 import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
-import {ButtonProperties} from "react-native";
+import {ButtonProperties, TextProperties, TextInputProperties} from "react-native";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/
@@ -201,25 +201,15 @@ export class BaseComponent<P, S> extends Component<P, S> {
 export interface BaseProps {
 	ml?; mr?; mt?; mb?;
 	pl?; pr?; pt?; pb?;
+	plr?; ptb?;
 
 	tabLabel?: string; active?: boolean;
 }
 export function BasicStyles(props) {
 	var result: any = {};
 
-	var fullKeys = {
-		ml: "marginLeft", mr: "marginRight", mt: "marginTop", mb: "marginBottom",
-		pl: "paddingLeft", pr: "paddingRight", pt: "paddingTop", pb: "paddingBottom",
-	};
-	for (let key in props) {
-		if (key in fullKeys) {
-			let fullKey = fullKeys[key];
-			result[fullKey] = props[key];
-		}
-	}
-
 	// old way
-	for (let key in props) {
+	/*for (let key in props) {
 		if (key.startsWith("ml"))
 			result.marginLeft = (key.startsWith("mlN") ? -1 : 1) * parseInt(key.substr(2));
 		else if (key.startsWith("mr"))
@@ -236,18 +226,34 @@ export function BasicStyles(props) {
 			result.paddingTop = (key.startsWith("ptN") ? -1 : 1) * parseInt(key.substr(2));
 		else if (key.startsWith("pb"))
 			result.paddingBottom = (key.startsWith("pbN") ? -1 : 1) * parseInt(key.substr(2));
+	}*/
+
+	var fullKeys = {
+		ml: "marginLeft", mr: "marginRight", mt: "marginTop", mb: "marginBottom",
+		pl: "paddingLeft", pr: "paddingRight", pt: "paddingTop", pb: "paddingBottom",
+	};
+	for (let key in props) {
+		if (key in fullKeys) {
+			let fullKey = fullKeys[key];
+			result[fullKey] = props[key];
+		} else if (key == "plr") {
+			result.paddingLeft = props[key];
+			result.paddingRight = props[key];
+		} else if (key == "ptb") {
+			result.paddingTop = props[key];
+			result.paddingBottom = props[key];
+		}
 	}
 
 	return result;
 }
 
-export class Row extends BaseComponent<any, any> {
+export class Row extends BaseComponent<{height?, style?} & BaseProps, {}> {
 	render() {
-		var {style, height, children} = this.props;
+		var {height, style, children, ...rest} = this.props;
 		height = height != null ? height : (style||{}).height;
-		var otherProps = this.props.Excluding(style, height, children);
 		return (
-			<Panel {...otherProps} style={E({flexDirection: "row"}, BasicStyles(this.props), style,
+			<Panel {...rest} style={E({flexDirection: "row"}, BasicStyles(this.props), style,
 					//height != null ? {height} : {flex: 1})}>
 					height != null && {height})}>
 				{children}
@@ -255,9 +261,9 @@ export class Row extends BaseComponent<any, any> {
 		);
 	}
 }
-export class RowLR extends BaseComponent<any, any> {
+export class RowLR extends BaseComponent<{height?, leftStyle?, rightStyle?} & BaseProps, {}> {
     render() {
-		var {height, leftStyle, rightStyle, children} = this.props;
+		var {height, leftStyle, rightStyle, children} = this.props as any;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
 			<Panel style={E({flexDirection: "row"}, BasicStyles(this.props), height != null && {height})}>
@@ -272,9 +278,9 @@ export class RowLR extends BaseComponent<any, any> {
     }
 }
 
-export class Column extends BaseComponent<any, any> {
+export class Column extends BaseComponent<{width?, style?} & BaseProps, {}> {
 	render() {
-		var {style, width, children, ...rest} = this.props;
+		var {width, style, children, ...rest} = this.props;
 		return (
 			<Panel {...rest} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
 				{children}
@@ -288,27 +294,26 @@ export class Column extends BaseComponent<any, any> {
 /*var View2: React.ComponentClass<any> = View;
 export class Panel extends View {*/
 
-export class Panel extends BaseComponent<any, any> {
+export class Panel extends BaseComponent<{style?} & BaseProps, any> {
 	setNativeProps (nativeProps) {
 		this.root.setNativeProps(nativeProps);
 	}
 	root;
 	render() {
-		var {children, style, ...rest} = this.props;
+		var {style, children, ...rest} = this.props;
 		return (
-			<View {...rest as any} ref={c=>this.root = c} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
+			<View {...rest} ref={c=>this.root = c} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
 				{children}
 			</View>
 		);
 	}
 }
 
-export class VText extends BaseComponent<any, any> {
+export class VText extends BaseComponent<{style?} & BaseProps & TextProperties, {}> {
 	render() {
-		var {style, children} = this.props;
-		var otherProps = this.props;
+		var {style, children, ...rest} = this.props;
 		return (
-			<Text {...otherProps}
+			<Text {...rest}
 					style={E(
 						{},
 						BasicStyles(this.props),
@@ -320,7 +325,8 @@ export class VText extends BaseComponent<any, any> {
 	}
 }
 
-export class VButton extends BaseComponent<BaseProps & ButtonProperties & {text, caps?, style?, textStyle?, enabled?}, {}> {
+export class VButton extends BaseComponent<
+		{text, caps?, style?, textStyle?, enabled?} & BaseProps & ButtonProperties, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;
@@ -341,16 +347,16 @@ export class VButton extends BaseComponent<BaseProps & ButtonProperties & {text,
 	}
 }
 
-export class AutoExpandingTextInput extends BaseComponent<any, any> {
+export class AutoExpandingTextInput extends BaseComponent<{style?} & BaseProps & TextInputProperties, {height, text}> {
 	constructor(props) {
   		super(props);
 		var {defaultValue, height} = props;
 		this.state = {text: defaultValue, height};
 	}
 	render() {
-		var {style} = this.props;
+		var {style, ...rest} = this.props;
 		return (
-			<TextInput {...this.props} multiline={true}
+			<TextInput {...rest as any} multiline={true}
 				style={E(styles.default, {height: Math.max(35, this.state.height)}, style)}
 				value={this.state.text}
 				onChange={event=> {
@@ -360,36 +366,6 @@ export class AutoExpandingTextInput extends BaseComponent<any, any> {
 					});
 				}}
 			/>
-		);
-	}
-}
-
-export class VTextInput extends BaseComponent<
-		{value?: string, onChange?: (val: string)=>void,
-			accessible?, accessibilityLabel?, // for "@ConvertStartSpacesToTabs" feature
-			editable?, style?}, {}> {
-	static defaultProps = {editable: true};
-	render() {
-		var {value, onChange, style, ...rest} = this.props;
-		return <TextInput {...rest}
-			style={E({flex: 1, textAlignVertical: "top", color: colors.text}, style)}
-			multiline={true} value={value} onChangeText={onChange}
-			autoCapitalize="none" autoCorrect={false}/>;
-	}
-}
-@observer
-export class VTextInput_Auto extends Component<
-	{value?: string, onChange?: (text: string)=>void,
-		editable?, style?,
-		path: ()=>any}, {}> {
-	render() {
-		var {value, onChange, path, ...rest} = this.props;
-		let {node, key: propName} = path();
-		return (
-			<VTextInput {...rest} value={node[propName]} onChange={val=> {
-				node[propName] = val;
-				if (onChange) onChange(val);
-			}}/>
 		);
 	}
 }

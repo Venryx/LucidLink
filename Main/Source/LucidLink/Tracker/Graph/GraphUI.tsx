@@ -43,7 +43,7 @@ export default class GraphUI extends Component<{} & BaseProps, {}> {
 				<Column style={{flex: 1, backgroundColor: colors.background}}>
 					<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 						{/*<VButton text="Options" style={{width: 100}} onPress={this.ToggleLeftPanelOpen}/>*/}
-						<VText ml10 mt10>Rows/days: </VText>
+						<VText ml={10} mt={10}>Rows/days: </VText>
 						<VButton text={node.rowCount.toString()} ml={3} mt={5} style={{width: 100, height: 32}}
 							onPress={()=> {
 								var values = [];

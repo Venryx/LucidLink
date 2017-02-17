@@ -114,8 +114,6 @@ export class LucidLink extends Node {
 	@T("Settings") @P(true, true) settings = new Settings();
 	@T("More") @P(true, true) more = new More();
 
-	spBridge = new SPBridge();
-
 	PushBasicDataToJava() {
 		var basicData = {};
 		// monitor
@@ -234,17 +232,15 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	});
 
 	// also for sp-monitor
-	if (!LL.spBridge.initialized)
-		LL.spBridge.Init();
+	if (!SPBridge.initialized)
+		SPBridge.Init();
 	autorun(()=> {
 		if (LL.tools.spMonitor.connect) {
-			LL.spBridge.Connect(20, "male");
-			/*WaitXThenRun(1000, ()=> {
-				LL.spBridge.StartSession();
-			});*/
+			SPBridge.Connect();
 		} else {
-			//LL.spBridge.StopSession();
-			LL.spBridge.Disconnect();
+			//SPBridge.StopSession();
+			SPBridge.Disconnect();
 		}
 	});
+	autorun(()=>SPBridge.SetUserInfo(LL.settings.age, LL.settings.gender.name.toLowerCase() as any));
 }

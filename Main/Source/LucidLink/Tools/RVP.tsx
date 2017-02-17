@@ -1,5 +1,5 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, VText, VTextInput, VTextInput_Auto} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, VText} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Vector2i} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
@@ -18,6 +18,7 @@ import {Log} from "../../Frame/Globals";
 import Sound from "react-native-sound";
 import {AudioFile} from "../../Frame/AudioFile";
 import {WaitXThenRun, Timer} from "../../Frame/General/Timers";
+import {VTextInput, VTextInput_Auto} from "../../Packages/ReactNativeComponents/VTextInput";
 
 var audioFiles = audioFiles || {};
 function GetAudioFile(name) {
@@ -159,81 +160,81 @@ export class RVPUI extends Component<any, any> {
 			<ScrollView style={{flex: 1, flexDirection: "column"}}>
 				<Row style={{flex: 1, flexDirection: "column", padding: 10}}>
 					<Row height={30}>
-						<VText mt2 mr10>Enabled: </VText>
+						<VText mt={2} mr={10}>Enabled: </VText>
 						<VSwitch_Auto path={()=>node.p.enabled}/>
 					</Row>
 					<Row>
-						<VText mt5 mr10>Voice-prompt interval: </VText>
+						<VText mt={5} mr={10}>Voice-prompt interval: </VText>
 						<NumberPicker_Auto path={()=>node.p.interval} min={1} max={10 * 60}
 							dialogTitle="Voice-prompt interval"
 							dialogMessage="The number of seconds between voice-prompts."/>
-						<VText mt5 ml10>seconds</VText>
+						<VText mt={5} ml={10}>seconds</VText>
 					</Row>
 
 					{/*<Row>
-						<VText mt5 mr10>Part 1 (phrase) volume, min: </VText>
+						<VText mt={5} mr={10}>Part 1 (phrase) volume, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_minVolume}
 							max={1} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) min-volume"/>
-						<VText mt5 ml10 mr10>max: </VText>
+						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_maxVolume}
 							max={1} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) max-volume"/>
 					</Row>*/}
 					<Row>
-						<VText mt5 mr10>Part 1 (phrase) pitch, min: </VText>
+						<VText mt={5} mr={10}>Part 1 (phrase) pitch, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_minPitch}
 							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) min-pitch"/>
-						<VText mt5 ml10 mr10>max: </VText>
+						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_maxPitch}
 							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) max-pitch"/>
 					</Row>
 
 					<Row>
-						<VText mt5 mr10>Pause duration: </VText>
+						<VText mt={5} mr={10}>Pause duration: </VText>
 						<NumberPicker_Auto path={()=>node.p.pauseDuration} max={60}
 							dialogTitle="Pause duration (between part 1 and 2)"/>
-						<VText mt5 ml10>seconds</VText>
+						<VText mt={5} ml={10}>seconds</VText>
 					</Row>
 
 					{/*<Row>
-						<VText mt5 mr10>Part 2 (number) volume, min: </VText>
+						<VText mt={5} mr={10}>Part 2 (number) volume, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_minVolume}
 							max={1} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) min-volume"/>
-						<VText mt5 ml10 mr10>max: </VText>
+						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_maxVolume}
 							max={1} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) max-volume"/>
 					</Row>*/}
 					<Row>
-						<VText mt5 mr10>Part 2 (number) pitch, min: </VText>
+						<VText mt={5} mr={10}>Part 2 (number) pitch, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_minPitch}
 							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) min-pitch"/>
-						<VText mt5 ml10 mr10>max: </VText>
+						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_maxPitch}
 							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) max-pitch"/>
 					</Row>
 
-					<Row mt30 height={30}>
-						<VText mt1 mr10>Background music: </VText>
+					<Row mt={30} height={30}>
+						<VText mt={1} mr={10}>Background music: </VText>
 						<VSwitch_Auto path={()=>node.p.backgroundMusic_enabled}/>
 					</Row>
 					{node.backgroundMusic_enabled &&
 						<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
 							<Row>
-								<VText mt5 mr10>Volume: </VText>
+								<VText mt={5} mr={10}>Volume: </VText>
 								<NumberPicker_Auto path={()=>node.p.backgroundMusic_volume}
 									max={1} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 									dialogTitle="Volume (background music)"/>
 							</Row>
 							<Row>
 								<Column style={{flex: 1}}>
-									<VText mt5 mr10>Tracks:</VText>
+									<VText mt={5} mr={10}>Tracks:</VText>
 									{node.backgroundMusic_tracks.map((name, index)=> {
 										return (
 											<Row key={index} height={35}>
@@ -253,14 +254,14 @@ export class RVPUI extends Component<any, any> {
 							</Row>
 						</Row>}
 
-					<Row mt30>
-						<VText mt5 mr10>Phrase: </VText>
+					<Row mt={30}>
+						<VText mt={5} mr={10}>Phrase: </VText>
 						<VTextInput_Auto style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 							editable={true} path={()=>node.p.phrase}/>
 					</Row>
 					<Row>
 						<Column style={{flex: 1, backgroundColor: colors.background}}>
-							<VText mt5 mr10>Names:</VText>
+							<VText mt={5} mr={10}>Names:</VText>
 							{node.names.map((name, index)=> {
 								return (
 									<Row key={index} height={35}>

@@ -1,51 +1,19 @@
 package SPlus;
 
-		import android.app.Activity;
+import android.app.Activity;
 
-		import com.facebook.react.bridge.Arguments;
-		import com.facebook.react.bridge.ReactApplicationContext;
-		import com.facebook.react.bridge.ReactContextBaseJavaModule;
-		import com.facebook.react.bridge.ReactMethod;
-		import com.facebook.react.bridge.WritableArray;
-		import com.facebook.react.modules.core.DeviceEventManagerModule;
-		import com.resmed.refresh.bed.BedDefaultRPCMapper;
-		import com.resmed.refresh.sleepsession.SleepSessionConnector;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.resmed.refresh.bed.BedDefaultRPCMapper;
+import com.resmed.refresh.bluetooth.CONNECTION_STATE;
+import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
-		import v.lucidlink.MainActivity;
-		import v.lucidlink.V;
-
-/*enum MessageType {
-	None(0),
-	DidFinishEdfRecovery(21),
-	StopCalculateAndSendResults(14),
-	AddEnvData(15),
-	OnRm20RealTimeSleepState(17),
-	OnRm20ValidBreathingRate(18);
-
-	MessageType(int value) { this.value = value; }
-	public int value;
-
-	/*public static MessageType GetValue(int val) {
-		MessageType[] entries = MessageType.values();
-		for(int i = 0; i < entries.length; i++){
-			if(entries[i].value == val)
-				return entries[i];
-		}
-		return MessageType.None;
-	}*#/
-	private static final Map<Integer, MessageType> intToTypeMap = new HashMap<>();
-	static {
-		for (MessageType type : MessageType.values()) {
-			intToTypeMap.put(type.value, type);
-		}
-	}
-	public static MessageType GetEntry(int val) {
-		MessageType type = intToTypeMap.get(Integer.valueOf(val));
-		if (type == null)
-			return MessageType.None;
-		return type;
-	}
-}*/
+import v.lucidlink.MainActivity;
+import v.lucidlink.V;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	public static Activity mainActivity;
@@ -152,9 +120,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
         this.sessionConnector.handleUserSleepState(data);
     }*/
 
-	@ReactMethod public void Connect(int age, int gender) { // for gender: 0=male, 1=female
-		V.Log("Connecting..." + age + ";" + gender);
-
+	@ReactMethod public void Connect() {
 		SPlusModule.main.sessionConnector.service.StartListening();
 
 		//int sessionID = 70;
@@ -172,6 +138,16 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		//this.sessionConnector.stopSleepSession();
+		//MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_CONNECTED); // make lights green again right now, since response might not arrive in time
+	}
+
+	public int age;
+	public String gender; // 0=male, 1=female
+	public int GenderInt() { return gender == "male" ? 0 : 1; }
+	@ReactMethod public void SetUserInfo(int age, String gender) {
+		V.Assert(gender.equals("male") || gender.equals("female"));
+		this.age = age;
+		this.gender = gender;
 	}
 
 	/*@ReactMethod public void GetSleepStage(Promise promise) {
@@ -187,14 +163,14 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.getRealTimeSleepState();
 	}*/
 	@ReactMethod public void StartRealTimeStream() {
-		V.Log("StartingRealTimeStream!!!");
-		this.sessionConnector.EnsureSleepSessionStarted();
+		V.Log("Starting real-time stream...");
+		//this.sessionConnector.EnsureSleepSessionStarted();
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
 	}
 	@ReactMethod public void StartSleep() {
-		V.Log("StartingSleep");
+		V.Log("Starting sleep stream...");
 		this.sessionConnector.EnsureSleepSessionStarted();
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy

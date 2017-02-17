@@ -22,11 +22,11 @@ export default class OptionsPanel extends BaseComponent<any, any> {
 						}}/>
 				</Row>
 				<Row>
-					<VText mt12>Channels: </VText>
-					<VSwitch_Auto text="1" path={()=>node.p.channel1}/>
-					<VSwitch_Auto text="2" path={()=>node.p.channel2}/>
-					<VSwitch_Auto text="3" path={()=>node.p.channel3}/>
-					<VSwitch_Auto text="4" path={()=>node.p.channel4}/>
+					<VText mt={6}>Channels: </VText>
+					<VSwitch_Auto text="1" path={()=>node.p.channel1} mt={3}/>
+					<VSwitch_Auto text="2" path={()=>node.p.channel2} mt={3}/>
+					<VSwitch_Auto text="3" path={()=>node.p.channel3} mt={3}/>
+					<VSwitch_Auto text="4" path={()=>node.p.channel4} mt={3}/>
 				</Row>
 			</Column>
 		)

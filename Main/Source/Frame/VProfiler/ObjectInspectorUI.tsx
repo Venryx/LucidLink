@@ -67,7 +67,7 @@ export default class ObjectInspectorUI extends Component<
 					defaultCollapsed={true} collapsible={hasExpandForChildren}
 					onArrowPress={collapsed=>!collapsed && this.setState({loadChildren: true})}>
 				{loadChildren &&
-					<Column ml10>
+					<Column ml={10}>
 						{obj instanceof Array ? obj.map((item, index)=> {
 					        return <ObjectInspectorUI {...props_subInspectorPassthroughs} ref={c=>this.childUIs[index] = c}
 								key={index} object={item} objectKey={index.toString()}/>;

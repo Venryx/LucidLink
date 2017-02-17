@@ -2,12 +2,15 @@ import {E, IsString} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
 import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";
-//import Sound from "react-native-sound";
+import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL} from "../../LucidLink";
 import {AudioFile} from "../../Frame/AudioFile";
-import {Timer} from "../../Frame/General/Timers";
-var Sound = require("react-native-sound");
+import {Timer, Sleep} from "../../Frame/General/Timers";
+import Speech from "react-native-android-speech";
+import SPBridge from "../../Frame/SPBridge";
+import {SleepStage} from "../../Frame/SPBridge";
+import Moment from "moment";
 
 // re-exports
 // ==========
@@ -16,7 +19,9 @@ export {
 	// values (ie normal variables)
 	LL,
 	// classes
-	V, Pattern, Matcher, Gap
+	V, Pattern, Matcher, Gap,
+	// enums
+	SleepStage,
 };
 
 // listeners
@@ -27,7 +32,7 @@ export function EveryXSecondsDo(seconds, func, maxCallCount = -1) {
 	timer.Start();
 	LL.scripts.scriptRunner.timers.push(timer);
 	return timer;
-};
+}
 
 export function WhenChangeMuseConnectStatus(func) {
 	LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus.push(func);
@@ -41,6 +46,63 @@ export function WhenMusePacketReceived(func) {
 export function WhenViewDistanceUpdated(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
 }*/
+
+function GetSimpleSleepStage(rawStage: SleepStage) {
+	var stageToNameMap = {
+		[SleepStage.Absent]: "absent", [SleepStage.Unknown]: "absent", [SleepStage.Break]: "absent",
+		[SleepStage.Wake]: "awake",
+		[SleepStage.LightSleep]: "light",
+		[SleepStage.DeepSleep]: "deep",
+		[SleepStage.RemSleep]: "rem",
+	};
+	return stageToNameMap[rawStage];
+}
+
+export function WhenChangeSleepStageDo(func) {
+	LL.scripts.scriptRunner.listeners_whenChangeSleepStage.push((rawStage: SleepStage)=> {
+		var stageName = GetSimpleSleepStage(rawStage);
+		func(stageName, rawStage);
+	});
+}
+
+var currentSegment_stage = SleepStage.Unknown;
+var currentSegment_startTime: Moment.Moment = null;
+SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
+	if (rawStage != currentSegment_stage) {
+		currentSegment_stage = rawStage;
+		currentSegment_startTime = Moment();
+		for (let entry of WhenXMinutesIntoSleepStageDo_entries)
+			entry.triggeredForCurrentSleepSegment = false;
+		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeSleepStage)
+			listener(rawStage);
+	}
+
+	var simpleStage = GetSimpleSleepStage(rawStage);
+	var timeInSegment = Moment().diff(currentSegment_startTime, "minutes", true);
+	for (let entry of WhenXMinutesIntoSleepStageDo_entries) {
+		if (entry.sleepStage == simpleStage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
+			entry.func();
+			entry.triggeredForCurrentSleepSegment = true;
+		}
+	}
+});
+
+class WhenXMinutesIntoSleepStageDo_Entry {
+	constructor(minutes: number, sleepStage: string, func: ()=>void) {
+		this.minutes = minutes;
+		this.sleepStage = sleepStage;
+		this.func = func;
+	}
+	minutes: number;
+	sleepStage: string;
+	func: ()=>void;
+	triggeredForCurrentSleepSegment = false;
+}
+
+var WhenXMinutesIntoSleepStageDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
+export function WhenXMinutesIntoSleepStageYDo(minutesX: number, sleepStageY: string, func: ()=>void) {
+	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutesX, sleepStageY, func));
+}
 
 // general
 // ==========
@@ -92,7 +154,7 @@ DeviceEventEmitter.addListener("OnSetPatternMatchProbabilities", (args: any)=> {
 });
 export function AddListener_OnUpdatePatternMatchProbabilities(func) {
 	LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities.push(func);
-};
+}
 
 // audio playback
 // ==========
@@ -115,8 +177,6 @@ export function GetAudioFile(name) {
 
 // text-to-speech
 // ==========
-
-var Speech = require("react-native-android-speech");
 
 export function Speak(options) {
 	options = E({forceStop: true}, options);

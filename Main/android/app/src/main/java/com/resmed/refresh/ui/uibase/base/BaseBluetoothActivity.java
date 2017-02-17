@@ -40,6 +40,7 @@ import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
+import com.resmed.refresh.model.json.SleepEvent;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
@@ -56,6 +57,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,8 +92,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		private List<Byte> partialMsgBuffer = new ArrayList();
 
 		public void handleMessage(Message msg) {
-			if (msg.what != 19 && msg.what != 20)
-				V.Log("BaseBluetoothActivity.handler.handleMessage(meaningful)..." + msg.what);
+			/*if (msg.what != 19 && msg.what != 20)
+				V.Log("BaseBluetoothActivity.handler.handleMessage(meaningful)..." + msg.what);*/
 			switch (msg.what) {
 				case RefreshBluetoothService.MessageType.BeD_STREAM_PACKET:
 					BaseBluetoothActivity.this.handleStreamPacket(msg.getData());
@@ -486,13 +488,28 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		float breathing_rate = data.getFloat(Consts.BUNDLE_BREATHING_RATE);
 		SPlusModule.main.SendEvent("OnReceiveBreathingRate", breathing_rate);
 	}
-	//public Promise getSleepStage_currentWaiter;
+
+	enum SleepStage {
+		Wake(1),
+		Absent(2), Unknown(3), Break(4),
+		LightSleep(5),
+		DeepSleep(6),
+		RemSleep(7);
+
+		public int value;
+		SleepStage(int value) { this.value = value;}
+	}
+
 	public void handleUserSleepState(Bundle bundle) {
 		// also transmit to connector
 		if (SPlusModule.main.sessionConnector != null)
 			SPlusModule.main.sessionConnector.handleUserSleepState(bundle);
 
 		int stageValue = bundle.getInt("BUNDLE_SLEEP_STATE");
+		int epochIndex = bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX");
+
+		V.Log("Got sleep-stage: " + stageValue + " (" + SleepStage.values()[stageValue - 1].name() + ") @epoch:" + epochIndex);
+
 		/*V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
 			+ ";BUNDLE_SLEEP_EPOCH_INDEX:" + bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX"));
 		if (getSleepStage_currentWaiter != null) {
