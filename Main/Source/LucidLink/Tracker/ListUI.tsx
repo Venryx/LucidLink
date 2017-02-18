@@ -8,6 +8,7 @@ import {E} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 import DialogAndroid from "react-native-dialogs";
 import {transaction} from "mobx";
+import {Session} from "./Session";
 
 @observer
 export default class ListUI extends Component<any, any> {
@@ -85,7 +86,7 @@ Doing so will remove ${sessionsToRemove.length} sessions, with ${LL.tracker.load
 }
 
 @observer
-class SessionHeaderUI extends Component<any, any> {
+class SessionHeaderUI extends Component<{parent, session: Session, index: number, style?}, any> {
 	render() {
 		var {parent, session, index, style} = this.props;
 		return (
@@ -95,6 +96,7 @@ class SessionHeaderUI extends Component<any, any> {
 				<Text style={{fontSize: 18}}>Session</Text>
 				<Text style={{marginTop: -25, fontSize: 18, textAlign: "right"}}>{session.date.format("YYYY-MM-DD, HH:mm")}</Text>
 				<Text>Event count: {session.events.length}</Text>
+				<Text>Sleep-session count: {session.sleepSessions.length}</Text>
 			</TouchableOpacity>
 		);
 	}

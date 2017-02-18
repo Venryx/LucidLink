@@ -658,27 +658,44 @@ Array.prototype._AddFunction_Inline = function Clear() {
 		this.pop();*/
     this.splice(0, this.length);
 };
-interface Array<T> { First(valFunc?: (item: T)=>boolean): T; }
-Array.prototype._AddFunction_Inline = function First(matchFunc = null) {
-    if (matchFunc) {
-        for (var item of this)
-            if (matchFunc.call(item, item))
-                return item;
-        return null;
-    }
-    return this[0];
-};
+interface Array<T> { First(matchFunc?: (item: T, index: number)=>boolean): T; }
+Array.prototype._AddFunction_Inline = function First(matchFunc?) {
+	var result = this.FirstOrX(matchFunc);
+	if (result == null)
+		throw new Error("Matching item not found.");
+	return result;
+}
+interface Array<T> { FirstOrX(matchFunc?: (item: T, index: number)=>boolean, x?): T; }
+Array.prototype._AddFunction_Inline = function FirstOrX(matchFunc?, x = null) {
+	if (matchFunc) {
+		for (let [index, item] of this.entries()) {
+			if (matchFunc.call(item, item, index))
+				return item;
+		}
+	} else if (this.length > 0)
+		return this[0];
+	return x;
+}
 //Array.prototype._AddFunction_Inline = function FirstWithPropValue(propName, propValue) { return this.Where(function() { return this[propName] == propValue; })[0]; };
 Array.prototype._AddFunction_Inline = function FirstWith(propName, propValue) { return this.Where(function() { return this[propName] == propValue; })[0]; };
-Array.prototype._AddFunction_Inline = function Last(matchFunc = null) {
+interface Array<T> { Last(matchFunc?: (item: T, index: number)=>boolean): T; }
+Array.prototype._AddFunction_Inline = function Last(matchFunc?) {
+	var result = this.LastOrX(matchFunc);
+	if (result == null)
+		throw new Error("Matching item not found.");
+	return result;
+}
+interface Array<T> { LastOrX(matchFunc?: (item: T, index: number)=>boolean, x?): T; }
+Array.prototype._AddFunction_Inline = function LastOrX(matchFunc?, x = null) {
 	if (matchFunc) {
-        for (var i = this.length - 1; i >= 0; i--)
-            if (matchFunc.call(this[i], this[i]))
-                return this[i];
-        return null;
-    }
-    return this[this.length - 1];
-};
+		for (var i = this.length - 1; i >= 0; i--) {
+			if (matchFunc.call(this[i], this[i], i))
+				return this[i];
+		}
+	} else if (this.length > 0)
+		return this[this.length - 1];
+	return x;
+}
 Array.prototype._AddFunction_Inline = function XFromLast(x) { return this[(this.length - 1) - x]; };
 
 // since JS doesn't have basic 'foreach' system

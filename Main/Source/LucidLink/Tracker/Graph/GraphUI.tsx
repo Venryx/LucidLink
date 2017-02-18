@@ -11,7 +11,7 @@ import {observer} from "mobx-react/native";
 import {View, Text} from "react-native";
 import {LL} from "../../../LucidLink";
 import GraphRowUI from "./GraphRowUI";
-import moment from "moment";
+import Moment from "moment";
 import GraphOverlayUI from "./GraphOverlayUI";
 import {Notify} from "../../../Frame/Globals";
 import {Session} from "../Session";
@@ -81,7 +81,7 @@ class ChartsUI extends Component<{}, {}> {
 
 	ComponentDidMountOrUpdate() {
 		var node = LL.tracker;
-		var now = moment();
+		var now = Moment();
 		var rangeStart = now.clone().startOf("day").subtract(node.rowCount, "day");
 		var rangeEnd = now.clone().endOf("day");
 		LL.tracker.LoadSessionsForRange(rangeStart, rangeEnd);
@@ -91,7 +91,7 @@ class ChartsUI extends Component<{}, {}> {
 		var {width, height} = this.state;
 		var node = LL.tracker;
 
-		var now = moment();
+		var now = Moment();
 		var dayStart = now.clone().startOf("day");
 		//var dayEnd = now.clone().endOf("day");
 		var dayEnd = dayStart.clone().add(1, "day");
@@ -129,7 +129,7 @@ class ChartsUI extends Component<{}, {}> {
 }
 
 @observer
-class ChartUI extends Component<{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number}, {}> {
+class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number}, {}> {
 	/*componentWillReact() {
         Log("Re-rendering ChartUI, because... " + new Error().stack);
     }*/

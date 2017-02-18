@@ -1,7 +1,7 @@
 import {Event} from "../Session";
 import {GraphRow, Segment} from "./GraphRow";
 import {BaseComponent as Component, Row, Panel} from "../../../Frame/ReactGlobals";
-import moment from "moment";
+import Moment from "moment";
 import {View, Text} from "react-native";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import {GraphOverlay, EventRenderInfo} from "./GraphOverlay";
@@ -10,7 +10,7 @@ import {Assert} from "../../../Frame/General/Assert";
 import {WaitXThenRun_BuiltIn} from "../../../Frame/General/Timers";
 
 export default class GraphOverlayUI extends Component<
-		{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number, events: Event[], overlay: GraphOverlay}, {}> {
+		{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number, events: Event[], overlay: GraphOverlay}, {}> {
 	constructor(props) {
 		super(props);
 		// for some absurd reason, this crashes as a class method

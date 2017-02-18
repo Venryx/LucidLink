@@ -117,24 +117,17 @@ export class SPBridgeClass {
 		core.SetUserInfo(age, gender);
 	}
 
-	StartSession() {
-		core.StartSession();
-	}
-	StopSession() {
-		core.StopSession();
-	}
-
 	/*async GetSleepStage() {
 		return await core.GetSleepStage() as number;
 	}*/
-	StartRealTimeStream() {
-		core.StartRealTimeStream();
+	StartRealTimeSession() {
+		core.StartRealTimeSession();
 	}
-	StartSleep() {
-		core.StartSleep();
+	StartSleepSession() {
+		core.StartSleepSession();
 	}
-	StopStream() {
-		core.StopStream();
+	StopSession() {
+		core.StopSession();
 	}
 }
 

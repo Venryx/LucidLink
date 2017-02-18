@@ -18,6 +18,17 @@ import {LL} from "../LucidLink";
 import DisplayerScriptRunner from "./Tracker/DisplayerScriptRunner";
 import {_VDFPreSerialize, P} from "../Packages/VDF/VDFTypeInfo";
 import {AssertWarn} from "../Frame/General/Assert";
+import {SleepStage} from "../Frame/SPBridge";
+import SPBridge from "../Frame/SPBridge";
+import {SleepSegment} from "./Tracker/Session/SleepSession";
+
+SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
+	var currentSegment = LL.tracker.currentSession.CurrentSleepSegment;
+	if (currentSegment == null || rawStage != currentSegment.stage) {
+		var sleepSegment = new SleepSegment(rawStage);
+		LL.tracker.currentSession.CurrentSleepSession.segments.push(sleepSegment)
+	}
+});
 
 export class Tracker extends Node {
 	@_VDFPreSerialize() PreSerialize() {

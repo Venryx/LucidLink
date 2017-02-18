@@ -408,7 +408,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public boolean sessionActive;
-	public void EnsureSessionStarted() {
+	public void StartNewSession() {
 		if (sessionActive) return;
 		sessionActive = true;
 

@@ -2,10 +2,10 @@ import {GraphRow, Segment} from "./GraphRow";
 import {BaseComponent as Component, Row, Panel} from "../../../Frame/ReactGlobals";
 import {E, Range, Notify} from "../../../Frame/Globals";
 import {Event} from "../Session";
-import moment from "moment";
+import Moment from "moment";
 
 export default class GraphRowUI extends Component<
-		{startTime: moment.Moment, endTime: moment.Moment, width: number, height: number, events: Event[], row: GraphRow, style}, {}> {
+		{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number, events: Event[], row: GraphRow, style}, {}> {
 	render() {
 		var {startTime, endTime, width, height, events, row, style} = this.props;
 

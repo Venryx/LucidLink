@@ -13,7 +13,7 @@ import Node from "../../Packages/VTree/Node";
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
 import OptionsPanel from "./SPMonitor/OptionsPanel";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
-import {default as SPBridge, SleepStage} from "../../Frame/SPBridge";
+import SPBridge, {SleepStage} from "../../Frame/SPBridge";
 import {Timer} from "../../Frame/General/Timers";
 import {autorun} from "mobx";
 
@@ -67,13 +67,18 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 							alert(await SPBridge.GetSleepStage());
 						}}/>*/}
 						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
-							SPBridge.StartRealTimeStream();
+							if (LL.tracker.currentSession.CurrentSleepSession)
+								LL.tracker.currentSession.CurrentSleepSession.End();
+							SPBridge.StartRealTimeSession();
 						}}/>
 						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
-							SPBridge.StartSleep();
+							LL.tracker.currentSession.StartSleepSession();
 						}}/>
 						<VButton text="Stop" ml={10} plr={10} onPress={()=> {
-							SPBridge.StopStream();
+							if (LL.tracker.currentSession.CurrentSleepSession)
+								LL.tracker.currentSession.CurrentSleepSession.End();
+							else
+								SPBridge.StopSession();
 						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>

@@ -357,7 +357,7 @@ export class AutoExpandingTextInput extends BaseComponent<{style?} & BaseProps &
 		var {style, ...rest} = this.props;
 		return (
 			<TextInput {...rest as any} multiline={true}
-				style={E(styles.default, {height: Math.max(35, this.state.height)}, style)}
+				style={E({height: Math.max(35, this.state.height)}, style)}
 				value={this.state.text}
 				onChange={event=> {
 					this.setState({

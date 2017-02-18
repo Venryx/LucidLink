@@ -616,7 +616,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		/*String boardVersion = RefreshModelController.getInstance().getBoardVersion();
 		String firmwareVersion = RefreshModelController.getInstance().getFirmwareVersion();
 		RefreshModelController.getInstance().saveRM20LibraryVersion(rm20Version());
-		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::EnsureSessionStarted boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
+		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::StartNewSession boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
 		pMeta.addMetaField(Enum_EDF_Meta.unitVer, BaseBluetoothActivity.boardVersion);
 		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, BaseBluetoothActivity.firmwareVersion);
 

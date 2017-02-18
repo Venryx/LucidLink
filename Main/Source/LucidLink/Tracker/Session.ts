@@ -1,11 +1,13 @@
 import {FromVDF, GetTypeName, ToVDF} from "../../Frame/Globals";
 import {autorun} from 'mobx';
 import {LL} from "../../LucidLink";
-import moment from "moment";
+import Moment from "moment";
 import {P} from "../../Packages/VDF/VDFTypeInfo";
 import {Assert} from "../../Frame/General/Assert";
 import DialogAndroid from "react-native-dialogs";
 import {BufferAction} from "../../Frame/General/Timers";
+import SleepSession from "./Session/SleepSession";
+import SPBridge from "../../Frame/SPBridge";
 
 export class Session {
 	static async Load(folder) {
@@ -15,7 +17,7 @@ export class Session {
 		var result = FromVDF(vdf, "Session");
 		result.folder = folder;
 		result.file = mainFile;
-		result.date = moment(folder.Name);
+		result.date = Moment(folder.Name);
 
 		result.logFile = folder.GetFile("Log.txt");
 
@@ -53,7 +55,7 @@ export class Session {
 		// if called by VDF, do nothing
 		if (date == null) return;
 
-		Assert(date instanceof moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
+		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
 		this.date = date;
 		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
 		this.folder = sessionsFolder.GetFolder(this.date.format("YYYY-MM-DD HH:mm:ss"));
@@ -85,12 +87,34 @@ export class Session {
 		endTime.diff(this.date.startOf("day"), "seconds");
 	}*/
 
-	logFile = null;
-	@P() events: Event[] = [];
-
-	AddEvent(event) {
-		this.events.push(event);
+	BufferSave() {
 		BufferAction(LL.settings.sessionSaveInterval, ()=>this.Save());
+	}
+
+	logFile = null;
+	@P() events = [] as Event[];
+	AddEvent(event: Event) {
+		this.events.push(event);
+		this.BufferSave();
+	}
+	
+	@P() sleepSessions = [] as SleepSession[];
+
+	get CurrentSleepSession() {
+		var last = this.sleepSessions.LastOrX();
+		return last && last.Active ? last : null;
+	}
+	get CurrentSleepSegment() {
+		if (this.CurrentSleepSession == null || !this.CurrentSleepSession.Active) return null;
+		return this.CurrentSleepSession.segments.LastOrX();
+	}
+	StartSleepSession() {
+		if (LL.tracker.currentSession.CurrentSleepSession)
+			LL.tracker.currentSession.CurrentSleepSession.End();
+		var session = new SleepSession();
+		this.sleepSessions.push(session);
+		SPBridge.StartSleepSession();
+		this.BufferSave();
 	}
 }
 global.Extend({Session});
@@ -98,11 +122,11 @@ global.Extend({Session});
 export class Event {
 	constructor(type, args) {
 		if (type == null) return; // if called by VDF, don't do anything
-		this.date = moment();
+		this.date = Moment();
 		this.type = type;
 		this.args = args;
 	}
-	@P() date: moment.Moment = null;
+	@P() date: Moment.Moment = null;
 	@P() type: string = null;
 	@P() args = [];
 }
