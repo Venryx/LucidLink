@@ -86,11 +86,11 @@ class WhenXMinutesIntoSleepStageDo_Entry {
 }
 
 var WhenXMinutesIntoSleepStageDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
-export function WhenXMinutesIntoSleepStageYDo(minutesX: number, sleepStageY: string, func: ()=>void) {
-	//let sleepStage = SleepStage.entries.FirstOrX(a=>a.name.toLowerCase() == sleepStage.toLowerCase());
-	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStage);
+export function WhenXMinutesIntoSleepStageYDo(minutes: number, sleepStageName: string, func: ()=>void) {
+	//let sleepStage = SleepStage.entries.FirstOrX(a=>a.name.toLowerCase() == sleepStageName.toLowerCase());
+	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStageName) as SleepStage;
 	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`)
-	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutesX, sleepStage, func));
+	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func));
 }
 
 // general
