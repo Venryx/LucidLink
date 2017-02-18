@@ -56,14 +56,14 @@ public class V {
 	public static void ConvertTextInputTabsToSpans(EditText input) {
 		ConvertTextInputTabsToSpans(input, 0, input.getEditableText().length());
 	}
-	public static void ConvertTextInputTabsToSpans(EditText input, int start, int end) {
+	public static void ConvertTextInputTabsToSpans(EditText input, int StartSession, int end) {
 		String str = input.getEditableText().toString();
 		float tabWidth = input.getPaint().measureText(INDEX_CHAR) * TAB_NUMBER;
-		while (start < end)     {
-			int index = str.indexOf("\t", start);
+		while (StartSession < end)     {
+			int index = str.indexOf("\t", StartSession);
 			if (index < 0) break;
 			input.getEditableText().setSpan(new CustomTabWidthSpan(Float.valueOf(tabWidth).intValue()), index, index + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			start = index + 1;
+			StartSession = index + 1;
 		}
 	}*/
 	static class CustomTabWidthSpan extends ReplacementSpan {

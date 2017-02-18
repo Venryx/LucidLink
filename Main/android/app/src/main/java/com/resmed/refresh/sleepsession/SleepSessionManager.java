@@ -88,13 +88,13 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			//SleepSessionManager.this.rm20Manager.startRespRateCallbacks(true);
 
 			SleepSessionManager.this.stopCalculateAndSendResults();
-			SleepSessionManager.this.start(71, 20, 1);
+			SleepSessionManager.this.StartSession(71, 20, 1);
 		}}, 10000, 10000);*/
 
 		/*SleepSessionConnector connector = new SleepSessionConnector(MainActivity.main, 1, false);
 		connector.init(true);*/
 
-		//SleepSessionManager.this.start(71, 20, 1);
+		//SleepSessionManager.this.StartSession(71, 20, 1);
 	}
 
 	private void didFinishEdfRecovery() {
@@ -574,7 +574,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 				this.rm20Manager.setSmartAlarm(rm20Alarmtime, rm20AlarmWindow, true);
 				final SmartAlarmInfo smartAlarm = this.rm20Manager.getSmartAlarm();
 				if (smartAlarm != null) {
-					Log.d("com.resmed.refresh.bluetooth", "Rm20alarm start,end: " + smartAlarm.alarmWinStart + "," + smartAlarm.alarmWinEnd);
+					Log.d("com.resmed.refresh.bluetooth", "Rm20alarm StartSession,end: " + smartAlarm.alarmWinStart + "," + smartAlarm.alarmWinEnd);
 					Log.d("com.resmed.refresh.smartAlarm", "SleepSessionManager alarm settings updated during a sleep session OK!");
 					AppFileLog.addTrace("SmartAlarm SleepSessionManager alarm settings updated during a sleep session OK!");
 					return;
@@ -585,7 +585,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public void start(long sessionId, int age, int gender) {
+	public void StartSession(long sessionId, int age, int gender) {
 		if (this.isActive) return;
 		Context context;
 		this.nrOfBioSamples = 0;
@@ -616,11 +616,11 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		/*String boardVersion = RefreshModelController.getInstance().getBoardVersion();
 		String firmwareVersion = RefreshModelController.getInstance().getFirmwareVersion();
 		RefreshModelController.getInstance().saveRM20LibraryVersion(rm20Version());
-		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::EnsureSleepSessionStarted boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
+		Log.d(LOGGER.TAG_BLUETOOTH, "SleepTrackFragment::EnsureSessionStarted boardVersion : " + boardVersion + " firmwareVersion:" + firmwareVersion);*/
 		pMeta.addMetaField(Enum_EDF_Meta.unitVer, BaseBluetoothActivity.boardVersion);
 		pMeta.addMetaField(Enum_EDF_Meta.rstEdfLibVer, BaseBluetoothActivity.firmwareVersion);
 
-		AppFileLog.addTrace("SleepSessionManager::start() battery level : " + RefreshTools.getBatteryLevel(context));
+		AppFileLog.addTrace("SleepSessionManager::StartSession() battery level : " + RefreshTools.getBatteryLevel(context));
 		//RefreshModelController.getInstance().updateLocation();
 	}
 

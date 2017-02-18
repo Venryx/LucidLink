@@ -1,6 +1,7 @@
 package SPlus;
 
 import android.app.Activity;
+import android.os.Message;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -10,6 +11,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
+import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
 import v.lucidlink.MainActivity;
@@ -70,75 +72,30 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		this.sessionConnector = new SleepSessionConnector(MainActivity.main, bioOnBed, isSyncing);
 		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
 	}
-	/*public void handleStreamPacket(Bundle data) {
-        if (this.sessionConnector != null) {
-            this.sessionConnector.handleStreamPacket(data);
-        }
-        byte[] decobbed = data.getByteArray(RefreshBluetoothService.REFRESH_BED_NEW_DATA);
-        byte packetType = data.getByte(RefreshBluetoothService.REFRESH_BED_NEW_DATA_TYPE);
-        data.getInt(RefreshBluetoothService.REFRESH_BED_NEW_DATA_SIZE);
-        Log.d(LOGGER.TAG_UI, " SleepTrackFragment handleStreamPacket decobbed : " + Arrays.toString(decobbed) + " packetType : " + packetType);
-        if (VLPacketType.PACKET_TYPE_NOTE_ILLUMINANCE_CHANGE.ordinal() == packetType) {
-            handleEnvData(decobbed, false);
-        } else if (VLPacketType.PACKET_TYPE_NOTE_HEARTBEAT.ordinal() == packetType) {
-            handleHeartBeat(decobbed);
-        } else if (VLPacketType.PACKET_TYPE_ENV_1.ordinal() == packetType) {
-            handleEnvData(decobbed, true);
-        } else if (VLPacketType.PACKET_TYPE_ENV_60.ordinal() == packetType) {
-            handleEnvData(decobbed, true);
-        }
-    }
-    private void handleEnvData(byte[] decobbed, boolean persistData) {
-        int illumValue = PacketsByteValuesReader.readIlluminanceValue(decobbed);
-        float tempValue = PacketsByteValuesReader.readTemperatureValue(decobbed);
-        this.mLightLevelValueText.setText(new StringBuilder(String.valueOf(illumValue)).append(" Lux").toString());
-        String tempInScale = "";
-        if (RefreshModelController.getInstance().getUseMetricUnits()) {
-            tempInScale = Math.round(tempValue) + " " + getString(R.string.degrees_celsius);
-        } else {
-            tempInScale = new StringBuilder(String.valueOf(Math.round(MeasureManager.convertCelsiusToFahrenheit(tempValue)))).append(" ").append(getString(R.string.degrees_farenheit)).toString();
-        }
-        this.mTemperatureValueText.setText(tempInScale);
-    }
-    private void handleHeartBeat(byte[] decobbed) {
-    }
-    public void handleEnvSample(Bundle data) {
-        this.sessionConnector.handleEnvSample(data);
-    }
-    public void handleSleepSessionStopped(Bundle data) {
-        Log.d(LOGGER.TAG_FINISH_SESSION, "handleSleepSessionStopped() ");
-        AppFileLog.addTrace("STOP handleSleepSessionStopped ");
-        this.sessionConnector.handleSleepSessionStopped(data);
-    }
-    public void handleBreathingRate(Bundle data) {
-        Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
-        this.sessionConnector.handleBreathingRate(data);
-    }
-    public void handleUserSleepState(Bundle data) {
-        Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
-        Log.i(LOGGER.TAG_RELAX, "handleUserSleepState() SleepTrackFragment " + data);
-        this.sessionConnector.handleUserSleepState(data);
-    }*/
 
+	public boolean connectorActive;
 	@ReactMethod public void Connect() {
-		SPlusModule.main.sessionConnector.service.StartListening();
+		if (connectorActive) return;
+		connectorActive = true;
 
-		//int sessionID = 70;
-		//baseManager.rm20Manager.rm20Lib.loadLibrary(reactContext);
-		//baseManager.start(sessionID, age, gender);
-
-		/*this.sessionConnector.init(false);
-		BaseBluetoothActivity.IN_SLEEP_SESSION = true;*/
+		SPlusModule.main.sessionConnector.service.StartConnector();
 	}
 	@ReactMethod public void Disconnect() {
+		if (!connectorActive) return;
+		connectorActive = false;
+
 		//if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null || !SPlusModule.main.sessionConnector.service.sleepSessionManager.isActive) return;
 		//baseManager.stop();
 
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
+		StopStream();
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		//this.sessionConnector.stopSleepSession();
-		//MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_CONNECTED); // make lights green again right now, since response might not arrive in time
+		SPlusModule.main.sessionConnector.service.StopConnector();
+		MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
+	}
+
+	public void ShutDown() {
+		Disconnect();
 	}
 
 	public int age;
@@ -164,16 +121,18 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}*/
 	@ReactMethod public void StartRealTimeStream() {
 		V.Log("Starting real-time stream...");
-		//this.sessionConnector.EnsureSleepSessionStarted();
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
+		this.sessionConnector.EnsureSessionStarted();
+		StopStream();
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
 	}
 	@ReactMethod public void StartSleep() {
 		V.Log("Starting sleep stream...");
-		this.sessionConnector.EnsureSleepSessionStarted();
+		this.sessionConnector.EnsureSessionStarted();
+		StopStream();
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+	}
+	@ReactMethod public void StopStream() {
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
 	}
 }

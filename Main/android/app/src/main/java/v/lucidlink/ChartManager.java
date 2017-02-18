@@ -157,7 +157,7 @@ class ChartManager {
 
 		lines = new ArrayList<>();
 		for (int i = 0; i < eegCount; i++) {
-			// start channels as flat
+			// StartSession channels as flat
 			ArrayList<Entry> thisChannelPoints = new ArrayList<>();
 			for (int i2 = 0; i2 <= eegProcessor.maxX; i2++)
 				thisChannelPoints.add(new Entry(i2 * stepSizeInPixels, i == 0 ? 0 : maxY_fullChart));
@@ -349,7 +349,7 @@ class ChartManager {
 	public void OnSetPatternMatchProbabilities(int currentX, HashMap<String, Double> probabilities) {
 		DataSet dataSet = (DataSet)data.getDataSetByIndex(4);
 
-		// if we went back to start of chart, clear end of chart's last filling
+		// if we went back to StartSession of chart, clear end of chart's last filling
 		if (currentX < lastSetPatternMatchProbability_x) {
 			for (int x = lastSetPatternMatchProbability_x + 1; x <= eegProcessor.maxX; x++) {
 				List entriesToRemove = dataSet.getEntriesForXValue(x);

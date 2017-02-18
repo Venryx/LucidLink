@@ -33,6 +33,7 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 
 	static final int REQUEST_WRITE_STORAGE = 112;
 	public boolean ArePermissionsGranted() {
+		V.Log("Checking if permissions granted. @AndroidVersion:" + Build.VERSION.SDK_INT + " @RefVersion:" + Build.VERSION_CODES.M);
 		// workaround for runtime bug of ContextCompat evaluating to the old version (in S+ jar)
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			return true;
@@ -56,7 +57,7 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	}
 
 	@Override protected void onDestroy() {
-		SPlusModule.main.Disconnect();
+		SPlusModule.main.ShutDown();
 	}
 
 	// returns the name of the main component registered from JavaScript (used to schedule rendering of the component)

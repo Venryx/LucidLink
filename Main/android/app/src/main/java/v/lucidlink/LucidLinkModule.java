@@ -202,7 +202,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 					//if (!mainChartManager.initialized)
 					eegProcessor.chartManager.TryToInit();
 
-					// if we just succeeded, disable timer and run post-init code
+					// if we just succeeded, Disable timer and run post-init code
 					if (eegProcessor.chartManager.initialized) {
 						chartAttachTimer.cancel();
 

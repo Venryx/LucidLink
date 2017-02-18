@@ -2,7 +2,6 @@ package com.resmed.refresh.bluetooth;
 
 import com.resmed.cobs.COBS;
 import com.resmed.refresh.bluetooth.receivers.*;
-import com.resmed.refresh.bluetooth.exception.*;
 import android.app.*;
 
 import com.resmed.refresh.utils.*;
@@ -262,10 +261,7 @@ public class BluetoothSetup {
 	public static int count;
 	private BluetoothAdapter bluetoothAdapter;
 	public RefreshBluetoothService bluetoothService;
-	private BroadcastReceiver bluetoothStateChangesReceiver;
 	public BluetoothDevice device;
-	private BroadcastReceiver deviceFoundReceiver;
-	private BroadcastReceiver devicePairedReceiver;
 	public BluetoothSetup.ConnectThread mConnectThread;
 	private BluetoothSetup.ConnectedThread mConnectedThread;
 	private Thread mReconnectionThread;
@@ -275,16 +271,56 @@ public class BluetoothSetup {
 		BluetoothSetup.count = 1;
 	}
 
-	public BluetoothSetup(final RefreshBluetoothService bluetoothService) throws BluetoothNotSupportedException {
+	public BluetoothSetup(final RefreshBluetoothService bluetoothService) {
 		this.uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 		this.bluetoothService = bluetoothService;
 		this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		this.deviceFoundReceiver = new BluetoothDeviceFoundReceiver(this);
-		this.devicePairedReceiver = new BluetoothDevicePairedReceiver(this);
-		this.bluetoothStateChangesReceiver = new BluetoothStateChangesReceiver(this);
-		if (this.bluetoothAdapter == null) {
-			throw new BluetoothNotSupportedException();
+		V.Assert(bluetoothAdapter != null, "Bluetooth is not supported. (could not get adapter)");
+	}
+
+	List<BroadcastReceiver> receivers = new ArrayList<>();
+	public void AddReceivers() {
+		AddAndRegisterReceiver(new BluetoothDevicePairedReceiver(this), new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
+		AddAndRegisterReceiver(new BluetoothStateChangesReceiver(this), new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED"));
+		AddAndRegisterReceiver(new BroadcastReceiver() {
+			public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
+				CONNECTION_STATE state = (CONNECTION_STATE)paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
+				setConnectionStatusAndNotify(state, false);
+			}
+		}, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
+	}
+	private void AddAndRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+		MainActivity.main.registerReceiver(receiver, filter);
+		receivers.add(receiver);
+	}
+	public void RemoveReceivers() {
+		for (BroadcastReceiver receiver : receivers) {
+			MainActivity.main.unregisterReceiver(receiver);
 		}
+		receivers.clear();
+	}
+
+	public void Enable() {
+		AddReceivers();
+	}
+	public synchronized void Disable() {
+		RemoveReceivers();
+		this.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_NOT_CONNECTED, true);
+		if (this.mConnectThread != null) {
+			this.mConnectThread.cancel();
+			this.mConnectThread.interrupt();
+			this.mConnectThread = null;
+		}
+		if (this.mConnectedThread != null) {
+			this.mConnectedThread.cancel();
+			this.mConnectedThread.interrupt();
+			this.mConnectedThread = null;
+		}
+		if (this.mReconnectionThread != null) {
+			this.mReconnectionThread.interrupt();
+			this.mReconnectionThread = null;
+		}
+		this.bluetoothAdapter.cancelDiscovery();
 	}
 
 	public static void CancelRepeatingReconnectAlarmWake(final Context context) {
@@ -343,32 +379,6 @@ public class BluetoothSetup {
 			} else {
 				count = 1;
 			}
-			return;
-		}
-	}
-
-
-	private void unregisterClientReceivers(final BroadcastReceiver... array) {
-		final int length = array.length;
-		int i = 0;
-		while (i < length) {
-			final BroadcastReceiver broadcastReceiver = array[i];
-			while (true) {
-				try {
-					LL.main.reactContext.unregisterReceiver(broadcastReceiver);
-					Log.d("com.resmed.refresh.bluetooth", "receivers unregistered");
-					++i;
-				}
-				catch (IllegalArgumentException ex) {
-					ex.printStackTrace();
-					Log.d("com.resmed.refresh.bluetooth", "receivers unregistered");
-					continue;
-				}
-				finally {
-					Log.d("com.resmed.refresh.bluetooth", "receivers unregistered");
-				}
-				break;
-			}
 		}
 	}
 
@@ -419,28 +429,6 @@ public class BluetoothSetup {
 		}
 	}
 
-	public void disable() {
-		synchronized (this) {
-			this.unregisterClientReceivers(this.deviceFoundReceiver, this.devicePairedReceiver, this.bluetoothStateChangesReceiver);
-			this.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_NOT_CONNECTED, true);
-			if (this.mConnectThread != null) {
-				this.mConnectThread.cancel();
-				this.mConnectThread.interrupt();
-				this.mConnectThread = null;
-			}
-			if (this.mConnectedThread != null) {
-				this.mConnectedThread.cancel();
-				this.mConnectedThread.interrupt();
-				this.mConnectedThread = null;
-			}
-			if (this.mReconnectionThread != null) {
-				this.mReconnectionThread.interrupt();
-				this.mReconnectionThread = null;
-			}
-			this.bluetoothAdapter.cancelDiscovery();
-		}
-	}
-
 	public void discoverResMedDevices(boolean something) {
 		V.JavaLog("Looking for resmed devices:" + something);
 		synchronized (this) {
@@ -478,13 +466,6 @@ public class BluetoothSetup {
 				this.bluetoothService.getContext().sendStickyBroadcast(intent);*/
 			} while (true);
 		}
-	}
-
-
-	public void enable() {
-		LL.main.reactContext.registerReceiver(this.deviceFoundReceiver, new IntentFilter("android.bluetooth.device.action.FOUND"));
-		LL.main.reactContext.registerReceiver(this.bluetoothStateChangesReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
-		LL.main.reactContext.registerReceiver(this.devicePairedReceiver, new IntentFilter("android.bluetooth.device.action.BOND_STATE_CHANGED"));
 	}
 
 	public void handleNewPacket(final ByteBuffer byteBuffer) {
@@ -552,7 +533,6 @@ public class BluetoothSetup {
 			} else {
 				this.setConnectionStatusAndNotify(CONNECTION_STATE.SOCKET_RECONNECTING, false);
 			}
-			return;
 		}
 	}
 
@@ -616,22 +596,10 @@ public class BluetoothSetup {
 					//SPlusModule.main.baseManager.rm20Manager.startRespRateCallbacks(true);
 
 					/*SPlusModule.main.baseManager.stopCalculateAndSendResults();
-					SPlusModule.main.baseManager.start(71, 20, 1);*#/
+					SPlusModule.main.baseManager.StartSession(71, 20, 1);*#/
 				}}, 10000, 10000);*#/
 			}*/
 		}
-	}
-	boolean addedReceivers;
-	public void AddReceivers() {
-		if (addedReceivers) return;
-		addedReceivers = true;
-
-		MainActivity.main.registerReceiver(new BroadcastReceiver() {
-			public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
-				CONNECTION_STATE state = (CONNECTION_STATE)paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
-				setConnectionStatusAndNotify(state, false);
-			}
-		}, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
 	}
 
 	public void unpairAll(final String s) {

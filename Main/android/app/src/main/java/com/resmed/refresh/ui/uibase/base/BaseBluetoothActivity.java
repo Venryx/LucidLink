@@ -1,46 +1,32 @@
 package com.resmed.refresh.ui.uibase.base;
 
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
-import android.os.PowerManager;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.view.Menu;
 
-import com.facebook.react.bridge.Promise;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.cobs.COBS;
 import com.resmed.refresh.bed.BedCommandsRPCMapper;
 import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bluetooth.BluetoothDataWriter;
-import com.resmed.refresh.bluetooth.BluetoothSetup;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.bluetooth.BluetoothSetup.AlarmReceiver;
 import com.resmed.refresh.model.json.JsonRPC;
-import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.model.json.JsonRPC.ErrorRpc;
 import com.resmed.refresh.model.json.JsonRPC.RPCallback;
-import com.resmed.refresh.model.json.SleepEvent;
+import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
@@ -56,17 +42,12 @@ import com.resmed.refresh.utils.RefreshUserPreferencesData;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import SPlus.SPlusModule;
-import v.lucidlink.LL;
-import v.lucidlink.MainActivity;
-import v.lucidlink.R;
 import v.lucidlink.V;
 
 public class BaseBluetoothActivity extends BaseActivity implements BluetoothDataListener, BluetoothDataWriter {
@@ -84,9 +65,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	};
 
-	protected boolean mBound;
+	public boolean mBound;
 	public IncomingHandler mFromServiceHandler = new IncomingHandler();
-	private List<BroadcastReceiver> receivers;
 
 	public class IncomingHandler extends Handler {
 		private List<Byte> partialMsgBuffer = new ArrayList();
@@ -262,13 +242,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return needsUpdate;
 	}
 
-	public void disconnectBluetoothConn() {
-		Message message1 = new Message();
-		message1.what = RefreshBluetoothService.MessageType.BeD_DISCONNECT;
-		sendMessageToService(message1);
-		this.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
-	}
-
 	public void handleConnectionStatus(CONNECTION_STATE newState) {
 		// also transmit to connector
 		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null)
@@ -283,8 +256,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 				//this.sendRpcToBed(RpcCommands.openSession("user1"));
 				// use static user-id different than S+ app's one
 				sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000009"));
-				// set up receivers, so BluetoothSetup.setConnectionStatusAndNotify gets called whenever the state changes
-				SPlusModule.main.sessionConnector.service.bluetoothManager.AddReceivers();
 				V.Log("Starting session!!!");
 
 				//BluetoothDataSerializeUtil.writeJsonFile(this.getApplicationContext(), this.mDevice);
@@ -309,7 +280,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 			if (CONNECTION_STATE.SOCKET_BROKEN == newState || CONNECTION_STATE.SOCKET_RECONNECTING == newState) {
 				CORRECT_FIRMWARE_VERSION = true;
 				UPDATING_FIRMWARE = false;
-				return;
 			}
 		}
 	}
@@ -489,7 +459,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		SPlusModule.main.SendEvent("OnReceiveBreathingRate", breathing_rate);
 	}
 
-	enum SleepStage {
+	public enum SleepStage {
 		Wake(1),
 		Absent(2), Unknown(3), Break(4),
 		LightSleep(5),
@@ -532,30 +502,22 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		return false;
 	}
 
-	public boolean isBoundToBluetoothService() {
-		return this.mBound;
-	}
-
-	public void onActivityResult(int var1, int var2, Intent var3) {
-		super.onActivityResult(var1, var1, var3);
-		if (var1 == 161) {
-			switch (var2) {
-				case -1:
-					userAllowBluetooth = true;
-					return;
-				case 0:
-					userAllowBluetooth = false;
-					this.disconnectBluetoothConn();
-					return;
+	protected static final int REQUEST_ENABLE_BT = 161;
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, requestCode, data);
+		if (requestCode == REQUEST_ENABLE_BT) {
+			if (resultCode == -1)
+				userAllowBluetooth = true;
+			else if (resultCode == 0) {
+				userAllowBluetooth = false;
+				SPlusModule.main.Disconnect();
 			}
 		}
-
 	}
 
 	protected void onCreate(Bundle var1) {
 		super.onCreate(var1);
 		RpcCommands.setContextBroadcaster(this);
-		this.receivers = new ArrayList();
 	}
 
 	public void PostModuleInit() {
@@ -573,11 +535,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 
 		this.registerReceiver(this.connectionStatusReceiver, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-		this.unregisterAll();
 	}
 
 	/*public void onPickedDevice(BluetoothDevice var1) {
@@ -610,12 +567,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		this.sendMessageToService(RefreshBluetoothService.MessageType.BeD_CONNECT_TO_DEVICE, bundle);
 	}
 
-	public Intent registerReceiver(BroadcastReceiver var1, IntentFilter var2) {
-		if (this.receivers.contains(var1)) return null;
-		this.receivers.add(var1);
-		return super.registerReceiver(var1, var2);
-	}
-
 	public boolean sendBytesToBeD(byte[] bytes, VLPacketType var2) {
 		int bytesLength = bytes != null ? bytes.length : 0;
 
@@ -640,21 +591,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 				BaseBluetoothActivity.CommandStack.put(jsonRPC.getId(), jsonRPC);
 			}
 		}
-	}
-
-	protected void unregisterAll() {
-		Iterator var1 = this.receivers.iterator();
-		while (var1.hasNext()) {
-			BroadcastReceiver receiver = (BroadcastReceiver) var1.next();
-			try {
-				this.unregisterReceiver(receiver);
-			} catch (IllegalArgumentException ex) {
-				ex.printStackTrace();
-			} finally {
-				Log.d("com.resmed.refresh.ui", "unregistered receiver : " + receiver);
-			}
-		}
-		this.receivers.clear();
 	}
 
 	public void updateDataStoredFlag(int var1) {

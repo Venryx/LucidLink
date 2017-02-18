@@ -5,13 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Messenger;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibJNI;
-import com.resmed.refresh.bluetooth.exception.BluetoothNotSupportedException;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
@@ -28,7 +25,6 @@ import com.resmed.rm20.RM20JNI;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
-import java.util.Date;
 
 import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
@@ -41,7 +37,6 @@ public class RefreshBluetoothService {
 		public static final int START_DISCOVERY = 3;
 		public static final int BeD_STREAM_PACKET = 5;
 		public static final int BeD_CONNECTION_STATUS = 6;
-		public static final int BeD_DISCONNECT = 7;
 		public static final int BeD_UNPAIR = 8;
 		public static final int DISCOVER_RESMED_DEVICES = 10;
 		public static final int BeD_CONNECT_TO_DEVICE = 11;
@@ -93,7 +88,6 @@ public class RefreshBluetoothService {
 	public class BluetoothRequestsHandler extends Handler {
 		public void handleMessage(Message msg) {
 			RefreshTools.writeTimeStampToFile(LL.main.reactContext, System.currentTimeMillis());
-			RefreshBluetoothService.this.checkManager();
 			Bundle b;
 			switch (msg.what) {
 				case MessageType.DISCOVER_PAIR_CONNECT_RESMED:
@@ -110,9 +104,6 @@ public class RefreshBluetoothService {
 					return;
 				case MessageType.BeD_CONNECTION_STATUS:
 					RefreshBluetoothService.this.sendConnectionStatus(LL.main.connectionState);
-					return;
-				case MessageType.BeD_DISCONNECT:
-					RefreshBluetoothService.this.bluetoothManager.disable();
 					return;
 				case MessageType.DISCOVER_RESMED_DEVICES:
 					RefreshBluetoothService.this.bluetoothManager.discoverResMedDevices(false);
@@ -215,25 +206,12 @@ public class RefreshBluetoothService {
 		}
 	}
 
-	private void checkManager() {
-		if (this.bluetoothManager != null) return;
-		try {
-			this.bluetoothManager = new BluetoothSetup(this);
-			this.bluetoothManager.enable();
-			return;
-		} catch (BluetoothNotSupportedException var1_1) {
-			var1_1.printStackTrace();
-			return;
-		}
-	}
-
-	public void StartSleepSession(long sessionID, int age, int gender) {
+	public void StartSession(long sessionID, int age, int gender) {
 		//V.Log("Starting sleep session...");
 		//RefreshBluetoothService.this.changeToForeground();
 		RefreshBluetoothService.this.sleepSessionManager = new SleepSessionManager(RefreshBluetoothService.this);
-		RefreshBluetoothService.this.sleepSessionManager.start(sessionID, age, gender);
+		RefreshBluetoothService.this.sleepSessionManager.StartSession(sessionID, age, gender);
 		Log.d(LOGGER.TAG_BLUETOOTH, "Bluetooth service current session id : " + sessionID);
-		return;
 	}
 
 	/*private void recoverSleepSession(long l) {
@@ -356,33 +334,33 @@ public class RefreshBluetoothService {
 		sendMessageToClient(newMessage);
 	}
 
-	boolean listening;
-	public void StartListening() {
-		if (listening) return;
-		listening = true;
+	boolean connectorActive;
+	public void StartConnector() {
+		connectorActive = true;
 
-		V.JavaLog("Start listening;" + MainActivity.main + ";" + LL.main.reactContext + ";" + LL.main);
+		V.JavaLog("Start connectorActive;" + MainActivity.main + ";" + LL.main.reactContext + ";" + LL.main);
 
-		try {
-			// rather than remember last one, just find first device and connect to it
+		if (bluetoothManager == null)
 			bluetoothManager = new BluetoothSetup(this);
-			bluetoothManager.enable();
-			bluetoothManager.discoverResMedDevices(true);
-		} catch (Exception ex) {
-			throw new Error(ex);
-		}
+		// rather than remember last one, just find first device and connect to it
+		bluetoothManager.Enable();
+		bluetoothManager.discoverResMedDevices(true);
+	}
+	public void StopConnector() {
+		connectorActive = false;
+		bluetoothManager.Disable();
 	}
 
 	public void ReactToFoundDevice(BluetoothDevice device) {
 		try {
 			/*this.bluetoothManager = new BluetoothSetup(this);
-			this.bluetoothManager.enable();
+			this.bluetoothManager.Enable();
 			this.checkNightTrack();
 			AppFileLog.addTrace("SERVICE onStartCommand overnight in progress");
 			Log.d("com.resmed.refresh.ui", " RefreshBluetoothService::onStartCommand overnight in progress");
 			bluetoothManager.pairDevice(device);
 			bluetoothManager.connectDevice(device);
-			bluetoothManager.enable();
+			bluetoothManager.Enable();
 			this.bluetoothManager.connectDevice(device);*/
 
 			/*Intent intent2 = new Intent(this, SleepTimeActivity.class);

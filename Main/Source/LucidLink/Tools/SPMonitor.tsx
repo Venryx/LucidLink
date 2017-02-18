@@ -72,6 +72,9 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
 							SPBridge.StartSleep();
 						}}/>
+						<VButton text="Stop" ml={10} plr={10} onPress={()=> {
+							SPBridge.StopStream();
+						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>
 						<GraphUI/>

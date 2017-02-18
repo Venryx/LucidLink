@@ -1,7 +1,6 @@
 package com.resmed.refresh.sleepsession;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,13 +22,11 @@ import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.KillableRunnable;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
-import com.resmed.refresh.utils.SortedList;
 import com.resmed.rm20.SleepParams;
 
 import org.acra.ACRAConstants;
 
 import SPlus.SPlusModule;
-import v.lucidlink.LL;
 import v.lucidlink.V;
 
 public class SleepSessionConnector implements BluetoothDataListener {
@@ -411,13 +408,13 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	}
 
 	public boolean sessionActive;
-	public void EnsureSleepSessionStarted() {
+	public void EnsureSessionStarted() {
 		if (sessionActive) return;
 		sessionActive = true;
 
 		AppFileLog.deleteCurrentFile();
 		// fake session-id (we don't care about (or even want) the on-device data-recording)
-		SPlusModule.main.sessionConnector.service.StartSleepSession(1, SPlusModule.main.age, SPlusModule.main.GenderInt());
+		SPlusModule.main.sessionConnector.service.StartSession(1, SPlusModule.main.age, SPlusModule.main.GenderInt());
 
 		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::setupController()");
 		this.isWaitLastSamples = false;

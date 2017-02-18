@@ -133,6 +133,9 @@ export class SPBridgeClass {
 	StartSleep() {
 		core.StartSleep();
 	}
+	StopStream() {
+		core.StopStream();
+	}
 }
 
 var SPBridge = new SPBridgeClass();
