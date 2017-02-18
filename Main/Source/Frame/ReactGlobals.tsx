@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Component} from "react";
-import {E, IsString, Toast} from "./Globals";
+import {E, Toast} from "./Globals";
 import {colors, styles} from "./Styles";
 import {Observer, observer} from "mobx-react/native";
 //import {View, Button} from "react-native";
@@ -58,6 +58,7 @@ import autoBind from "react-autobind";
 import {Assert} from "./General/Assert";
 import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
 import {ButtonProperties, TextProperties, TextInputProperties} from "react-native";
+import {IsString} from "./Types";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/
@@ -115,7 +116,7 @@ export class BaseComponent<P, S> extends Component<P, S> {
 			this.changeListeners.push({host: host, func: func});*/
 	    for (let func of funcs) {
 			if (IsString(func))
-				func = func.Func(this.Update);
+				func = (func as any).Func(this.Update);
 			// if actual function, add it (else, ignore entry--it must have been a failed conditional)
 			if (func instanceof Function) {
 				//if (!host.HasExtraMethod(func)) {

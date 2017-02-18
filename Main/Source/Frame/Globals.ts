@@ -12,6 +12,7 @@ import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-
 import {observable as O} from "mobx";
 //import Moment from "moment";
 import {VDFSaveOptions, VDFSaver, VDFTypeMarking} from "../Packages/VDF/VDFSaver";
+import {IsString} from "./Types";
 var Moment = require("moment");
 
 var globalComps = {O};
@@ -78,7 +79,7 @@ g.Extend({Toast});
 enum NotifyLength { Short, Long, Persistent }
 export function Notify(text: string, length = NotifyLength.Persistent) {
 	if (!IsString(text))
-		text = text != null ? text.toString() : "";
+		text = text != null ? (text as any).toString() : "";
 	let lengthStr = NotifyLength[length];
 	JavaBridge.Main.Notify(text, lengthStr);
 }
@@ -295,24 +296,6 @@ var observableHelper = O({test1: []});
 var ObservableArray = observableHelper.test1.constructor;
 (ObservableArray as any).name_fake = "List(object)";
 //alert(ObservableArray + ";" + VDF.GetTypeNameOfObject(observableHelper.test1))
-
-// types stuff
-// ==========
-
-export function IsPrimitive(obj) { return IsBool(obj) || IsNumber(obj) || IsString(obj); }
-export function IsBool(obj) { return typeof obj == "boolean"; } //|| obj instanceof Boolean
-export function ToBool(boolStr) { return boolStr == "true" ? true : false; }
-export function IsNumber(obj, allowNumberObj = false) { return typeof obj == "number" || (allowNumberObj && obj instanceof Number); }
-export function IsNumberString(obj) { return IsString(obj) && parseInt(obj).toString() == obj; }
-export function ToInt(stringOrFloatVal) { return parseInt(stringOrFloatVal); }
-export function ToDouble(stringOrIntVal) { return parseFloat(stringOrIntVal); }
-export function IsString(obj, allowStringObj = false) { return typeof obj == "string" || (allowStringObj && obj instanceof String); }
-export function ToString(val) { return "" + val; }
-
-export function IsNaN(obj) { return typeof obj == "number" && obj != obj; }
-
-export function IsInt(obj) { return typeof obj == "number" && parseFloat(obj as any) == parseInt(obj as any); }
-export function IsDouble(obj) { return typeof obj == "number" && parseFloat(obj as any) != parseInt(obj as any); }
 
 // others
 // ==========

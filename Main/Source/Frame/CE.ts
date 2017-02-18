@@ -577,9 +577,9 @@ Array.prototype._AddFunction_Inline = function Prepend(...newItems) { this.splic
 Array.prototype._AddFunction_Inline = function Add(item) { return this.push(item); };
 Array.prototype._AddFunction_Inline = function CAdd(item) { this.push(item); return this; }; // CAdd = ChainAdd
 Array.prototype._AddFunction_Inline = function TAdd(item) { this.push(item); return item; }; // TAdd = TransparentAdd
+interface Array<T> { AddRange(items: T[]): void; }
 Array.prototype._AddFunction_Inline = function AddRange(array) {
-	for (var i in array)
-		this.push(array[i]);
+	this.push(...array);
 };
 interface Array<T> { Remove(item: T): boolean; }
 Array.prototype._AddFunction_Inline = function Remove(item) {
@@ -868,3 +868,8 @@ Date.prototype.Clone = function() {
 // ==========
 
 Object.prototype._AddFunction_Inline = function plus(offset) { return { left: this.left + offset.left, top: this.top + offset.top }; };
+
+// Error
+// ==========
+
+interface Error { readonly Stack: string; }

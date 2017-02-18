@@ -65,12 +65,13 @@ export default class ListUI extends Component<any, any> {
 	}
 
 	TrimSessions() {
-		var sessionsToRemove = LL.tracker.loadedSessions.Except(LL.tracker.currentSession).Where(a=>a.events.length == 0);
+		var sessionsToRemove = LL.tracker.loadedSessions.Except(LL.tracker.currentSession)
+			.Where(a=>a.events.length == 0 && a.sleepSessions.length == 0);
 		
 		var dialog = new DialogAndroid();
 		dialog.set({
 			"title": `Trim/delete empty sessions`,
-			"content": `Permanently delete all (loaded) sessions containing no events?
+			"content": `Permanently delete all (loaded) sessions containing no events or sleep-sessions?
 			
 Doing so will remove ${sessionsToRemove.length} sessions, with ${LL.tracker.loadedSessions.length - sessionsToRemove.length} remaining.`,
 			"positiveText": "OK", "negativeText": "Cancel",

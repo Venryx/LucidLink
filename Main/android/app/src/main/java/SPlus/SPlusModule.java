@@ -142,5 +142,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 			MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
 		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
 		currentSessionType = null;
+		V.Log("Stopping session...");
 	}
 }

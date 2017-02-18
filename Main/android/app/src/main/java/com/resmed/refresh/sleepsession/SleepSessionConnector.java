@@ -30,16 +30,14 @@ import SPlus.SPlusModule;
 import v.lucidlink.V;
 
 public class SleepSessionConnector implements BluetoothDataListener {
-	private static final int ALARM_REQUEST_CODE = 5123;
-	private static final int MAX_SOUND_EVENTS = 5;
 	private BaseBluetoothActivity bAct;
 	private int bioCurrentTotalCount;
 	private int bioOnBeD;
-	private KillableRunnable cancelSleepSessionRunnable;
-	private boolean closeSleepSession;
-	private boolean hasSessionStarted;
+	//private KillableRunnable cancelSleepSessionRunnable;
+	//private boolean closeSleepSession;
+	//private boolean hasSessionStarted;
 	private Runnable heartbeatTimeoutRunnable;
-	private boolean isClosingSession;
+	//private boolean isClosingSession;
 	private boolean isHandlingHeartBeat;
 	private boolean isRecovering = false;
 	private boolean isSyncAndStop;
@@ -55,8 +53,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.isSyncAndStop = paramBoolean;
 		this.bAct = paramBaseBluetoothActivity;
 		this.bioOnBeD = paramInt;
-		this.isClosingSession = false;
-		this.hasSessionStarted = false;
+		//this.isClosingSession = false;
 		this.myHeartbeatHandler = new Handler();
 
 		service = new RefreshBluetoothService();
@@ -118,14 +115,14 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			}
 			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			//this.sleepSessionListener.onSessionOk();
-			if (this.isClosingSession) {
+			/*if (this.isClosingSession) {
 				this.isWaitLastSamples = true;
 				this.bAct.updateDataStoredFlag(0);
-			}
+			}*/
 		}
 
 		// if this is the last of the samples
-		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null && this.isClosingSession) {
+		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null) { // && this.isClosingSession) {
 			JsonRPC stopSampleRpc = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
 			stopSampleRpc.setRPCallback(new RPCallback() {
 				public void preExecute() {}
@@ -237,12 +234,12 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.bAct.sendRpcToBed(stopNightTimeTracking);
 	}
 
-	private void syncDataAndStop() {
+	/*private void syncDataAndStop() {
 		Log.d("com.resmed.refresh.sleepFragment", "SleepTrackFragment::syncDataAndStop()");
 		this.isWaitLastSamples = true;
 		this.isHandlingHeartBeat = true;
 		stopSleepSession();
-	}
+	}*/
 
 	public void handleBreathingRate(Bundle paramBundle) {
 		Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
@@ -263,7 +260,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			case REAL_STREAM_ON:
 				this.isHandlingHeartBeat = false;
 				break;
-			case SOCKET_RECONNECTING:
+			/*case SOCKET_RECONNECTING:
 				this.hasSessionStarted = true;
 				Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::handleConnectionStatus()  hasSessionStarted : " + this.hasSessionStarted);
 				this.isHandlingHeartBeat = false;
@@ -271,9 +268,11 @@ public class SleepSessionConnector implements BluetoothDataListener {
 					stopSleepSession();
 					this.closeSleepSession = false;
 				}
-				break;
+				break;*/
 			case SOCKET_CONNECTED:
-				Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment SESSION_OPENED, isWaitLastSamples : " + this.isWaitLastSamples + " isClosingSession:" + this.isClosingSession + " isSyncAndStop:" + this.isSyncAndStop);
+				Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment SESSION_OPENED, isWaitLastSamples : " + this.isWaitLastSamples
+						//+ " isClosingSession:" + this.isClosingSession
+						+ " isSyncAndStop:" + this.isSyncAndStop);
 				/*if ((!this.isWaitLastSamples) && (!this.isClosingSession)) {
 					localHandler.postDelayed(() -> {
 						//SleepSessionConnector.this.registerForSessionTimeout(localHandler);
@@ -407,11 +406,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		}*/
 	}
 
-	public boolean sessionActive;
 	public void StartNewSession() {
-		if (sessionActive) return;
-		sessionActive = true;
-
 		AppFileLog.deleteCurrentFile();
 		// fake session-id (we don't care about (or even want) the on-device data-recording)
 		SPlusModule.main.sessionConnector.service.StartSession(1, SPlusModule.main.age, SPlusModule.main.GenderInt());
@@ -420,7 +415,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.isWaitLastSamples = false;
 	}
 
-	public void stopSleepSession() {
+	/*public void stopSleepSession() {
 		AppFileLog.addTrace("STOP SLEEP SESSION");
 		//preSleepLog.addTrace("STOP SLEEP SESSION");
 		Log.d(LOGGER.TAG_FINISH_SESSION, "SleepTrackFragment stopSleepSession isClosingSession? " + this.isClosingSession);
@@ -435,5 +430,5 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				stopStreamAndRequestAllSamples();
 			}
 		}
-	}
+	}*/
 }

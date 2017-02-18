@@ -1,6 +1,6 @@
 ﻿import {VDFSaver, VDFSaveOptions} from "./VDFSaver";
 import {VDFLoadOptions, VDFLoader} from "./VDFLoader";
-import {List} from "./VDFExtras";
+import {List, ConvertObjectTypeNameToVDFTypeName} from "./VDFExtras";
 import {
     VDFDeserialize,
     VDFDeserializeProp,
@@ -76,23 +76,34 @@ String.prototype._AddProperty("TrimStart", function(chars: Array<string>) {
 
 declare global {
 	interface Array<T> {
-		Contains(str: T): boolean;
-		Where(matchFunc: Function): T[];
-		First(matchFunc: Function): T;
+		Contains(obj: T): boolean;
+		Where(matchFunc: (item: T, index: number)=>boolean): T[];
+		//First(matchFunc: (item: T, index: number)=>boolean, requireMatch: boolean): T;
 	}
 }
 if (!Array.prototype["Contains"])
 	Array.prototype._AddProperty("Contains", function(item) { return this.indexOf(item) != -1; });
 if (!Array.prototype["Where"])
 	Array.prototype._AddProperty("Where", function(matchFunc = (()=>true)) {
-		var result = this instanceof List ? new List(this.itemType) : [];
+		var result: any = this instanceof List ? new List(this.itemType) : [];
 		for (let item of this)
 			if (matchFunc.call(item, item)) // call, having the item be "this", as well as the first argument
-				result[this instanceof List ? "Add" : "push"](item);
+				result.push(item);
 		return result;
 	});
-if (!Array.prototype["First"])
-	Array.prototype._AddProperty("First", function(matchFunc = (()=>true)) { return this.Where(matchFunc)[0]; });
+/*if (!Array.prototype["First"]) {
+	Array.prototype._AddProperty("First", function(matchFunc = (()=>true), requireMatch?) {
+		if (matchFunc) {
+			for (let [index, item] of this.Entries) {
+				if (matchFunc.call(item, item, index))
+					return item;
+			}
+		} else if (this.length > 0)
+			return this[0];
+		if (requireMatch)
+			throw new Error("Matching item not found.");
+	});
+}*/
 
 declare global {
 	interface Function {
@@ -180,18 +191,10 @@ export class VDF {
 				return obj.realTypeName;
 			if (obj.itemType)
 				return "List(" + obj.itemType + ")";
-			var nativeTypeName = obj.constructor.name_fake || obj.constructor.name || null;
-			if (nativeTypeName == "Boolean")
-				return "bool";
-			if (nativeTypeName == "Number")
+			var objectTypeName = obj.constructor.name_fake || obj.constructor.name || null;
+			if (objectTypeName == "Number")
 				return obj.toString().Contains(".") ? "double" : "int";
-			if (nativeTypeName == "String")
-				return "string";
-			if (nativeTypeName == "Object") // if anonymous-object
-				return "object";
-			if (nativeTypeName == "Array")
-				return "List(object)";
-			return nativeTypeName;
+			return ConvertObjectTypeNameToVDFTypeName(objectTypeName);
 		}
 		if (rawType == "boolean")
 			return "bool";
@@ -210,37 +213,36 @@ export class VDF {
 		if (type == null) return {};
 		if (!type.hasOwnProperty("classPropsCache") || type.allowPropsCache === false || !allowGetFromCache) {
 			var result = {};
-			var currentType = type;
-			while (currentType && currentType != Object) {
-				// get static props on constructor itself
-				for (let propName of Object.getOwnPropertyNames(currentType)) {
-					if (propName in result) continue;
-					let propInfo = Object.getOwnPropertyDescriptor(currentType, propName);
-					// don't include if prop is a getter or setter func (causes problems when enumerating)
-					if (propInfo == null || (propInfo.get == null && propInfo.set == null))
-						result[propName] = currentType[propName];
-				}
-				// get "real" props on the prototype-object
-				for (let propName of Object.getOwnPropertyNames(currentType.prototype)) {
-					if (propName in result) continue;
-					let propInfo = Object.getOwnPropertyDescriptor(currentType.prototype, propName);
-					// don't include if prop is a getter or setter func (causes problems when enumerating)
-					if (propInfo == null || (propInfo.get == null && propInfo.set == null))
-						result[propName] = currentType.prototype[propName];
-				}
-				currentType = Object.getPrototypeOf(currentType.prototype).constructor;
+			// get static props on constructor itself
+			for (let propName in VDF.GetObjectProps(type)) {
+				if (propName in result) continue;
+				result[propName] = type[propName];
+			}
+			// get "real" props on the prototype-object
+			for (let propName in VDF.GetObjectProps(type.prototype)) {
+				if (propName in result) continue;
+				result[propName] = type.prototype[propName];
 			}
 			type.classPropsCache = result;
 		}
         return type.classPropsCache;
 	}
-	static GetObjectProps(obj): any {
+	static GetObjectProps(obj, includeInherited = true, includeGetterSetters = false): any {
 		if (obj == null) return {};
+
 		var result = {};
-		for (let propName in VDF.GetClassProps(obj.constructor))
-            result[propName] = null;
-        for (let propName in obj)
-            result[propName] = null;
+		var currentHost = Object(obj); // coerce to object first, in case it's a primitive and we're in es5
+		while (currentHost && currentHost != Object && (currentHost == obj || includeInherited)) {
+			for (let propName of Object.getOwnPropertyNames(currentHost)) {
+				if (propName in result) continue;
+				let propInfo = Object.getOwnPropertyDescriptor(currentHost, propName);
+				let isGetterSetter = propInfo && (propInfo.get || propInfo.set);
+				// don't include if prop is a getter or setter func (causes problems when enumerating)
+				if (!isGetterSetter)
+					result[propName] = currentHost[propName];
+			}
+			currentHost = Object.getPrototypeOf(currentHost);
+		}
         return result;
 	}
 

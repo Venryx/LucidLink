@@ -2,44 +2,45 @@ import {Timer} from "./General/Timers";
 import {JavaBridge, Toast, Log} from "./Globals";
 import {Assert} from "./General/Assert";
 import {NativeModules, DeviceEventEmitter} from "react-native";
+import {Enum, _Enum} from "./General/Enums";
+
+@_Enum export class SleepStage extends Enum { static V: SleepStage;
+	Absent = this
+    Wake = this
+    Light = this
+    Deep = this
+    Rem = this
+
+	static FromJavaStageValue(stageValue: number) {
+		let stageValueToStageMap = {
+			1: SleepStage.V.Wake,
+			2: SleepStage.V.Absent, 3: SleepStage.V.Absent, 4: SleepStage.V.Absent,
+			5: SleepStage.V.Light,
+			6: SleepStage.V.Deep,
+			7: SleepStage.V.Rem,
+		}
+		return stageValueToStageMap[stageValue];
+	}
+	static GetColorForStage(stage: SleepStage) {
+		let stageToColorMap = {
+			[SleepStage.V.Absent.name]: "rgba(0,0,0,0)",
+			[SleepStage.V.Wake.name]: "#d8381e",
+			[SleepStage.V.Light.name]: "#41a767",
+			[SleepStage.V.Deep.name]: "#009ee2",
+			[SleepStage.V.Rem.name]: "#eca100",
+		};
+		return stageToColorMap[stage.name];
+	}
+}
 
 // keep values, since must match with Java
-/*enum SleepStage_Detailed {
-    Wake = 1, // -> Simple.Wake
-    Absent = 2, Unknown = 3, Break = 4, // -> Simple.Other
-    LightSleep = 5, // -> Simple.Light
-    DeepSleep = 6, // -> Simple.Deep
-    RemSleep = 7, // -> Simple.REM
-}
-// keep values, since must match with Java
-enum SleepStage_Simple {
-    Other = 0,
-    Wake = -1,
-    REM = 1,
-    Light = 2,
-    Deep = 3,
-}
-function ConvertDetailedSleepStateToSimpleSleepState(detailedState: SleepState_Detailed) {
-	if ([SleepState_Detailed.Absent, SleepState_Detailed.Unknown, SleepState_Detailed.Break].Contains(detailedState))
-		return SleepState_Simple.Other;
-	if (detailedState == SleepState_Detailed.Wake)
-		return SleepState_Simple.Wake;
-	if (detailedState == SleepState_Detailed.RemSleep)
-		return SleepState_Simple.REM;
-	if (detailedState == SleepState_Detailed.LightSleep)
-		return SleepState_Simple.Light;
-	//if (detailedState == SleepState_Detailed.DeepSleep)
-	return SleepState_Simple.Deep;
-}*/
-
-// keep values, since must match with Java
-export enum SleepStage {
-    Wake = 1,
+/*export enum SleepStage {
     Absent = 2, Unknown = 3, Break = 4,
+    Wake = 1,
     LightSleep = 5,
     DeepSleep = 6,
     RemSleep = 7,
-}
+}*/
 
 var core = NativeModules.SPlus;
 export class SPBridgeClass {
@@ -68,13 +69,13 @@ export class SPBridgeClass {
 				listener(breathingRate);
 		});
 		DeviceEventEmitter.addListener("OnReceiveSleepStage", (args: any)=> {
-			var [stage] = args as [SleepStage];
+			var [stageValue] = args as [number];
 			/*var stageEnum_detailed_name =  SleepState_Detailed[stageValue];
 			var stageEnum_detailed: SleepState_Detailed = SleepState_Detailed[stageEnum_detailed_name];
 			var stageEnum_simple = ConvertDetailedSleepStateToSimpleSleepState(stageEnum_detailed);*/
-			var stageEnum_name =  SleepStage[stage];
+			var stageEnum = SleepStage.FromJavaStageValue(stageValue);
 			for (let listener of this.listeners_onReceiveSleepStage)
-				listener(stage);
+				listener(stageEnum);
 		});
 
 		this.initialized = true;

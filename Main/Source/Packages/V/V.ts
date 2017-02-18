@@ -1,6 +1,7 @@
-import {IsPrimitive, Log, IsString} from "../../Frame/Globals";
+import {Log} from "../../Frame/Globals";
 import {Dictionary, List} from "../VDF/VDFExtras";
 import {Assert} from "../../Frame/General/Assert";
+import {IsPrimitive, IsString} from "../../Frame/Types";
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;

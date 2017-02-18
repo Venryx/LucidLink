@@ -1,4 +1,5 @@
-import {E, IsString} from "../../Frame/Globals";
+import {Assert} from "../../Frame/General/Assert";
+import {E} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
 import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";
@@ -47,40 +48,25 @@ export function WhenViewDistanceUpdated(func) {
 	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
 }*/
 
-function GetSimpleSleepStage(rawStage: SleepStage) {
-	var stageToNameMap = {
-		[SleepStage.Absent]: "absent", [SleepStage.Unknown]: "absent", [SleepStage.Break]: "absent",
-		[SleepStage.Wake]: "awake",
-		[SleepStage.LightSleep]: "light",
-		[SleepStage.DeepSleep]: "deep",
-		[SleepStage.RemSleep]: "rem",
-	};
-	return stageToNameMap[rawStage];
-}
-
 export function WhenChangeSleepStageDo(func) {
-	LL.scripts.scriptRunner.listeners_whenChangeSleepStage.push((rawStage: SleepStage)=> {
-		var stageName = GetSimpleSleepStage(rawStage);
-		func(stageName, rawStage);
-	});
+	LL.scripts.scriptRunner.listeners_whenChangeSleepStage.push(func);
 }
 
-var currentSegment_stage = SleepStage.Unknown;
+var currentSegment_stage = null as SleepStage;
 var currentSegment_startTime: Moment.Moment = null;
-SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
-	if (rawStage != currentSegment_stage) {
-		currentSegment_stage = rawStage;
+SPBridge.listeners_onReceiveSleepStage.push((stage: SleepStage)=> {
+	if (stage != currentSegment_stage) {
+		currentSegment_stage = stage;
 		currentSegment_startTime = Moment();
 		for (let entry of WhenXMinutesIntoSleepStageDo_entries)
 			entry.triggeredForCurrentSleepSegment = false;
 		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeSleepStage)
-			listener(rawStage);
+			listener(stage);
 	}
 
-	var simpleStage = GetSimpleSleepStage(rawStage);
 	var timeInSegment = Moment().diff(currentSegment_startTime, "minutes", true);
 	for (let entry of WhenXMinutesIntoSleepStageDo_entries) {
-		if (entry.sleepStage == simpleStage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
+		if (entry.sleepStage == stage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
 			entry.func();
 			entry.triggeredForCurrentSleepSegment = true;
 		}
@@ -88,20 +74,23 @@ SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
 });
 
 class WhenXMinutesIntoSleepStageDo_Entry {
-	constructor(minutes: number, sleepStage: string, func: ()=>void) {
+	constructor(minutes: number, sleepStage: SleepStage, func: ()=>void) {
 		this.minutes = minutes;
 		this.sleepStage = sleepStage;
 		this.func = func;
 	}
 	minutes: number;
-	sleepStage: string;
+	sleepStage: SleepStage;
 	func: ()=>void;
 	triggeredForCurrentSleepSegment = false;
 }
 
 var WhenXMinutesIntoSleepStageDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
 export function WhenXMinutesIntoSleepStageYDo(minutesX: number, sleepStageY: string, func: ()=>void) {
-	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutesX, sleepStageY, func));
+	//let sleepStage = SleepStage.entries.FirstOrX(a=>a.name.toLowerCase() == sleepStage.toLowerCase());
+	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStage);
+	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`)
+	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutesX, sleepStage, func));
 }
 
 // general

@@ -11,7 +11,9 @@ import com.resmed.edflib.EdfLibCallbackHandler;
 import com.resmed.edflib.FileEdfInterface;
 import com.resmed.edflib.RstEdfMetaData;
 import com.resmed.edflib.RstEdfMetaData.Enum_EDF_Meta;
+import com.resmed.refresh.bed.BedDefaultRPCMapper;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
+import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.utils.Consts;
@@ -622,6 +624,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 
 		AppFileLog.addTrace("SleepSessionManager::StartSession() battery level : " + RefreshTools.getBatteryLevel(context));
 		//RefreshModelController.getInstance().updateLocation();
+
+		// use static user-id different than S+ app's one
+		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000001"));
 	}
 
 

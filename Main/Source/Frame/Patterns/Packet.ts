@@ -1,8 +1,9 @@
 import {ProfileMethod} from '../VProfiler';
-import {IsNumber, Toast} from '../Globals';
+import {Toast} from '../Globals';
 import PatternMatchAttempt from './PatternMatchAttempt';
 import Bind from "autobind-decorator";
 import {LL} from "../../LucidLink";
+import {IsNumber} from "../Types";
 
 export class Packet {
 	x;

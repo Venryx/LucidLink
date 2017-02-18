@@ -9,17 +9,20 @@ import "./Packages/VDF/VDFTypeInfo";
 // special, early imports (eg type extensions)
 import "./Frame/CE"; // contains first actual statements (eg, setting global "g")
 
+// imports for otherwise-not-imported files
+import "./Frame/General/Errors";
+
 import {E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';
 import {Panel} from "./Frame/ReactGlobals";
 import Node from "./Packages/VTree/Node";
-import {colors} from './Frame/Styles';
+import {colors} from "./Frame/Styles";
 
 import {Component} from "react";
 import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter} from "react-native";
 var {Keyboard} = require("react-native");
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 //import Moment from "moment";
-var Moment = require("moment");
+import Moment from "moment";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 
 import {MonitorUI, Monitor} from "./LucidLink/Tools/Monitor";
@@ -131,6 +134,8 @@ export class LucidLink extends Node {
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 
 	SaveFileSystemData() {
+		if (this.tracker.currentSession.CurrentSleepSession)
+			this.tracker.currentSession.CurrentSleepSession.End();
 		this.SaveMainData();
 		
 		this.tracker.SaveFileSystemData();

@@ -138,7 +138,7 @@ class GraphOverlayUI extends Component<{}, {}> {
 	OnReceiveBreathingRate(breathingRate: number) {
 		this.breathingRate = breathingRate;
 	}
-	sleepStage = SleepStage.Unknown;
+	sleepStage = null as SleepStage;
 	OnReceiveSleepStage(sleepStage: SleepStage) {
 		this.sleepStage = sleepStage;
 	}
@@ -150,7 +150,7 @@ class GraphOverlayUI extends Component<{}, {}> {
 				<Text>Light: {this.light}</Text>
 				<Text>Breath: {this.breath}</Text>
 				<Text>Breathing rate: {this.breathingRate}</Text>
-				<Text>Sleep stage: {SleepStage[this.sleepStage]}</Text>
+				<Text>Sleep stage: {this.sleepStage ? this.sleepStage.name : "Unknown"}</Text>
 			</Column>
         );
     }

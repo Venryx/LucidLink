@@ -3,6 +3,7 @@ import {VDFToken, VDFTokenParser, VDFTokenType} from "./VDFTokenParser";
 import {VDFTypeInfo} from "./VDFTypeInfo";
 import {Dictionary, object, List} from "./VDFExtras";
 import {VDF} from "./VDF";
+
 export class VDFLoadOptions {
 	constructor(initializerObj?: any, messages?: any[], allowStringKeys = true, allowCommaSeparators = false, loadUnknownTypesAsBasicTypes = false) {
 		this.messages = messages || [];
@@ -134,7 +135,7 @@ export class VDFLoader {
 				var token = tokensAtDepth1[i];
 				if (token.type != VDFTokenType.ListEndMarker && token.type != VDFTokenType.MapEndMarker) {
 					var itemFirstToken = tokens[token.index];
-					var itemEnderToken = tokensAtDepth1.FirstOrDefault(a => a.index > itemFirstToken.index + (itemFirstToken.type == VDFTokenType.Metadata ? 1 : 0) && token.type != VDFTokenType.ListEndMarker && token.type != VDFTokenType.MapEndMarker);
+					var itemEnderToken = tokensAtDepth1.FirstOrX(a=>a.index > itemFirstToken.index + (itemFirstToken.type == VDFTokenType.Metadata ? 1 : 0) && token.type != VDFTokenType.ListEndMarker && token.type != VDFTokenType.MapEndMarker);
 					//node.AddListChild(VDFLoader.ToVDFNode(VDFLoader.GetTokenRange_Tokens(tokens, itemFirstToken, itemEnderToken), typeGenericArgs[0], options));
 					node.AddListChild(VDFLoader.ToVDFNode(tokens, typeGenericArgs[0], options, itemFirstToken.index, itemEnderToken != null ? itemEnderToken.index : enderTokenIndex));
 					if (itemFirstToken.type == VDFTokenType.Metadata) // if item had metadata, skip an extra token (since it had two non-end tokens)
@@ -166,7 +167,7 @@ export class VDFLoader {
 						propValueType = typeof propNameNode.primitiveValue == "string" && typeInfo && typeInfo.props[propNameNode.primitiveValue] ? typeInfo.props[propNameNode.primitiveValue].typeName : null;
 
 					var propValueFirstToken = tokensAtDepth1[i + 1];
-					var propValueEnderToken = tokensAtDepth1.FirstOrDefault(a=>a.index > propValueFirstToken.index && a.type == VDFTokenType.Key);
+					var propValueEnderToken = tokensAtDepth1.FirstOrX(a=>a.index > propValueFirstToken.index && a.type == VDFTokenType.Key);
 					//var propValueNode = VDFLoader.ToVDFNode(VDFLoader.GetTokenRange_Tokens(tokens, propValueFirstToken, propValueEnderToken), propValueTypeName, options);
 					var propValueNode = VDFLoader.ToVDFNode(tokens, propValueType, options, propValueFirstToken.index, propValueEnderToken != null ? propValueEnderToken.index : enderTokenIndex);
 

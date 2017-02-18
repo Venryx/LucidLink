@@ -82,8 +82,7 @@ public class JsonRPC {
 		private Integer code;
 		private String message;
 
-		public ErrorRpc() {
-		}
+		public ErrorRpc() {}
 
 		public Integer getCode() {
 			return this.code;
@@ -94,11 +93,9 @@ public class JsonRPC {
 		}
 	}
 
-	public static abstract interface RPCallback {
-		public abstract void execute();
-
-		public abstract void onError(JsonRPC.ErrorRpc paramErrorRpc);
-
-		public abstract void preExecute();
+	public interface RPCallback {
+		void preExecute();
+		void execute();
+		void onError(JsonRPC.ErrorRpc paramErrorRpc);
 	}
 }

@@ -34,11 +34,11 @@ AddKeyUpListener(keyCodeForTheLetterA, function() {
 // S+ sleep tracker
 // ==========
 
-// list of sleep stages: "absent", "awake", "light", "deep", "rem"
-WhenChangeSleepStageDo(function(stage, rawStage) {
+// list of sleep stages: "Absent", "Awake", "Light", "Deep", "Rem"
+WhenChangeSleepStageDo(function(stage) {
 	// code here runs whenever you transition into a different sleep stage
 })
-WhenXMinutesIntoSleepStageYDo(5, "rem", function() {
+WhenXMinutesIntoSleepStageYDo(5, "Rem", function() {
 	// code here runs whenever you reach 5 minutes into a rem-sleep segment
 })
 

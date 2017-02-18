@@ -137,6 +137,7 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 	render() {
 		var {startTime, endTime, width, height} = this.props;
 		var node = LL.tracker;
+		var sleepSegments = node.GetSleepSegmentsForRange(startTime, endTime);
 		var events = node.GetEventsForRange(startTime, endTime);
 		
 		var mainLineColor = "#e1cd00";
@@ -144,7 +145,7 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 
 		var currentOffset = 0;
 		var rowUIs = LL.tracker.scriptRunner.graphRows.map((row, index)=> {
-			var result = <GraphRowUI {...{startTime, endTime, events, row, width, height}} key={index}
+			var result = <GraphRowUI {...{startTime, endTime, sleepSegments, events, row, width, height}} key={index}
 				style={{top: height * currentOffset}}/>;
 			currentOffset += row.height;
 			return result;

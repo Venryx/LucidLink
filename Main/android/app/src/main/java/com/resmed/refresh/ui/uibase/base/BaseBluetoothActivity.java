@@ -55,7 +55,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	private static Map CommandStack = new LinkedHashMap();
 	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	public static boolean UPDATING_FIRMWARE = false;
-	private static boolean connectingToBeD = false;
 	private static boolean userAllowBluetooth = true;
 	private JsonRPC bioSensorSerialNrRPC;
 	protected BroadcastReceiver connectionStatusReceiver = new BroadcastReceiver() {
@@ -65,7 +64,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		}
 	};
 
-	public boolean mBound;
 	public IncomingHandler mFromServiceHandler = new IncomingHandler();
 
 	public class IncomingHandler extends Handler {
@@ -247,36 +245,9 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null)
 			SPlusModule.main.sessionConnector.handleConnectionStatus(newState);
 
-		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " mBound : " + this.mBound + " isAvailable:" + this.isAvailable);
-		if (newState != null && !UPDATING_FIRMWARE && this.mBound && this.isAvailable) { // && LL.main.connectionState != newState) {
-			//this.currentState = newState;
-			Log.d("com.resmed.refresh.pair", "    handleConnectionStatus connState=" + newState);
-			if (CONNECTION_STATE.SOCKET_CONNECTED == newState) {
-				//this.sendRpcToBed(RpcCommands.openSession(RefreshModelController.getInstance().getUserSessionID()));
-				//this.sendRpcToBed(RpcCommands.openSession("user1"));
-				// use static user-id different than S+ app's one
-				sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000009"));
-				V.Log("Starting session!!!");
-
-				//BluetoothDataSerializeUtil.writeJsonFile(this.getApplicationContext(), this.mDevice);
-				// todo: if you want to store the bluetooth-device-info for auto-connect next time, do it here
-			} /*else if (newState == CONNECTION_STATE.SESSION_OPENED) {
-				V.Log("YAY3!!!");
-				//MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
-				MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
-			}*/
-
-			StringBuilder var4 = (new StringBuilder("Should show device paired? ")).append(connectingToBeD).append(" ");
-			boolean var5 = CONNECTION_STATE.SESSION_OPENED == newState;
-
-			Log.d("com.resmed.refresh.dialog", var4.append(var5).toString());
-			if (connectingToBeD && CONNECTION_STATE.SESSION_OPENED == newState) {
-				Log.d("com.resmed.refresh.pair", "handleConnectionStatus SOCKET_CONNECTED connectingToBeD=" + connectingToBeD);
-				connectingToBeD = false;
-				Log.d("com.resmed.refresh.dialog", "showDialog device paired");
-				//this.showDialog((new CustomDialogBuilder(this)).title(2131165891).setPositiveButton(2131165892, (OnClickListener)null), false);
-			}
-
+		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState
+			+ " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " isAvailable:" + this.isAvailable);
+		if (newState != null && !UPDATING_FIRMWARE && this.isAvailable) { // && LL.main.connectionState != newState) {
 			if (CONNECTION_STATE.SOCKET_BROKEN == newState || CONNECTION_STATE.SOCKET_RECONNECTING == newState) {
 				CORRECT_FIRMWARE_VERSION = true;
 				UPDATING_FIRMWARE = false;
@@ -560,7 +531,6 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 
 	public void pairAndConnect(BluetoothDevice deviceInfo) {
 		Log.d("com.resmed.refresh.pair", "connectAndPair");
-		connectingToBeD = true;
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("deviceInfo", deviceInfo);
 		bundle.putBoolean("makePaired", true);
@@ -585,7 +555,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	public void sendRpcToBed(final JsonRPC jsonRPC) {
 		synchronized (this) {
 			final boolean sendRPC = this.sendRPC(jsonRPC);
-			AppFileLog.addTrace(" BaseBluetoothActivity::sendRpcToBed(rpc) rpc : " + jsonRPC + " wasSent : " + sendRPC + " mBound : " + this.mBound);
+			AppFileLog.addTrace(" BaseBluetoothActivity::sendRpcToBed(rpc) rpc : " + jsonRPC + " wasSent : " + sendRPC);
 			Log.d("com.resmed.refresh.ui", "sendRpcToBed wasSent : " + sendRPC);
 			if (sendRPC) {
 				BaseBluetoothActivity.CommandStack.put(jsonRPC.getId(), jsonRPC);
@@ -596,7 +566,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	public void updateDataStoredFlag(int var1) {
 		if (var1 == 0) {
 			Message var2 = new Message();
-			var2.what = 28;
+			var2.what = RefreshBluetoothService.MessageType.RESET_BeD_AVAILABLE_DATA;
 			sendMessageToService(var2);
 		}
 		//super.updateDataStoredFlag(var1);

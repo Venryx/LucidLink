@@ -1,11 +1,12 @@
 import V from "../../Packages/V/V";
-import {E, IsBool, IsNumber, IsString, Toast} from "../Globals";
+import {E, Toast} from "../Globals";
 import {BaseComponent as Component, Row, Column} from "../ReactGlobals";
 //import TreeView from 'react-native-treeview'
 import TreeView from "../../Frame/Components/TreeView";
 import {View, Text} from "react-native";
 import {Dictionary, List} from "../../Packages/VDF/VDFExtras";
 import {D, P} from "../../Packages/VDF/VDFTypeInfo";
+import {IsBool, IsNumber, IsString} from "../Types";
 
 export default class ObjectInspectorUI extends Component<
 		{object, objectKey?: string, style?, textElementStyle?, titleModifierFunc: Function, keyModifierForTreeStateFunc: Function},

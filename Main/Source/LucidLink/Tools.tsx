@@ -1,4 +1,4 @@
-import {FromVDF, IsString, ToVDF, Global} from "../Frame/Globals";
+import {FromVDF, ToVDF, Global} from "../Frame/Globals";
 import {BaseComponent, BaseProps} from "../Frame/ReactGlobals";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import DialogAndroid from "react-native-dialogs";

@@ -17,7 +17,7 @@ import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import DisplayerScriptRunner from "./Tracker/DisplayerScriptRunner";
 import {_VDFPreSerialize, P} from "../Packages/VDF/VDFTypeInfo";
-import {AssertWarn} from "../Frame/General/Assert";
+import {Assert, AssertWarn} from "../Frame/General/Assert";
 import {SleepStage} from "../Frame/SPBridge";
 import SPBridge from "../Frame/SPBridge";
 import {SleepSegment} from "./Tracker/Session/SleepSession";
@@ -25,8 +25,9 @@ import {SleepSegment} from "./Tracker/Session/SleepSession";
 SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
 	var currentSegment = LL.tracker.currentSession.CurrentSleepSegment;
 	if (currentSegment == null || rawStage != currentSegment.stage) {
-		var sleepSegment = new SleepSegment(rawStage);
-		LL.tracker.currentSession.CurrentSleepSession.segments.push(sleepSegment)
+		var session = LL.tracker.currentSession.CurrentSleepSession;
+		var sleepSegment = new SleepSegment(session, rawStage);
+		session.segments.push(sleepSegment);
 	}
 });
 
@@ -147,6 +148,15 @@ export class Tracker extends Node {
 		});
 	}
 
+	GetSleepSegmentsForRange(start, endOut) {
+		return this.loadedSessions.SelectMany(session=> {
+			return session.sleepSessions.SelectMany(sleepSession=> {
+				return sleepSession.segments.Where(a=> {
+					return a.startTime >= start && a.EndTime < endOut;
+				});
+			});
+		});
+	}
 	GetEventsForRange(start, endOut) {
 		return this.loadedSessions.SelectMany(session=> {
 			return session.events.Where(a=> {

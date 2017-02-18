@@ -17,9 +17,9 @@ export class VDFType {
 	}
 }
 export class VDFTypeInfo {
-	static Get(type_orTypeName: any): VDFTypeInfo {
+	static Get(typeOrName: string | (new(..._)=>any)): VDFTypeInfo {
 		//var type = type_orTypeName instanceof Function ? type_orTypeName : window[type_orTypeName];
-		var typeName = type_orTypeName instanceof Function ? type_orTypeName.name : type_orTypeName;
+		var typeName = typeOrName instanceof Function ? typeOrName.name : typeOrName;
 
 		var typeNameBase = typeName.Contains("(") ? typeName.substr(0, typeName.indexOf("(")) : typeName;
 		if (VDF.GetIsTypeAnonymous(typeNameBase)) {
@@ -28,7 +28,7 @@ export class VDFTypeInfo {
 			return result;
 		}
 		
-		var typeBase = type_orTypeName instanceof Function ? type_orTypeName : window[typeNameBase];
+		var typeBase = typeOrName instanceof Function ? typeOrName : window[typeNameBase];
         /*if (typeBase == null)
 			throw new Error("Could not find constructor for type: " + typeNameBase);*/
         if (typeBase && !typeBase.hasOwnProperty("typeInfo")) {
@@ -97,14 +97,14 @@ export class VDFPropInfo {
 		this.name = propName;
 		this.typeName = propTypeName;
 		this.tags = new List<any>();
-		this.propTag = this.tags.FirstOrDefault(a=>a instanceof VDFProp);
-		this.defaultValueTag = this.tags.FirstOrDefault(a=>a instanceof DefaultValue);
+		this.propTag = this.tags.FirstOrX(a=>a instanceof VDFProp);
+		this.defaultValueTag = this.tags.FirstOrX(a=>a instanceof DefaultValue);
 	}
 
 	AddTags(...tags) {
 		this.tags.AddRange(tags);
-		this.propTag = this.tags.FirstOrDefault(a=>a instanceof VDFProp);
-		this.defaultValueTag = this.tags.FirstOrDefault(a=>a instanceof DefaultValue);
+		this.propTag = this.tags.FirstOrX(a=>a instanceof VDFProp);
+		this.defaultValueTag = this.tags.FirstOrX(a=>a instanceof DefaultValue);
 	}
 
 	ShouldValueBeSaved(val: any) {
@@ -133,18 +133,32 @@ export class VDFPropInfo {
 		return true;
 	}
 }
-export function T(typeOrTypeName: any) {
+export function T(type: new(..._)=>any);
+export function T(typeName: string);
+export function T(typeGetterFunc: (_?)=>new(..._)=>any);
+export function T(typeNameGetterFunc: (_?)=>string);
+export function T(...args) {
     return (target, name)=> {
         //target.prototype[name].AddTags(new VDFPostDeserialize());
         //Prop(target, name, typeOrTypeName);
         //target.p(name, typeOrTypeName);
         var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name);
-        propInfo.typeName = typeOrTypeName instanceof Function ? typeOrTypeName.name : typeOrTypeName;
+		if (typeof args[0] == "string") { // if type-name
+			propInfo.typeName = args[0];
+		} else if (args[0].name) { // if type/constructor
+			let type = args[0];
+			propInfo.typeName = type.name;
+		} else { // if type/type-name getter-func
+			//propInfo.typeName = func.toString().match(/return (\w+?);/)[1];
+			let func = args[0];
+			let typeOrName = func();
+			propInfo.typeName = typeof typeOrName == "string" ? typeOrName : typeOrName.name;
+		}
     };
-};
+}
 export function P(includeL2 = true, popOutL2?: boolean): PropertyDecorator {
     return function(target, name) {
-        var propInfo = VDFTypeInfo.Get(target.constructor).GetProp(name as string);
+        var propInfo = VDFTypeInfo.Get(target.constructor as any).GetProp(name as string);
         propInfo.AddTags(new VDFProp(includeL2, popOutL2));
     };
 };

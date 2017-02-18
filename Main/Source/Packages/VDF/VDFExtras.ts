@@ -1,4 +1,5 @@
-import {VDFPropInfo} from "./VDFTypeInfo";
+import {VDF} from "./VDF";
+import {T, VDFPropInfo} from "./VDFTypeInfo";
 // classes
 // ==========
 
@@ -76,6 +77,23 @@ export class VDFNodePath {
 			result += (index++ == 0 ? "" : "/") + node;
 		return result;
 	}
+}
+
+// helper functions
+// ==========
+
+export function ConvertObjectTypeNameToVDFTypeName(objectTypeName: string) {
+	if (objectTypeName == "Boolean")
+		return "bool";
+	if (objectTypeName == "Number")
+		return "double";
+	if (objectTypeName == "String")
+		return "string";
+	if (objectTypeName == "Object") // if anonymous-object
+		return "object";
+	if (objectTypeName == "Array")
+		return "List(object)";
+	return objectTypeName;
 }
 
 // helper classes
@@ -166,18 +184,42 @@ export class EnumValue {
 	static GetEnumStringForIntValue(enumTypeName: string, intValue: number) { return eval(enumTypeName + "[" + intValue + "]"); }
 }
 
+function TypeOrNameOrGetter_ToName<T>(typeOrNameOrGetter?: string | (new(..._)=>T) | ((_?)=>new(..._)=>T)): string {
+	return typeOrNameOrGetter instanceof Function && typeOrNameOrGetter.name ? typeOrNameOrGetter.name :
+		typeOrNameOrGetter instanceof Function ? (typeOrNameOrGetter as any)().name :
+		typeOrNameOrGetter;
+}
+
 export class List<T> extends Array<T> {
-	constructor(itemType?: string, ...items: T[]) {
+	/** usage: @T(_=>List.G(_=>ItemType)) prop1; */
+	/*static G<T>(itemTypeGetterFunc: (_?)=>new(..._)=>T): string {
+		var type = itemTypeGetterFunc() as any;
+		return `List(${type.name})`;
+	}*/
+
+	constructor(itemTypeOrNameOrGetter?: string | (new(..._)=>T) | ((_?)=>new(..._)=>T), ...items: T[]) {
 		//super(...items);
 		super();
 		(this as any).__proto__ = List.prototype;
+		//Object.setPrototypeOf(this, List.prototype);
+
+		// this can occur when calling .slice on a List; it internally calls this constructor, passing a number for the first arg
+		if (itemTypeOrNameOrGetter == null) return;
+		
 		this.AddRange(items);
-		this.itemType = itemType;
+		this.itemType = ConvertObjectTypeNameToVDFTypeName(TypeOrNameOrGetter_ToName(itemTypeOrNameOrGetter));
 	}
 
 	itemType: string;
 
+	// properties
 	get Count() { return this.length; }
+	get Entries(): [number, T][] {
+		var entries = [];
+		for (var i = 0; i < this.length; i++)
+			entries.push([i, this[i]]);
+		return entries;
+	}
 
 	/*s.Indexes = function () {
 		var result = {};
@@ -196,55 +238,59 @@ export class List<T> extends Array<T> {
 	Remove(item) { return this.RemoveAt(this.indexOf(item)) != null; }
 	RemoveAt(index) { return this.splice(index, 1)[0]; }
 	RemoveRange(index, count) { return this.splice(index, count); }
-	Any(matchFunc) {
-		for (let item of this)
-			if (matchFunc.call(item, item))
+	Any(matchFunc?: (item: T, index: number)=>boolean) {
+		if (matchFunc == null)
+			return this.length > 0;
+		for (let [index, item] of this.Entries) {
+			if (matchFunc.call(item, item, index))
 				return true;
+		}
 		return false;
 	}
-	All(matchFunc) {
-		for (let item of this)
-			if (!matchFunc.call(item, item))
+	All(matchFunc: (item: T, index: number)=>boolean) {
+		for (let [index, item] of this.Entries) {
+			if (!matchFunc.call(item, item, index))
 				return false;
+		}
 		return true;
 	}
-	Select<T2>(selectFunc: (item: T)=>T2, itemType?) {
+	Select<T2>(selectFunc: (item: T, index: number)=>T2, itemType?) {
 		var result = new List<T2>(itemType || "object");
-		for (let item of this)
-			result.Add(selectFunc.call(item, item));
+		for (let [index, item] of this.Entries)
+			result.Add(selectFunc.call(item, item, index));
 		return result;
 	}
-	First(matchFunc) {
-		var result = this.FirstOrDefault(matchFunc);
+	First(matchFunc?: (item: T, index: number)=>boolean) {
+		var result = this.FirstOrX(matchFunc);
 		if (result == null)
 			throw new Error("Matching item not found.");
 		return result;
 	}
-	FirstOrDefault(matchFunc) {
+	FirstOrX(matchFunc?: (item: T, index: number)=>boolean, x: T = null) {
 		if (matchFunc) {
-			for (let item of this)
-				if (matchFunc.call(item, item))
+			for (let [index, item] of this.Entries) {
+				if (matchFunc.call(item, item, index))
 					return item;
-			return null;
-		}
-		else
+			}
+		} else if (this.length > 0)
 			return this[0];
+		return x;
 	}
-	Last(matchFunc?) {
-		var result = this.LastOrDefault(matchFunc);
+	Last(matchFunc?: (item: T, index: number)=>boolean) {
+		var result = this.LastOrX(matchFunc);
 		if (result == null)
 			throw new Error("Matching item not found.");
 		return result;
 	}
-	LastOrDefault(matchFunc?) {
+	LastOrX(matchFunc?: (item: T, index: number)=>boolean, x: T = null) {
 		if (matchFunc) {
-			for (var i = this.length - 1; i >= 0; i--)
-				if (matchFunc.call(this[i], this[i]))
+			for (var i = this.length - 1; i >= 0; i--) {
+				if (matchFunc.call(this[i], this[i], i))
 					return this[i];
-			return null;
-		}
-		else
+			}
+		} else if (this.length > 0)
 			return this[this.length - 1];
+		return x;
 	}
 	GetRange(index, count) {
 		var result = new List(this.itemType);
@@ -257,7 +303,19 @@ export class List<T> extends Array<T> {
 window["List"] = List;
 
 export class Dictionary<K, V> {
-	constructor(keyType?: string, valueType?: string, keyValuePairsObj?) {
+	/** usage: @T(_=>Dictionary.G(_=>KeyType, _=>ValueType)) prop1; */
+	/*static G<K, V>(keyTypeGetterFunc: (_?)=>new(..._)=>K, valueTypeGetterFunc: (_?)=>new(..._)=>V): string {
+		var keyType = keyTypeGetterFunc() as any;
+		var valueType = valueTypeGetterFunc() as any;
+		return `Dictionary(${keyType.name} ${valueType.name})`;
+	}*/
+
+	constructor(keyTypeOrNameOrGetter?: string | (new(..._)=>K) | ((_?)=>new(..._)=>K),
+			valueTypeOrNameOrGetter?: string | (new(..._)=>V) | ((_?)=>new(..._)=>V),
+			keyValuePairsObj?) {
+		var keyType = ConvertObjectTypeNameToVDFTypeName(TypeOrNameOrGetter_ToName(keyTypeOrNameOrGetter));
+		var valueType = ConvertObjectTypeNameToVDFTypeName(TypeOrNameOrGetter_ToName(valueTypeOrNameOrGetter));
+
 		//VDFUtils.SetUpHiddenFields(this, true, "realTypeName", "keyType", "valueType", "keys", "values");
 		this.realTypeName = "Dictionary(" + keyType + " " + valueType + ")";
 		this.keyType = keyType;
@@ -277,14 +335,14 @@ export class Dictionary<K, V> {
 	values: V[];
 
 	// properties
-	get Keys() { // (note that this will return each key's toString() result (not the key itself, for non-string keys))
+	/*get Keys() { // (note that this will return each key's toString() result (not the key itself, for non-string keys))
 		var result = {};
 		for (var i = 0; i < this.keys.length; i++)
 			result[<any>this.keys[i]] = null;
 		return result;
-	}
+	}*/
 	get Pairs() {
-		var result = [];
+		var result = [] as {index: number, key: K, value: V}[];
 		for (var i = 0; i < this.keys.length; i++)
 			result.push({index: i, key: this.keys[i], value: this.values[i]});
 		return result;

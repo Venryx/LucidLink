@@ -87,7 +87,7 @@ class SegmentUI extends Component<{session: SleepSession, segment: SleepSegment}
 			endTime = session.segments[session.segments.indexOf(segment) + 1];*/		
 		return (
 			<Row ml={10}>
-				<Text style={{flex: .5}}>Stage: {segment.stage}</Text>
+				<Text style={{flex: .5}}>Stage: {segment.stage.name}</Text>
 				{/*<Text style={{flex: .5}}>Time-span: {segment.startTime.format("HH:mm:ss")} to {endTime.format("HH:mm:ss")}</Text>*/}
 				<Text style={{flex: .5}}>Start time: {segment.startTime.format("HH:mm:ss")}</Text>
 			</Row>

@@ -1,9 +1,8 @@
-import {FromVDF, IsString, ToVDF} from "../Frame/Globals";
+import {FromVDF, ToVDF} from "../Frame/Globals";
 import {BaseComponent} from "../Frame/ReactGlobals";
-var ScrollableTabView = require("react-native-scrollable-tab-view");
-var DialogAndroid = require("react-native-dialogs");
+import ScrollableTabView from "react-native-scrollable-tab-view";
+import DialogAndroid from "react-native-dialogs";
 import Node from "../Packages/VTree/Node";
-
 import GeneralUI from "./Settings/GeneralUI";
 import AudiosUI from "./Settings/AudiosUI";
 import {LL} from "../LucidLink";
