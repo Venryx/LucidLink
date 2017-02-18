@@ -15,6 +15,7 @@ import Moment from "moment";
 import GraphOverlayUI from "./GraphOverlayUI";
 import {Notify} from "../../../Frame/Globals";
 import {Session} from "../Session";
+import SleepSegmentsUI from "./SleepSegmentsUI";
 
 @observer
 export default class GraphUI extends Component<{} & BaseProps, {}> {
@@ -137,15 +138,13 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 	render() {
 		var {startTime, endTime, width, height} = this.props;
 		var node = LL.tracker;
-		var sleepSegments = node.GetSleepSegmentsForRange(startTime, endTime);
-		var events = node.GetEventsForRange(startTime, endTime);
-		
-		var mainLineColor = "#e1cd00";
-		var mainLinePoints = [[0, 0]]; // placeholder
 
+		var innerHeight = height - 21;
+
+		var events = node.GetEventsForRange(startTime, endTime);
 		var currentOffset = 0;
 		var rowUIs = LL.tracker.scriptRunner.graphRows.map((row, index)=> {
-			var result = <GraphRowUI {...{startTime, endTime, sleepSegments, events, row, width, height}} key={index}
+			var result = <GraphRowUI {...{startTime, endTime, events, row, width, height: innerHeight}} key={index}
 				style={{top: height * currentOffset}}/>;
 			currentOffset += row.height;
 			return result;
@@ -156,10 +155,12 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 		if (overlay) {
 			let overlayEvents = events.Where(a=>overlay.events.Contains(a.type));
 			overlayUI = (
-				<GraphOverlayUI {...{startTime, endTime, width, height, overlay}} events={overlayEvents}/>
+				<GraphOverlayUI {...{startTime, endTime, width, height: innerHeight, overlay}} events={overlayEvents}/>
 			);
 		}
 		
+		var mainLineColor = "#e1cd00";
+		var mainLinePoints = [[0, 0]]; // placeholder
         return (
 			<View style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
@@ -167,6 +168,8 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
 					axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
 					type="line" color={[mainLineColor]} data={[mainLinePoints]}/>
+				<SleepSegmentsUI {...{startTime, endTime, width, height: innerHeight}} style={{top: 0}}
+					sleepSegments={node.GetSleepSegmentsForRange(startTime, endTime)}/>
 				{rowUIs}
 				{overlayUI}
             </View>

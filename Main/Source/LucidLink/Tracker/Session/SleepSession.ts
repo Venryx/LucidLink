@@ -50,6 +50,9 @@ export class SleepSegment {
 	}
 
 	@P() stage = null as SleepStage;
+	get Height() {
+		return SleepStage.GetHeightForStage(this.stage);
+	}
 	get Color() {
 		return SleepStage.GetColorForStage(this.stage);
 	}

@@ -21,6 +21,23 @@ import {Enum, _Enum} from "./General/Enums";
 		}
 		return stageValueToStageMap[stageValue];
 	}
+	static GetHeightForStage(stage: SleepStage) {
+		/*let stageToHeightMap = {
+			[SleepStage.V.Absent.name]: 0,
+			[SleepStage.V.Wake.name]: 1 / 7,
+			[SleepStage.V.Light.name]: 5 / 7,
+			[SleepStage.V.Deep.name]: 7 / 7,
+			[SleepStage.V.Rem.name]: 3 / 7,
+		};*/
+		let stageToHeightMap = {
+			[SleepStage.V.Absent.name]: 0,
+			[SleepStage.V.Wake.name]: 1 / 4,
+			[SleepStage.V.Light.name]: 3 / 4,
+			[SleepStage.V.Deep.name]: 4 / 4,
+			[SleepStage.V.Rem.name]: 2 / 4,
+		};
+		return stageToHeightMap[stage.name];
+	}
 	static GetColorForStage(stage: SleepStage) {
 		let stageToColorMap = {
 			[SleepStage.V.Absent.name]: "rgba(0,0,0,0)",

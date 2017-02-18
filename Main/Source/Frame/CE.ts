@@ -214,23 +214,25 @@ var {max, min} = require('moment');
 //interface Object { Init(obj: any): this; }
 interface Object { Init<T>(this: T, obj: any): T; }
 Object.prototype._AddFunction_Inline = function Init(x) { return this.Extend(x); };
-interface Object { Init_VTree: (obj)=>Object; }
-Object.prototype._AddFunction_Inline = function Init_VTree(x) { // by default, uses set_self method
-    for (var name in x)
-    	this.a(name).set_self = x[name];
+
+interface Object { Get(propName: any): any; }
+Object.prototype._AddFunction_Inline = function Get(propName) { return this[propName]; };
+interface Object { VSet<T>(this: T, obj: any): T; }
+Object.prototype._AddFunction_Inline = function VSet(other) {
+	for (var name in other)
+        this[name] = other[name];
 	return this;
 };
 
-Object.prototype._AddFunction_Inline = function Set_Normal(x) { return this.Extend(x); };
-Object.prototype._AddFunction_Inline = function Set_VTree(x) { return this.Init_VTree(x); };
-
+interface Object { Extended<T>(this: T, x): T; }
 Object.prototype._AddFunction_Inline = function Extended(x) {
 	var result = {};
 	for (var name in this)
 		result[name] = this[name];
-	if (x)
+	if (x) {
     	for (var name in x)
     		result[name] = x[name];
+	}
     return result;
 };
 //Object.prototype._AddFunction_Inline = function E(x) { return this.Extended(x); };
