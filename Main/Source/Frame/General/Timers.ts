@@ -1,6 +1,7 @@
 import V from "../../Packages/V/V";
 import BackgroundTimer from "react-native-background-timer";
-import {Global} from "../Globals";
+import {Global, Log} from "../Globals";
+import {LL} from "../../LucidLink";
 
 // methods
 // ==========
@@ -32,32 +33,39 @@ export function DoNothingXTimesThenDoY(doNothingCount: number, func: Function, k
 
 // interval is in seconds (can be decimal)
 export class Timer {
-	constructor(interval, func, maxCallCount = -1) {
+	constructor(interval, func, maxCallCount = -1, asBackground = false) {
 	    this.interval = interval;
 	    this.func = func;
 	    this.maxCallCount = maxCallCount;
+		this.asBackground = asBackground;
 	}
 
-	interval;
-	func;
-	maxCallCount;
+	interval: number;
+	func: Function;
+	maxCallCount: number;
+	asBackground: boolean;
+
 	timerID = -1;
 	get IsRunning() { return this.timerID != -1; }
 
 	callCount = 0;
 	Start() {
-		//this.timerID = setInterval(()=> {
-		this.timerID = BackgroundTimer.setInterval(()=> {
+		let wrapperFunc = ()=> {
 			this.func();
 			this.callCount++;
 			if (this.maxCallCount != -1 && this.callCount >= this.maxCallCount)
 				this.Stop();
-		}, this.interval * 1000);
+		};
+		this.timerID = this.asBackground
+			? BackgroundTimer.setInterval(wrapperFunc, this.interval * 1000)
+			: setInterval(wrapperFunc, this.interval * 1000);
 		return this;
 	}
 	Stop() {
-		//clearInterval(this.timerID);
-		BackgroundTimer.clearInterval(this.timerID);
+		if (this.asBackground)
+			BackgroundTimer.clearInterval(this.timerID);
+		else
+			clearInterval(this.timerID);
 		this.timerID = -1;
 	}
 }
@@ -67,30 +75,41 @@ export class TimerMS extends Timer {
     }
 }
 
-@Global
-class Sequence {
+export class Sequence {
+	constructor(asBackground = true, userCreated = false) {
+		this.asBackground = asBackground;
+		this.userCreated = userCreated;
+	}
+	asBackground: boolean;
+	userCreated: boolean;
+	
 	segments = [] as SequenceSegment[];
 	AddSegment(delayInS: number, func: Function) {
 		this.segments.push(new SequenceSegment(delayInS, func));
 	}
 
 	enabled = true;
-	currentSegmentTimeout = null;
+	currentSegmentTimeout = null as Timer;
 	get Active() { return this.currentSegmentTimeout != null; }
 
 	Start() {
-		this.currentSegmentTimeout = this.segments[0].StartDelay(this);
+		this.currentSegmentTimeout = this.segments[0].StartDelay(this, this.asBackground);
+		if (this.userCreated)
+			LL.scripts.scriptRunner.timers.push(this.currentSegmentTimeout);
 	}
 	OnCompleteSegment(segment: SequenceSegment) {
 		this.currentSegmentTimeout = null;
 		if (this.enabled) {
 			let nextSegment = this.segments[this.segments.indexOf(segment) + 1];
-			if (nextSegment)
-				this.currentSegmentTimeout = nextSegment.StartDelay(this);
+			if (nextSegment) {
+				this.currentSegmentTimeout = nextSegment.StartDelay(this, this.asBackground);
+				if (this.userCreated)
+					LL.scripts.scriptRunner.timers.push(this.currentSegmentTimeout);
+			}
 		}
 	}
 	Stop() {
-		BackgroundTimer.clearTimeout(this.currentSegmentTimeout);
+		this.currentSegmentTimeout.Stop();
 		this.currentSegmentTimeout = null;
 		this.enabled = false;
 	}
@@ -103,11 +122,11 @@ class SequenceSegment {
 	delayInS = 0;
 	func = null as Function;
 
-	StartDelay(sequence: Sequence): number {
-		return WaitXThenRun(this.delayInS * 1000, ()=> {
+	StartDelay(sequence: Sequence, asBackground: boolean): Timer {
+		return new Timer(this.delayInS, ()=> {
 			this.func();
 			sequence.OnCompleteSegment(this);
-		});
+		}, 1, asBackground).Start();
 	}
 }
 

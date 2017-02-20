@@ -5,7 +5,7 @@ import {LL} from "../../LucidLink";
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
 import {Pattern} from "../../Frame/Patterns/Pattern";
-import {WaitXThenRun} from "../../Frame/General/Timers";
+import {WaitXThenRun, Timer} from "../../Frame/General/Timers";
 
 export default class ScriptRunner {
 	constructor() {
@@ -18,7 +18,7 @@ export default class ScriptRunner {
 
 	patterns: Pattern[] = []; // func-based patterns
 
-	timers = [];
+	timers = [] as Timer[];
 	keyDownListeners = [];
 	TriggerKeyDown(keyCode) {
 		for (let listener of this.keyDownListeners) {

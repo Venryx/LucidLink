@@ -7,7 +7,7 @@ import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL} from "../../LucidLink";
 import {AudioFile} from "../../Frame/AudioFile";
-import {Sleep, Timer, WaitXThenRun} from "../../Frame/General/Timers";
+import {Sleep, Timer, WaitXThenRun, Sequence} from "../../Frame/General/Timers";
 import Speech from "react-native-android-speech";
 import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
@@ -24,18 +24,11 @@ export {
 	// enums
 	SleepStage,
 	// functions,
-	WaitXThenRun,
+	//WaitXThenRun,
 };
 
 // listeners
 // ==========
-
-export function EveryXSecondsDo(seconds, func, maxCallCount = -1) {
-	var timer = new Timer(seconds, func, maxCallCount);
-	timer.Start();
-	LL.scripts.scriptRunner.timers.push(timer);
-	return timer;
-}
 
 export function WhenChangeMuseConnectStatus(func) {
 	LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus.push(func);
@@ -60,14 +53,14 @@ SPBridge.listeners_onReceiveSleepStage.push((stage: SleepStage)=> {
 	if (stage != currentSegment_stage) {
 		currentSegment_stage = stage;
 		currentSegment_startTime = Moment();
-		for (let entry of WhenXMinutesIntoSleepStageDo_entries)
+		for (let entry of WhenXMinutesIntoSleepStageYDo_entries)
 			entry.triggeredForCurrentSleepSegment = false;
 		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeSleepStage)
 			listener(stage);
 	}
 
 	var timeInSegment = Moment().diff(currentSegment_startTime, "minutes", true);
-	for (let entry of WhenXMinutesIntoSleepStageDo_entries) {
+	for (let entry of WhenXMinutesIntoSleepStageYDo_entries) {
 		if (entry.sleepStage == stage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
 			entry.func();
 			entry.triggeredForCurrentSleepSegment = true;
@@ -87,12 +80,12 @@ class WhenXMinutesIntoSleepStageDo_Entry {
 	triggeredForCurrentSleepSegment = false;
 }
 
-var WhenXMinutesIntoSleepStageDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
+var WhenXMinutesIntoSleepStageYDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
 export function WhenXMinutesIntoSleepStageYDo(minutes: number, sleepStageName: string, func: ()=>void) {
 	//let sleepStage = SleepStage.entries.FirstOrX(a=>a.name.toLowerCase() == sleepStageName.toLowerCase());
 	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStageName) as SleepStage;
 	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`)
-	WhenXMinutesIntoSleepStageDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func));
+	WhenXMinutesIntoSleepStageYDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func));
 }
 
 // general
@@ -116,10 +109,20 @@ export function AddPattern(info) {
 	LL.scripts.scriptRunner.patterns.push(pattern);
 }
 
-export function CreateTimer(intervalInSec: number, func: Function, maxCallCount = -1) {
-	var timer = new Timer(intervalInSec, func, maxCallCount);
+export function CreateTimer(intervalInSec: number, func: Function, maxCallCount = -1, asBackground = true) {
+	var timer = new Timer(intervalInSec, func, maxCallCount, asBackground);
 	LL.scripts.scriptRunner.timers.push(timer);
 	return timer;
+}
+export function WaitXThenDo(seconds, func, asBackground = true) {
+	return CreateTimer(seconds, func, 1, asBackground).Start();
+}
+export function EveryXSecondsDo(seconds, func, maxCallCount = -1, asBackground = true) {
+	return CreateTimer(seconds, func, maxCallCount, asBackground).Start();
+}
+
+export function CreateSequence(asBackground = true) {
+	return new Sequence(asBackground, true);
 }
 
 // input
