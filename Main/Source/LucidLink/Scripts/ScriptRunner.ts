@@ -1,3 +1,4 @@
+import {WhenXMinutesIntoSleepStageDo_Entry} from "./ScriptGlobals";
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {Log} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
@@ -6,6 +7,8 @@ import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
 import {Pattern} from "../../Frame/Patterns/Pattern";
 import {WaitXThenRun, Timer} from "../../Frame/General/Timers";
+import Moment from "moment";
+import {SleepStage} from "../../Frame/SPBridge";
 
 export default class ScriptRunner {
 	constructor() {
@@ -41,6 +44,10 @@ export default class ScriptRunner {
 	listeners_whenViewDistanceUpdated = [];*/
 	listeners_onUpdatePatternMatchProbabilities = [];
 	listeners_whenChangeSleepStage = [];
+	
+	currentSegment_stage = null as SleepStage;
+	currentSegment_startTime: Moment.Moment = null;
+	listeners_whenXMinutesIntoSleepStageY = [] as WhenXMinutesIntoSleepStageDo_Entry[];
 
 	Reset() {
 		this.patterns = [];
@@ -59,6 +66,7 @@ export default class ScriptRunner {
 		this.listeners_whenMusePacketReceived = [LL.tools.monitor.eegProcessor.OnReceiveMusePacket];
 		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.listeners_whenChangeSleepStage = [];
+		this.listeners_whenXMinutesIntoSleepStageY = [];
 	}
 	//currentExecutionScope = {};
 	Apply(scripts) {

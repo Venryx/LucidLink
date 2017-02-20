@@ -47,20 +47,18 @@ export function WhenChangeSleepStageDo(func) {
 	LL.scripts.scriptRunner.listeners_whenChangeSleepStage.push(func);
 }
 
-var currentSegment_stage = null as SleepStage;
-var currentSegment_startTime: Moment.Moment = null;
 SPBridge.listeners_onReceiveSleepStage.push((stage: SleepStage)=> {
-	if (stage != currentSegment_stage) {
-		currentSegment_stage = stage;
-		currentSegment_startTime = Moment();
-		for (let entry of WhenXMinutesIntoSleepStageYDo_entries)
+	if (stage != LL.scripts.scriptRunner.currentSegment_stage) {
+		LL.scripts.scriptRunner.currentSegment_stage = stage;
+		LL.scripts.scriptRunner.currentSegment_startTime = Moment();
+		for (let entry of LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY)
 			entry.triggeredForCurrentSleepSegment = false;
 		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeSleepStage)
 			listener(stage);
 	}
 
-	var timeInSegment = Moment().diff(currentSegment_startTime, "minutes", true);
-	for (let entry of WhenXMinutesIntoSleepStageYDo_entries) {
+	var timeInSegment = Moment().diff(LL.scripts.scriptRunner.currentSegment_startTime, "minutes", true);
+	for (let entry of LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY) {
 		if (entry.sleepStage == stage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
 			entry.func();
 			entry.triggeredForCurrentSleepSegment = true;
@@ -68,7 +66,7 @@ SPBridge.listeners_onReceiveSleepStage.push((stage: SleepStage)=> {
 	}
 });
 
-class WhenXMinutesIntoSleepStageDo_Entry {
+export class WhenXMinutesIntoSleepStageDo_Entry {
 	constructor(minutes: number, sleepStage: SleepStage, func: ()=>void) {
 		this.minutes = minutes;
 		this.sleepStage = sleepStage;
@@ -80,12 +78,12 @@ class WhenXMinutesIntoSleepStageDo_Entry {
 	triggeredForCurrentSleepSegment = false;
 }
 
-var WhenXMinutesIntoSleepStageYDo_entries = [] as WhenXMinutesIntoSleepStageDo_Entry[];
 export function WhenXMinutesIntoSleepStageYDo(minutes: number, sleepStageName: string, func: ()=>void) {
 	//let sleepStage = SleepStage.entries.FirstOrX(a=>a.name.toLowerCase() == sleepStageName.toLowerCase());
 	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStageName) as SleepStage;
-	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`)
-	WhenXMinutesIntoSleepStageYDo_entries.push(new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func));
+	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`);
+	let entry = new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func);
+	LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY.push(entry);
 }
 
 // general
