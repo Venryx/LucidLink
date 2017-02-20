@@ -7,7 +7,7 @@ import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL} from "../../LucidLink";
 import {AudioFile} from "../../Frame/AudioFile";
-import {Timer, Sleep} from "../../Frame/General/Timers";
+import {Sleep, Timer, WaitXThenRun} from "../../Frame/General/Timers";
 import Speech from "react-native-android-speech";
 import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
@@ -23,6 +23,8 @@ export {
 	V, Pattern, Matcher, Gap,
 	// enums
 	SleepStage,
+	// functions,
+	WaitXThenRun,
 };
 
 // listeners

@@ -1,12 +1,13 @@
 import V from "../../Packages/V/V";
 import BackgroundTimer from "react-native-background-timer";
+import {Global} from "../Globals";
 
 // methods
 // ==========
 
 export function TryCall(func, /*optional:*/ args_) { if (func instanceof Function) func.apply(this, V.CloneArray(arguments).splice(0, 1)); }
 export function TryCall_OnX(obj, func, /*optional:*/ args_) { if (func instanceof Function) func.apply(obj, V.CloneArray(arguments).splice(0, 1)); }
-window.Extend({TryCall, TryCall_OnX});
+g.Extend({TryCall, TryCall_OnX});
 
 //window.requestAnimationFrame = function() {};
 
@@ -64,6 +65,50 @@ export class TimerMS extends Timer {
     constructor(interval_decimal, func, maxCallCount = -1) {
         super(interval_decimal / 1000, func, maxCallCount);
     }
+}
+
+@Global
+class Sequence {
+	segments = [] as SequenceSegment[];
+	AddSegment(delayInS: number, func: Function) {
+		this.segments.push(new SequenceSegment(delayInS, func));
+	}
+
+	enabled = true;
+	currentSegmentTimeout = null;
+	get Active() { return this.currentSegmentTimeout != null; }
+
+	Start() {
+		this.currentSegmentTimeout = this.segments[0].StartDelay(this);
+	}
+	OnCompleteSegment(segment: SequenceSegment) {
+		this.currentSegmentTimeout = null;
+		if (this.enabled) {
+			let nextSegment = this.segments[this.segments.indexOf(segment) + 1];
+			if (nextSegment)
+				this.currentSegmentTimeout = nextSegment.StartDelay(this);
+		}
+	}
+	Stop() {
+		BackgroundTimer.clearTimeout(this.currentSegmentTimeout);
+		this.currentSegmentTimeout = null;
+		this.enabled = false;
+	}
+}
+class SequenceSegment {
+	constructor(delayInS: number, func: Function) {
+		this.delayInS = delayInS;
+		this.func = func;
+	}
+	delayInS = 0;
+	func = null as Function;
+
+	StartDelay(sequence: Sequence): number {
+		return WaitXThenRun(this.delayInS * 1000, ()=> {
+			this.func();
+			sequence.OnCompleteSegment(this);
+		});
+	}
 }
 
 var funcLastScheduledRunTimes = {};
