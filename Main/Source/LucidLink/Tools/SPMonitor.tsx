@@ -22,6 +22,8 @@ export class SPMonitor extends Node {
 	@O @P() connect = true;
 	@O @P() monitor = true;
 	@O @P() process = true;
+
+	//@O @P() calculateBreathingRate = true;
 }
 
 @observer
@@ -77,9 +79,6 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 								LL.tracker.currentSession.CurrentSleepSession.End();
 							else
 								SPBridge.StopSession();
-						}}/>
-						<VButton text="Test1" ml={10} plr={10} onPress={()=> {
-							SPBridge.StopAndCalculateResults();
 						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>

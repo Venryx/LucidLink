@@ -1,54 +1,50 @@
 package com.resmed.rm20;
 
-import android.app.*;
-import android.os.*;
-import android.util.*;
-
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import java.util.Random;
 
 public class IndexActivity extends Activity implements RM20Callbacks {
-	protected RM20JNI rm20Lib;
+	private RM20JNI rm20Lib;
 
-	public void onCreate(final Bundle bundle) {
-		super.onCreate(bundle);
-		this.rm20Lib = new RM20JNI(Environment.getExternalStorageDirectory(), this, this.getApplicationContext());
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		RM20JNI.loadLibrary(getApplicationContext()); // custom
+
+		this.rm20Lib = new RM20JNI(Environment.getExternalStorageDirectory(), this, getApplicationContext());
 		this.rm20Lib.startupLibrary(34, 1);
 		this.rm20Lib.setRespRateCallbacks(true);
 		new Thread(new Runnable() {
-			@Override
 			public void run() {
-				final Random random = new Random();
-				int i = 0;
-				while (i < 10000) {
-					IndexActivity.this.rm20Lib.writeSampleData(random.nextInt(1000), random.nextInt(1000));
-					while (true) {
-						try {
-							Thread.sleep(5L);
-							++i;
-						}
-						catch (InterruptedException ex) {
-							ex.printStackTrace();
-							continue;
-						}
-						break;
+				Random rand = new Random();
+				for (int i = 0; i < 10000; i++) {
+					//IndexActivity.this.rm20Lib.writeSampleData(rand.nextInt(1000), rand.nextInt(1000));
+					IndexActivity.this.rm20Lib.writeSampleData(1000 + rand.nextInt(300), 1000 + rand.nextInt(300));
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				IndexActivity.this.rm20Lib.getEpochCount();
 				IndexActivity.this.rm20Lib.stopAndCalculate();
-				Log.d(this.getClass().getName(), " results : " + IndexActivity.this.rm20Lib.resultsForSession());
+				Log.d(getClass().getName(), " results : " + IndexActivity.this.rm20Lib.resultsForSession());
 			}
 		}).start();
 	}
 
-	public void onRm20Alarm(final int n) {
+	public void onRm20Alarm(int fireEpoch) {
 		Log.d("RM20NDK", " onRm20Alarm");
 	}
 
-	public void onRm20RealTimeSleepState(final int n, final int n2) {
-		Log.d("RM20NDK", " onRm20RealTimeSleepState");
+	public void onRm20ValidBreathingRate(float rate, int secIndex) {
+		Log.d("RM20NDK", " onRm20ValidBreathingRate");
 	}
 
-	public void onRm20ValidBreathingRate(final float n, final int n2) {
-		Log.d("RM20NDK", " onRm20ValidBreathingRate");
+	public void onRm20RealTimeSleepState(int pSleepState, int pEpochIdx) {
+		Log.d("RM20NDK", " onRm20RealTimeSleepState");
 	}
 }

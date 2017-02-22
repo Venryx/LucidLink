@@ -28,6 +28,12 @@
 
     <application android:name=".MainApplication" android:label="@string/app_name" android:allowBackup="true"
             android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme" android:largeHeap="true">
+
+        <!--
+        <activity android:name=".MainActivity" android:label="@string/app_name"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:launchMode="singleInstance">
+        <activity android:name="com.resmed.rm20.IndexActivity" android:label="@string/app_name">
+        -->
         <activity android:name=".MainActivity" android:label="@string/app_name"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:launchMode="singleInstance">
             <intent-filter>
@@ -35,6 +41,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
     </application>
 </manifest>

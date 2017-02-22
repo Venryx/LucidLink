@@ -11,11 +11,12 @@ import {SPMonitorUI} from "../SPMonitor";
 export default class OptionsPanel extends BaseComponent<{parent: SPMonitorUI}, {}> {
 	render() {
 		var {parent} = this.props;
-		var node = LL.tools.monitor;
+		var node = LL.tools.spMonitor;
 		
 		return (
 			<Column style={{flex: 1, backgroundColor: colors.background_light}}>
 				<Row>
+					{/*<VSwitch_Auto text="Calculate breathing rate" path={()=>node.p.calculateBreathingRate} mt={3}/>*/}
 				</Row>
 			</Column>
 		)

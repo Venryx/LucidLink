@@ -148,8 +148,4 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		currentSessionType = null;
 		V.Log("Stopping session...");
 	}
-
-	@ReactMethod public void StopAndCalculateResults() {
-		sessionConnector.service.sleepSessionManager.stopCalculateAndSendResults();
-	}
 }
