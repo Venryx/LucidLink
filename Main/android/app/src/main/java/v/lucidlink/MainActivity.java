@@ -19,6 +19,9 @@ import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
 import com.resmed.refresh.utils.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 
@@ -92,6 +95,25 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	// S+ stuff
 	// ==========
 
+	boolean nightTrackActive;
+	Timer getBioBufferTimer;
+	void OnNightTrackStart() {
+		V.Assert(getBioBufferTimer == null, "Timer should be null on night-track start!");
+
+		getBioBufferTimer = new Timer();
+		int intervalInMS = SPlusModule.main.bioBufferSize * 1000;
+		getBioBufferTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override public void run() {
+				SPlusModule.main.sessionConnector.requestSamples_whateverIsLeft();
+			}
+		}, intervalInMS, intervalInMS);
+	}
+	void OnNightTrackEnd() {
+		V.Assert(getBioBufferTimer != null, "Timer should not be null on night-track end!");
+		getBioBufferTimer.cancel();
+		getBioBufferTimer = null;
+	}
+
 	public void handleConnectionStatus(final CONNECTION_STATE state) {
 		LL.main.connectionState = state;
 		V.Log("Connection status changed: " + state);
@@ -102,6 +124,16 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN));
 			} else if (state == CONNECTION_STATE.REAL_STREAM_ON || state == CONNECTION_STATE.NIGHT_TRACK_ON) {
 				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.OFF));
+			}
+
+			if (state == CONNECTION_STATE.NIGHT_TRACK_ON) {
+				if (nightTrackActive == false) {
+					nightTrackActive = true;
+					OnNightTrackStart();
+				}
+			} else if (nightTrackActive) {
+				nightTrackActive = false;
+				OnNightTrackEnd();
 			}
 		}
 

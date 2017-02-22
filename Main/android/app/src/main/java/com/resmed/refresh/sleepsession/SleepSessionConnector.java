@@ -100,6 +100,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			}
 			this.pendingBioSamplesRpc = null;
 
+			V.Log("BIO transmission complete...");
+
 			// whenever a batch of raw bio-data is received, have the sleep-stage be calculated as well
 			if (SPlusModule.main.sessionConnector.service.sleepSessionManager != null) // if this data was from a session we actually started this launch // temp fix
 				SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.getRealTimeSleepState();
@@ -164,9 +166,15 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
 			AppFileLog.addTrace("");
 			AppFileLog.addTrace("IN : HeartBeat Pending BIO : " + storeLocalBio + " ENV : " + storeLocalEnv + "\tbioTotalCount=" + this.bioCurrentTotalCount);
-			this.requestSamples(storeLocalBio, storeLocalEnv);
+
+			//this.requestSamples(storeLocalBio, storeLocalEnv);
+			V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
+			storeLocalBio_copy = storeLocalBio;
+			storeLocalEnv_copy = storeLocalEnv;
 		}
 	}
+	int storeLocalBio_copy;
+	int storeLocalEnv_copy;
 
 	private void checkReceivingHeartBeat(final int totalBioCountAtHeartBeat, int bioCountForHeartbeat) {
 		int delayTime;
@@ -193,8 +201,17 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) delayTime);
 	}
 
+	public void requestSamples_whateverIsLeft() {
+		V.Log("Requesting samples:" + storeLocalBio_copy + ";" + storeLocalEnv_copy);
+		if (storeLocalBio_copy == 0 && storeLocalEnv_copy == 0) return;
+		requestSamples(storeLocalBio_copy, storeLocalEnv_copy);
+		storeLocalBio_copy = 0;
+		storeLocalEnv_copy = 0;
+	}
 
-	private void requestSamples(int countBio, int countEnv) {
+	public void requestSamples(int countBio, int countEnv) {
+		V.Log("Requesting samples:" + countBio + ";" + countEnv + ";" + V.GetStackTrace());
+
 		Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionConnector::requestSamples(" + countBio + ", " + countEnv + ") pendingBioSamplesRpc : " + this.pendingBioSamplesRpc + " pendingEnvSamplesRpc : " + this.pendingEnvSamplesRpc);
 		if (this.bAct != null) {
 			int nrBioRequest = 65535;

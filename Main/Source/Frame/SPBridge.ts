@@ -131,8 +131,8 @@ export class SPBridgeClass {
 		core.Disconnect();
 	}
 
-	SetUserInfo(age, gender: "male" | "female") {
-		core.SetUserInfo(age, gender);
+	SetUserInfo(age: number, gender: "male" | "female", bioBufferSize: number) {
+		core.SetUserInfo(age, gender, bioBufferSize);
 	}
 
 	/*async GetSleepStage() {

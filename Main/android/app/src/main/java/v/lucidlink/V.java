@@ -232,6 +232,11 @@ public class V {
 		}
 	}
 
+	public static String GetStackTrace() {
+		//return Arrays.toString(Thread.currentThread().getStackTrace());
+		//return Arrays.toString(new Throwable().getStackTrace();.getStackTrace());
+		return GetStackTrace(new Throwable());
+	}
 	public static String GetStackTrace(Throwable ex) {
 		StringWriter writer = new StringWriter();
 		ex.printStackTrace(new PrintWriter(writer));

@@ -211,6 +211,7 @@ public class BedDefaultRPCMapper implements BedCommandsRPCMapper {
 		map.put("channels", "ALL");
 		map.put("src", "REAL");
 		map.put("nTicks", 3456000);
+		//map.put("nTicks", 345600);
 		map.put("bandWidth", 8);
 		JsonRPC startNightTrackingRPC = new JsonRPC("startSample", map, this.rpcId);
 		if (this.btContext != null) {

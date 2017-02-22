@@ -38,6 +38,11 @@ export default class GeneralUI extends Component<{} & BaseProps, {}> {
 						<VText mt={5} mr={10}>Gender:</VText>
 						<Select_Auto path={()=>node.p.gender} options={Gender} dialogTitle="Gender"/>
 					</Row>
+					<Row height={35}>
+						<VText mt={5} mr={10}>S+ bio buffer-size:</VText>
+						<NumberPicker_Auto path={()=>node.p.spBioBufferSize}
+							min={1} max={1000} format={val=>val + " seconds"} dialogTitle="S+ bio buffer-size"/>
+					</Row>
 				</Row>
             </Panel>
 		);

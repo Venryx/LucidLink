@@ -27,6 +27,7 @@ export class Settings extends Node {
 	@O @P() keepDeviceAwake = true;
 	@O @P() age = 20;
 	@O @P() gender = Gender.V.Male;
+	@O @P() spBioBufferSize = 10; // in seconds
 
 	// muse
 	@O @P() museEEGPacketBufferSize = 30;

@@ -438,14 +438,14 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 							cMqBuf[n2] = bioSample2.getMqValue();
 							String string = SleepSessionManager.getHexString(cMiBuf[n2]);
 							String string2 = SleepSessionManager.getHexString(cMqBuf[n2]);
-							Log.d("com.resmed.refresh.mqmi", (String.valueOf(n2 + this.nrOfBioSamples) + "\tEDF cMiBuf[" + n2 + "]=" + cMiBuf[n2] + "(" + string + ")  cMqBuf[" + n2 + "]=" + cMqBuf[n2] + "(" + string2 + ")"));
+							/*Log.d("com.resmed.refresh.mqmi", (String.valueOf(n2 + this.nrOfBioSamples)
+								+ "\tEDF cMiBuf[" + n2 + "]=" + cMiBuf[n2] + "(" + string + ")  cMqBuf[" + n2 + "]=" + cMqBuf[n2] + "(" + string2 + ")"));*/
 							++n2;
 						} while (true);
 					}
 				}
 				++n;
 			}
-			return;
 		}
 	}
 
