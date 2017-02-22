@@ -147,6 +147,11 @@ export class SPBridgeClass {
 	StopSession() {
 		core.StopSession();
 	}
+
+	// temp
+	StopAndCalculateResults() {
+		core.StopAndCalculateResults();
+	}
 }
 
 var SPBridge = new SPBridgeClass();

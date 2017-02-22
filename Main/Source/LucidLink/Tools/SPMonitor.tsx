@@ -67,9 +67,7 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 							alert(await SPBridge.GetSleepStage());
 						}}/>*/}
 						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
-							if (LL.tracker.currentSession.CurrentSleepSession)
-								LL.tracker.currentSession.CurrentSleepSession.End();
-							SPBridge.StartRealTimeSession();
+							LL.tracker.currentSession.StartSleepSession_RealTime();
 						}}/>
 						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
 							LL.tracker.currentSession.StartSleepSession();
@@ -79,6 +77,9 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 								LL.tracker.currentSession.CurrentSleepSession.End();
 							else
 								SPBridge.StopSession();
+						}}/>
+						<VButton text="Test1" ml={10} plr={10} onPress={()=> {
+							SPBridge.StopAndCalculateResults();
 						}}/>
 					</Row>
 					<Panel style={{marginTop: -7, flex: 1}}>

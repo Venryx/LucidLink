@@ -100,7 +100,7 @@ public class RM20JNI {
 		System.load(context.getApplicationInfo().nativeLibraryDir + "/librm20-jni.so");
 	}
 
-	public native int disableSmartAlarm();
+	//public native int disableSmartAlarm();
 
 	public native int getEpochCount();
 
@@ -108,7 +108,7 @@ public class RM20JNI {
 
 	public native int getRealTimeSleepState();
 
-	public native SmartAlarmInfo getSmartAlarm();
+	//public native SmartAlarmInfo getSmartAlarm();
 
 	public native UserInfo getUserInfo();
 
@@ -137,7 +137,7 @@ public class RM20JNI {
 
 	public native int setRespRateCallbacks(boolean var1);
 
-	public native int setSmartAlarm(int var1, int var2, boolean var3);
+	//public native int setSmartAlarm(int var1, int var2, boolean var3);
 
 	// starts streaming the raw data over (I think you have to connect through bluetooth first)
 	public native int startupLibrary(int var1, int var2);

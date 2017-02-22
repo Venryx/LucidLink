@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.view.MotionEventCompat;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfFileManager;
@@ -23,7 +24,6 @@ import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.rm20.RM20Callbacks;
 import com.resmed.rm20.RM20DefaultManager;
-import com.resmed.rm20.RM20Manager;
 import com.resmed.rm20.SleepParams;
 import com.resmed.rm20.SmartAlarmInfo;
 
@@ -65,8 +65,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	private long lengthOfSession;
 	private int nrOfBioSamples = 0;
 	private int nrOfEnvSamples = 0;
-	private int rm20AlarmWindow;
-	private Date rm20Alarmtime;
 	public RM20DefaultManager rm20Manager;
 	private List<BioSample> sampleBuffer;
 	private RefreshBluetoothService serviceHandler;
@@ -139,55 +137,59 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public void stopCalculateAndSendResults() {
 		this.rm20Manager.startRespRateCallbacks(false);
 		this.rm20Manager.stopAndCalculate();
-		Object localObject = this.rm20Manager.resultsForSession();
-		if (localObject != null) {
-			if (((SleepParams) localObject).sleepScore >= 255) {
-				((SleepParams) localObject).sleepScore = 0;
+		SleepParams sParams = this.rm20Manager.resultsForSession();
+		if (sParams != null) {
+			if (sParams.sleepScore >= MotionEventCompat.ACTION_MASK) {
+				sParams.sleepScore = 0;
 			}
-			if (((SleepParams) localObject).timeToSleep >= 65535) {
-				((SleepParams) localObject).timeToSleep = 0;
+			if (sParams.timeToSleep >= 65535) {
+				sParams.timeToSleep = 0;
 			}
-			if (((SleepParams) localObject).sleepOnset >= 65535) {
-				((SleepParams) localObject).sleepOnset = 0;
+			if (sParams.sleepOnset >= 65535) {
+				sParams.sleepOnset = 0;
 			}
-			if (((SleepParams) localObject).timeInBed >= 65535) {
-				((SleepParams) localObject).timeInBed = 0;
+			if (sParams.timeInBed >= 65535) {
+				sParams.timeInBed = 0;
 			}
-			if (((SleepParams) localObject).finalWakeTime >= 65535) {
-				((SleepParams) localObject).finalWakeTime = 0;
+			if (sParams.finalWakeTime >= 65535) {
+				sParams.finalWakeTime = 0;
 			}
-			if (((SleepParams) localObject).numAwakenings >= 65535) {
-				((SleepParams) localObject).numAwakenings = 0;
+			if (sParams.numAwakenings >= 65535) {
+				sParams.numAwakenings = 0;
 			}
-			if (((SleepParams) localObject).deepEpochs >= 65535) {
-				((SleepParams) localObject).deepEpochs = 0;
+			if (sParams.deepEpochs >= 65535) {
+				sParams.deepEpochs = 0;
 			}
-			if (((SleepParams) localObject).lightEpochs >= 65535) {
-				((SleepParams) localObject).lightEpochs = 0;
+			if (sParams.lightEpochs >= 65535) {
+				sParams.lightEpochs = 0;
 			}
-			if (((SleepParams) localObject).remEpochs >= 65535) {
-				((SleepParams) localObject).remEpochs = 0;
+			if (sParams.remEpochs >= 65535) {
+				sParams.remEpochs = 0;
 			}
-			if (((SleepParams) localObject).wakeEpochs >= 65535) {
-				((SleepParams) localObject).wakeEpochs = 0;
+			if (sParams.wakeEpochs >= 65535) {
+				sParams.wakeEpochs = 0;
 			}
-			if (((SleepParams) localObject).waso >= 65535) {
-				((SleepParams) localObject).waso = 0;
+			if (sParams.waso >= 65535) {
+				sParams.waso = 0;
 			}
 		}
-		Message localMessage = new Message();
-		localMessage.what = 14;
-		Bundle localBundle = new Bundle();
-		localObject = new Gson().toJson(localObject);
-		localBundle.putInt(ParamNumberOfBioSamples, this.nrOfBioSamples);
-		localBundle.putLong(ParamsecondsElapsed, this.lengthOfSession);
-		localBundle.putLong(ParamSessionId, this.sessionId);
-		localBundle.putInt(ParamAlarmFireEpoch, this.alarmFireEpoch);
-		localBundle.putString(ParamSParamsJson, (String) localObject);
-		localMessage.setData(localBundle);
-		Log.d("com.resmed.refresh.finish", " SleepSessionManager send MSG_SLEEP_SESSION_STOP");
-		this.serviceHandler.sendMessageToClient(localMessage);
+
+		V.Log("Sleep results: " + (sParams != null ? sParams.toString() : null));
+
+		Message msgSessionEnded = new Message();
+		msgSessionEnded.what = RefreshBluetoothService.MessageType.SLEEP_SESSION_STOP;
+		Bundle data = new Bundle();
+		String sParamsJson = new Gson().toJson(sParams);
+		data.putInt(ParamNumberOfBioSamples, this.nrOfBioSamples);
+		data.putLong(ParamsecondsElapsed, this.lengthOfSession);
+		data.putLong(ParamSessionId, this.sessionId);
+		data.putInt(ParamAlarmFireEpoch, this.alarmFireEpoch);
+		data.putString(ParamSParamsJson, sParamsJson);
+		msgSessionEnded.setData(data);
+		Log.d(LOGGER.TAG_FINISH_SESSION, " SleepSessionManager send MSG_SLEEP_SESSION_STOP");
+		this.serviceHandler.sendMessageToClient(msgSessionEnded);
 	}
+
 
 	public void addBioData(final byte[] array, final byte b) {
 		if (!this.isActive) return;
@@ -436,9 +438,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 							BioSample bioSample2 = (BioSample)iterator.next();
 							cMiBuf[n2] = bioSample2.getMiValue();
 							cMqBuf[n2] = bioSample2.getMqValue();
-							String string = SleepSessionManager.getHexString(cMiBuf[n2]);
+							/*String string = SleepSessionManager.getHexString(cMiBuf[n2]);
 							String string2 = SleepSessionManager.getHexString(cMqBuf[n2]);
-							/*Log.d("com.resmed.refresh.mqmi", (String.valueOf(n2 + this.nrOfBioSamples)
+							Log.d("com.resmed.refresh.mqmi", (String.valueOf(n2 + this.nrOfBioSamples)
 								+ "\tEDF cMiBuf[" + n2 + "]=" + cMiBuf[n2] + "(" + string + ")  cMqBuf[" + n2 + "]=" + cMqBuf[n2] + "(" + string2 + ")"));*/
 							++n2;
 						} while (true);
@@ -460,8 +462,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		}
 	}
 
-	public void onFileClosed() {
-	}
+	public void onFileClosed() {}
 
 	public void onFileCompressed(int paramInt) {
 		Log.d("com.resmed.refresh.finish", " SleepSessionManager edf onFileCompressed");
@@ -470,11 +471,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		stopCalculateAndSendResults();
 	}
 
-	public void onFileFixed() {
-	}
-
-	public void onFileOpened() {
-	}
+	public void onFileFixed() {}
+	public void onFileOpened() {}
 
 	public void onRm20RealTimeSleepState(int sleepState, int epochIndex) {
 		Message localMessage = new Message();
@@ -519,7 +517,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			this.fileName = fileByName.getName();
 			Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager edf file : " + this.fileName);
 			AppFileLog.addTrace("Found file to recover" + sessionId + " length : " + fileByName.length());
-			this.edfManager = (FileEdfInterface) new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), (EdfLibCallbackHandler) this, LL.main.reactContext);
+			this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.main.reactContext);
 			if (fileByName.length() < 12000L) {
 				if (fileByName.delete()) {
 					this.edfManager.openFileForMode("w");
@@ -560,31 +558,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			return String.valueOf(this.edfManager.getRM60LibVersion()) + "_" + "1.0.0";
 		}
 		return "0";
-	}
-
-	public void setRM20AlarmTime(final Date rm20Alarmtime, final int rm20AlarmWindow) {
-		if (this.rm20Manager != null) {
-			Log.d("com.resmed.refresh.bluetooth", "Rm20alarm did setAlarmTime, date : " + rm20Alarmtime + " alarm window : " + rm20AlarmWindow);
-			Log.d("com.resmed.refresh.smartAlarm", "SleepSessionManager setRM20AlarmTime(" + rm20Alarmtime + "," + rm20AlarmWindow + ")");
-			AppFileLog.addTrace("SmartAlarm SleepSessionManager setRM20AlarmTime(" + rm20Alarmtime + "," + rm20AlarmWindow + ")");
-			if (rm20AlarmWindow < 0 || rm20Alarmtime.getTime() < System.currentTimeMillis()) {
-				AppFileLog.addTrace("SmartAlarm setRM20AlarmTime data not valid");
-				Log.d("com.resmed.refresh.smartAlarm", "SmartAlarm setRM20AlarmTime data not valid");
-			} else {
-				this.rm20Alarmtime = rm20Alarmtime;
-				this.rm20AlarmWindow = rm20AlarmWindow;
-				this.rm20Manager.setSmartAlarm(rm20Alarmtime, rm20AlarmWindow, true);
-				final SmartAlarmInfo smartAlarm = this.rm20Manager.getSmartAlarm();
-				if (smartAlarm != null) {
-					Log.d("com.resmed.refresh.bluetooth", "Rm20alarm StartSession,end: " + smartAlarm.alarmWinStart + "," + smartAlarm.alarmWinEnd);
-					Log.d("com.resmed.refresh.smartAlarm", "SleepSessionManager alarm settings updated during a sleep session OK!");
-					AppFileLog.addTrace("SmartAlarm SleepSessionManager alarm settings updated during a sleep session OK!");
-					return;
-				}
-				Log.d("com.resmed.refresh.smartAlarm", "SleepSessionManager alarm settings updated during a sleep session KO!!!");
-				AppFileLog.addTrace("SmartAlarm SleepSessionManager alarm settings updated during a sleep session KO!!!!");
-			}
-		}
 	}
 
 	public void StartSession(long sessionId, int age, int gender) {
@@ -653,13 +626,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.isActive = false;
 	}
 
-	public void updateAlarmSettings(long paramLong, int paramInt) {
-		Log.d("com.resmed.refresh.smartAlarm", "SleepSessionManager updateAlarmSettings");
-		if (this.rm20Manager != null) {
-			setRM20AlarmTime(new Date(paramLong), paramInt * 60);
-		}
-	}
-
 	private class BioSample {
 		private int miValue;
 		private int mqValue;
@@ -672,7 +638,6 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		public int getMiValue() {
 			return this.miValue;
 		}
-
 		public int getMqValue() {
 			return this.mqValue;
 		}

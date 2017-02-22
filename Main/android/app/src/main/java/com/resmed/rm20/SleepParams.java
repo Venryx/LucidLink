@@ -43,13 +43,16 @@ public class SleepParams {
 		return "epochLen       : " + this.epochLen + "\n numEpochs      : " + this.numEpochs
 			+ "\n unknownEpochs  : " + this.unknownEpochs + "\n absentEpochs   : " + this.absentEpochs
 			+ "\n finalWakeTime  : " + this.finalWakeTime + "\n sleepEff \t\t : " + this.sleepEff
-			+ "\n sleepOnset \t : " + this.sleepOnset + "\n timeToSleep \t : " + this.timeToSleep
-			+ "\n timeInBed \t : " + this.timeInBed + "\n sleepDuration  : " + this.sleepDuration + "\n numAwakenings  : "
+			+ "\n sleepOnset \t : " + this.sleepOnset + "\n timeToSleep \t : " + this.timeToSleep + "\n timeInBed \t : "
+			+ this.timeInBed + "\n sleepDuration  : " + this.sleepDuration + "\n numAwakenings  : "
 			+ this.numAwakenings + "\n lightEpochs \t : " + this.lightEpochs + "\n remEpochs \t : " + this.remEpochs
 			+ "\n deepEpochs \t : " + this.deepEpochs + "\n bodyScore \t : " + this.bodyScore + "\n mindScore \t : "
-			+ this.mindScore + "\n sleepScore \t : " + this.sleepScore + "\n binSleepOnset  : " + this.binSleepOnset
-			+ "\n binSleepOnset  : " + this.binLightDuration + "\n binWaso\t\t : " + this.binWaso + "\n binTst \t\t : " + this.binTst
-			+ "\n binDeep \t\t : " + this.binDeep + "\n binRem \t\t : " + this.binRem + "\n wakeEpochs \t : " + this.wakeEpochs
-			+ "\n waso \t \t\t : " + this.waso + "\n hypnogram \t : " + Arrays.toString(this.hypnogram);
+			+ this.mindScore + "\n sleepScore \t : " + this.sleepScore + "\n binSleepOnset  : " + this.binSleepOnset + "\n binSleepOnset  : "
+			+ this.binLightDuration + "\n binWaso\t\t : " + this.binWaso + "\n binTst \t\t : " + this.binTst + "\n binDeep \t\t : "
+			+ this.binDeep + "\n binRem \t\t : " + this.binRem + "\n wakeEpochs \t : " + this.wakeEpochs + "\n waso \t \t\t : " + this.waso
+
+			+ "\n signalQuality : " + signalQuality // custom
+
+			+ "\n hypnogram \t : " + Arrays.toString(this.hypnogram);
 	}
 }

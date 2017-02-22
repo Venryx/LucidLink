@@ -4,7 +4,7 @@ import android.content.Context;
 import java.io.File;
 import java.util.Date;
 
-public class RM20DefaultManager implements RM20Manager {
+public class RM20DefaultManager {
 	private RM20JNI rm20Lib;
 	private Thread writerThread;
 
@@ -39,36 +39,6 @@ public class RM20DefaultManager implements RM20Manager {
 		return this.rm20Lib.getEpochCount();
 	}
 
-	public synchronized SmartAlarmInfo getSmartAlarm() {
-		return this.rm20Lib.getSmartAlarm();
-	}
-
-	public synchronized int setSmartAlarm(Date alarmDate, int alarmWindowSeconds, boolean enableCallbacks) {
-		int alarmWinStartEpc;
-		int alarmWinEndEpc;
-		alarmWinStartEpc = 65535;
-		alarmWinEndEpc = 65535;
-		if (alarmWindowSeconds >= 0) {
-			alarmWinEndEpc = ((((int) (alarmDate.getTime() - System.currentTimeMillis())) / 1000) / 30) + this.rm20Lib.getEpochCount();
-			alarmWinStartEpc = alarmWinEndEpc - (alarmWindowSeconds / 30);
-		}
-		if (alarmWinStartEpc < 0) {
-			alarmWinStartEpc = 0;
-		}
-		if (alarmWinEndEpc < 0) {
-			alarmWinStartEpc = 65535;
-			alarmWinEndEpc = 65535;
-		}
-		if (alarmWinStartEpc > 65535) {
-			alarmWinStartEpc = 65535;
-			alarmWinEndEpc = 65535;
-		}
-		if (alarmWinEndEpc > 65535) {
-			alarmWinEndEpc = 65535;
-		}
-		return this.rm20Lib.setSmartAlarm(alarmWinStartEpc, alarmWinEndEpc, enableCallbacks);
-	}
-
 	public synchronized int startRespRateCallbacks(boolean enableCallbacks) {
 		return this.rm20Lib.setRespRateCallbacks(enableCallbacks);
 	}
@@ -83,9 +53,5 @@ public class RM20DefaultManager implements RM20Manager {
 
 	public synchronized int startupLibrary(int age, int gender) {
 		return this.rm20Lib.startupLibrary(age, gender);
-	}
-
-	public synchronized int disableSmartAlarm() {
-		return this.rm20Lib.disableSmartAlarm();
 	}
 }

@@ -50,7 +50,6 @@ public class RefreshBluetoothService {
 		public static final int BeD_UNPAIR_ALL = 23;
 		public static final int BLUETOOTH_BULK_TRANSFER_START = 24;
 		public static final int BLUETOOTH_BULK_TRANSFER_STOP = 25;
-		public static final int SMARTALARM_UPDATE = 26;
 		public static final int REQUEST_BeD_AVAILABLE_DATA = 27;
 		public static final int RESET_BeD_AVAILABLE_DATA = 28;
 		public static final int BLUETOOTH_RADIO_RESET = 29;
@@ -173,14 +172,6 @@ public class RefreshBluetoothService {
 					return;
 				case MessageType.BLUETOOTH_BULK_TRANSFER_STOP /*25*/:
 					RefreshBluetoothService.this.isHandleBulkTransfer = false;
-					return;
-				case MessageType.SMARTALARM_UPDATE /*26*/:
-					if (RefreshBluetoothService.this.sleepSessionManager != null) {
-						Log.d(LOGGER.TAG_SMART_ALARM, "RefreshBluetoothService MSG_SMARTALARM_UPDATE");
-						b = msg.getData();
-						RefreshBluetoothService.this.sleepSessionManager.updateAlarmSettings(b.getLong(Consts.SMART_ALARM_TIME_VALUE), b.getInt(Consts.SMART_ALARM_WINDOW_VALUE));
-						return;
-					}
 					return;
 				case MessageType.REQUEST_BeD_AVAILABLE_DATA /*27*/:
 					V.Log("Requesting bed available data");

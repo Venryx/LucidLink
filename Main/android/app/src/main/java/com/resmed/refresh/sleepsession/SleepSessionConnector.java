@@ -33,11 +33,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 	private BaseBluetoothActivity bAct;
 	private int bioCurrentTotalCount;
 	private int bioOnBeD;
-	//private KillableRunnable cancelSleepSessionRunnable;
-	//private boolean closeSleepSession;
-	//private boolean hasSessionStarted;
 	private Runnable heartbeatTimeoutRunnable;
-	//private boolean isClosingSession;
 	private boolean isHandlingHeartBeat;
 	private boolean isRecovering = false;
 	private boolean isSyncAndStop;
@@ -100,7 +96,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			}
 			this.pendingBioSamplesRpc = null;
 
-			V.Log("BIO transmission complete...");
+			//V.Log("BIO transmission complete...");
 
 			// whenever a batch of raw bio-data is received, have the sleep-stage be calculated as well
 			if (SPlusModule.main.sessionConnector.service.sleepSessionManager != null) // if this data was from a session we actually started this launch // temp fix
@@ -167,14 +163,14 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			AppFileLog.addTrace("");
 			AppFileLog.addTrace("IN : HeartBeat Pending BIO : " + storeLocalBio + " ENV : " + storeLocalEnv + "\tbioTotalCount=" + this.bioCurrentTotalCount);
 
-			//this.requestSamples(storeLocalBio, storeLocalEnv);
-			V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
+			this.requestSamples(storeLocalBio, storeLocalEnv);
+			/*V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
 			storeLocalBio_copy = storeLocalBio;
-			storeLocalEnv_copy = storeLocalEnv;
+			storeLocalEnv_copy = storeLocalEnv;*/
 		}
 	}
-	int storeLocalBio_copy;
-	int storeLocalEnv_copy;
+	/*int storeLocalBio_copy;
+	int storeLocalEnv_copy;*/
 
 	private void checkReceivingHeartBeat(final int totalBioCountAtHeartBeat, int bioCountForHeartbeat) {
 		int delayTime;
@@ -201,16 +197,16 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) delayTime);
 	}
 
-	public void requestSamples_whateverIsLeft() {
+	/*public void requestSamples_whateverIsLeft() {
 		V.Log("Requesting samples:" + storeLocalBio_copy + ";" + storeLocalEnv_copy);
 		if (storeLocalBio_copy == 0 && storeLocalEnv_copy == 0) return;
 		requestSamples(storeLocalBio_copy, storeLocalEnv_copy);
 		storeLocalBio_copy = 0;
 		storeLocalEnv_copy = 0;
-	}
+	}*/
 
 	public void requestSamples(int countBio, int countEnv) {
-		V.Log("Requesting samples:" + countBio + ";" + countEnv + ";" + V.GetStackTrace());
+		//V.Log("Requesting samples:" + countBio + ";" + countEnv + ";" + V.GetStackTrace());
 
 		Log.d(LOGGER.TAG_SLEEP_FRAGMENT, " SleepSessionConnector::requestSamples(" + countBio + ", " + countEnv + ") pendingBioSamplesRpc : " + this.pendingBioSamplesRpc + " pendingEnvSamplesRpc : " + this.pendingEnvSamplesRpc);
 		if (this.bAct != null) {
@@ -218,7 +214,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			int nrEnvRequest = 65535;
 			if (countBio > 50000) {
 				Message msg = new Message();
-				msg.what = 24;
+				msg.what = RefreshBluetoothService.MessageType.BLUETOOTH_BULK_TRANSFER_START;
 				this.bAct.sendMessageToService(msg);
 			} else if (countBio < 1000) {
 				nrBioRequest = countBio;
@@ -232,31 +228,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			}
 		}
 	}
-
-	private void stopStreamAndRequestAllSamples() {
-		this.isWaitLastSamples = true;
-		if (this.bAct == null) {
-			return;
-		}
-		final JsonRPC stopNightTimeTracking = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
-		stopNightTimeTracking.setRPCallback(new JsonRPC.RPCallback() {
-			public void execute() {
-				SleepSessionConnector.this.requestSamples(65535, 65535);
-			}
-			public void onError(JsonRPC.ErrorRpc paramAnonymousErrorRpc) {
-			}
-			public void preExecute() {
-			}
-		});
-		this.bAct.sendRpcToBed(stopNightTimeTracking);
-	}
-
-	/*private void syncDataAndStop() {
-		Log.d("com.resmed.refresh.sleepFragment", "SleepTrackFragment::syncDataAndStop()");
-		this.isWaitLastSamples = true;
-		this.isHandlingHeartBeat = true;
-		stopSleepSession();
-	}*/
 
 	public void handleBreathingRate(Bundle paramBundle) {
 		Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
@@ -398,12 +369,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 	public void handleUserSleepState(Bundle paramBundle) {
 		Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
-	}
-
-	public void resume() {
-		this.pendingBioSamplesRpc = null;
-		this.pendingEnvSamplesRpc = null;
-		// back on track
 	}
 
 	public void setBioOnBeD(final int bioOnBeD) {
