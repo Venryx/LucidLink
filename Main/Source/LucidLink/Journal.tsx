@@ -246,7 +246,7 @@ class DreamHeaderUI extends Component<{parent, dream: Dream, index, style?}, {}>
 					{dream.date.format("YYYY-MM-DD, HH:mm")}
 				</Text>
 				{dream.lucid &&
-					<Text style={{position: "absolute", right: 7, fontSize: 18, textAlign: "right", color: "#0F0"}}>Lucid</Text>}
+					<Text style={{position: "absolute", right: 7, top: 25, fontSize: 18, textAlign: "right", color: "#0F0"}}>Lucid</Text>}
 				<Text>{dream.text}</Text>
 			</TouchableOpacity>
 		);

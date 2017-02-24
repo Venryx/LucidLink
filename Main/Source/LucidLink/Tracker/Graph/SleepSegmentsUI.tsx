@@ -12,9 +12,9 @@ import {View} from "react-native";
 
 export default class SleepSegmentsUI extends Component<
 		{startTime: Moment.Moment, endTime: Moment.Moment,
-			sleepSessions: SleepSession[], style?}, {}> {
+			sleepSessions: SleepSession[], height: number, style?}, {}> {
 	render() {
-		let {startTime, endTime, sleepSessions, style} = this.props;
+		let {startTime, endTime, sleepSessions, height, style} = this.props;
 
 		// for testing
 		/*let session = new SleepSession();
@@ -25,14 +25,12 @@ export default class SleepSegmentsUI extends Component<
 		session.segments.push(new SleepSegment(session, SleepStage.V.Rem).VSet({startTime: Moment().add(-1, "hours")}));
 		sleepSegments = session.segments;*/
 
-		if (1)
-			return <View style={{backgroundColor: 'blue', height: '50%' as any, width: '50%' as any}}/>;
-
 		return (
-			<Row style={E({position: "absolute", width: "100%", height: "100%"}, style)}>
+			<Row style={E({position: "absolute", width: "100%", height}, style)}>
 				{sleepSessions.map((session, index)=> {
-					let sessionStart_posPercent = session.startTime.diff(startTime) / endTime.diff(startTime);
-					let sessionWidth_sizePercent = session.endTime.diff(session.startTime) / endTime.diff(startTime);
+					let rowLength = endTime.diff(startTime);
+					let sessionStart_posPercent = session.startTime.diff(startTime) / rowLength;
+					let sessionWidth_sizePercent = session.endTime.diff(session.startTime) / rowLength;
 
 					let sleepSegments = session.segments.Where(a=> {
 						return a.startTime >= startTime && a.EndTime < endTime;
@@ -41,8 +39,8 @@ export default class SleepSegmentsUI extends Component<
 						<Row key={index}
 								style={E({
 									position: "absolute", height: "100%",
-									left: sessionStart_posPercent + "%",
-									width: sessionWidth_sizePercent + "%",
+									left: sessionStart_posPercent.ToPercentStr(),
+									width: sessionWidth_sizePercent.ToPercentStr(),
 									backgroundColor: "rgba(255,255,255,.1)",
 								}, style)}
 								touchable={true}
@@ -50,13 +48,14 @@ export default class SleepSegmentsUI extends Component<
 									LL.tracker.openSleepSession = session;
 								}}>
 							{sleepSegments.map((segment, index)=> {
-								let segmentStart_posPercent = segment.startTime.diff(startTime) / endTime.diff(startTime);
-								let segmentWidth_sizePercent = segment.EndTime.diff(segment.startTime) / endTime.diff(startTime);
+								let sessionLength = session.endTime.diff(session.startTime);
+								let segmentStart_posPercent = segment.startTime.diff(session.startTime) / sessionLength;
+								let segmentWidth_sizePercent = segment.EndTime.diff(segment.startTime) / sessionLength;
 								return (
 									<Panel key={index} style={E({position: "absolute", bottom: 0,
-										height: segment.Height + "%",
-										left: (segmentStart_posPercent - sessionStart_posPercent) + "%",
-										width: segmentWidth_sizePercent + "%",
+										height: segment.Height.ToPercentStr(),
+										left: segmentStart_posPercent.ToPercentStr(),
+										width: segmentWidth_sizePercent.ToPercentStr(),
 										backgroundColor: segment.Color})}/>
 								);
 							})}

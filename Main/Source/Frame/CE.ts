@@ -342,6 +342,13 @@ Number.prototype._AddFunction_Inline = function IfN1Then(valIfSelfIsNeg1) {
 };
 
 //Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) { return Math.round(new Number(this) / step) * step; }; //return this.lastIndexOf(str, 0) === 0; };
+interface Number { ToPercentStr: (precision?: number)=>string; }
+Number.prototype._AddFunction_Inline = function ToPercentStr(precision?: number) {
+	let number = this * 100;
+	if (precision != null)
+		return number.toFixed(precision) + "%";
+	return number.toString() + "%";
+};
 Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) {
 	var integeredAndRounded = Math.round((new Number(this) as any) / step);
 	var result = (integeredAndRounded * step).toFixed(step.toString().TrimStart("0").length); // - 1);

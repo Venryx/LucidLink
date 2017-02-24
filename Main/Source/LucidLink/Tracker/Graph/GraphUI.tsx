@@ -162,7 +162,7 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 		var mainLineColor = "#e1cd00";
 		var mainLinePoints = [[0, 0]]; // placeholder
         return (
-			<View style={{width, height, backgroundColor: colors.background}}>
+			<Row style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
 					minX={0} maxX={24} legendStepsX={25}
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
@@ -171,9 +171,9 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 				{rowUIs}
 				{overlayUI}
 				{/* put this later so it's clickable */}
-				<SleepSegmentsUI {...{startTime, endTime}} style={{top: 0}}
+				<SleepSegmentsUI {...{startTime, endTime}} height={innerHeight} style={{top: 0}}
 					sleepSessions={node.GetSleepSessionsForRange(startTime, endTime)}/>
-            </View>
+            </Row>
         );
 	}
 }

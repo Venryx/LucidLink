@@ -31,6 +31,16 @@ import {ScriptsUI, Scripts} from "./LucidLink/Scripts";
 import {SettingsUI, Settings} from "./LucidLink/Settings";
 import {MoreUI, More} from "./LucidLink/More";
 
+import KeepAwake from "react-native-keep-awake";
+import MuseBridge from "./Frame/MuseBridge";
+import {Folder, VFile} from "./Packages/V/VFile";
+import {autorun} from "mobx";
+import TestData from "./Frame/TestData";
+import LibMuse from "react-native-libmuse";
+import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
+import {Tools} from "./LucidLink/Tools";
+import SPBridge from "./Frame/SPBridge";
+
 //var ScrollableTabView = require("react-native-scrollable-tab-view");
 ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
 	{
@@ -40,6 +50,7 @@ ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
 		tabBarStyle: {borderColor: "#555"},
 		tabBarUnderlineStyle: {backgroundColor: "#777"},
 		contentProps: E(ScrollableTabView.defaultProps.contentProps, {
+			//style: E(ScrollableTabView.defaultProps.contentProps.style, {backgroundColor: colors.background}),
 			contentContainerStyle: {backgroundColor: colors.background},
 		})
 	}
@@ -157,8 +168,6 @@ g.Extend({LucidLink});
 
 export var LL: LucidLink;
 
-import KeepAwake from "react-native-keep-awake";
-
 export async function Init(ui) {
 	try {
 
@@ -209,15 +218,6 @@ export async function Init(ui) {
 
 	} catch (ex) { alert("Startup error) " + ex + "\n" + ex.stack); }
 }
-
-import MuseBridge from "./Frame/MuseBridge";
-import {Folder, VFile} from "./Packages/V/VFile";
-import {autorun} from "mobx";
-import TestData from "./Frame/TestData";
-import LibMuse from "react-native-libmuse";
-import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
-import {Tools} from "./LucidLink/Tools";
-import SPBridge from "./Frame/SPBridge";
 
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	var inEmulator = await JavaBridge.Main.IsInEmulator();
