@@ -357,9 +357,11 @@ Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) {
 	return result;
 };
 
+interface Number { KeepAtLeast: (min: number)=>number; }
 Number.prototype._AddFunction_Inline = function KeepAtLeast(min) {
 	return Math.max(min, this);
 };
+interface Number { KeepAtMost: (max: number)=>number; }
 Number.prototype._AddFunction_Inline = function KeepAtMost(max) {
 	return Math.min(max, this);
 };

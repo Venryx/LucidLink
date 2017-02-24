@@ -10,6 +10,7 @@ import "./Packages/VDF/VDFTypeInfo";
 import "./Frame/CE"; // contains first actual statements (eg, setting global "g")
 
 // imports for otherwise-not-imported files
+import "moment-round";
 import "./Frame/General/Errors";
 
 import {E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';

@@ -154,7 +154,8 @@ export class Tracker extends Node {
 	GetSleepSessionsForRange(start, endOut) {
 		return this.loadedSessions.SelectMany(session=> {
 			return session.sleepSessions.Where(a=> {
-				return a.startTime >= start && a.endTime < endOut;
+				//return a.endTime >= start && a.startTime < endOut;
+				return a.endTime > start && a.startTime < endOut;
 			});
 		});
 	}

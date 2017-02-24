@@ -12,6 +12,9 @@ import {ToolsUI} from "./LucidLink/Tools";
 import SleepSegmentsUI from "./LucidLink/Tracker/Graph/SleepSegmentsUI";
 import {observer} from "mobx-react/native";
 import {A} from "./Frame/General/Assert";
+import Chart from "react-native-chart";
+import {ChartUI} from "./LucidLink/Tracker/Graph/GraphUI";
+import {colors} from "./Frame/Styles";
 
 // note: we have to alias BaseComponent as Component, because otherwise react-native's hot-reloading breaks
 // (see here for some info: https://github.com/gaearon/react-transform-hmr/issues/82)
@@ -48,7 +51,7 @@ export default class LucidLinkUI extends Component<{}, {}> {
 					</Panel>*/}
 
 				{sleepSession &&
-					<Column style={{top: 0, width: 500, height: 500}}>
+					<Column style={{position: "absolute", top: 0, width: "100%", height: "100%", backgroundColor: colors.background}}>
 						<Row style={{padding: 3, height: 56, backgroundColor: "#303030"}}>
 							<VButton text="Back" style={{width: 100}} onPress={()=> {
 								LL.tracker.openSleepSession = null;
@@ -57,9 +60,22 @@ export default class LucidLinkUI extends Component<{}, {}> {
 							<VButton text="Export" mr={10} style={{width: 100}} onPress={()=> {
 							}}/>*/}
 						</Row>
-						<SleepSegmentsUI {...{startTime: sleepSession.startTime, endTime: sleepSession.endTime}}
-							style={{top: 0, flex: 1}}
-							sleepSessions={[sleepSession]}/>
+						<Row style={{flex: 1}}>
+							{/*<Chart style={{width: "100%", height: " 100%", paddingRight: 10}}
+								minX={0} maxX={24} legendStepsX={25}
+								minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
+								axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
+								type="line" color={[mainLineColor]} data={[mainLinePoints]}/>
+							<SleepSegmentsUI {...{startTime: sleepSession.startTime, endTime: sleepSession.endTime}}
+								height="100%" clickable={false}
+								style={{top: 0, flex: 1}}
+								sleepSessions={[sleepSession]}/>*/}
+							<ChartUI startTime={sleepSession.startTime} endTime={sleepSession.endTime}
+								sessions={[sleepSession]}
+								//width="100%" height="100%"
+								width={Dimensions.get("window").width} height={Dimensions.get("window").height - (56 + 20)}
+								clickable={false}/>
+						</Row>
 					</Column>}
 			</Panel>
 		);

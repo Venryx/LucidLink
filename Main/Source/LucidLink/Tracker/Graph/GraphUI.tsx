@@ -16,6 +16,7 @@ import GraphOverlayUI from "./GraphOverlayUI";
 import {Notify} from "../../../Frame/Globals";
 import {Session} from "../Session";
 import SleepSegmentsUI from "./SleepSegmentsUI";
+import SleepSession from "../Session/SleepSession";
 
 @observer
 export default class GraphUI extends Component<{} & BaseProps, {}> {
@@ -130,28 +131,35 @@ class ChartsUI extends Component<{}, {}> {
 }
 
 @observer
-class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number}, {}> {
+export class ChartUI extends Component<
+		{startTime: Moment.Moment, endTime: Moment.Moment, clickable?: boolean, sessions?: SleepSession[],
+			width: number, height: number}, {}> {
+	static defaultProps = {clickable: true};
 	/*componentWillReact() {
         Log("Re-rendering ChartUI, because... " + new Error().stack);
     }*/
 	
 	render() {
-		var {startTime, endTime, width, height} = this.props;
-		var node = LL.tracker;
+		let {startTime, endTime, clickable, sessions, width, height} = this.props;
+		let node = LL.tracker;
+		startTime = startTime.clone();
+		endTime = endTime.clone();
 
-		var innerHeight = height - 21;
+		let innerHeight = height - 21;
 
-		var events = node.GetEventsForRange(startTime, endTime);
-		var currentOffset = 0;
-		var rowUIs = LL.tracker.scriptRunner.graphRows.map((row, index)=> {
-			var result = <GraphRowUI {...{startTime, endTime, events, row, width, height: innerHeight}} key={index}
+		sessions = sessions || node.GetSleepSessionsForRange(startTime, endTime);
+
+		let events = node.GetEventsForRange(startTime, endTime);
+		let currentOffset = 0;
+		let rowUIs = LL.tracker.scriptRunner.graphRows.map((row, index)=> {
+			let result = <GraphRowUI {...{startTime, endTime, events, row, width, height: innerHeight}} key={index}
 				style={{top: height * currentOffset}}/>;
 			currentOffset += row.height;
 			return result;
 		});
 
-		var overlay = LL.tracker.scriptRunner.graphOverlay;
-		var overlayUI = null;
+		let overlay = LL.tracker.scriptRunner.graphOverlay;
+		let overlayUI = null;
 		if (overlay) {
 			let overlayEvents = events.Where(a=>overlay.events.Contains(a.type));
 			overlayUI = (
@@ -159,20 +167,26 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 			);
 		}
 		
-		var mainLineColor = "#e1cd00";
-		var mainLinePoints = [[0, 0]]; // placeholder
+		// chart
+		startTime.startOf("hour");
+		//endTime.endOf("hour");
+		(endTime as any).ceil(1, "hour");
+		let hours = endTime.clone().diff(startTime, "hours");
+		let mainLineColor = "#e1cd00";
+		let mainLinePoints = [[0, 0]]; // placeholder
+
         return (
 			<Row style={{width, height, backgroundColor: colors.background}}>
 				<Chart style={{width, height, paddingRight: 10}}
-					minX={0} maxX={24} legendStepsX={25}
+					minX={startTime.get("hour")}
+					maxX={startTime.get("hour") + endTime.diff(startTime, "hours")} legendStepsX={hours + 1}
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
 					axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
 					type="line" color={[mainLineColor]} data={[mainLinePoints]}/>
 				{rowUIs}
 				{overlayUI}
 				{/* put this later so it's clickable */}
-				<SleepSegmentsUI {...{startTime, endTime}} height={innerHeight} style={{top: 0}}
-					sleepSessions={node.GetSleepSessionsForRange(startTime, endTime)}/>
+				<SleepSegmentsUI {...{startTime, endTime, clickable}} sleepSessions={sessions} height={innerHeight} style={{top: 0}}/>
             </Row>
         );
 	}

@@ -12,9 +12,10 @@ import {View} from "react-native";
 
 export default class SleepSegmentsUI extends Component<
 		{startTime: Moment.Moment, endTime: Moment.Moment,
-			sleepSessions: SleepSession[], height: number, style?}, {}> {
+			sleepSessions: SleepSession[], height: number | string, clickable?: boolean, style?}, {}> {
+	static defaultProps = {clickable: true};
 	render() {
-		let {startTime, endTime, sleepSessions, height, style} = this.props;
+		let {startTime, endTime, sleepSessions, height, clickable, style} = this.props;
 
 		// for testing
 		/*let session = new SleepSession();
@@ -33,7 +34,8 @@ export default class SleepSegmentsUI extends Component<
 					let sessionWidth_sizePercent = session.endTime.diff(session.startTime) / rowLength;
 
 					let sleepSegments = session.segments.Where(a=> {
-						return a.startTime >= startTime && a.EndTime < endTime;
+						//return a.endTime >= startTime && a.startTime < endTime;
+						return a.EndTime > startTime && a.startTime < endTime;
 					});
 					return (
 						<Row key={index}
@@ -43,14 +45,17 @@ export default class SleepSegmentsUI extends Component<
 									width: sessionWidth_sizePercent.ToPercentStr(),
 									backgroundColor: "rgba(255,255,255,.1)",
 								}, style)}
-								touchable={true}
+								touchable={clickable}
 								onPress={()=> {
 									LL.tracker.openSleepSession = session;
 								}}>
 							{sleepSegments.map((segment, index)=> {
 								let sessionLength = session.endTime.diff(session.startTime);
 								let segmentStart_posPercent = segment.startTime.diff(session.startTime) / sessionLength;
+								if (segmentStart_posPercent >= 1) return null;
 								let segmentWidth_sizePercent = segment.EndTime.diff(segment.startTime) / sessionLength;
+								if (segmentStart_posPercent + segmentWidth_sizePercent > 1)
+									segmentWidth_sizePercent = 1 - segmentStart_posPercent;
 								return (
 									<Panel key={index} style={E({position: "absolute", bottom: 0,
 										height: segment.Height.ToPercentStr(),
