@@ -1,6 +1,5 @@
-/// <reference path="globals/react-native/index.d.ts" />
-/// <reference path="globals/react/index.d.ts" />
-//// <reference path="../Source/Frame/Globals.d.ts" />
+/// <reference path="../node_modules/@types/react-native/index.d.ts"/>
+/// <reference path="../node_modules/@types/react/index.d.ts"/>
 
 declare var g;
 //declare var LL;
@@ -9,3 +8,4 @@ declare var g;
 // ==========
 
 declare var O;
+declare var React;

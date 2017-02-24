@@ -7,7 +7,7 @@ import DialogAndroid from "react-native-dialogs";
 import Drawer from "react-native-drawer";
 import {Text} from "react-native";
 
-import ScriptRunner from "./Scripts/ScriptRunner";
+import ScriptContext from "./Scripts/ScriptContext";
 
 import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/BuiltInHelpers";
 import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
@@ -17,7 +17,7 @@ import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomS
 import scriptDefaultText_CustomPatterns from "./Scripts/UserScriptDefaults/CustomPatterns";
 
 import ScriptsPanel from "./Scripts/ScriptsPanel";
-import {E, Log, ToJSON} from "../Frame/Globals";
+import {E, Log, ToJSON, Global} from "../Frame/Globals";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
 import {observer} from "mobx-react/native";
@@ -26,6 +26,7 @@ import {P, _VDFPreSerialize} from "../Packages/VDF/VDFTypeInfo";
 import {AssertWarn, Assert} from "../Frame/General/Assert";
 import {VTextInput} from "../Packages/ReactNativeComponents/VTextInput";
 
+@Global
 export class Scripts extends Node {
 	@_VDFPreSerialize() PreSerialize() {
 	    if (this.selectedScript)
@@ -40,7 +41,7 @@ export class Scripts extends Node {
 	@O selectedScript: Script = null;
 	@P() selectedScriptName = null; // used only during save-to/load-from disk
 	@O scriptLastRunsOutdated = false;
-	scriptRunner = new ScriptRunner();
+	scriptRunner = new ScriptContext();
 
 	LoadFileSystemData() {
 		this.LoadScripts();
@@ -149,7 +150,6 @@ This will permanently remove all custom code from the script.`,
 		this.scriptLastRunsOutdated = false;
 	}
 }
-g.Extend({Scripts});
 
 @observer
 export class ScriptsUI extends Component<any, any> {

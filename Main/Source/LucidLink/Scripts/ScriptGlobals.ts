@@ -1,3 +1,4 @@
+import ScriptContext from "./ScriptContext";
 import {Assert} from "../../Frame/General/Assert";
 import {E} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
@@ -5,13 +6,16 @@ import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import V from "../../Packages/V/V";
 import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
-import {LL} from "../../LucidLink";
+import {LL, LucidLink} from "../../LucidLink";
 import {AudioFile} from "../../Frame/AudioFile";
 import {Sleep, Timer, WaitXThenRun, Sequence} from "../../Frame/General/Timers";
 import Speech from "react-native-android-speech";
 import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
+
+export var scriptContext: ScriptContext = null; // set to LL.scripts.scriptContext;
+export function SetScriptContext(context) { scriptContext = context; }
 
 // re-exports
 // ==========
@@ -31,34 +35,34 @@ export {
 // ==========
 
 export function WhenChangeMuseConnectStatus(func) {
-	LL.scripts.scriptRunner.listeners_whenChangeMuseConnectStatus.push(func);
+	scriptContext.listeners_whenChangeMuseConnectStatus.push(func);
 }
 export function WhenMusePacketReceived(func) {
-	LL.scripts.scriptRunner.listeners_whenMusePacketReceived.push(func);
+	scriptContext.listeners_whenMusePacketReceived.push(func);
 }
 /*export function WhenViewDirectionUpdated(func) {
-	LL.scripts.scriptRunner.listeners_whenViewDirectionUpdated.push(func);
+	currentScriptContext.listeners_whenViewDirectionUpdated.push(func);
 }
 export function WhenViewDistanceUpdated(func) {
-	LL.scripts.scriptRunner.listeners_whenViewDistanceUpdated.push(func);
+	currentScriptContext.listeners_whenViewDistanceUpdated.push(func);
 }*/
 
 export function WhenChangeSleepStageDo(func) {
-	LL.scripts.scriptRunner.listeners_whenChangeSleepStage.push(func);
+	scriptContext.listeners_whenChangeSleepStage.push(func);
 }
 
 SPBridge.listeners_onReceiveSleepStage.push((stage: SleepStage)=> {
-	if (stage != LL.scripts.scriptRunner.currentSegment_stage) {
-		LL.scripts.scriptRunner.currentSegment_stage = stage;
-		LL.scripts.scriptRunner.currentSegment_startTime = Moment();
-		for (let entry of LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY)
+	if (stage != scriptContext.currentSegment_stage) {
+		scriptContext.currentSegment_stage = stage;
+		scriptContext.currentSegment_startTime = Moment();
+		for (let entry of scriptContext.listeners_whenXMinutesIntoSleepStageY)
 			entry.triggeredForCurrentSleepSegment = false;
-		for (let listener of LL.scripts.scriptRunner.listeners_whenChangeSleepStage)
+		for (let listener of scriptContext.listeners_whenChangeSleepStage)
 			listener(stage);
 	}
 
-	var timeInSegment = Moment().diff(LL.scripts.scriptRunner.currentSegment_startTime, "minutes", true);
-	for (let entry of LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY) {
+	var timeInSegment = Moment().diff(scriptContext.currentSegment_startTime, "minutes", true);
+	for (let entry of scriptContext.listeners_whenXMinutesIntoSleepStageY) {
 		if (entry.sleepStage == stage && timeInSegment >= entry.minutes && !entry.triggeredForCurrentSleepSegment) {
 			entry.func();
 			entry.triggeredForCurrentSleepSegment = true;
@@ -83,7 +87,7 @@ export function WhenXMinutesIntoSleepStageYDo(minutes: number, sleepStageName: s
 	let sleepStage = SleepStage.entries.FirstOrX(a=>a.name == sleepStageName) as SleepStage;
 	Assert(sleepStage, `Sleep-stage must exactly match one of the following: "Absent", "Awake", "Light", "Deep", "Rem"`);
 	let entry = new WhenXMinutesIntoSleepStageDo_Entry(minutes, sleepStage, func);
-	LL.scripts.scriptRunner.listeners_whenXMinutesIntoSleepStageY.push(entry);
+	scriptContext.listeners_whenXMinutesIntoSleepStageY.push(entry);
 }
 
 // general
@@ -104,13 +108,11 @@ export function AddEvent(type, ...args) {
 
 export function AddPattern(info) {
 	var pattern = new Pattern(info);
-	LL.scripts.scriptRunner.patterns.push(pattern);
+	scriptContext.patterns.push(pattern);
 }
 
 export function CreateTimer(intervalInSec: number, func: Function, maxCallCount = -1, asBackground = true) {
-	var timer = new Timer(intervalInSec, func, maxCallCount, asBackground);
-	LL.scripts.scriptRunner.timers.push(timer);
-	return timer;
+	return new Timer(intervalInSec, func, maxCallCount, asBackground).SetContext(scriptContext.timerContext);
 }
 export function WaitXThenDo(seconds, func, asBackground = true) {
 	return CreateTimer(seconds, func, 1, asBackground).Start();
@@ -120,7 +122,7 @@ export function EveryXSecondsDo(seconds, func, maxCallCount = -1, asBackground =
 }
 
 export function CreateSequence(asBackground = true) {
-	return new Sequence(asBackground, true);
+	return new Sequence(asBackground).SetContext(scriptContext.timerContext);
 }
 
 // input
@@ -129,10 +131,10 @@ export function CreateSequence(asBackground = true) {
 // key-codes can be found here: https://developer.android.com/ndk/reference/keycodes_8h.html
 // (or by checking the logs for the key-codes of those pressed)
 export function AddKeyDownListener(keyCode, func) {
-	LL.scripts.scriptRunner.keyDownListeners.push({keyCode: keyCode, func: func});
+	scriptContext.keyDownListeners.push({keyCode: keyCode, func: func});
 }
 export function AddKeyUpListener(keyCode, func) {
-	LL.scripts.scriptRunner.keyDownListeners.push({keyCode: keyCode, func: func});
+	scriptContext.keyDownListeners.push({keyCode: keyCode, func: func});
 }
 
 // pattern matching
@@ -141,11 +143,11 @@ export function AddKeyUpListener(keyCode, func) {
 DeviceEventEmitter.addListener("OnSetPatternMatchProbabilities", (args: any)=> {
 	var [x, probabilities] = args;
 	//Log(`X: ${x}; Probabilities: ${ToJSON(probabilities)}`);
-	for (let listener of LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities)
+	for (let listener of scriptContext.listeners_onUpdatePatternMatchProbabilities)
 		listener(probabilities, x);
 });
 export function AddListener_OnUpdatePatternMatchProbabilities(func) {
-	LL.scripts.scriptRunner.listeners_onUpdatePatternMatchProbabilities.push(func);
+	scriptContext.listeners_onUpdatePatternMatchProbabilities.push(func);
 }
 
 // audio playback

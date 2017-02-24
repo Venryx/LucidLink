@@ -3,6 +3,15 @@ import BackgroundTimer from "react-native-background-timer";
 import {Global, Log} from "../Globals";
 import {LL} from "../../LucidLink";
 
+export class TimerContext {
+	timers = [] as Timer[];
+	CloseAndReset() {
+		for (let timer of this.timers)
+			timer.Stop();
+		this.timers = [];
+	}
+}
+
 // methods
 // ==========
 
@@ -45,6 +54,12 @@ export class Timer {
 	maxCallCount: number;
 	asBackground: boolean;
 
+	SetContext(context: TimerContext) {
+		if (context)
+			context.timers.push(this);
+		return this;
+	}
+
 	timerID = -1;
 	get IsRunning() { return this.timerID != -1; }
 
@@ -76,12 +91,16 @@ export class TimerMS extends Timer {
 }
 
 export class Sequence {
-	constructor(asBackground = true, userCreated = false) {
+	constructor(asBackground = true) {
 		this.asBackground = asBackground;
-		this.userCreated = userCreated;
 	}
 	asBackground: boolean;
-	userCreated: boolean;
+
+	context: TimerContext;
+	SetContext(context: TimerContext) {
+		this.context = context;
+		return this;
+	}
 	
 	segments = [] as SequenceSegment[];
 	AddSegment(delayInS: number, func: Function) {
@@ -93,18 +112,14 @@ export class Sequence {
 	get Active() { return this.currentSegmentTimeout != null; }
 
 	Start() {
-		this.currentSegmentTimeout = this.segments[0].StartDelay(this, this.asBackground);
-		if (this.userCreated)
-			LL.scripts.scriptRunner.timers.push(this.currentSegmentTimeout);
+		this.currentSegmentTimeout = this.segments[0].StartDelay(this, this.asBackground).SetContext(this.context);
 	}
 	OnCompleteSegment(segment: SequenceSegment) {
 		this.currentSegmentTimeout = null;
 		if (this.enabled) {
 			let nextSegment = this.segments[this.segments.indexOf(segment) + 1];
 			if (nextSegment) {
-				this.currentSegmentTimeout = nextSegment.StartDelay(this, this.asBackground);
-				if (this.userCreated)
-					LL.scripts.scriptRunner.timers.push(this.currentSegmentTimeout);
+				this.currentSegmentTimeout = nextSegment.StartDelay(this, this.asBackground).SetContext(this.context);
 			}
 		}
 	}

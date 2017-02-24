@@ -171,7 +171,7 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 				{rowUIs}
 				{overlayUI}
 				{/* put this later so it's clickable */}
-				<SleepSegmentsUI {...{startTime, endTime, width, height: innerHeight}} style={{top: 0}}
+				<SleepSegmentsUI {...{startTime, endTime}} style={{top: 0}}
 					sleepSessions={node.GetSleepSessionsForRange(startTime, endTime)}/>
             </View>
         );

@@ -8,12 +8,13 @@ import {SleepStage} from "../../../Frame/SPBridge";
 import {SleepSegment} from "../Session/SleepSession";
 import SleepSession from "../Session/SleepSession";
 import {LL} from "../../../LucidLink";
+import {View} from "react-native";
 
 export default class SleepSegmentsUI extends Component<
-		{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number,
+		{startTime: Moment.Moment, endTime: Moment.Moment,
 			sleepSessions: SleepSession[], style?}, {}> {
 	render() {
-		let {startTime, endTime, width, height, sleepSessions, style} = this.props;
+		let {startTime, endTime, sleepSessions, style} = this.props;
 
 		// for testing
 		/*let session = new SleepSession();
@@ -24,8 +25,11 @@ export default class SleepSegmentsUI extends Component<
 		session.segments.push(new SleepSegment(session, SleepStage.V.Rem).VSet({startTime: Moment().add(-1, "hours")}));
 		sleepSegments = session.segments;*/
 
+		if (1)
+			return <View style={{backgroundColor: 'blue', height: '50%' as any, width: '50%' as any}}/>;
+
 		return (
-			<Row style={E({position: "absolute", width, height}, style)}>
+			<Row style={E({position: "absolute", width: "100%", height: "100%"}, style)}>
 				{sleepSessions.map((session, index)=> {
 					let sessionStart_posPercent = session.startTime.diff(startTime) / endTime.diff(startTime);
 					let sessionWidth_sizePercent = session.endTime.diff(session.startTime) / endTime.diff(startTime);
@@ -36,9 +40,9 @@ export default class SleepSegmentsUI extends Component<
 					return (
 						<Row key={index}
 								style={E({
-									position: "absolute", height,
-									left: sessionStart_posPercent * width,
-									width: sessionWidth_sizePercent * width,
+									position: "absolute", height: "100%",
+									left: sessionStart_posPercent + "%",
+									width: sessionWidth_sizePercent + "%",
 									backgroundColor: "rgba(255,255,255,.1)",
 								}, style)}
 								touchable={true}
@@ -50,9 +54,9 @@ export default class SleepSegmentsUI extends Component<
 								let segmentWidth_sizePercent = segment.EndTime.diff(segment.startTime) / endTime.diff(startTime);
 								return (
 									<Panel key={index} style={E({position: "absolute", bottom: 0,
-										height: height * segment.Height,
-										left: (segmentStart_posPercent - sessionStart_posPercent) * width,
-										width: segmentWidth_sizePercent * width,
+										height: segment.Height + "%",
+										left: (segmentStart_posPercent - sessionStart_posPercent) + "%",
+										width: segmentWidth_sizePercent + "%",
 										backgroundColor: segment.Color})}/>
 								);
 							})}

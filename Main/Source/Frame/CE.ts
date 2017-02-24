@@ -655,6 +655,7 @@ Array.prototype._AddFunction_Inline = function SelectMany(selectFunc) {
 Array.prototype._AddGetter_Inline = function Count() { return this.length; }; // needed for items to be added properly to custom classes that extend Array
 interface Array<T> { VCount(matchFunc: (item: T)=>boolean): number; }
 Array.prototype._AddFunction_Inline = function VCount(matchFunc) { return this.Where(matchFunc).length; };
+interface Array<T> { Clear(): void; }
 Array.prototype._AddFunction_Inline = function Clear() {
 	/*while (this.length > 0)
 		this.pop();*/

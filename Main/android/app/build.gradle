@@ -226,15 +226,22 @@ allprojects {
     })
 }*/
 configurations {
-    /*compile.exclude module: 'commons'
-    all*.exclude group: 'org.gradle.test.excludes', module: 'reports'*/
-    /*all*.exclude group: 'com.android.support'
-    all*.exclude module: 'com.android.support'
-    all*.exclude module: 'support-v4'*/
+    /*compile.exclude module: "commons"
+    all*.exclude group: "org.gradle.test.excludes", module: "reports"*/
+    /*all*.exclude group: "com.android.support"
+    all*.exclude module: "com.android.support"
+    all*.exclude module: "support-v4"*/
 }
 
+configurations.all {
+    exclude group: "com.facebook.react", module: "react-native"
+}
 
 dependencies {
+    //compile "com.android.support:appcompat-v7:23.0.1"
+    //compile "com.facebook.react:react-native:0.42.0-rc.3" // From node_modules
+    compile project(":ReactAndroid")
+
     // android support
     compile("com.android.support:support-v4:25.1.0") {
         force = true

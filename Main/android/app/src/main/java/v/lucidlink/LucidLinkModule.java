@@ -1,7 +1,8 @@
 package v.lucidlink;
 
-import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Debug;
@@ -15,7 +16,6 @@ import com.annimon.stream.Stream;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -323,6 +323,24 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		eegProcessor.eyePosX = .5;
 		eegProcessor.viewDistanceY = .5;
 		eegProcessor.ResetLastNPositions();
+	}
+
+	double normalVolumeToApply = -1;
+	double bluetoothVolumeToApply = -1;
+	@ReactMethod public void SetVolumes(double normalVolume, double bluetoothVolume) {
+		this.normalVolumeToApply = normalVolume;
+		this.bluetoothVolumeToApply = bluetoothVolume;
+		this.ApplyVolumeForCurrentType();
+	}
+	public void ApplyVolumeForCurrentType() {
+		AudioManager audioManager = (AudioManager)MainActivity.main.getSystemService(Context.AUDIO_SERVICE);
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		if (!MainActivity.main.bluetoothConnected && normalVolumeToApply != -1) {
+			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
+			normalVolumeToApply = -1;
+		} else if (MainActivity.main.bluetoothConnected && bluetoothVolumeToApply != -1)
+			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
+		bluetoothVolumeToApply = -1;
 	}
 
 	@ReactMethod public void GetAppUsedMemory(Promise promise) {

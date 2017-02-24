@@ -1,7 +1,13 @@
 package v.lucidlink;
 
 import android.Manifest;
+import android.bluetooth.BluetoothA2dp;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -9,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.facebook.react.ReactPackage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.refresh.bed.LedsState;
@@ -24,19 +31,51 @@ import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 
 import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 
 public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener {
+	// these aren't actually needed for version used; Android Studio just thinks we're using an older version, which does need these
+	protected boolean getUseDeveloperSupport() {
+		return false;
+	}
+	protected List<ReactPackage> getPackages() {
+		return null;
+	}
+
 	public static MainActivity main;
 	public MainActivity() {
 		super();
 		main = this;
 		LibMuseModule.mainActivity = this;
 		SPlusModule.mainActivity = this;
+	}
+
+	public boolean bluetoothConnected;
+	@Override protected void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
+		MainActivity.main.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				// Bluetooth device gained/lost it's state as the media audio device
+				if(intent.getIntExtra(BluetoothA2dp.EXTRA_STATE, -1) == BluetoothA2dp.STATE_CONNECTED) {
+					MainActivity.this.bluetoothConnected = true;
+					V.Toast("A2DP device connected!", Toast.LENGTH_LONG);
+					LL.main.ApplyVolumeForCurrentType();
+				} else {
+					MainActivity.this.bluetoothConnected = false;
+					V.Toast("A2DP device disconnected!", Toast.LENGTH_LONG);
+					LL.main.ApplyVolumeForCurrentType();
+				}
+			}
+		}, new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED));
+	}
+	@Override protected void onDestroy() {
+		SPlusModule.main.ShutDown();
 	}
 
 	static final int REQUEST_WRITE_STORAGE = 112;
@@ -62,10 +101,6 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 				V.Toast("The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG);
 			}
 		}
-	}
-
-	@Override protected void onDestroy() {
-		SPlusModule.main.ShutDown();
 	}
 
 	// returns the name of the main component registered from JavaScript (used to schedule rendering of the component)

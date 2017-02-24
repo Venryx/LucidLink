@@ -2,6 +2,7 @@ import {Log} from "../../Frame/Globals";
 import {Dictionary, List} from "../VDF/VDFExtras";
 import {Assert} from "../../Frame/General/Assert";
 import {IsPrimitive, IsString} from "../../Frame/Types";
+
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;
@@ -15,6 +16,15 @@ export default class V {
 	static AsArray(args) { return V.Slice(args, 0); };
 	//s.ToArray = function(args) { return s.Slice(args, 0); };
 	static Slice(args, start, end?) { return Array.prototype.slice.call(args, start != null ? start : 0, end); };
+
+	static PropNameToTitle(propName: string) {
+		// demo string: somePropName
+		return propName
+			// somePropName -> some prop name
+			.replace(/[A-Z]/g, a=>" " + a.toLowerCase())
+			// some prop name -> Some prop name
+			.replace(/^./, a=>a.toUpperCase());
+	}
 
 	/*static startupInfo = null;
 	static startupInfoRequested = false;

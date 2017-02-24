@@ -1,7 +1,7 @@
 import {Log, ToJSON} from "../Frame/Globals";
 import {Script} from "./Scripts/Script";
 import {Session} from "./Tracker/Session";
-import ScriptRunner from "./Scripts/ScriptRunner";
+import ScriptContext from "./Scripts/ScriptContext";
 import {BaseComponent} from "../Frame/ReactGlobals";
 import Moment from "moment";
 

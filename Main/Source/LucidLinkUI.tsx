@@ -58,8 +58,6 @@ export default class LucidLinkUI extends Component<{}, {}> {
 							}}/>*/}
 						</Row>
 						<SleepSegmentsUI {...{startTime: sleepSession.startTime, endTime: sleepSession.endTime}}
-							width={A.NonNull = Dimensions.get("window").width}
-							height={A.NonNull = Dimensions.get("window").height}
 							style={{top: 0, flex: 1}}
 							sleepSessions={[sleepSession]}/>
 					</Column>}
@@ -86,13 +84,13 @@ class LucidLinkTabUI extends Component<{activeTab}, {}> {
 					this.setState({activeTab: data.i})
 					JavaBridge.Main.OnTabSelected(data.i);
 				}}>
-			<ToolsUI tabLabel="Tools" active={activeTab == 0}/>
-			<TrackerUI tabLabel="Tracker" active={activeTab == 1}/>
-			<JournalUI tabLabel="Journal" active={activeTab == 2}/>
-			<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
-			<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
-			<MoreUI tabLabel="More" active={activeTab == 5}/>
-		</ScrollableTabView>
+				<ToolsUI tabLabel="Tools" active={activeTab == 0}/>
+				<TrackerUI tabLabel="Tracker" active={activeTab == 1}/>
+				<JournalUI tabLabel="Journal" active={activeTab == 2}/>
+				<ScriptsUI tabLabel="Scripts" active={activeTab == 3}/>
+				<SettingsUI tabLabel="Settings" active={activeTab == 4}/>
+				<MoreUI tabLabel="More" active={activeTab == 5}/>
+			</ScrollableTabView>
 		);
 	}
 }

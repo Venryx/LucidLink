@@ -3,6 +3,7 @@ import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {E, JavaLog} from "../../Frame/Globals";
 import Node from "../VTree/Node";
 import {observer} from "mobx-react/native";
+import V from "../V/V";
 
 export default class NumberPicker extends Component<
 		{min?, max?, step?,
@@ -31,7 +32,7 @@ export default class NumberPicker extends Component<
 				style={E({width: 100, height: 32}, style)}
 				onPress={async ()=> {
 					var id = await NumberPickerDialog.show({
-						title: dialogTitle,
+						title: dialogTitle || "",
 						message: dialogMessage || "",
 						values: names,
 						//selectedValueIndex: values.indexOf(value),
@@ -68,10 +69,14 @@ export class NumberPicker_Auto extends Component<
 	}*/
 
 	render() {
-		var {onChange, path, ...rest} = this.props;
+		var {onChange, path, dialogTitle, ...rest} = this.props;
 		let {node, key: propName} = path();
+
+		if (dialogTitle === null || dialogTitle === undefined)
+			dialogTitle = V.PropNameToTitle(propName);
+		
 		return (
-			<NumberPicker {...rest} value={node[propName]} onChange={val=> {
+			<NumberPicker {...rest} dialogTitle={dialogTitle} value={node[propName]} onChange={val=> {
 				//node.a(propName).set = val;
 				node[propName] = val;
 				if (onChange) onChange(val);

@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 
+import com.facebook.react.ReactActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.cobs.COBS;
@@ -53,15 +54,25 @@ import v.lucidlink.LL;
 import v.lucidlink.MainActivity;
 import v.lucidlink.V;
 
-public class BaseBluetoothActivity extends BaseActivity implements BluetoothDataListener, BluetoothDataWriter {
+public abstract class BaseBluetoothActivity extends ReactActivity implements BluetoothDataListener, BluetoothDataWriter {
+	protected void onResume() {
+		super.onResume();
+		//RefreshApplication.getInstance().increaseActivitiesInForeground();
+
+		//registerReceiver(this.connectionStatusReceiver, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS")); // (registered in PostModuleInit)
+	}
+
 	public static boolean CORRECT_FIRMWARE_VERSION = true;
 	public static Map CommandStack = new LinkedHashMap();
 	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	public static boolean UPDATING_FIRMWARE = false;
-	private static boolean userAllowBluetooth = true;
 	private JsonRPC bioSensorSerialNrRPC;
 	protected BroadcastReceiver connectionStatusReceiver = new BroadcastReceiver() {
 		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
+			CONNECTION_STATE state = (CONNECTION_STATE) paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
+			Log.d("com.resmed.refresh.pair", " onReceive()  CONNECTION_STATE " + CONNECTION_STATE.toString(state));
+			Log.d("com.resmed.refresh.ui", " onReceive()  CONNECTION_STATE " + CONNECTION_STATE.toString(state));
+
 			CONNECTION_STATE connectionState = (CONNECTION_STATE) paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
 			BaseBluetoothActivity.this.handleConnectionStatus(connectionState);
 		}
@@ -227,9 +238,8 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null)
 			SPlusModule.main.sessionConnector.handleConnectionStatus(newState);
 
-		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState
-			+ " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE + " isAvailable:" + this.isAvailable);
-		if (newState != null && !UPDATING_FIRMWARE && this.isAvailable) { // && LL.main.connectionState != newState) {
+		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE);
+		if (newState != null && !UPDATING_FIRMWARE) { // && LL.main.connectionState != newState) {
 			if (CONNECTION_STATE.SOCKET_BROKEN == newState || CONNECTION_STATE.SOCKET_RECONNECTING == newState) {
 				CORRECT_FIRMWARE_VERSION = true;
 				UPDATING_FIRMWARE = false;
@@ -374,6 +384,7 @@ public class BaseBluetoothActivity extends BaseActivity implements BluetoothData
 	}
 
 	protected static final int REQUEST_ENABLE_BT = 161;
+	private static boolean userAllowBluetooth = true;
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, requestCode, data);
 		if (requestCode == REQUEST_ENABLE_BT) {

@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 
 import com.google.gson.Gson;
-import com.resmed.edflib.EdfFileManager;
 import com.resmed.edflib.EdfLibCallbackHandler;
 import com.resmed.edflib.FileEdfInterface;
 import com.resmed.edflib.RstEdfMetaData;
@@ -58,7 +57,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public static String ParamSessionId;
 	public static String ParamsecondsElapsed = "secondsElapsed";
 	public int alarmFireEpoch = 0;
-	private FileEdfInterface edfManager;
+	//private FileEdfInterface edfManager;
 	private String fileName;
 	private File filesFolder;
 	public boolean isActive = false;
@@ -429,9 +428,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 						do {
 							if (!iterator.hasNext()) {
 								this.nrOfBioSamples = 16 + this.nrOfBioSamples;
-								if (this.edfManager != null) {
+								/*if (this.edfManager != null) {
 									this.edfManager.writeDigitalSamples(cMiBuf, cMqBuf);
-								}
+								}*/
 								this.sampleBuffer.clear();
 								break;
 							}
@@ -465,10 +464,10 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public void onFileClosed() {}
 
 	public void onFileCompressed(int paramInt) {
-		Log.d("com.resmed.refresh.finish", " SleepSessionManager edf onFileCompressed");
+		/*Log.d("com.resmed.refresh.finish", " SleepSessionManager edf onFileCompressed");
 		boolean bool = this.edfManager.deleteFile();
 		Log.d("com.resmed.refresh.finish", " SleepSessionManager edf file wasDeleted :" + bool);
-		stopCalculateAndSendResults();
+		stopCalculateAndSendResults();*/
 	}
 
 	public void onFileFixed() {}
@@ -500,7 +499,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	public void onWroteDigitalSamples() {}
 	public void onWroteMetadata() {}
 
-	public void recoverSession(final long sessionId, final int n, final int n2) {
+	/*public void recoverSession(final long sessionId, final int n, final int n2) {
 		this.nrOfBioSamples = 0;
 		this.sessionId = sessionId;
 		this.isActive = true;
@@ -541,7 +540,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.setMetaData(metaData);
 		(this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.main.reactContext)).openFileForMode("w");
 		this.didFinishEdfRecovery();
-	}
+	}*/
 
 	public void requestUserSleepState() {
 		Log.d("com.resmed.refresh.rm20_callback", " requestUserSleepState");
@@ -554,9 +553,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		return "0";
 	}
 	public String rm60Version() {
-		if (this.edfManager != null) {
+		/*if (this.edfManager != null) {
 			return String.valueOf(this.edfManager.getRM60LibVersion()) + "_" + "1.0.0";
-		}
+		}*/
 		return "0";
 	}
 
@@ -583,8 +582,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			context = LL.main.reactContext;
 		}
 		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, context);
-		this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, pMeta.toArray(), this, context);
-		this.edfManager.openFileForMode("w");
+		/*this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, pMeta.toArray(), this, context);
+		this.edfManager.openFileForMode("w");*/
 		this.rm20Manager.startupLibrary(age, gender);
 		this.rm20Manager.startRespRateCallbacks(true);
 
@@ -604,8 +603,8 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 
 
 	public void stop() {
-		Log.d("com.resmed.refresh.finish", " SleepSessionManager isActive : " + this.isActive + " edfManager : " + this.edfManager);
-		if (!this.isActive || this.edfManager == null) {
+		Log.d("com.resmed.refresh.finish", " SleepSessionManager isActive : " + this.isActive); // + " edfManager : " + this.edfManager);
+		if (!this.isActive) { // || this.edfManager == null) {
 			this.stopCalculateAndSendResults();
 			return;
 		}
@@ -614,14 +613,14 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		Log.d("com.resmed.refresh.finish", " SleepSessionManager stopped");
 		this.lengthOfSession = (System.currentTimeMillis() - this.startTimeStamp) / 1000L;
 		Log.d("com.resmed.refresh.finish", " secondsElapsed : " + this.lengthOfSession);
-		this.edfManager.closeFile();
+		//this.edfManager.closeFile();
 		if (this.nrOfBioSamples < Consts.MIN_SAMPLES_TO_SAVE_RECORD) {
 			this.stopCalculateAndSendResults();
-			Log.d("com.resmed.refresh.finish", " edf file isDeleted : " + this.edfManager.deleteFile());
+			//Log.d("com.resmed.refresh.finish", " edf file isDeleted : " + this.edfManager.deleteFile());
 		} else {
 			final String string = String.valueOf(this.filesFolder.getAbsolutePath()) + "/" + this.fileName.replace(".edf", ".lz4");
 			Log.d("com.resmed.refresh.finish", "compressed File : " + string);
-			this.edfManager.compressFile(string);
+			//this.edfManager.compressFile(string);
 		}
 		this.isActive = false;
 	}

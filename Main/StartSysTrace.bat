@@ -1,1 +1,1 @@
-python C:\Root\Apps\@V\@Tools\AndroidSDK\platform-tools\systrace\systrace.py --time=10 -o trace.html sched gfx view -a com.lucidlink
+python C:\Root\Apps\@V\@Tools\AndroidSDK\platform-tools\systrace\systrace.py --time=10 -o trace.html sched gfx view -a v.lucidlink

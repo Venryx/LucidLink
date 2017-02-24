@@ -265,9 +265,9 @@ export function BasicStyles(props) {
 export class Panel extends View {*/
 
 //type PanelProps = {touchable?, style?} & BaseProps & ViewProperties;
-type PanelProps = {touchable?, style?} & BaseProps & TouchableOpacityProperties;
+type PanelProps = {touchable?, style?} & BaseProps & Partial<ViewProperties> & Partial<TouchableOpacityProperties>;
 export class Panel extends BaseComponent<PanelProps, {}> {
-	setNativeProps (nativeProps) {
+	setNativeProps(nativeProps) {
 		this.root.setNativeProps(nativeProps);
 	}
 	root;
@@ -333,7 +333,7 @@ export class Column extends BaseComponent<{width?, style?} & PanelProps, {}> {
 
 export class VText extends BaseComponent<{style?} & BaseProps & TextProperties, {}> {
 	render() {
-		var {style, children, ...rest} = this.props;
+		var {style, children, ...rest} = this.props as any;
 		return (
 			<Text {...rest}
 					style={E(
@@ -348,7 +348,7 @@ export class VText extends BaseComponent<{style?} & BaseProps & TextProperties, 
 }
 
 export class VButton extends BaseComponent<
-		{text, caps?, style?, textStyle?, enabled?} & BaseProps & ButtonProperties, {}> {
+		{text, caps?, style?, textStyle?, enabled?, title?} & BaseProps & Partial<ButtonProperties>, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;

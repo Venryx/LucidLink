@@ -17,7 +17,7 @@ import {EveryXSecondsDo, GetRandomNumber, Speak} from "../Scripts/ScriptGlobals"
 import {Log, Global} from "../../Frame/Globals";
 import Sound from "react-native-sound";
 import {AudioFile} from "../../Frame/AudioFile";
-import {WaitXThenRun, Timer} from "../../Frame/General/Timers";
+import {WaitXThenRun, Timer, TimerContext} from "../../Frame/General/Timers";
 import {VTextInput, VTextInput_Auto} from "../../Packages/ReactNativeComponents/VTextInput";
 import BackgroundMusicConfigUI from "./@Shared/BackgroundMusicSelectorUI";
 
@@ -90,8 +90,7 @@ export class RVP extends Node {
 		"A purple submarine", "A yellow frog", "A blue tomato",
 	];
 
-	backgroundMusicRestartTimer: Timer;
-	promptTimer: Timer;
+	timerContext = new TimerContext();
 	Start() {
 		if (this.backgroundMusic_enabled) {
 			for (let track of this.backgroundMusic_tracks) {
@@ -104,15 +103,15 @@ export class RVP extends Node {
 					audioFile.SetVolume(this.backgroundMusic_volume);
 				});
 			}
-			this.backgroundMusicRestartTimer = new Timer(30, ()=> {
+			new Timer(30, ()=> {
 				for (let track of this.backgroundMusic_tracks) {
 					var audioFile = GetAudioFile(track);
 					audioFile.Play();
 					audioFile.SetVolume(this.backgroundMusic_volume);
 				}
-			}).Start();
+			}).Start().SetContext(this.timerContext);
 		}
-		this.promptTimer = new Timer(this.interval, ()=> {
+		new Timer(this.interval, ()=> {
 			var name = this.names[GetRandomNumber({min: 0, max: this.names.length - 1, mustBeInteger: true})];
 			var namePitch = GetRandomNumber({min: .01, max: 2});
 			var phraseText_final = this.phrase.replace("$name", name);
@@ -132,24 +131,17 @@ export class RVP extends Node {
 
 				Log(`Name: ${name} (${namePitch}) Number: ${text} (${numberPitch})`);
 			})
-		}).Start();
+		}).Start().SetContext(this.timerContext);
 		if (g.RVP_PostStart) g.RVP_PostStart();
 	}
 	Stop() {
-		if (this.promptTimer == null) return;
+		if (this.timerContext.timers.length == 0) return;
+		this.timerContext.CloseAndReset();
 
-		if (this.backgroundMusicRestartTimer) {
-			this.backgroundMusicRestartTimer.Stop();
-			this.backgroundMusicRestartTimer = null;
-
-			// stop and clear (background-music) audio-files
-			for (let audioFile of audioFiles.Props.Select(a=>a.value))
-				audioFile.Stop();
-			audioFiles = [];
-		}
-		
-		this.promptTimer.Stop();
-		this.promptTimer = null;
+		// stop and clear (background-music) audio-files
+		for (let audioFile of audioFiles.Props.Select(a=>a.value))
+			audioFile.Stop();
+		audioFiles = [];
 	}
 }
 
