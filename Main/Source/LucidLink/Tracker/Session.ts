@@ -109,14 +109,14 @@ export class Session {
 		return this.CurrentSleepSession.segments.LastOrX();
 	}
 
-	StartSleepSession_RealTime() {
+	/*StartSleepSession_RealTime() {
 		if (LL.tracker.currentSession.CurrentSleepSession)
 			LL.tracker.currentSession.CurrentSleepSession.End();
 		var session = new SleepSession();
 		this.sleepSessions.push(session);
 		SPBridge.StartRealTimeSession();
 		this.BufferSave();
-	}
+	}*/
 	StartSleepSession() {
 		if (LL.tracker.currentSession.CurrentSleepSession)
 			LL.tracker.currentSession.CurrentSleepSession.End();

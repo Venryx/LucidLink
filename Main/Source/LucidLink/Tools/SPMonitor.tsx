@@ -64,12 +64,12 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 						<VSwitch_Auto mt={6} path={()=>node.p.connect}/>
 						<VSwitch_Auto text="Monitor" ml={5} mt={6} path={()=>node.p.monitor}/>
 						<VSwitch_Auto text="Process" ml={5} mt={6} path={()=>node.p.process}/>
-
-						{/*<VButton text="Get stage" onPress={async ()=> {
-							alert(await SPBridge.GetSleepStage());
-						}}/>*/}
+						
 						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
-							LL.tracker.currentSession.StartSleepSession_RealTime();
+							//LL.tracker.currentSession.StartSleepSession_RealTime();
+							if (LL.tracker.currentSession.CurrentSleepSession)
+								LL.tracker.currentSession.CurrentSleepSession.End();
+							SPBridge.StartRealTimeSession();
 						}}/>
 						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
 							LL.tracker.currentSession.StartSleepSession();
