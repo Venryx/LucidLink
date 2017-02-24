@@ -3,7 +3,7 @@ import DialogAndroid from "react-native-dialogs";
 import Moment from "moment";
 
 import DreamUI from "./Journal/DreamUI";
-import {FromVDF, GetTypeName, ToVDF, E, Toast} from "../Frame/Globals";
+import {FromVDF, GetTypeNameOf, ToVDF, E, Toast} from "../Frame/Globals";
 import {DatePickerAndroid, ScrollView, TouchableOpacity, Text} from "react-native";
 import Node from "../Packages/VTree/Node";
 import {LL} from "../LucidLink";
@@ -63,7 +63,7 @@ export class Dream extends Node {
 		// if called by VDF, do nothing
 		if (date == null) return;
 
-		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
+		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeNameOf(date)}.`);
 		this.date = date;
 		this.file = this.NewFile;
 	}

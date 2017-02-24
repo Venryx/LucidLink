@@ -61,9 +61,6 @@ MKTouchable.propTypes = {
 
   // Touch events callback
   onTouch: PropTypes.func,
-
-  // FIXME `no propType for native prop` error on Android
-  nativeBackgroundAndroid: PropTypes.object,
 };
 
 const NativeTouchable = requireNativeComponent('MKTouchable', {

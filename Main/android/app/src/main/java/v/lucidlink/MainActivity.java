@@ -37,14 +37,6 @@ import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 
 public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener {
-	// these aren't actually needed for version used; Android Studio just thinks we're using an older version, which does need these
-	protected boolean getUseDeveloperSupport() {
-		return false;
-	}
-	protected List<ReactPackage> getPackages() {
-		return null;
-	}
-
 	public static MainActivity main;
 	public MainActivity() {
 		super();

@@ -1,3 +1,4 @@
+import "../CE"; // quick-fix
 import {Log, Global} from "../Globals";
 import V from "../../Packages/V/V";
 

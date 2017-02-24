@@ -276,8 +276,8 @@ export function ToVDFNode(obj, declaredTypeName_orOptions?, options_orNothing?) 
 	}/**/ finally {}
 }
 
-export function GetTypeName(obj) {
-	if (obj === null || obj === undefined) return null;
+export function GetTypeNameOf(obj) {
+	if (obj === null || obj === undefined || obj.constructor == null) return null;
 	return obj.GetTypeName();
 }
 

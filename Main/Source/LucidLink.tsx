@@ -19,10 +19,9 @@ import {colors} from "./Frame/Styles";
 
 import {Component} from "react";
 import {Dimensions, AppRegistry, StyleSheet, AppState, DeviceEventEmitter} from "react-native";
-var {Keyboard} = require("react-native");
+import {Keyboard} from "react-native";
 import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 //import Moment from "moment";
-import Moment from "moment";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 
 import {MonitorUI, Monitor} from "./LucidLink/Tools/Monitor";
@@ -96,13 +95,13 @@ Keyboard.addListener("keyboardDidShow", e=> {
 	g.keyboardHeight = e.endCoordinates.height;
 	if (LL && LL.ui)
 		LL.ui.forceUpdate();
-});
+}, null);
 Keyboard.addListener("keyboardDidHide", ()=> {
 	g.keyboardVisible = false;
 	g.keyboardHeight = 0;
 	if (LL && LL.ui)
 		LL.ui.forceUpdate();
-});
+}, null);
 
 export class LucidLink extends Node {
 	/*constructor() {

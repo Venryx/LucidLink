@@ -1,4 +1,4 @@
-import {FromVDF, GetTypeName, ToVDF} from "../../Frame/Globals";
+import {FromVDF, GetTypeNameOf, ToVDF} from "../../Frame/Globals";
 import {autorun} from 'mobx';
 import {LL} from "../../LucidLink";
 import Moment from "moment";
@@ -55,7 +55,7 @@ export class Session {
 		// if called by VDF, do nothing
 		if (date == null) return;
 
-		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeName(date)}.`);
+		Assert(date instanceof Moment, `Date must be an instance of the Moment class, not ${GetTypeNameOf(date)}.`);
 		this.date = date;
 		var sessionsFolder = LL.RootFolder.GetFolder("Sessions");
 		this.folder = sessionsFolder.GetFolder(this.date.format("YYYY-MM-DD HH:mm:ss"));

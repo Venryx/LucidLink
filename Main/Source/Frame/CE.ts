@@ -28,6 +28,8 @@ Object.defineProperty(Object.prototype, "_AddItem", { // note; these functions s
 				enumerable: false,
 				value: value
 			});
+			/*if (this[name] == null)
+				throw new Error(`Failed to add property "${name}" to type "${this}".`);*/
 		}
 	}
 });
@@ -53,12 +55,19 @@ Object.prototype._AddFunction("_AddGetterSetter", function(name, getter, setter)
 });
 
 // the below lets you do stuff like this: Array.prototype._AddFunction_Inline = function AddX(value) { this.push(value); }; [].AddX = "newItem";
+// maybe make-so: these use func.GetName()
 interface Object { _AddFunction_Inline: Function; }
-Object.prototype._AddGetterSetter("_AddFunction_Inline", null, function(func) { this._AddFunction(func.name, func); }); // maybe make-so: these use func.GetName()
+Object.prototype._AddGetterSetter("_AddFunction_Inline", null, function(func) {
+	this._AddFunction(func.name_fake || func.name, func);
+});
 interface Object { _AddGetter_Inline: Function; }
-Object.prototype._AddGetterSetter("_AddGetter_Inline", null, function(func) { this._AddGetterSetter(func.name, func, null); });
+Object.prototype._AddGetterSetter("_AddGetter_Inline", null, function(func) {
+	this._AddGetterSetter(func.name_fake || func.name, func, null);
+});
 interface Object { _AddSetter_Inline: Function; }
-Object.prototype._AddGetterSetter("_AddSetter_Inline", null, function(func) { this._AddGetterSetter(func.name, null, func); });
+Object.prototype._AddGetterSetter("_AddSetter_Inline", null, function(func) {
+	this._AddGetterSetter(func.name_fake || func.name, null, func);
+});
 
 // alias for _AddFunction_Inline, since now we need to add functions to the "window" object relatively often
 //Object.prototype._AddGetterSetter("AddFunc", null, function(func) { this._AddFunction(func.name, func); });
@@ -69,11 +78,12 @@ Object.prototype._AddGetterSetter("_AddSetter_Inline", null, function(func) { th
 //interface Function {
 interface Object { // add to Object interface, otherwise TS thinks "Function" refers to this interface instead of the Function class
 	GetName(): string;
+	SetName(name: string): Function;
 }
 
 //Function.prototype._AddFunction_Inline = function GetName() { return this.name || this.name_fake || this.toString().match(/^function\s*([^\s(]+)/)[1]; };
 Function.prototype._AddFunction_Inline = function GetName() { return this.name_fake || this.name || this.toString().match(/^function\s*([^\s(]+)/)[1]; };
-Function.prototype._AddFunction_Inline = function SetName(name) { this.name_fake = name; return this; };
+Function.prototype._AddFunction_Inline = function SetName(name: string) { this.name_fake = name; return this; };
 // probably make-so: SetName_Temp function exists
 //Function.prototype._AddFunction_Inline = function Call_Silent(self) { this.apply(self, V.Slice(arguments, 1)); return this; }
 //Function.prototype._AddFunction_Inline = function Call_Silent() { this.apply(this, arguments); return this; }
@@ -183,8 +193,8 @@ import {max, min} from 'moment';*/
 //Object.prototype._AddFunction_Inline = function CopyXChildrenAsOwn(x) { $.extend(this, x); };
 //Object.prototype._AddFunction_Inline = function CopyXChildrenToClone(x) { return $.extend($.extend({}, this), x); };
 
-interface Object { Extend: (obj)=>void; }
-Object.prototype._AddFunction_Inline = function Extend(x) {
+// must also do it on window/global, for some reason
+g.Extend = function(x) {
 	for (var name in x) {
 		var value = x[name];
 		//if (value !== undefined)
@@ -193,8 +203,8 @@ Object.prototype._AddFunction_Inline = function Extend(x) {
 	return this;
 };
 
-// must also do it on window/global, for some reason
-window.Extend = function(x) {
+interface Object { Extend: (obj)=>void; }
+Object.prototype._AddFunction_Inline = function Extend(x) {
 	for (var name in x) {
 		var value = x[name];
 		//if (value !== undefined)

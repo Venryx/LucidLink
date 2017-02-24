@@ -265,7 +265,7 @@ export function BasicStyles(props) {
 export class Panel extends View {*/
 
 //type PanelProps = {touchable?, style?} & BaseProps & ViewProperties;
-type PanelProps = {touchable?, style?} & BaseProps & Partial<ViewProperties> & Partial<TouchableOpacityProperties>;
+type PanelProps = {touchable?, style?} & BaseProps & Partial<ViewProperties> & Partial<TouchableOpacityProperties> & {fixer?};
 export class Panel extends BaseComponent<PanelProps, {}> {
 	setNativeProps(nativeProps) {
 		this.root.setNativeProps(nativeProps);

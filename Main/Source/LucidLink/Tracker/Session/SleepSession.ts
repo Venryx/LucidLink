@@ -1,9 +1,9 @@
 import {Assert} from "../../../Frame/General/Assert";
-import Moment from "moment";
 import {P, _VDFPostDeserialize} from "../../../Packages/VDF/VDFTypeInfo";
 import {SleepStage} from "../../../Frame/SPBridge";
 import SPBridge from "../../../Frame/SPBridge";
 import {LL} from "../../../LucidLink";
+import Moment from "moment";
 
 export default class SleepSession {
 	@_VDFPostDeserialize() PostDeserialize() {

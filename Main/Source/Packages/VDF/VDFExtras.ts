@@ -165,7 +165,6 @@ export class StringBuilder {
 // for anonymous objects (JS anonymous-objects are all just instances of Object, so we don't lose anything by attaching type-info to the shared constructor)
 //var object = Object;
 //object["typeInfo"] = new VDFTypeInfo(null, true);
-export class object {} // just an alias for Object, to be consistent with C# version
 
 export class EnumValue {
 	realTypeName: string; // prop-name is special; used to identify 'true' or 'represented' type of object

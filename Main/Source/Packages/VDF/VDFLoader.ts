@@ -1,7 +1,7 @@
 ﻿import {VDFNode} from "./VDFNode";
 import {VDFToken, VDFTokenParser, VDFTokenType} from "./VDFTokenParser";
 import {VDFTypeInfo} from "./VDFTypeInfo";
-import {Dictionary, object, List} from "./VDFExtras";
+import {Dictionary, List} from "./VDFExtras";
 import {VDF} from "./VDF";
 
 export class VDFLoadOptions {
@@ -17,8 +17,8 @@ export class VDFLoadOptions {
 	}
 
 	messages: any[];
-	objPostDeserializeFuncs_early = new Dictionary<object, List<Function>>("object", "List(Function)");
-	objPostDeserializeFuncs = new Dictionary<object, List<Function>>("object", "List(Function)");
+	objPostDeserializeFuncs_early = new Dictionary<Object, List<Function>>("object", "List(Function)");
+	objPostDeserializeFuncs = new Dictionary<Object, List<Function>>("object", "List(Function)");
 	AddObjPostDeserializeFunc(obj, func: Function, early = false) {
 		if (early) {
 			if (!this.objPostDeserializeFuncs_early.ContainsKey(obj))
