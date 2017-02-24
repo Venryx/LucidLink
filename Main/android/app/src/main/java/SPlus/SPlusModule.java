@@ -98,13 +98,11 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	public int age;
 	public String gender; // 0=male, 1=female
 	public int GenderInt() { return gender == "male" ? 0 : 1; }
-	public int bioBufferSize;
 
-	@ReactMethod public void SetUserInfo(int age, String gender, int bioBufferSize) {
+	@ReactMethod public void SetUserInfo(int age, String gender) {
 		V.Assert(gender.equals("male") || gender.equals("female"));
 		this.age = age;
 		this.gender = gender;
-		this.bioBufferSize = bioBufferSize;
 	}
 
 	/*@ReactMethod public void GetSleepStage(Promise promise) {

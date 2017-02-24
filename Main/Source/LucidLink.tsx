@@ -249,6 +249,6 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 	});
 	//autorun(()=>SPBridge.SetUserInfo(LL.settings.age, LL.settings.gender.name.toLowerCase() as any));
 	autorun(()=> {
-		SPBridge.SetUserInfo(LL.settings.age, LL.settings.gender.name.toLowerCase() as any, LL.settings.spBioBufferSize);
+		SPBridge.SetUserInfo(LL.settings.age, LL.settings.gender.name.toLowerCase() as any);
 	});
 }

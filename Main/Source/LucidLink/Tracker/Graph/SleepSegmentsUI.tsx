@@ -7,12 +7,13 @@ import Moment from "moment";
 import {SleepStage} from "../../../Frame/SPBridge";
 import {SleepSegment} from "../Session/SleepSession";
 import SleepSession from "../Session/SleepSession";
+import {LL} from "../../../LucidLink";
 
 export default class SleepSegmentsUI extends Component<
 		{startTime: Moment.Moment, endTime: Moment.Moment, width: number, height: number,
-			sleepSegments: SleepSegment[], style?}, {}> {
+			sleepSessions: SleepSession[], style?}, {}> {
 	render() {
-		let {startTime, endTime, width, height, sleepSegments, style} = this.props;
+		let {startTime, endTime, width, height, sleepSessions, style} = this.props;
 
 		// for testing
 		/*let session = new SleepSession();
@@ -25,14 +26,37 @@ export default class SleepSegmentsUI extends Component<
 
 		return (
 			<Row style={E({position: "absolute", width, height}, style)}>
-				{sleepSegments.map((segment, index)=> {
-					let segmentStart_percentFromLeftToRight = segment.startTime.diff(startTime) / endTime.diff(startTime);
-					let segmentWidth_percentOfChartWidth = segment.EndTime.diff(segment.startTime) / endTime.diff(startTime);
+				{sleepSessions.map((session, index)=> {
+					let sessionStart_posPercent = session.startTime.diff(startTime) / endTime.diff(startTime);
+					let sessionWidth_sizePercent = session.endTime.diff(session.startTime) / endTime.diff(startTime);
+
+					let sleepSegments = session.segments.Where(a=> {
+						return a.startTime >= startTime && a.EndTime < endTime;
+					});
 					return (
-						<Panel key={index} style={E({position: "absolute", bottom: 0,
-							height: height * segment.Height,
-							left: segmentStart_percentFromLeftToRight * width, width: segmentWidth_percentOfChartWidth * width,
-							backgroundColor: segment.Color})}/>
+						<Row key={index}
+								style={E({
+									position: "absolute", height,
+									left: sessionStart_posPercent * width,
+									width: sessionWidth_sizePercent * width,
+									backgroundColor: "rgba(255,255,255,.1)",
+								}, style)}
+								touchable={true}
+								onPress={()=> {
+									LL.tracker.openSleepSession = session;
+								}}>
+							{sleepSegments.map((segment, index)=> {
+								let segmentStart_posPercent = segment.startTime.diff(startTime) / endTime.diff(startTime);
+								let segmentWidth_sizePercent = segment.EndTime.diff(segment.startTime) / endTime.diff(startTime);
+								return (
+									<Panel key={index} style={E({position: "absolute", bottom: 0,
+										height: height * segment.Height,
+										left: (segmentStart_posPercent - sessionStart_posPercent) * width,
+										width: segmentWidth_sizePercent * width,
+										backgroundColor: segment.Color})}/>
+								);
+							})}
+						</Row>
 					);
 				})}
 			</Row>

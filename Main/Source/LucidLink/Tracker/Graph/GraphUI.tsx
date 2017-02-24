@@ -168,10 +168,11 @@ class ChartUI extends Component<{startTime: Moment.Moment, endTime: Moment.Momen
 					minY={0} maxY={1} legendStepsY={2} showYAxisLabels={false} yAxisWidth={0}
 					axisColor="#AAA" axisLabelColor="#AAA" gridColor="#777"
 					type="line" color={[mainLineColor]} data={[mainLinePoints]}/>
-				<SleepSegmentsUI {...{startTime, endTime, width, height: innerHeight}} style={{top: 0}}
-					sleepSegments={node.GetSleepSegmentsForRange(startTime, endTime)}/>
 				{rowUIs}
 				{overlayUI}
+				{/* put this later so it's clickable */}
+				<SleepSegmentsUI {...{startTime, endTime, width, height: innerHeight}} style={{top: 0}}
+					sleepSessions={node.GetSleepSessionsForRange(startTime, endTime)}/>
             </View>
         );
 	}

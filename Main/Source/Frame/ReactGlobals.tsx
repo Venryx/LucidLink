@@ -9,6 +9,7 @@ import {Dimensions, StyleSheet,
 	DatePickerAndroid, TimePickerAndroid} from "react-native";
 import RNFS from "react-native-fs";
 //import autobind from "react-autobind"; // caused error in Babel transpiler
+import ShallowCompare from "react-addons-shallow-compare";
 
 import Button from "apsl-react-native-button"
 
@@ -57,7 +58,7 @@ EStyleSheet.build();
 import autoBind from "react-autobind";
 import {Assert} from "./General/Assert";
 import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
-import {ButtonProperties, TextProperties, TextInputProperties} from "react-native";
+import {ViewProperties, TouchableOpacityProperties, ButtonProperties, TextProperties, TextInputProperties} from "react-native";
 import {IsString} from "./Types";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
@@ -199,6 +200,15 @@ export class BaseComponent<P, S> extends Component<P, S> {
 }
 //global.Extend({Component2: Component, BaseComponent: Component});
 
+export function SimpleShouldUpdate(target) {
+	target.prototype.shouldComponentUpdate = function(newProps, newState) {
+	    return ShallowCompare(this, newProps, newState);
+		/*var result = ShallowCompare(this, newProps, newState);
+		g.Log(result + ";" + g.ToJSON(this.props) + ";" + g.ToJSON(newProps));
+		return result;*/
+	}
+}
+
 export interface BaseProps {
 	ml?; mr?; mt?; mb?;
 	pl?; pr?; pt?; pb?;
@@ -249,9 +259,40 @@ export function BasicStyles(props) {
 	return result;
 }
 
-export class Row extends BaseComponent<{height?, style?} & BaseProps, {}> {
+// for some reason, errors here if we extend BaseComponent (see: http://stackoverflow.com/questions/31741705)
+// (I guess cause it renders just a View)
+/*var View2: React.ComponentClass<any> = View;
+export class Panel extends View {*/
+
+//type PanelProps = {touchable?, style?} & BaseProps & ViewProperties;
+type PanelProps = {touchable?, style?} & BaseProps & TouchableOpacityProperties;
+export class Panel extends BaseComponent<PanelProps, {}> {
+	setNativeProps (nativeProps) {
+		this.root.setNativeProps(nativeProps);
+	}
+	root;
 	render() {
-		var {height, style, children, ...rest} = this.props;
+		var {touchable, style, children, ...rest} = this.props;
+		if (touchable) {
+			return (
+				<TouchableOpacity {...rest} ref={c=>this.root = c}
+						style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
+					{children}
+				</TouchableOpacity>
+			);
+		}
+		return (
+			<View {...rest} ref={c=>this.root = c}
+					style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
+				{children}
+			</View>
+		);
+	}
+}
+
+export class Row extends BaseComponent<{height?, style?} & PanelProps, {}> {
+	render() {
+		var {height, style, children, ...rest} = this.props as any;
 		height = height != null ? height : (style||{}).height;
 		return (
 			<Panel {...rest} style={E({flexDirection: "row"}, BasicStyles(this.props), style,
@@ -262,12 +303,12 @@ export class Row extends BaseComponent<{height?, style?} & BaseProps, {}> {
 		);
 	}
 }
-export class RowLR extends BaseComponent<{height?, leftStyle?, rightStyle?} & BaseProps, {}> {
+export class RowLR extends BaseComponent<{height?, leftStyle?, rightStyle?} & PanelProps, {}> {
     render() {
-		var {height, leftStyle, rightStyle, children} = this.props as any;
+		var {height, leftStyle, rightStyle, children, ...rest} = this.props as any;
         Assert(children.length == 2, "Row child-count must be 2. (one for left-side, one for right-side)");
         return (
-			<Panel style={E({flexDirection: "row"}, BasicStyles(this.props), height != null && {height})}>
+			<Panel {...rest} style={E({flexDirection: "row"}, BasicStyles(this.props), height != null && {height})}>
 				<Panel style={E({alignItems: "flex-start", flex: 1}, leftStyle)}>
 					{children[0]}
 				</Panel>
@@ -279,33 +320,13 @@ export class RowLR extends BaseComponent<{height?, leftStyle?, rightStyle?} & Ba
     }
 }
 
-export class Column extends BaseComponent<{width?, style?} & BaseProps, {}> {
+export class Column extends BaseComponent<{width?, style?} & PanelProps, {}> {
 	render() {
-		var {width, style, children, ...rest} = this.props;
+		var {width, style, children, ...rest} = this.props as any;
 		return (
 			<Panel {...rest} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</Panel>
-		);
-	}
-}
-
-// for some reason, errors here if we extend BaseComponent (see: http://stackoverflow.com/questions/31741705)
-// (I guess cause it renders just a View)
-/*var View2: React.ComponentClass<any> = View;
-export class Panel extends View {*/
-
-export class Panel extends BaseComponent<{style?} & BaseProps, any> {
-	setNativeProps (nativeProps) {
-		this.root.setNativeProps(nativeProps);
-	}
-	root;
-	render() {
-		var {style, children, ...rest} = this.props;
-		return (
-			<View {...rest} ref={c=>this.root = c} style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
-				{children}
-			</View>
 		);
 	}
 }

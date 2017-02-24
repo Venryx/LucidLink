@@ -21,6 +21,7 @@ import {Assert, AssertWarn} from "../Frame/General/Assert";
 import {SleepStage} from "../Frame/SPBridge";
 import SPBridge from "../Frame/SPBridge";
 import {SleepSegment} from "./Tracker/Session/SleepSession";
+import SleepSession from "./Tracker/Session/SleepSession";
 
 SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
 	if (LL.tracker.currentSession.CurrentSleepSession == null) return;
@@ -43,7 +44,7 @@ export class Tracker extends Node {
 	        return new VDFNode(this.selectedDisplayerScript.Name);
 	}*/
 
-	@O displayerScripts: Script[] = [];
+	@O displayerScripts = [] as Script[];
 	@computed get DisplayerScriptFilesOutdated() {
 		return this.displayerScripts.Any(a=>a.fileOutdated);
 	}
@@ -84,7 +85,7 @@ export class Tracker extends Node {
 		
 		Log("Finished loading displayer scripts.");
 
-		onDone && onDone();
+		if (onDone) onDone();
 	}
 
 	SaveFileSystemData() {
@@ -150,12 +151,10 @@ export class Tracker extends Node {
 		});
 	}
 
-	GetSleepSegmentsForRange(start, endOut) {
+	GetSleepSessionsForRange(start, endOut) {
 		return this.loadedSessions.SelectMany(session=> {
-			return session.sleepSessions.SelectMany(sleepSession=> {
-				return sleepSession.segments.Where(a=> {
-					return a.startTime >= start && a.EndTime < endOut;
-				});
+			return session.sleepSessions.Where(a=> {
+				return a.startTime >= start && a.endTime < endOut;
 			});
 		});
 	}
@@ -176,6 +175,8 @@ export class Tracker extends Node {
 	}
 
 	@O @P() rowCount = 3;
+
+	@O openSleepSession: SleepSession;
 }
 g.Extend({Tracker});
 
