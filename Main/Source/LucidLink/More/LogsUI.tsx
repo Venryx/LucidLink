@@ -1,13 +1,12 @@
-import {BaseComponent, Panel, VButton} from "../../Frame/ReactGlobals";
+import {BaseComponent, Panel, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Log} from "../../Frame/Globals";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {More} from "../More";
-import {Switch, Text, ScrollView as ScrollView0} from "react-native";
-var ScrollView: any = ScrollView0;
+import {Switch, Text, ScrollView} from "react-native";
 import {LL} from "../../LucidLink";
 
-export default class LogsUI extends BaseComponent<any, any> {
+export default class LogsUI extends BaseComponent<{} & BaseProps, {}> {
 	constructor(props) {
 		super(props);
 		LL.more.logsUI = this;

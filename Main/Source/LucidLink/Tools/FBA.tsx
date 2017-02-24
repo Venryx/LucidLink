@@ -132,6 +132,8 @@ class FBARun {
 			}).Start().SetContext(this.timerContext);
 		}
 
+		LL.tracker.currentSession.StartSleepSession();
+
 		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveSleepStage, (stage: SleepStage)=> {
 			if (stage != this.currentSegment_stage) {
 				this.currentSegment_stage = stage as SleepStage;
@@ -162,6 +164,8 @@ class FBARun {
 	Stop() {
 		this.timerContext.CloseAndReset();
 		this.listenersContext.CloseAndReset();
+
+		LL.tracker.currentSession.CurrentSleepSession.End();
 
 		// stop and clear (background-music) audio-files
 		for (let audioFile of audioFiles.Props.Select(a=>a.value))
