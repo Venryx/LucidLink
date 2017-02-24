@@ -23,6 +23,8 @@ import SPBridge from "../Frame/SPBridge";
 import {SleepSegment} from "./Tracker/Session/SleepSession";
 
 SPBridge.listeners_onReceiveSleepStage.push((rawStage: SleepStage)=> {
+	if (LL.tracker.currentSession.CurrentSleepSession == null) return;
+
 	var currentSegment = LL.tracker.currentSession.CurrentSleepSegment;
 	if (currentSegment == null || rawStage != currentSegment.stage) {
 		var session = LL.tracker.currentSession.CurrentSleepSession;
