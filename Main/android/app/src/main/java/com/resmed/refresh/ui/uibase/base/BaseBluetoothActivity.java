@@ -2,13 +2,10 @@ package com.resmed.refresh.ui.uibase.base;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,10 +14,8 @@ import android.preference.PreferenceManager;
 
 import com.facebook.react.ReactActivity;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.resmed.cobs.COBS;
-import com.resmed.refresh.bed.BedCommandsRPCMapper;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
+import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.BluetoothDataWriter;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
@@ -31,7 +26,6 @@ import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLP;
 import com.resmed.refresh.packets.VLPacketType;
-import com.resmed.refresh.sleepsession.SleepSessionManager;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.BluetoothDataSerializeUtil;
@@ -44,17 +38,13 @@ import com.resmed.refresh.utils.RefreshUserPreferencesData;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import SPlus.SPlusModule;
-import v.lucidlink.LL;
-import v.lucidlink.MainActivity;
-import v.lucidlink.V;
 
-public abstract class BaseBluetoothActivity extends ReactActivity implements BluetoothDataListener, BluetoothDataWriter {
+public abstract class BaseBluetoothActivity extends ReactActivity implements BluetoothDataWriter {
 	protected void onResume() {
 		super.onResume();
 		//RefreshApplication.getInstance().increaseActivitiesInForeground();
@@ -64,19 +54,8 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 
 	public static boolean CORRECT_FIRMWARE_VERSION = true;
 	public static Map CommandStack = new LinkedHashMap();
-	private static BedCommandsRPCMapper RpcCommands = BedDefaultRPCMapper.getInstance();
 	public static boolean UPDATING_FIRMWARE = false;
 	private JsonRPC bioSensorSerialNrRPC;
-	protected BroadcastReceiver connectionStatusReceiver = new BroadcastReceiver() {
-		public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
-			CONNECTION_STATE state = (CONNECTION_STATE) paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
-			Log.d("com.resmed.refresh.pair", " onReceive()  CONNECTION_STATE " + CONNECTION_STATE.toString(state));
-			Log.d("com.resmed.refresh.ui", " onReceive()  CONNECTION_STATE " + CONNECTION_STATE.toString(state));
-
-			CONNECTION_STATE connectionState = (CONNECTION_STATE) paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE");
-			BaseBluetoothActivity.this.handleConnectionStatus(connectionState);
-		}
-	};
 
 	public IncomingHandler mFromServiceHandler = new IncomingHandler();
 
@@ -92,7 +71,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 					return;
 				case RefreshBluetoothService.MessageType.BeD_CONNECTION_STATUS:
 					CONNECTION_STATE state = (CONNECTION_STATE) msg.getData().get(RefreshBluetoothService.REFRESH_BED_NEW_CONN_STATUS);
-					Log.d(LOGGER.TAG_PAIR, "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + CONNECTION_STATE.toString(state));
+					Log.d(LOGGER.TAG_PAIR, "BaseActivity MSG_BeD_CONNECTION_STATUS CONNECTION_STATE : " + state);
 					BaseBluetoothActivity.this.handleConnectionStatus(state);
 					return;
 				case RefreshBluetoothService.MessageType.BeD_UNPAIR:
@@ -165,11 +144,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 			}
 		}
 	}
-
-	public static BedCommandsRPCMapper getRpcCommands() {
-		return RpcCommands;
-	}
-
+	
 	protected void handleErrorRPC(JsonRPC var1, ErrorRpc var2) {
 		if (var1 != null && var2 != null) {
 			RPCallback var3 = var1.getRPCallback();
@@ -193,17 +168,17 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		sendMessageToService(message);
 	}
 	public void sendMessageToService(Message message) {
-		SPlusModule.main.sessionConnector.service.mMessageHandler.handleMessage(message);
+		SPlusModule.main.sessionConnector.service.handleMessage(message);
 	}
 
 	private boolean sendRPC(JsonRPC var1) {
-		if (getRpcCommands() == null) {
+		if (RPCMapper.main == null) {
 			return false;
 		} else {
 			Gson var3 = new Gson();
-			getRpcCommands().setRPCid(1 + getRpcCommands().getRPCid());
-			var1.setId(getRpcCommands().getRPCid());
-			AppFileLog.addTrace("OUT NEW RPC ID : " + getRpcCommands().getRPCid() + " METHOD :" + var1.getMethod() + " PARAMS : " + var1.getParams());
+			RPCMapper.main.setRPCid(1 + RPCMapper.main.getRPCid());
+			var1.setId(RPCMapper.main.getRPCid());
+			AppFileLog.addTrace("OUT NEW RPC ID : " + RPCMapper.main.getRPCid() + " METHOD :" + var1.getMethod() + " PARAMS : " + var1.getParams());
 			String var4 = var3.toJson(var1);
 			Log.d("com.resmed.refresh.ui", "bluetooth json rpc : " + var4);
 			ByteBuffer var6 = VLP.getInstance().Packetize((byte) VLPacketType.PACKET_TYPE_CALL.ordinal(), Integer.valueOf(var1.getId()).byteValue(), var4.getBytes().length, 64, var4.getBytes());
@@ -239,7 +214,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 			SPlusModule.main.sessionConnector.handleConnectionStatus(newState);
 
 		Log.d("com.resmed.refresh.pair", "    BaseBluetoothActivity::handleConnectionStatus() connState=" + newState + " UPDATING_FIRMWARE:" + UPDATING_FIRMWARE);
-		if (newState != null && !UPDATING_FIRMWARE) { // && LL.main.connectionState != newState) {
+		if (newState != null && !UPDATING_FIRMWARE) { // && LL.mainModule.connectionState != newState) {
 			if (CONNECTION_STATE.SOCKET_BROKEN == newState || CONNECTION_STATE.SOCKET_RECONNECTING == newState) {
 				CORRECT_FIRMWARE_VERSION = true;
 				UPDATING_FIRMWARE = false;
@@ -274,7 +249,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 					if (CORRECT_FIRMWARE_VERSION) {
 						/*editorPref.putString(getString(R.string.extra_bed_board_version), boardVersion);
 						editorPref.commit();
-						this.bioSensorSerialNrRPC = getRpcCommands().getBioSensorSerialNumber();
+						this.bioSensorSerialNrRPC = RPCMapper.main.getBioSensorSerialNumber();
 						this.bioSensorSerialNrRPC.setRPCallback(new RPCallback() {
 							public void preExecute() {
 							}
@@ -304,18 +279,12 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		}
 	}
 
-
-	public void handleSessionRecovered(Bundle var1) {
-		Log.d("com.resmed.refresh.ui", " BaseBluetoothActivity::handleSessionRecovered()");
-	}
-
 	public void handleSleepSessionStopped(Bundle var1) {
 		// also transmit to connector
 		if (SPlusModule.main.sessionConnector != null)
 			SPlusModule.main.sessionConnector.handleSleepSessionStopped(var1);
 	}
 
-	@Override
 	public void handleStreamPacket(Bundle paramBundle) {
 		throw new Error("Should be handled in MainActivity.X");
 	}
@@ -375,14 +344,6 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		throw new Error("Should be handled in MainActivity.X");
 	}
 
-	protected boolean isBluetoothServiceRunning() {
-		for (RunningServiceInfo var2 : ((ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE)) {
-			if (RefreshBluetoothService.class.getName().equals(var2.service.getClassName()))
-				return true;
-		}
-		return false;
-	}
-
 	protected static final int REQUEST_ENABLE_BT = 161;
 	private static boolean userAllowBluetooth = true;
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -399,24 +360,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 
 	protected void onCreate(Bundle var1) {
 		super.onCreate(var1);
-		RpcCommands.setContextBroadcaster(this);
-	}
-
-	public void PostModuleInit() {
-		boolean serviceRunning = this.isBluetoothServiceRunning();
-		V.JavaLog("com.resmed.refresh.ui", ": bluetooth service is running : " + serviceRunning);
-
-		SharedPreferences var4 = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-		int var5 = var4.getInt("PREF_CONNECTION_STATE", -1);
-		Log.d("com.resmed.refresh.ui", " SleepTimeActivity::onResume conn state : " + var5);
-		if (var5 == CONNECTION_STATE.NIGHT_TRACK_ON.ordinal()) {
-			int var9 = var4.getInt("PREF_LAST_RPC_ID_USED", -1);
-			if (-1 != var9) {
-				RpcCommands.setRPCid(var9);
-			}
-		}
-
-		this.registerReceiver(this.connectionStatusReceiver, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
+		RPCMapper.main.setContextBroadcaster(this);
 	}
 
 	/*public void onPickedDevice(BluetoothDevice var1) {

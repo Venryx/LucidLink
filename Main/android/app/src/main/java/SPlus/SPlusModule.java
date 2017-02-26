@@ -8,7 +8,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
+import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
@@ -123,7 +123,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 		V.Log("Starting real-time session...");
 		this.sessionConnector.StartNewSession();
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startRealTimeStream());
+		MainActivity.main.sendRpcToBed(RPCMapper.main.startRealTimeStream());
 		currentSessionType = "real time";
 	}
 	@ReactMethod public void StartSleepSession() {
@@ -131,17 +131,17 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 		V.Log("Starting sleep session...");
 		this.sessionConnector.StartNewSession();
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().startNightTracking());
+		MainActivity.main.sendRpcToBed(RPCMapper.main.startNightTracking());
 		currentSessionType = "sleep";
 	}
 	@ReactMethod public void StopSession() {
 		if (currentSessionType == null) return;
 
 		if (currentSessionType.equals("real time"))
-			MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopRealTimeStream()); // quick fix, since lazy
+			MainActivity.main.sendRpcToBed(RPCMapper.main.stopRealTimeStream()); // quick fix, since lazy
 		else //if (currentSessionType == "sleep")
-			MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().stopNightTimeTracking()); // quick fix, since lazy
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().closeSession());
+			MainActivity.main.sendRpcToBed(RPCMapper.main.stopNightTimeTracking()); // quick fix, since lazy
+		MainActivity.main.sendRpcToBed(RPCMapper.main.closeSession());
 		sessionConnector.service.sleepSessionManager.stopCalculateAndSendResults();
 		currentSessionType = null;
 		V.Log("Stopping session...");

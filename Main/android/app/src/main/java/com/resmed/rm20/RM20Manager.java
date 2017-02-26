@@ -4,11 +4,11 @@ import android.content.Context;
 import java.io.File;
 import java.util.Date;
 
-public class RM20DefaultManager {
+public class RM20Manager {
 	private RM20JNI rm20Lib;
 	private Thread writerThread;
 
-	public RM20DefaultManager(File filesFolder, RM20Callbacks callbacks, Context context) {
+	public RM20Manager(File filesFolder, RM20Callbacks callbacks, Context context) {
 		this.rm20Lib = new RM20JNI(filesFolder, callbacks, context);
 	}
 

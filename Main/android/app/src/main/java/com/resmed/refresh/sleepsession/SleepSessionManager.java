@@ -1,19 +1,16 @@
 package com.resmed.refresh.sleepsession;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 
 import com.google.gson.Gson;
 import com.resmed.edflib.EdfLibCallbackHandler;
-import com.resmed.edflib.FileEdfInterface;
 import com.resmed.edflib.RstEdfMetaData;
 import com.resmed.edflib.RstEdfMetaData.Enum_EDF_Meta;
-import com.resmed.refresh.bed.BedDefaultRPCMapper;
+import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
-import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
 import com.resmed.refresh.ui.utils.Consts;
@@ -22,9 +19,8 @@ import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.refresh.utils.RefreshTools;
 import com.resmed.rm20.RM20Callbacks;
-import com.resmed.rm20.RM20DefaultManager;
+import com.resmed.rm20.RM20Manager;
 import com.resmed.rm20.SleepParams;
-import com.resmed.rm20.SmartAlarmInfo;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,15 +36,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import SPlus.SPlusModule;
-import v.lucidlink.LL;
-import v.lucidlink.LucidLinkModule;
 import v.lucidlink.MainActivity;
-import v.lucidlink.MainApplication;
 import v.lucidlink.V;
+
+import static v.lucidlink.LLHolder.LL;
 
 public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks {
 	public static String ParamAlarmFireEpoch = "alarmFireEpoch";
@@ -64,7 +57,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 	private long lengthOfSession;
 	private int nrOfBioSamples = 0;
 	private int nrOfEnvSamples = 0;
-	public RM20DefaultManager rm20Manager;
+	public RM20Manager rm20Manager;
 	private List<BioSample> sampleBuffer;
 	private RefreshBluetoothService serviceHandler;
 	private long sessionId;
@@ -505,7 +498,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		this.isActive = true;
 		//this.setRM20AlarmTime(new Date(SmartAlarmDataManager.getInstance().getAlarmDateTime()), SmartAlarmDataManager.getInstance().getWindowValue());
 
-		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, LL.main.reactContext);
+		this.rm20Manager = new RM20Manager(this.filesFolder, this, LL.reactContext);
 		this.rm20Manager.startupLibrary(n, n2);
 		this.rm20Manager.startRespRateCallbacks(true);
 
@@ -516,7 +509,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			this.fileName = fileByName.getName();
 			Log.d("com.resmed.refresh.bluetooth", " SleepSessionManager edf file : " + this.fileName);
 			AppFileLog.addTrace("Found file to recover" + sessionId + " length : " + fileByName.length());
-			this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.main.reactContext);
+			this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.reactContext);
 			if (fileByName.length() < 12000L) {
 				if (fileByName.delete()) {
 					this.edfManager.openFileForMode("w");
@@ -538,7 +531,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		AppFileLog.addTrace("SleepSessionManager Failed to find file to recover - creating new one " + sessionId);
 		this.fileName = this.fileNameForSessionId(sessionId);
 		this.setMetaData(metaData);
-		(this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.main.reactContext)).openFileForMode("w");
+		(this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, metaData.toArray(), this, LL.reactContext)).openFileForMode("w");
 		this.didFinishEdfRecovery();
 	}*/
 
@@ -579,9 +572,9 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		if (Consts.UNIT_TEST_MODE) {
 			context = this.unitTestContext;
 		} else {
-			context = LL.main.reactContext;
+			context = LL.reactContext;
 		}
-		this.rm20Manager = new RM20DefaultManager(this.filesFolder, this, context);
+		this.rm20Manager = new RM20Manager(this.filesFolder, this, context);
 		/*this.edfManager = new EdfFileManager(this.filesFolder, this.fileName, pMeta.toArray(), this, context);
 		this.edfManager.openFileForMode("w");*/
 		this.rm20Manager.startupLibrary(age, gender);
@@ -598,7 +591,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 		//RefreshModelController.getInstance().updateLocation();
 
 		// use static user-id different than S+ app's one
-		MainActivity.main.sendRpcToBed(BedDefaultRPCMapper.getInstance().openSession("c63eb080-a864-11e3-a5e2-000000000001"));
+		MainActivity.main.sendRpcToBed(RPCMapper.main.openSession("c63eb080-a864-11e3-a5e2-000000000001"));
 	}
 
 
@@ -609,7 +602,7 @@ public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks
 			return;
 		}
 		AppFileLog.addTrace("STOP SleepSessionManager in Service");
-		AppFileLog.addTrace("SleepSessionManager::stop() battery level : " + RefreshTools.getBatteryLevel(LL.main.reactContext));
+		AppFileLog.addTrace("SleepSessionManager::stop() battery level : " + RefreshTools.getBatteryLevel(LL.reactContext));
 		Log.d("com.resmed.refresh.finish", " SleepSessionManager stopped");
 		this.lengthOfSession = (System.currentTimeMillis() - this.startTimeStamp) / 1000L;
 		Log.d("com.resmed.refresh.finish", " secondsElapsed : " + this.lengthOfSession);

@@ -7,6 +7,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
+import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.model.json.JsonRPC;
@@ -16,10 +17,8 @@ import com.resmed.refresh.model.json.ResultRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
-import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.ui.utils.Consts;
 import com.resmed.refresh.utils.AppFileLog;
-import com.resmed.refresh.utils.KillableRunnable;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.rm20.SleepParams;
@@ -29,7 +28,7 @@ import org.acra.ACRAConstants;
 import SPlus.SPlusModule;
 import v.lucidlink.V;
 
-public class SleepSessionConnector implements BluetoothDataListener {
+public class SleepSessionConnector {
 	private BaseBluetoothActivity bAct;
 	private int bioCurrentTotalCount;
 	private int bioOnBeD;
@@ -121,13 +120,13 @@ public class SleepSessionConnector implements BluetoothDataListener {
 
 		// if this is the last of the samples
 		if (this.isWaitLastSamples && this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null) { // && this.isClosingSession) {
-			JsonRPC stopSampleRpc = BaseBluetoothActivity.getRpcCommands().stopNightTimeTracking();
+			JsonRPC stopSampleRpc = RPCMapper.main.stopNightTimeTracking();
 			stopSampleRpc.setRPCallback(new RPCallback() {
 				public void preExecute() {}
 				public void onError(ErrorRpc errRpc) {}
 				public void execute() {
 					if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.bAct.isFinishing()) {
-						SleepSessionConnector.this.bAct.sendRpcToBed(BaseBluetoothActivity.getRpcCommands().clearBuffers());
+						SleepSessionConnector.this.bAct.sendRpcToBed(RPCMapper.main.clearBuffers());
 					}
 				}
 			});
@@ -156,7 +155,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 			this.isHandlingHeartBeat = true;
 			final int storeLocalBio = PacketsByteValuesReader.getStoreLocalBio(array);
 			final int storeLocalEnv = PacketsByteValuesReader.getStoreLocalEnv(array);
-			V.JavaLog("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
+			V.LogJava("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
 
 			this.setBioOnBeD(storeLocalBio);
 			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
@@ -221,8 +220,8 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				nrEnvRequest = countEnv;
 			}
 			if (this.pendingBioSamplesRpc == null && this.pendingEnvSamplesRpc == null) {
-				this.pendingBioSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(nrBioRequest, false, false);
-				this.pendingEnvSamplesRpc = BaseBluetoothActivity.getRpcCommands().transmitPacket(nrEnvRequest, true, false);
+				this.pendingBioSamplesRpc = RPCMapper.main.transmitPacket(nrBioRequest, false, false);
+				this.pendingEnvSamplesRpc = RPCMapper.main.transmitPacket(nrEnvRequest, true, false);
 				AppFileLog.addTrace("OUT : Requesting BIO : " + countBio + " ENV : " + countEnv);
 				this.bAct.sendRpcToBed(this.pendingBioSamplesRpc);
 			}
@@ -264,7 +263,7 @@ public class SleepSessionConnector implements BluetoothDataListener {
 				/*if ((!this.isWaitLastSamples) && (!this.isClosingSession)) {
 					localHandler.postDelayed(() -> {
 						//SleepSessionConnector.this.registerForSessionTimeout(localHandler);
-						JsonRPC localJsonRPC = BaseBluetoothActivity.getRpcCommands().startNightTracking();
+						JsonRPC localJsonRPC = RPCMapper.main.startNightTracking();
 						SleepSessionConnector.this.bAct.sendRpcToBed(localJsonRPC);
 					}, 1000L);
 				}
@@ -285,7 +284,6 @@ public class SleepSessionConnector implements BluetoothDataListener {
 		}
 	}
 
-	@Override
 	public void handleReceivedRpc(JsonRPC receivedRPC) {
 		Log.d(LOGGER.TAG_UI, " SleepSessionConnector::handleReceivedRpc() receivedRPC:" + receivedRPC);
 		if (receivedRPC != null) {

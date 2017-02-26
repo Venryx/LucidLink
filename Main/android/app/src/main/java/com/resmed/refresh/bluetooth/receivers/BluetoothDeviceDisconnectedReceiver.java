@@ -6,7 +6,7 @@ import android.bluetooth.*;
 import com.resmed.refresh.bluetooth.*;
 import com.resmed.refresh.utils.*;
 
-import v.lucidlink.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class BluetoothDeviceDisconnectedReceiver extends BroadcastReceiver {
 	private BluetoothSetup bluetoothManager;
@@ -18,7 +18,7 @@ public class BluetoothDeviceDisconnectedReceiver extends BroadcastReceiver {
 	public void onReceive(final Context context, final Intent intent) {
 		if ("android.bluetooth.device.action.ACL_DISCONNECTED".equals(intent.getAction())) {
 			final BluetoothDevice bluetoothDevice = intent.getParcelableExtra("android.bluetooth.device.extra.DEVICE");
-			final boolean b = LL.main.connectionState == CONNECTION_STATE.SOCKET_CONNECTED;
+			final boolean b = LL.mainModule.connectionState == CONNECTION_STATE.SOCKET_CONNECTED;
 			Log.d("com.resmed.refresh.bluetooth", " Bluetooth previous connected : " + b);
 			if (b) {
 				this.bluetoothManager.connectDevice(bluetoothDevice);

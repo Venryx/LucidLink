@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import static v.lucidlink.LLHolder.LL;
+
 class RelativeLayout_NonReactRoot extends RelativeLayout {
 	public RelativeLayout_NonReactRoot(Context context) {
 		super(context);
@@ -317,10 +319,10 @@ class ChartManager {
 
 				DataSet dataSet = (DataSet) data.getDataSetByIndex(channel);
 
-				if (channel == 0) dataSet.setVisible(LL.main.channel1);
-				else if (channel == 1) dataSet.setVisible(LL.main.channel2);
-				else if (channel == 2) dataSet.setVisible(LL.main.channel3);
-				else if (channel == 3) dataSet.setVisible(LL.main.channel4);
+				if (channel == 0) dataSet.setVisible(LL.mainModule.channel1);
+				else if (channel == 1) dataSet.setVisible(LL.mainModule.channel2);
+				else if (channel == 2) dataSet.setVisible(LL.mainModule.channel3);
+				else if (channel == 3) dataSet.setVisible(LL.mainModule.channel4);
 
 				float yBase = (heightPerChannel * 4) - (channel * heightPerChannel); // simulate lines being in different rows
 				float yValue = (float)packet.eegValues[channel];
@@ -333,7 +335,7 @@ class ChartManager {
 				chart.setVisibleXRange(0, eegProcessor.maxX);
 
 			MainActivity.main.runOnUiThread(() -> {
-				if (eegProcessor.currentIndex % LL.main.updateInterval == 0)
+				if (eegProcessor.currentIndex % LL.mainModule.updateInterval == 0)
 					UpdateChart();
 				UpdateEyeTrackerUI(); // update eye-tracker ui to match processor's changes
 				UpdateDebugUI();
@@ -373,7 +375,7 @@ class ChartManager {
 
 		chart.setVisibleXRange(0, eegProcessor.maxX);
 
-		if (eegProcessor.currentIndex % LL.main.updateInterval == 0)
+		if (eegProcessor.currentIndex % LL.mainModule.updateInterval == 0)
 			UpdateChart();
 	}
 

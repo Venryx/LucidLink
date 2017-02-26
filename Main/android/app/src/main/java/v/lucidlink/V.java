@@ -1,5 +1,6 @@
 package v.lucidlink;
 
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -31,11 +32,12 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static v.lucidlink.LLHolder.LL;
 
 public class V {
 	// ui
@@ -88,34 +90,25 @@ public class V {
 	public static void Log(String tag, String message) { Log(tag, message, true); }
 	public static void Log(String tag, String message, boolean sendToJS) {
 		//Log.i(tag, message);
-		JavaLog(tag, message);
-		//if (sendToJS)
-		if (sendToJS) {
-			if (LL.main != null && LL.main.reactContext.hasActiveCatalystInstance())
-				LL.main.SendEvent("PostJavaLog", tag, message);
-			else
-				JavaLog(tag, "Could not log to JS, because react was not yet fully initialized.");
-		}
+		LogJava(tag, message);
+		if (sendToJS)
+			JSBridge.SendEvent("PostJavaLog", tag, message);
 	}
 
 	// logcat has a message length limit, so cut long messages into pieces that are displayable
-	public static void JavaLog(String message) { JavaLog("default", message); }
-	public static void JavaLog(String tag, String message) {
+	public static void LogJava(String message) { LogJava("default", message); }
+	public static void LogJava(String tag, String message) {
 		//Log.i(tag, "Length: " + message.length());
 		if (message.length() > 4000) {
 			Log.i(tag, message.substring(0, 4000));
-			JavaLog(tag, message.substring(4000));
+			LogJava(tag, message.substring(4000));
 		} else {
 			Log.i(tag, message);
 		}
 	}
 
 	public static void Alert(String message) {
-		if (LL.main != null && LL.main.reactContext.hasActiveCatalystInstance())
-			LL.main.SendEvent("Alert", message);
-		else
-			JavaLog("Could not alert to JS, because react was not yet fully initialized.");
-
+		JSBridge.SendEvent("Alert", message);
 	}
 
 	public static void Assert(boolean condition) {
@@ -245,18 +238,18 @@ public class V {
 	}
 
 	public static void Toast(String message) {
-		//LL.main.ShowToast(message, 0);
-		LL.main.ShowToast(message, Toast.LENGTH_LONG);
+		//LL.mainModule.ShowToast(message, 0);
+		LL.mainModule.ShowToast(message, Toast.LENGTH_LONG);
 	}
 	public static void Toast(String message, int duration) {
-		LL.main.ShowToast(message, duration);
+		LL.mainModule.ShowToast(message, duration);
 	}
 
 	public static void Notify(String message) {
-		LL.main.Notify(message, "Long");
+		LL.mainModule.Notify(message, "Long");
 	}
 	public static void Notify(String message, String lengthStr) {
-		LL.main.Notify(message, lengthStr);
+		LL.mainModule.Notify(message, lengthStr);
 	}
 
 	public static void WaitXThenRun(int waitMS, Runnable runnable) {
@@ -434,6 +427,13 @@ public class V {
 		if (val < min) return min;
 		if (val > max) return max;
 		return val;
+	}
+
+	public static IntentFilter IntentFilter(String... actions) {
+		IntentFilter result = new IntentFilter();
+		for (String action : actions)
+			result.addAction(action);
+		return result;
 	}
 }
 

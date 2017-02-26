@@ -34,6 +34,8 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static v.lucidlink.LLHolder.LL;
+
 public class LucidLinkModule extends ReactContextBaseJavaModule {
     private static final String DURATION_SHORT_KEY = "SHORT";
     private static final String DURATION_LONG_KEY = "LONG";
@@ -41,32 +43,21 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
     public LucidLinkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 		// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
-		firstLaunch = LL.main == null;
+		firstLaunch = LL.mainModule == null;
 		if (!firstLaunch)
-			LL.main.Shutdown();
+			LL.mainModule.Shutdown();
 
-		LL.main = this;
-		this.reactContext = reactContext;
+		LL.reactContext = reactContext;
+		LL.mainModule = this;
 
 		MainActivity.main.EnsurePermissionsGranted();
-
 		MainActivity.main.PostModuleInit();
     }
-	public ReactApplicationContext reactContext;
 	public boolean firstLaunch;
 
 	@ReactMethod
 	public void ArePermissionsGranted(Promise promise) {
 		promise.resolve(MainActivity.main.ArePermissionsGranted());
-	}
-
-	public void SendEvent(String eventName, Object... args) {
-		WritableArray argsList = Arguments.createArray();
-		for (Object arg : args)
-			V.WritableArray_Add(argsList, arg);
-
-		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
-		jsModuleEventEmitter.emit(eventName, argsList);
 	}
 
     @Override
@@ -118,7 +109,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 			V.Assert(false, "Length-string is invalid. (" + lengthStr + ")");
 
 		//MainApplication.GetPackageOfType(ReactSnackbarPackage.class).show(message, Snackbar.LENGTH_SHORT, true, Color.parseColor("#FFFFFF"), "HI", null);
-		LL.main.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, length, true, Color.parseColor("#FFFFFF"), "HI", null);
+		LL.reactContext.getNativeModule(ReactSnackbarModule.class).show(message, length, true, Color.parseColor("#FFFFFF"), "HI", null);
 	}
 
 	@ReactMethod public void IsInEmulator(Promise promise) {
@@ -179,6 +170,20 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 	// special
 	//public BluetoothDevice targetDevice;
 	public CONNECTION_STATE connectionState = CONNECTION_STATE.SOCKET_NOT_CONNECTED;
+	public boolean IsSocketConnected() {
+		switch(connectionState) {
+			case SOCKET_CONNECTED:
+			case SESSION_OPENING:
+			case SESSION_OPENED:
+			case REAL_STREAM_OFF:
+			case REAL_STREAM_ON:
+			case NIGHT_TRACK_OFF:
+			case NIGHT_TRACK_ON:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	/*@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
 		String type = args.getString(0);
@@ -338,9 +343,10 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		if (!MainActivity.main.bluetoothConnected && normalVolumeToApply != -1) {
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
 			normalVolumeToApply = -1;
-		} else if (MainActivity.main.bluetoothConnected && bluetoothVolumeToApply != -1)
+		} else if (MainActivity.main.bluetoothConnected && bluetoothVolumeToApply != -1) {
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
-		bluetoothVolumeToApply = -1;
+			bluetoothVolumeToApply = -1;
+		}
 	}
 
 	@ReactMethod public void GetAppUsedMemory(Promise promise) {

@@ -3,6 +3,7 @@ package v.lucidlink;
 import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.corbt.keepawake.KCKeepAwakePackage;
+import com.facebook.react.shell.MainReactPackage;
 import com.zmxv.RNSound.RNSoundPackage;
 
 import SPlus.SPlusPackage;
@@ -18,18 +19,12 @@ import com.lugg.ReactSnackbar.ReactSnackbarPackage;
 import com.mihir.react.tts.RCTTextToSpeechModule;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
 import android.content.Intent;
 import android.content.res.Configuration;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
-	/*public static List<ReactPackage> packages;
-	public static <T> T GetPackageOfType(Class<T> class1) {
-		return (T)Stream.of(packages).filter(a->a.getClass() == class1).toArray()[0];
-	}*/
-
 	private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 		@Override
 		protected String getJSMainModuleName() {
@@ -41,9 +36,8 @@ public class MainApplication extends Application implements ReactApplication {
 		  return BuildConfig.DEBUG;
 		}
 
-		@Override
-		protected List<ReactPackage> getPackages() {
-			//packages = Arrays.asList(
+		// use LL.reactContext.getNativeModule(SomeModule.class) to access the modules for these later
+		@Override protected List<ReactPackage> getPackages() {
 			return Arrays.asList(
 				new MainReactPackage(),
             	new ReactMaterialKitPackage(),
@@ -61,7 +55,6 @@ public class MainApplication extends Application implements ReactApplication {
 				new BackgroundTimerPackage(),
 				new KCKeepAwakePackage()
 			);
-			//return packages;
 		}
 	};
 

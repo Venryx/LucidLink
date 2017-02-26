@@ -2,6 +2,7 @@ package v.lucidlink;
 
 import android.Manifest;
 import android.bluetooth.BluetoothA2dp;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,28 +16,30 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
-import com.facebook.react.ReactPackage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.refresh.bed.LedsState;
+import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.bluetooth.RefreshBluetoothService;
 import com.resmed.refresh.model.json.JsonRPC;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import com.resmed.refresh.packets.VLPacketType;
 import com.resmed.refresh.ui.uibase.base.BaseBluetoothActivity;
-import com.resmed.refresh.ui.uibase.base.BluetoothDataListener;
 import com.resmed.refresh.utils.AppFileLog;
 import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 
-public class MainActivity extends BaseBluetoothActivity implements BluetoothDataListener {
+import static v.lucidlink.LLHolder.LL;
+
+public class MainActivity extends BaseBluetoothActivity {
 	public static MainActivity main;
 	public MainActivity() {
 		super();
@@ -45,29 +48,66 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		SPlusModule.mainActivity = this;
 	}
 
-	public boolean bluetoothConnected;
 	@Override protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		LL = new LucidLink();
+		//LL.baseContext = getBaseContext();
+		LL.appContext = (MainApplication)getApplicationContext();
 		MainActivity.main.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				// Bluetooth device gained/lost it's state as the media audio device
-				if(intent.getIntExtra(BluetoothA2dp.EXTRA_STATE, -1) == BluetoothA2dp.STATE_CONNECTED) {
-					MainActivity.this.bluetoothConnected = true;
-					V.Toast("A2DP device connected!", Toast.LENGTH_LONG);
-					LL.main.ApplyVolumeForCurrentType();
-				} else {
-					MainActivity.this.bluetoothConnected = false;
-					V.Toast("A2DP device disconnected!", Toast.LENGTH_LONG);
-					LL.main.ApplyVolumeForCurrentType();
-				}
-			}
-		}, new IntentFilter(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED));
 	}
 	@Override protected void onDestroy() {
 		SPlusModule.main.ShutDown();
+	}
+
+	List<BroadcastReceiver> receivers = new ArrayList<>();
+	private void AddAndRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+		MainActivity.main.registerReceiver(receiver, filter);
+		receivers.add(receiver);
+	}
+	public void RemoveReceivers() {
+		for (BroadcastReceiver receiver : receivers)
+			MainActivity.main.unregisterReceiver(receiver);
+		receivers.clear();
+	}
+
+	@Override protected void onStart() {
+		super.onStart();
+		boolean restarting = LL.mainModule != null;
+		if (restarting)
+			OnModuleInitOrRestart();
+	}
+	@Override protected void onStop() {
+		super.onStop();
+		RemoveReceivers();
+	}
+
+	public boolean bluetoothConnected;
+	void UpdateBluetoothConnected() {
+		AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+		boolean connected = audioManager.isBluetoothA2dpOn();
+		if (connected == bluetoothConnected) return;
+
+		bluetoothConnected = connected;
+		LL.mainModule.ApplyVolumeForCurrentType();
+		V.Log(bluetoothConnected ? "Bluetooth speaker connected." : "Bluetooth speaker disconnected.");
+	}
+
+	public void PostModuleInit() {
+		V.LogJava("PostModuleInit");
+		OnModuleInitOrRestart();
+		UpdateBluetoothConnected();
+	}
+	void OnModuleInitOrRestart() {
+		AddAndRegisterReceiver(new BroadcastReceiver() {
+			@Override public void onReceive(Context context, Intent intent) {
+				UpdateBluetoothConnected();
+			}
+		}, V.IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED, BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED, BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED));
+		AddAndRegisterReceiver(new BroadcastReceiver() {
+			public void onReceive(Context paramAnonymousContext, Intent paramAnonymousIntent) {
+				MainActivity.this.handleConnectionStatus((CONNECTION_STATE)paramAnonymousIntent.getExtras().get("EXTRA_RESMED_CONNECTION_STATE"));
+			}
+		}, new IntentFilter("ACTION_RESMED_CONNECTION_STATUS"));
 	}
 
 	static final int REQUEST_WRITE_STORAGE = 112;
@@ -76,7 +116,7 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 		// workaround for runtime bug of ContextCompat evaluating to the old version (in S+ jar)
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			return true;
-		return ContextCompat.checkSelfPermission(LL.main.reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+		return ContextCompat.checkSelfPermission(LL.reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 	}
 	public void EnsurePermissionsGranted() {
 		boolean hasPermission = ArePermissionsGranted();
@@ -106,20 +146,20 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
-		if (LL.main == null) super.onKeyDown(keyCode, event);
+		if (LL.mainModule == null) super.onKeyDown(keyCode, event);
 
 		char keyChar = (char)event.getUnicodeChar();
-		LL.main.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
-		if (LL.main.blockUnusedKeys)
+		JSBridge.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
+		if (LL.mainModule.blockUnusedKeys)
 			return true;
 		return super.onKeyDown(keyCode, event);
 	}
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (LL.main == null) super.onKeyUp(keyCode, event);
+		if (LL.mainModule == null) super.onKeyUp(keyCode, event);
 
 		char keyChar = (char)event.getUnicodeChar();
-		LL.main.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
-		if (LL.main.blockUnusedKeys)
+		JSBridge.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
+		if (LL.mainModule.blockUnusedKeys)
 			return true;
 		return super.onKeyUp(keyCode, event);
 	}
@@ -174,15 +214,15 @@ public class MainActivity extends BaseBluetoothActivity implements BluetoothData
 	}
 
 	public void handleConnectionStatus(final CONNECTION_STATE state) {
-		LL.main.connectionState = state;
+		LL.mainModule.connectionState = state;
 		V.Log("Connection status changed: " + state);
 
 		if (SPlusModule.main != null && SPlusModule.main.sessionConnector != null) {
 			if (state == CONNECTION_STATE.SOCKET_CONNECTED || state == CONNECTION_STATE.SOCKET_RECONNECTING
 				|| state == CONNECTION_STATE.SESSION_OPENING || state == CONNECTION_STATE.SESSION_OPENED) {
-				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.GREEN));
+				sendRpcToBed(RPCMapper.main.leds(LedsState.GREEN));
 			} else if (state == CONNECTION_STATE.REAL_STREAM_ON || state == CONNECTION_STATE.NIGHT_TRACK_ON) {
-				sendRpcToBed(BaseBluetoothActivity.getRpcCommands().leds(LedsState.OFF));
+				sendRpcToBed(RPCMapper.main.leds(LedsState.OFF));
 			}
 
 			if (state == CONNECTION_STATE.REAL_STREAM_ON) {
