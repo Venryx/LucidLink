@@ -4,7 +4,7 @@
 // special, early codes
 var g: any = global;
 g.g = g;
-Object.freeze = obj=>obj; // mwahahaha!! React can no longer freeze it's objects, so we can do as we please
+Object.freeze = obj=>obj; // mwahahaha!! React can no longer freeze its objects, so we can do as we please
 Object.isFrozen = obj=>true;
 
 var {VDF} = require("../Packages/VDF/VDF");
@@ -134,7 +134,7 @@ Object.prototype._AddFunction_Inline = function CallBaseConstructor_Manual(deriv
 	return this;
 };
 
-// probably temp; helper so 'p' function is usable on objects that aren't Node's (e.g. to declare property types)
+// probably temp; helper so "p" function is usable on objects that aren't Node's (e.g. to declare property types)
 /*Object.prototype._AddFunction_Inline = function AddHelpers(obj) {
 	this.p = Node_p;
 	return this;
@@ -176,9 +176,9 @@ Object.prototype._AddFunction_Inline = function GetTypeName(vdfType = true) { //
     return result;
 };*/
 
-/*import V from '../Packages/V/V';
-import {GetTypeName, IsNumberString, SimplifyType} from './Globals';
-import {max, min} from 'moment';*/
+/*import V from "../Packages/V/V";
+import {GetTypeName, IsNumberString, SimplifyType} from "./Globals";
+import {max, min} from "moment";*/
 
 // Object: normal
 // ==================
@@ -212,11 +212,6 @@ Object.prototype._AddFunction_Inline = function Extend(x) {
     }
 	return this;
 };
-
-// use "require" instead, so doesn't make TS see this as an external module (and thus disable interface extension)
-var V = require('../Packages/V/V').default;
-var {GetTypeName, IsNumberString, SimplifyType} = require('./Globals');
-var {max, min} = require('moment');
 
 // as replacement for C#'s "new MyClass() {prop = true}"
 //interface Object { Init: (obj)=>Object; }
@@ -262,9 +257,9 @@ Object.prototype._AddFunction_Inline = function Excluding(...propNames) {
 			result.push(key);
 	return result;
 };*/
-//Object.prototype._AddFunction_Inline = function Keys() { return Object.keys(this); }; // 'Keys' is already used for Dictionary prop
-//Object.prototype._AddGetter_Inline = function VKeys() { return Object.keys(this); }; // 'Keys' is already used for Dictionary prop
-Object.prototype._AddFunction_Inline = function VKeys() { return Object.keys(this); }; // 'Keys' is already used for Dictionary prop
+//Object.prototype._AddFunction_Inline = function Keys() { return Object.keys(this); }; // "Keys" is already used for Dictionary prop
+//Object.prototype._AddGetter_Inline = function VKeys() { return Object.keys(this); }; // "Keys" is already used for Dictionary prop
+Object.prototype._AddFunction_Inline = function VKeys() { return Object.keys(this); }; // "Keys" is already used for Dictionary prop
 // like Pairs for Dictionary, except for Object
 interface Object { readonly Props: any[]; }
 Object.prototype._AddGetter_Inline = function Props() {
@@ -720,7 +715,7 @@ Array.prototype._AddFunction_Inline = function LastOrX(matchFunc?, x = null) {
 }
 Array.prototype._AddFunction_Inline = function XFromLast(x) { return this[(this.length - 1) - x]; };
 
-// since JS doesn't have basic 'foreach' system
+// since JS doesn't have basic "foreach" system
 Array.prototype._AddFunction_Inline = function ForEach(func) {
 	for (var i in this)
 		func.call(this[i], this[i], i); // call, having the item be "this", as well as the first argument
@@ -832,15 +827,6 @@ Array.prototype._AddFunction_Inline = function Median() {
 	return ordered[this.length / 2]; // otherwise, return the exactly-middle one
 };
 
-// like Pairs for Dictionary, except for Array (why is this on Object.prototype instead of Array.prototype?)
-Object.prototype._AddGetter_Inline = function Entries() {
-	var result = [];
-	for (var i in this)
-		if (IsNumberString(i))
-			result.push({index: parseInt(i), value: this[i]});
-	return result;
-};
-
 // ArrayIterator
 // ==========
 
@@ -895,3 +881,10 @@ Object.prototype._AddFunction_Inline = function plus(offset) { return { left: th
 // ==========
 
 interface Error { readonly Stack: string; }
+
+// late-require things from other modules, that are used in the methods
+// ==========
+
+// use "require" instead, so doesn't make TS see this as an external module (and thus disable interface extension)
+var V = require("../Packages/V/V").default;
+var {IsNumberString} = require("./Globals");

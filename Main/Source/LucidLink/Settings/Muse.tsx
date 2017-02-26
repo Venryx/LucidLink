@@ -9,7 +9,7 @@ import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPick
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
 
 @observer
-export default class MuseUI extends Component<{} & BaseProps, {}> { 
+export default class MuseUI extends Component<{}, {}> { 
 	render() {
 		var node = LL.settings;
 		return (

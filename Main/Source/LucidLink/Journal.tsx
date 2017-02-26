@@ -163,7 +163,7 @@ export class Journal extends Node {
 g.Extend({Journal});
 
 @observer
-export class JournalUI extends Component<{} & BaseProps, {month?, openDream?}> {
+export class JournalUI extends Component<{}, {month?, openDream?}> {
 	state = {month: Moment(new Date().MonthDate), openDream: null};
 
 	loadedMonths = [];

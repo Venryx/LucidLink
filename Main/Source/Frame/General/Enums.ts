@@ -40,7 +40,7 @@ export function _Enum(target: any) {
 
 	// add enum entries
 	//var names = Object.getOwnPropertyNames(target.prototype);
-	var names = (Object.getOwnPropertyNames(new target()) as any).Except("name", "value");
+	var names = Object.getOwnPropertyNames(new target()).Except("name", "value");
 	var index = -1;
 	for (let name of names) {
 		let entry = new (target as any)(name, ++index);

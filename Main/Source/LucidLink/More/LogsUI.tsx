@@ -1,4 +1,5 @@
-import {BaseComponent, Panel, VButton, BaseProps} from "../../Frame/ReactGlobals";
+import {EveryXSecondsDo} from "../Scripts/ScriptGlobals";
+import {BaseComponent as Component, Panel, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Log} from "../../Frame/Globals";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
@@ -6,10 +7,16 @@ import {More} from "../More";
 import {Switch, Text, ScrollView} from "react-native";
 import {LL} from "../../LucidLink";
 
-export default class LogsUI extends BaseComponent<{} & BaseProps, {}> {
+export default class LogsUI extends Component<{}, {}> {
 	constructor(props) {
 		super(props);
-		LL.more.logsUI = this;
+
+		let lastLogCount = 0;
+		EveryXSecondsDo(1, ()=> {
+			if (More.logEntries.length == lastLogCount) return;
+			lastLogCount = More.logEntries.length;
+			this.Update();
+		}).SetContext(this);
 	}
 
 	render() {

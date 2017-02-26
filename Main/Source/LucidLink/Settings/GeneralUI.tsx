@@ -12,7 +12,7 @@ import {Gender} from "../Settings";
 import {Select_Auto} from "../../Packages/ReactNativeComponents/Select";
 
 @observer
-export default class GeneralUI extends Component<{} & BaseProps, {}> { 
+export default class GeneralUI extends Component<{}, {}> { 
 	render() {
 		var node = LL.settings;
 		return (

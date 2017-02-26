@@ -341,7 +341,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		AudioManager audioManager = (AudioManager)MainActivity.main.getSystemService(Context.AUDIO_SERVICE);
 		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		if (!MainActivity.main.bluetoothConnected && normalVolumeToApply != -1) {
-			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
+			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (normalVolumeToApply * maxVolume), 0);
 			normalVolumeToApply = -1;
 		} else if (MainActivity.main.bluetoothConnected && bluetoothVolumeToApply != -1) {
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);

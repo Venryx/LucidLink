@@ -19,7 +19,7 @@ import SleepSegmentsUI from "./SleepSegmentsUI";
 import SleepSession from "../Session/SleepSession";
 
 @observer
-export default class GraphUI extends Component<{} & BaseProps, {}> {
+export default class GraphUI extends Component<{}, {}> {
 	leftPanel = null;
 	ToggleLeftPanelOpen() {
 		if (this.leftPanel._open)

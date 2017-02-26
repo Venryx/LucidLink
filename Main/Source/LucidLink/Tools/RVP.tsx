@@ -146,7 +146,7 @@ export class RVP extends Node {
 }
 
 @observer
-export class RVPUI extends Component<{} & BaseProps, {}> {
+export class RVPUI extends Component<{}, {}> {
 	render() {
 		var node = LL.tools.rvp;
 		return (

@@ -101,6 +101,8 @@ public class MainActivity extends BaseBluetoothActivity {
 		AddAndRegisterReceiver(new BroadcastReceiver() {
 			@Override public void onReceive(Context context, Intent intent) {
 				UpdateBluetoothConnected();
+				// try again a second later, since audio-manager's state can take a bit to update after a change (such as might have just happened)
+				V.WaitXThenRun(1000, ()->UpdateBluetoothConnected());
 			}
 		}, V.IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED, BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED, BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED));
 		AddAndRegisterReceiver(new BroadcastReceiver() {

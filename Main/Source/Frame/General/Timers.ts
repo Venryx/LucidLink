@@ -1,3 +1,4 @@
+import {BaseComponent} from "../ReactGlobals";
 import V from "../../Packages/V/V";
 import BackgroundTimer from "react-native-background-timer";
 import {Global, Log} from "../Globals";
@@ -54,9 +55,9 @@ export class Timer {
 	maxCallCount: number;
 	asBackground: boolean;
 
-	SetContext(context: TimerContext) {
-		if (context)
-			context.timers.push(this);
+	SetContext(contextOrComp: TimerContext | BaseComponent<any, any>) {
+		if (contextOrComp)
+			contextOrComp.timers.push(this);
 		return this;
 	}
 

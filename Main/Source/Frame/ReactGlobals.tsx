@@ -57,19 +57,21 @@ EStyleSheet.build();
 
 import autoBind from "react-autobind";
 import {Assert} from "./General/Assert";
-import {WaitXThenRun, WaitXThenRun_BuiltIn} from "./General/Timers";
+import {WaitXThenRun, WaitXThenRun_BuiltIn, Timer} from "./General/Timers";
 import {ViewProperties, TouchableOpacityProperties, ButtonProperties, TextProperties, TextInputProperties} from "react-native";
 import {IsString} from "./Types";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/
 
-export class BaseComponent<P, S> extends Component<P, S> {
+export class BaseComponent<P, S> extends Component<P & BaseProps, S> {
 	constructor(props) {
 		super(props);
 		autoBind(this);
 		this.state = this.state || {} as any;
 	}
+
+	timers = [] as Timer[];
 
 	get FlattenedChildren() {
 	    var children = this.props.children;
@@ -142,18 +144,18 @@ export class BaseComponent<P, S> extends Component<P, S> {
 	autoRemoveChangeListeners = true;
 	ComponentWillMount(): void {};
 	ComponentWillMountOrReceiveProps(props: any, forMount?: boolean): void {};
-	componentWillMount() {
+	private componentWillMount() {
 		if (this.autoRemoveChangeListeners)
 			this.RemoveChangeListeners();
-		this.ComponentWillMount && this.ComponentWillMount(); 
-	    this.ComponentWillMountOrReceiveProps && this.ComponentWillMountOrReceiveProps(this.props, true); 
+		this.ComponentWillMount(); 
+	    this.ComponentWillMountOrReceiveProps(this.props, true); 
 	}
 	ComponentDidMount(...args: any[]): void {};
 	ComponentDidMountOrUpdate(forMount: boolean): void {};
 	mounted = false;
-	componentDidMount(...args) {
-	    this.ComponentDidMount && this.ComponentDidMount(...args);
-		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(true);
+	private componentDidMount(...args) {
+		this.ComponentDidMount(...args);
+		this.ComponentDidMountOrUpdate(true);
 		this.mounted = true;
 		if (this.PostRender) {
 			WaitXThenRun_BuiltIn(0, ()=>window.requestAnimationFrame(()=> {
@@ -165,17 +167,24 @@ export class BaseComponent<P, S> extends Component<P, S> {
 			});*/
 		}
 	}
+	private componentWillUnmount() {
+		for (let timer of this.timers)
+			timer.Stop();
+		this.timers = [];
+		this.mounted = false;
+	}
+	
 	ComponentWillReceiveProps(newProps: any[]): void {};
-	componentWillReceiveProps(newProps) {
+	private componentWillReceiveProps(newProps) {
 		if (this.autoRemoveChangeListeners)
 			this.RemoveChangeListeners();
-		this.ComponentWillReceiveProps && this.ComponentWillReceiveProps(newProps);
-	    this.ComponentWillMountOrReceiveProps && this.ComponentWillMountOrReceiveProps(newProps, false);
+		this.ComponentWillReceiveProps(newProps);
+	    this.ComponentWillMountOrReceiveProps(newProps, false);
 	}
 	ComponentDidUpdate(...args: any[]): void {};
-	componentDidUpdate(...args) {
-	    this.ComponentDidUpdate && this.ComponentDidUpdate(...args);
-		this.ComponentDidMountOrUpdate && this.ComponentDidMountOrUpdate(false);
+	private componentDidUpdate(...args) {
+	    this.ComponentDidUpdate(...args);
+		this.ComponentDidMountOrUpdate(false);
 		if (this.PostRender) {
 			WaitXThenRun_BuiltIn(0, ()=>window.requestAnimationFrame(()=> {
 			    if (!this.mounted) return;
@@ -185,10 +194,6 @@ export class BaseComponent<P, S> extends Component<P, S> {
 				this.PostRender(false);
 			});*/
 		}
-	}
-
-	componentWillUnmount() {
-		this.mounted = false;
 	}
 
 	PostRender(initialMount: boolean): void {};
@@ -264,8 +269,8 @@ export function BasicStyles(props) {
 /*var View2: React.ComponentClass<any> = View;
 export class Panel extends View {*/
 
-//type PanelProps = {touchable?, style?} & BaseProps & ViewProperties;
-type PanelProps = {touchable?, style?} & BaseProps & Partial<ViewProperties> & Partial<TouchableOpacityProperties> & {fixer?};
+//type PanelProps = {touchable?, style?} & ViewProperties;
+type PanelProps = {touchable?, style?} & Partial<ViewProperties> & Partial<TouchableOpacityProperties> & {fixer?};
 export class Panel extends BaseComponent<PanelProps, {}> {
 	setNativeProps(nativeProps) {
 		this.root.setNativeProps(nativeProps);
@@ -331,7 +336,7 @@ export class Column extends BaseComponent<{width?, style?} & PanelProps, {}> {
 	}
 }
 
-export class VText extends BaseComponent<{style?} & BaseProps & TextProperties, {}> {
+export class VText extends BaseComponent<{style?} & TextProperties, {}> {
 	render() {
 		var {style, children, ...rest} = this.props as any;
 		return (
@@ -348,7 +353,7 @@ export class VText extends BaseComponent<{style?} & BaseProps & TextProperties, 
 }
 
 export class VButton extends BaseComponent<
-		{text, caps?, style?, textStyle?, enabled?, title?} & BaseProps & Partial<ButtonProperties>, {}> {
+		{text, caps?, style?, textStyle?, enabled?, title?} & Partial<ButtonProperties>, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;
@@ -369,7 +374,7 @@ export class VButton extends BaseComponent<
 	}
 }
 
-export class AutoExpandingTextInput extends BaseComponent<{style?} & BaseProps & TextInputProperties, {height, text}> {
+export class AutoExpandingTextInput extends BaseComponent<{style?} & TextInputProperties, {height, text}> {
 	constructor(props) {
   		super(props);
 		var {defaultValue, height} = props;

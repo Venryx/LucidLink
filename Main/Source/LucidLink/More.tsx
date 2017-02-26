@@ -58,12 +58,7 @@ export class More extends Node {
 				LL.tracker.currentSession.logFile.AppendText("\n" + More.logEntries[i].toString());
 			More.logEntries_lastLoggedToFile = More.logEntries.length - 1;
 		}
-
-		if (LL && LL.more && LL.more.logsUI && LL.more.logsUI.props.active)
-			LL.more.logsUI.forceUpdate();
 	}
-	
-	logsUI = null;
 
 	// console
 	@P() jsCode = "";

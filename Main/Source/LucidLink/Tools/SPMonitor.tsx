@@ -101,7 +101,7 @@ class GraphUI extends Component<{}, {}> {
 
 class GraphOverlayUI extends Component<{}, {}> {
 	timer: Timer;
-	componentDidMount() {
+	ComponentDidMount() {
 		SPBridge.listeners_onReceiveTemp.push(this.OnReceiveTemp);
 		SPBridge.listeners_onReceiveLightValue.push(this.OnReceiveLightValue);
 		SPBridge.listeners_onReceiveBreathValue.push(this.OnReceiveBreathValue);
@@ -111,7 +111,7 @@ class GraphOverlayUI extends Component<{}, {}> {
 			this.forceUpdate();
 		}).Start();
 	}
-	componentWillUnmount() {
+	ComponentWillUnmount() {
 		SPBridge.listeners_onReceiveTemp.Remove(this.OnReceiveTemp);
 		SPBridge.listeners_onReceiveLightValue.Remove(this.OnReceiveLightValue);
 		SPBridge.listeners_onReceiveBreathValue.Remove(this.OnReceiveBreathValue);

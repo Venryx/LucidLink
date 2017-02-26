@@ -7,7 +7,7 @@ import Node from "../VTree/Node";
 import {Assert} from "../../Frame/General/Assert";
 
 @observer
-export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?} & BaseProps, {}> {
+export class VSwitch extends Component<{text?, value?, onChange?, style?, containerStyle?}, {}> {
 	render() {
 		var {text, value, onChange, style, containerStyle, ...rest} = this.props;
 
@@ -32,7 +32,7 @@ export class VSwitch extends Component<{text?, value?, onChange?, style?, contai
 @observer
 export class VSwitch_Auto extends Component<
 		{text?, value?, onChange?, style?, containerStyle?,
-			path: ()=>any} & BaseProps, {}> {
+			path: ()=>any}, {}> {
 	render() {
 		var {onChange, path, ...rest} = this.props;
 		let {node, key: propName} = path();

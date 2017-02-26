@@ -175,7 +175,7 @@ class FBARun {
 }
 
 @observer
-export class FBAUI extends Component<{} & BaseProps, {}> {
+export class FBAUI extends Component<{}, {}> {
 	render() {
 		var node = LL.tools.fba;
 		return (

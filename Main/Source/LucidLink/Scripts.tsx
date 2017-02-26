@@ -161,7 +161,7 @@ export class ScriptsUI extends Component<any, any> {
 			this._drawer.open();
 	}
 
-	componentDidMount() {
+	ComponentDidMount() {
 		autorun(()=> {
 			LL.scripts.selectedScript; // listen for changes
 			this._drawer.close();

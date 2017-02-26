@@ -11,7 +11,7 @@ import {LL} from "../../LucidLink";
 import {VTextInput} from "../../Packages/ReactNativeComponents/VTextInput";
 
 @observer
-export default class DisplayersUI extends Component<any, any> {
+export default class DisplayersUI extends Component<{}, {scriptLastRunsOutdated}> {
 	_drawer = null;
 	ToggleSidePanelOpen() {
 		if (this._drawer._open)
@@ -20,7 +20,7 @@ export default class DisplayersUI extends Component<any, any> {
 			this._drawer.open();
 	}
 
-	componentDidMount() {
+	ComponentDidMount() {
 		autorun(()=> {
 			LL.tracker.selectedDisplayerScript; // listen for changes
 			this._drawer.close();

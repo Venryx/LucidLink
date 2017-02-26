@@ -7,7 +7,7 @@ import "./Packages/VDF/VDFTokenParser";
 import "./Packages/VDF/VDFTypeInfo";
 
 // special, early imports (eg type extensions)
-import "./Frame/CE"; // contains first actual statements (eg, setting global "g")
+import "./Frame/CE";
 
 // imports for otherwise-not-imported files
 import "moment-round";
@@ -41,6 +41,10 @@ import LibMuse from "react-native-libmuse";
 import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
 import {Tools} from "./LucidLink/Tools";
 import SPBridge from "./Frame/SPBridge";
+
+//Assert([].Except instanceof Function, "Could not add extension-methods. Make sure function names are preserved by js-minifier.");
+if (!([].Except instanceof Function))
+	throw new Error("Could not add extension-methods. Make sure function names are preserved by js-minifier.");
 
 //var ScrollableTabView = require("react-native-scrollable-tab-view");
 ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
