@@ -1,6 +1,7 @@
 package SPlus;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -8,12 +9,15 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
 import v.lucidlink.MainActivity;
 import v.lucidlink.V;
+
+import static v.lucidlink.LLHolder.LL;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	public static Activity mainActivity;
@@ -125,6 +129,8 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		this.sessionConnector.StartNewSession();
 		MainActivity.main.sendRpcToBed(RPCMapper.main.startRealTimeStream());
 		currentSessionType = "real time";
+
+		LL.analytics.logEvent("StartRealTimeSession", new Bundle());
 	}
 	@ReactMethod public void StartSleepSession() {
 		StopSession();
@@ -133,6 +139,8 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		this.sessionConnector.StartNewSession();
 		MainActivity.main.sendRpcToBed(RPCMapper.main.startNightTracking());
 		currentSessionType = "sleep";
+
+		LL.analytics.logEvent("StartSleepSession", new Bundle());
 	}
 	@ReactMethod public void StopSession() {
 		if (currentSessionType == null) return;

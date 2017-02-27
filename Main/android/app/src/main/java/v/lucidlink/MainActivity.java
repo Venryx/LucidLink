@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.resmed.refresh.bed.LedsState;
@@ -53,6 +54,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		LL = new LucidLink();
 		//LL.baseContext = getBaseContext();
 		LL.appContext = (MainApplication)getApplicationContext();
+		LL.analytics = FirebaseAnalytics.getInstance(this);
 		MainActivity.main.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	@Override protected void onDestroy() {
