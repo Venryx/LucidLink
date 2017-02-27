@@ -1,24 +1,36 @@
-import {Assert} from "../Packages/VDF/VDF";
+import {Assert, Log} from "../Packages/VDF/VDF";
 import {Timer, WaitXThenRun} from "./General/Timers";
+import Sound from "react-native-sound";
 
 export class AudioFile {
-	constructor(baseFile) {
-		this.baseFile = baseFile;
+	constructor(audioFilePath: string, onLoaded?: Function) {
+		this.baseFile = new Sound(audioFilePath, "", error=> {
+			if (error)
+				Log(`Failed to load the sound "${name}":`, error);
+			// apply delayed commands, since base-file's loaded now
+			for (let func of this.postLoadFuncs)
+				func();
+			if (onLoaded) onLoaded(error);
+		});
 		//this.PlayCount = -1;
 	}
 	baseFile;
+	postLoadFuncs = [] as (()=>void)[];
 
 	Play() {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.Play()); return this; }
 		this.playStartTime = new Date().getTime();
 		this.baseFile.play();
 		return this;
 	}
 	Pause() {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.Pause()); return this; }
 		this.baseFile.pause();
 		this.wasPaused = true;
 		return this;
 	}
 	Stop() {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.Stop()); return this; }
 		this.SetCurrentTime(0);
 		this.baseFile.stop();
 		WaitXThenRun(1000, ()=> {
@@ -32,7 +44,10 @@ export class AudioFile {
 		this.playStartTime = null;
 		return this;
 	}
-	Release() { this.baseFile.release(); }
+	Release() {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.Release()); return; }
+		this.baseFile.release();
+	}
 
 	playStartTime = null;
 	wasPaused = false;
@@ -51,7 +66,11 @@ export class AudioFile {
 
 	// volume range is 0-1
 	GetVolume() { return this.baseFile.getVolume(); }
-	SetVolume(volume) { return this.baseFile.setVolume(volume); }
+	SetVolume(volume) {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.SetVolume(volume)); return; }
+		this.baseFile.setVolume(volume);
+	}
+
 	AddVolume(amount) { return this.SetVolume(this.GetVolume() + amount); }
 	fadeVolumeTimer: Timer;
 	FadeVolume(options) {
@@ -77,20 +96,25 @@ export class AudioFile {
 	}
 
 	GetCurrentTime(callback) { this.baseFile.getCurrentTime(callback); }
-	SetCurrentTime(newTime) { this.baseFile.setCurrentTime(newTime); }
+	SetCurrentTime(newTime) {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.SetCurrentTime(newTime)); return; }
+		this.baseFile.setCurrentTime(newTime);
+	}
+
 	get PlayCount() { 
-		var result = this.baseFile.getNumberOfLoops();
+		var loopCount = this.baseFile.getNumberOfLoops();
 		// library "loop count" is apparently *extra* times to play audio
 		//		since base-file's "loop count" didn't include 1 for the first-play, we add it ourselves
-		if (result != -1) result--;
-		return result;
+		let playCount = loopCount == -1 ? -1 : loopCount + 1;
+		return playCount;
 	}
 	// set to -1 for endless loop
-	set PlayCount(count) {
+	set PlayCount(playCount) {
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.PlayCount = playCount); return; }
 		// library "loop count" is apparently *extra* times to play audio
 		//		since first-play is outside that, remove it's 1 from the base-file's "loop count" we're sending
-		if (count != -1) count--;
-		this.baseFile.setNumberOfLoops(count);
+		let loopCount = playCount == -1 ? -1 : playCount - 1;
+		this.baseFile.setNumberOfLoops(loopCount);
 	}
 
 	//GetPan() { return this.baseFile.getPan(pan); } // ios only

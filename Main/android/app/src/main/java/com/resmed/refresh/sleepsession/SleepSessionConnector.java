@@ -30,27 +30,19 @@ import v.lucidlink.V;
 
 public class SleepSessionConnector {
 	private BaseBluetoothActivity bAct;
-	private int bioCurrentTotalCount;
-	private int bioOnBeD;
-	private Runnable heartbeatTimeoutRunnable;
 	private boolean isHandlingHeartBeat;
 	private boolean isRecovering = false;
 	private boolean isSyncAndStop;
 	private boolean isWaitLastSamples;
-	private Long lastHeartBeatTimestamp;
-	private Handler myHeartbeatHandler;
 	private JsonRPC pendingBioSamplesRpc;
 	private JsonRPC pendingEnvSamplesRpc;
 
 	public RefreshBluetoothService service;
 
-	public SleepSessionConnector(BaseBluetoothActivity paramBaseBluetoothActivity, int paramInt, boolean paramBoolean) {
-		this.isSyncAndStop = paramBoolean;
+	public SleepSessionConnector(BaseBluetoothActivity paramBaseBluetoothActivity, boolean isSyncing) {
+		this.isSyncAndStop = isSyncing;
 		this.bAct = paramBaseBluetoothActivity;
-		this.bioOnBeD = paramInt;
 		//this.isClosingSession = false;
-		this.myHeartbeatHandler = new Handler();
-
 		service = new RefreshBluetoothService();
 	}
 
@@ -106,11 +98,9 @@ public class SleepSessionConnector {
 			this.pendingEnvSamplesRpc = null;
 			this.isHandlingHeartBeat = false;
 			AppFileLog.addTrace("");
-			this.myHeartbeatHandler.removeCallbacks(this.heartbeatTimeoutRunnable);
 			if (this.isRecovering) {
 				this.isRecovering = false;
 			}
-			this.lastHeartBeatTimestamp = System.currentTimeMillis();
 			//this.sleepSessionListener.onSessionOk();
 			/*if (this.isClosingSession) {
 				this.isWaitLastSamples = true;
@@ -144,10 +134,6 @@ public class SleepSessionConnector {
 	private void handleHeartBeat(final byte[] array) {
 		if (this.bAct != null) {
 			Log.d("com.resmed.refresh.sleepFragment", "IN HeartBeat ignored because : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
-			this.lastHeartBeatTimestamp = System.currentTimeMillis();
-			final SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this.bAct.getApplicationContext()).edit();
-			edit.putLong("PREF_NIGHT_LAST_TIMESTAMP_ID", this.lastHeartBeatTimestamp);
-			edit.commit();
 			if (this.isWaitLastSamples || this.isHandlingHeartBeat) {
 				AppFileLog.addTrace("IN HeartBeat ignored because : isWaitLastSamples=" + this.isWaitLastSamples + "  ||  isHandlingHeartBeat=" + this.isHandlingHeartBeat);
 				return;
@@ -157,52 +143,12 @@ public class SleepSessionConnector {
 			final int storeLocalEnv = PacketsByteValuesReader.getStoreLocalEnv(array);
 			V.LogJava("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
 
-			this.setBioOnBeD(storeLocalBio);
-			this.checkReceivingHeartBeat(this.bioCurrentTotalCount += this.bioOnBeD, storeLocalBio);
 			AppFileLog.addTrace("");
-			AppFileLog.addTrace("IN : HeartBeat Pending BIO : " + storeLocalBio + " ENV : " + storeLocalEnv + "\tbioTotalCount=" + this.bioCurrentTotalCount);
+			AppFileLog.addTrace("IN : HeartBeat Pending BIO : " + storeLocalBio + " ENV : " + storeLocalEnv);
 
 			this.requestSamples(storeLocalBio, storeLocalEnv);
-			/*V.Log("storeLocalBio:" + storeLocalBio + ";storeLocalEnv:" + storeLocalEnv);
-			storeLocalBio_copy = storeLocalBio;
-			storeLocalEnv_copy = storeLocalEnv;*/
 		}
 	}
-	/*int storeLocalBio_copy;
-	int storeLocalEnv_copy;*/
-
-	private void checkReceivingHeartBeat(final int totalBioCountAtHeartBeat, int bioCountForHeartbeat) {
-		int delayTime;
-		if (bioCountForHeartbeat < ACRAConstants.DEFAULT_SOCKET_TIMEOUT) {
-			delayTime = 15000;
-		} else if (bioCountForHeartbeat < 50000) {
-			delayTime = 100000;
-		} else if (bioCountForHeartbeat < 500000) {
-			delayTime = 400000;
-		} else {
-			delayTime = 900000;
-		}
-		Log.d(LOGGER.TAG_SLEEP_FRAGMENT, "Heartbeat time to be completed : " + delayTime);
-		AppFileLog.addTrace("Heartbeat time to be completed : " + delayTime);
-		this.heartbeatTimeoutRunnable = () -> {
-			AppFileLog.addTrace("Checking HeartBeat lastBioCount=" + totalBioCountAtHeartBeat + " bioTotalCount=" + SleepSessionConnector.this.bioCurrentTotalCount);
-			if (SleepSessionConnector.this.bAct != null && !SleepSessionConnector.this.isWaitLastSamples && SleepSessionConnector.this.bioCurrentTotalCount == totalBioCountAtHeartBeat) {
-				AppFileLog.addTrace("Timeout waiting for HeartBeat => Binding the service");
-				SleepSessionConnector.this.pendingBioSamplesRpc = null;
-				SleepSessionConnector.this.pendingEnvSamplesRpc = null;
-				SleepSessionConnector.this.isHandlingHeartBeat = false;
-			}
-		};
-		this.myHeartbeatHandler.postDelayed(this.heartbeatTimeoutRunnable, (long) delayTime);
-	}
-
-	/*public void requestSamples_whateverIsLeft() {
-		V.Log("Requesting samples:" + storeLocalBio_copy + ";" + storeLocalEnv_copy);
-		if (storeLocalBio_copy == 0 && storeLocalEnv_copy == 0) return;
-		requestSamples(storeLocalBio_copy, storeLocalEnv_copy);
-		storeLocalBio_copy = 0;
-		storeLocalEnv_copy = 0;
-	}*/
 
 	public void requestSamples(int countBio, int countEnv) {
 		//V.Log("Requesting samples:" + countBio + ";" + countEnv + ";" + V.GetStackTrace());
@@ -228,14 +174,14 @@ public class SleepSessionConnector {
 		}
 	}
 
-	public void handleBreathingRate(Bundle paramBundle) {
+	public void handleBreathingRate(Bundle breathingRate) {
 		Log.i("RM20StartMethod", "handleBreathingRate() SleepTrackFragment");
 	}
 
 	public void handleConnectionStatus(CONNECTION_STATE paramCONNECTION_STATE) {
 		if (this.isSyncAndStop) {
 		}
-		final Handler localHandler = new Handler();
+		//final Handler localHandler = new Handler();
 		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::handleConnectionStatus()  connState : " + paramCONNECTION_STATE);
 		Log.d("com.resmed.refresh.sleepFragment", " SleepSessionConnector::handleConnectionStatus()  isHandlingHeartBeat : " + this.isHandlingHeartBeat);
 		switch (paramCONNECTION_STATE) {
@@ -331,7 +277,7 @@ public class SleepSessionConnector {
 			AppFileLog.addTrace("STOP handleSleepSessionStopped() sessionId : " + long1 + " secondsElapsed : " + long2 + " sParamsJson : " + string);
 			AppFileLog.addTrace("Session AlarmFireEpoch: " + int1);
 			final SleepParams sleepParams = (SleepParams) new Gson().fromJson(string, (Class) SleepParams.class);
-			Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment::handleSleepSessionStopped(Bundle data) bioTotalCount : " + this.bioCurrentTotalCount);
+			Log.d("com.resmed.refresh.sleepFragment", " SleepTrackFragment::handleSleepSessionStopped(Bundle data)");
 			if (int2 < Consts.MIN_SAMPLES_TO_SAVE_RECORD) {
 				b = true;
 			} else {
@@ -367,23 +313,6 @@ public class SleepSessionConnector {
 
 	public void handleUserSleepState(Bundle paramBundle) {
 		Log.i("RM20StartMethod", "handleUserSleepState() SleepTrackFragment");
-	}
-
-	public void setBioOnBeD(final int bioOnBeD) {
-		this.bioOnBeD = bioOnBeD;
-		int n = 15000;
-		if (bioOnBeD < 50000) {
-			n = 2000;
-		} else if (bioOnBeD > 50000 && bioOnBeD < 200000) {
-			n = 5000;
-		} else if (bioOnBeD > 300000) {
-			n = 10000;
-		} else if (bioOnBeD > 500000) {
-			n = 20000;
-		}
-		/*if (this.processRecord != null) {
-			this.processRecord.setTickTime((long)n);
-		}*/
 	}
 
 	public void StartNewSession() {

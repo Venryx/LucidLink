@@ -58,6 +58,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		MainActivity.main.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	@Override protected void onDestroy() {
+		super.onDestroy();
 		SPlusModule.main.ShutDown();
 	}
 

@@ -26,6 +26,12 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		super(reactContext);
 		main = this;
 		this.reactContext = reactContext;
+
+		//Init(); // just call it right away
+		if (mainActivity == null)
+			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
+		this.sessionConnector = new SleepSessionConnector(MainActivity.main, false);
+		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
 	}
 	ReactApplicationContext reactContext;
 	@Override public String getName() {
@@ -34,46 +40,19 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 	public void SendEvent(String eventName, Object... args) {
 		WritableArray argsList = Arguments.createArray();
-		for (Object arg : args) {
-			// for types that are invalid, but can easily be cast to a valid one, do so
-			/*if (arg instanceof Float)
-				arg = (double)(float)arg;
-
-			if (arg == null)
-				argsList.pushNull();
-			else if (arg instanceof Boolean)
-				argsList.pushBoolean((Boolean) arg);
-			else if (arg instanceof Integer)
-				argsList.pushInt((Integer) arg);
-			else if (arg instanceof Double)
-				argsList.pushDouble((Double) arg);
-			else if (arg instanceof String)
-				argsList.pushString((String) arg);
-			else if (arg instanceof WritableArray)
-				argsList.pushArray((WritableArray) arg);
-			else {
-				//Assert(arg instanceof WritableMap, "Event args must be one of: WritableArray, Boolean")
-				if (!(arg instanceof WritableMap))
-					throw new RuntimeException("Event args must be one of: Boolean, Integer, Double, String, WritableArray, WritableMap");
-				argsList.pushMap((WritableMap) arg);
-			}*/
+		for (Object arg : args)
 			V.WritableArray_Add(argsList, arg);
-		}
-
 		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(eventName, argsList);
 	}
 
 	public SleepSessionConnector sessionConnector;
-	@ReactMethod public void Init() {
+	/*@ReactMethod public void Init() {
 		if (mainActivity == null)
 			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
-
-		int bioOnBed = 0; // how many packets to buffer before sending from device to here?
-		boolean isSyncing = false;
-		this.sessionConnector = new SleepSessionConnector(MainActivity.main, bioOnBed, isSyncing);
+		this.sessionConnector = new SleepSessionConnector(MainActivity.main, false);
 		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
-	}
+	}*/
 
 	public boolean connectorActive;
 	@ReactMethod public void Connect() {

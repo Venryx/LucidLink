@@ -25,16 +25,12 @@ import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
 
 var audioFiles = audioFiles || {};
-function GetAudioFile(name) {
+function GetAudioFile(name: string, onLoaded?: Function): AudioFile {
 	if (audioFiles[name] == null) {
 		var audioFileEntry = LL.settings.audioFiles.First(a=>a.name == name);
 		if (audioFileEntry == null)
-			alert("Cannot find audio-file entry with name '" + name + "'.");
-		var baseFile = new Sound(audioFileEntry.path, "", function(error) {
-			if (error)
-				console.log("Failed to load the sound '" + name + "':", error);
-		});
-		var audioFile = new AudioFile(baseFile);
+			alert(`Cannot find audio-file entry with name "${name}".`);
+		var audioFile = new AudioFile(audioFileEntry.path, onLoaded);
 		audioFiles[name] = audioFile;
 	}
 	return audioFiles[name];
@@ -117,17 +113,12 @@ class FBARun {
 				var audioFile = GetAudioFile(track);
 				audioFile.PlayCount = -1;
 				//audioFile.Stop().SetVolume(0);
-				// wait a bit (apparently audio files need some time to load)
-				WaitXThenRun(1000, ()=> {
-					audioFile.Play();
-					audioFile.SetVolume(node.backgroundMusic_volume);
-				});
+				audioFile.Play().SetVolume(node.backgroundMusic_volume);
 			}
 			new Timer(30, ()=> {
 				for (let track of node.backgroundMusic_tracks) {
 					var audioFile = GetAudioFile(track);
-					audioFile.Play();
-					audioFile.SetVolume(node.backgroundMusic_volume);
+					audioFile.Play().SetVolume(node.backgroundMusic_volume);
 				}
 			}).Start().SetContext(this.timerContext);
 		}

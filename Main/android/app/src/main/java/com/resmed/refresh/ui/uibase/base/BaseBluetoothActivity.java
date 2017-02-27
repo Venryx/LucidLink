@@ -168,7 +168,8 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		sendMessageToService(message);
 	}
 	public void sendMessageToService(Message message) {
-		SPlusModule.main.sessionConnector.service.handleMessage(message);
+		if (SPlusModule.main.sessionConnector != null) // fix for bug while closing (during dev)
+			SPlusModule.main.sessionConnector.service.handleMessage(message);
 	}
 
 	private boolean sendRPC(JsonRPC var1) {

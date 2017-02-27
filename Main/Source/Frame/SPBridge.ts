@@ -63,7 +63,7 @@ var core = NativeModules.SPlus;
 export class SPBridgeClass {
 	initialized = false;
 	Init() {
-		core.Init();
+		//core.Init();
 
 		DeviceEventEmitter.addListener("OnReceiveTemp", (args: any)=> {
 			var [tempInCelsius, tempInFarenheit] = args;
