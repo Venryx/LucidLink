@@ -6,6 +6,7 @@ import {IsPrimitive, IsString} from "../../Frame/Types";
 export default class V {
 	static minInt = Number.MIN_SAFE_INTEGER;
 	static maxInt = Number.MAX_SAFE_INTEGER;
+	//static emptyString_truthy = []; // not really a string, but ([] + "") == "", and [] is truthy (ie, !![] == true)
 
 	static Distance(point1, point2) {
 		var width = Math.abs(point2.x - point1.x);

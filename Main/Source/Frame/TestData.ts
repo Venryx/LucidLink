@@ -9,7 +9,7 @@ LucidLink>{^}
 	scripts:Scripts>{^}
 	settings:Settings>{^}
 		audioFiles:[^]
-			{name:"waterfall" path:"file:///android_asset/Waterfall.mp3"}
+			{name:"waterfall" path:"assets/Waterfall.mp3"}
 	more:More>{^}
 		jsCode:""
 `.trim();

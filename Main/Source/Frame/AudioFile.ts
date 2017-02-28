@@ -18,10 +18,11 @@ export class AudioFileManager {
 }
 
 export class AudioFile {
-	constructor(audioFilePath: string, onLoaded?: Function) {
-		this.baseFile = new Sound(audioFilePath, "", error=> {
+	constructor(filePath: string, onLoaded?: Function) {
+		let [basePath, fileName] = filePath.SplitAt(filePath.lastIndexOf("/"), false);
+		this.baseFile = new Sound(fileName, basePath, error=> {
 			if (error)
-				Log(`Failed to load audio-file at "${audioFilePath}":`, error);
+				Log(`Failed to load audio-file at "${filePath}":`, error);
 			else {
 				// apply delayed commands, since base-file's loaded now
 				for (let func of this.postLoadFuncs)

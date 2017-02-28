@@ -345,7 +345,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		throw new Error("Should be handled in MainActivity.X");
 	}
 
-	protected static final int REQUEST_ENABLE_BT = 161;
+	/*protected static final int REQUEST_ENABLE_BT = 161;
 	private static boolean userAllowBluetooth = true;
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, requestCode, data);
@@ -357,7 +357,7 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 				SPlusModule.main.Disconnect();
 			}
 		}
-	}
+	}*/
 
 	protected void onCreate(Bundle var1) {
 		super.onCreate(var1);

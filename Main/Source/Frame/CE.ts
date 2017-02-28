@@ -517,6 +517,14 @@ String.prototype._AddFunction_Inline = function splitByAny() {
 
 	return this.split(splitStr);
 };
+interface String { SplitAt: (index: number, includeCharAtIndex?)=>[string, string]; }
+String.prototype.SplitAt = function(index: number, includeCharAtIndex = true) {
+	if (index == -1) // if no split-index, pass source-string as part2 (makes more sense for paths and such)
+		return ["", this];
+	let part1 = this.substr(0, index);
+	let part2 = includeCharAtIndex ? this.substr(index) : this.substr(index + 1);
+	return [part1, part2];
+};
 String.prototype._AddFunction_Inline = function splice(index, removeCount, insert) { return this.slice(0, index) + insert + this.slice(index + Math.abs(removeCount)); };
 String.prototype._AddFunction_Inline = function Indent(indentCount) {
     var indentStr = "\t".repeat(indentCount);
