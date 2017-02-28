@@ -9,7 +9,7 @@ LucidLink>{^}
 	scripts:Scripts>{^}
 	settings:Settings>{^}
 		audioFiles:[^]
-			{name:"air raid siren" path:"FakePath"}
+			{name:"waterfall" path:"file:///android_asset/Waterfall.mp3"}
 	more:More>{^}
 		jsCode:""
 `.trim();

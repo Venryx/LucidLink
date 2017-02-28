@@ -155,4 +155,8 @@ export default class V {
 		return stackTrace.substr(stackTrace.IndexOf_X(1, "\n")); // remove "Error" line and first stack-frame (that of this method)
 	}
 	static LogStackTrace() { Log(V.GetStackTraceStr()); }
+
+	static Bind<T extends Function>(func: T, newThis: object): T {
+		return func.bind(newThis);
+	}
 }

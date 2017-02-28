@@ -16,25 +16,17 @@ import {autorun} from "mobx";
 import {EveryXSecondsDo, GetRandomNumber, Speak, WhenXMinutesIntoSleepStageYDo, CreateSequence} from "../Scripts/ScriptGlobals";
 import {Log, Global, JavaBridge} from "../../Frame/Globals";
 import Sound from "react-native-sound";
-import {AudioFile} from "../../Frame/AudioFile";
+import {AudioFile, AudioFileManager} from "../../Frame/AudioFile";
 import {Sequence, Timer, TimerContext, WaitXThenRun} from "../../Frame/General/Timers";
 import {VTextInput, VTextInput_Auto} from "../../Packages/ReactNativeComponents/VTextInput";
 import BackgroundMusicConfigUI from "./@Shared/BackgroundMusicSelectorUI";
 import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
+import V from "../../Packages/V/V";
 
-var audioFiles = audioFiles || {};
-function GetAudioFile(name: string, onLoaded?: Function): AudioFile {
-	if (audioFiles[name] == null) {
-		var audioFileEntry = LL.settings.audioFiles.First(a=>a.name == name);
-		if (audioFileEntry == null)
-			alert(`Cannot find audio-file entry with name "${name}".`);
-		var audioFile = new AudioFile(audioFileEntry.path, onLoaded);
-		audioFiles[name] = audioFile;
-	}
-	return audioFiles[name];
-}
+var audioFileManager = new AudioFileManager();
+var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);
 
 @Global
 export class FBA extends Node {
@@ -137,7 +129,7 @@ class FBARun {
 			if (stage == SleepStage.V.Rem && timeInSegment >= node.promptStartDelay) {
 				Speak({text: node.phrase});
 				Log(node.phrase);
-				this.StopSequence()
+				this.StopSequence();
 
 				this.remSequence = new Sequence();
 				for (var i = 0; i <= 100; i++) {
@@ -159,9 +151,9 @@ class FBARun {
 		LL.tracker.currentSession.CurrentSleepSession.End();
 
 		// stop and clear (background-music) audio-files
-		for (let audioFile of audioFiles.Props.Select(a=>a.value))
+		for (let audioFile of audioFileManager.audioFiles.Props.Select(a=>a.value))
 			audioFile.Stop();
-		audioFiles = [];
+		audioFileManager.audioFiles = [];
 	}
 }
 

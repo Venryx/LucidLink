@@ -3,16 +3,16 @@ import {Assert} from "../../Frame/General/Assert";
 import {E} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
 import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
-import V from "../../Packages/V/V";
 import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
-import {LL, LucidLink} from "../../LucidLink";
-import {AudioFile} from "../../Frame/AudioFile";
+import {LL, LucidLink, RunPostInit} from "../../LucidLink";
+import {AudioFile, AudioFileManager} from "../../Frame/AudioFile";
 import {Sleep, Timer, WaitXThenRun, Sequence} from "../../Frame/General/Timers";
 import Speech from "react-native-android-speech";
 import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
+import V from "../../Packages/V/V";
 
 export var scriptContext: ScriptContext = null; // set to LL.scripts.scriptContext;
 export function SetScriptContext(context) { scriptContext = context; }
@@ -153,32 +153,46 @@ export function AddListener_OnUpdatePatternMatchProbabilities(func) {
 // audio playback
 // ==========
 
-export var audioFiles = audioFiles || {};
-export function GetAudioFile(name) {
-	if (audioFiles[name] == null) {
-		var audioFileEntry = LL.settings.audioFiles.First(a=>a.name == name);
-		if (audioFileEntry == null)
-			alert("Cannot find audio-file entry with name '" + name + "'.");
-		var baseFile = new Sound(audioFileEntry.path, "", function(error) {
-			if (error)
-				console.log("Failed to load the sound '" + name + "':", error);
-		});
-		var audioFile = new AudioFile(baseFile);
-		audioFiles[name] = audioFile;
-	}
-	return audioFiles[name];
-}
+export var audioFileManager = new AudioFileManager();
+export var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);
+
+// internal version
+var audioFileManager_internal = new AudioFileManager();
+var GetAudioFile_Internal = V.Bind(audioFileManager_internal.GetAudioFile, audioFileManager_internal);
+RunPostInit(()=> {
+	GetAudioFile_Internal("waterfall"); // pre-load waterfall audio
+});
 
 // text-to-speech
 // ==========
 
-export function Speak(options) {
-	options = E({forceStop: true}, options);
+class SpeakOptions {
+	text: string;
+	forceStop = true;
+	pitch = 1;
+	delayLength = 1;
+	whiteNoiseVolume = 0;
+}
+export function Speak(optionsDelta: Partial<SpeakOptions>) {
+	let options = new SpeakOptions().Extended(optionsDelta);
 	options.text = options.text.toString();
 	return new Promise((resolve, reject)=> {
-		Speech.speak(options).then(resolve).catch(ex=> {
-			if (ex.toString().contains("TTS is already speaking something")) return;
-			throw ex;
-		});
+		function Speak() {
+			Speech.speak(options).then(resolve).catch(ex=> {
+				if (ex.toString().contains("TTS is already speaking something")) return;
+				throw ex;
+			});
+		}
+		
+		if (options.delayLength) {
+			// start silent waterfall audio, then delay speaking by 1 second, so bluetooth speaker can activate in time
+			GetAudioFile_Internal("waterfall").SetVolume(options.whiteNoiseVolume).Play();
+			WaitXThenDo(options.delayLength, ()=> {
+				Speak();
+				GetAudioFile_Internal("waterfall").Stop();
+			});
+		} else {
+			Speak();
+		}
 	});
 };

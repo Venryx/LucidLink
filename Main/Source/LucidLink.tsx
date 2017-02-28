@@ -13,7 +13,7 @@ import "./Frame/CE";
 import "moment-round";
 import "./Frame/General/Errors";
 
-import {E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF} from './Frame/Globals';
+import {E, FromVDFNode, FromVDFToNode, JavaBridge, Log, ToVDF, Global} from "./Frame/Globals";
 import {Panel} from "./Frame/ReactGlobals";
 import Node from "./Packages/VTree/Node";
 import {colors} from "./Frame/Styles";
@@ -119,6 +119,7 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 		LL.ui.forceUpdate();
 }, null);
 
+@Global
 export class LucidLink extends Node {
 	/*constructor() {
 		super();
@@ -169,7 +170,6 @@ export class LucidLink extends Node {
 //LucidLink.typeInfo = new VDFTypeInfo(new VDFType("^(?!_)(?!s$)(?!root$)", true));
 //LucidLink.typeInfo.typeTag = new VDFType("^(?!_)(?!s$)(?!root$)", true);
 (LucidLink as any).typeInfo.typeTag = new VDFType(null, true);
-g.Extend({LucidLink});
 
 export var LL: LucidLink;
 
@@ -221,7 +221,20 @@ export async function Init(ui) {
 
 	CheckIfInEmulator_ThenMaybeInitAndStartSearching();
 
+	for (let listener of postInitActions)
+		listener();
+	postInitActions = "done" as any;	
+
 	} catch (ex) { alert("Startup error) " + ex + "\n" + ex.stack); }
+}
+var postInitActions = [] as (()=>void)[];
+export function RunPostInit(action: ()=>void) {
+	if (postInitActions == "done" as any) // if init already done, just run directly
+		action();
+	else {
+		postInitActions = postInitActions || [];
+		postInitActions.push(action);
+	}
 }
 
 async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {

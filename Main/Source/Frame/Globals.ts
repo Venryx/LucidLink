@@ -4,7 +4,6 @@ import {VDFLoader, VDFLoadOptions} from "../Packages/VDF/VDFLoader";
 import {VDFNode} from "../Packages/VDF/VDFNode";
 
 //import {LogEntry, More} from '../LucidLink/More';
-import {LogEntry, More} from '../LucidLink/More';
 import V from '../Packages/V/V';
 
 import {AppRegistry, NativeModules, StyleSheet, DeviceEventEmitter} from "react-native";
@@ -51,6 +50,7 @@ export function Log(...args) {
 	console.log.apply(this, args);
 
 	try {
+		var {LogEntry, More} = require("../LucidLink/More");
 		More.AddLogEntry(new LogEntry(type, message, new Date()));
 	} catch (ex) {}
 	if (sendToJava) {

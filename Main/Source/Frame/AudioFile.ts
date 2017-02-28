@@ -1,15 +1,32 @@
 import {Assert, Log} from "../Packages/VDF/VDF";
 import {Timer, WaitXThenRun} from "./General/Timers";
 import Sound from "react-native-sound";
+import {LL} from "../LucidLink";
+import V from "../Packages/V/V";
+
+export class AudioFileManager {
+	audioFiles = {};
+	GetAudioFile(name: string, onLoaded?: Function): AudioFile {
+		if (this.audioFiles[name] == null) {
+			var audioFileEntry = LL.settings.audioFiles.First(a=>a.name == name);
+			if (audioFileEntry == null)
+				alert(`Cannot find audio-file entry with name "${name}".`);
+			this.audioFiles[name] = new AudioFile(audioFileEntry.path, onLoaded);
+		}
+		return this.audioFiles[name];
+	}
+}
 
 export class AudioFile {
 	constructor(audioFilePath: string, onLoaded?: Function) {
 		this.baseFile = new Sound(audioFilePath, "", error=> {
 			if (error)
-				Log(`Failed to load the sound "${name}":`, error);
-			// apply delayed commands, since base-file's loaded now
-			for (let func of this.postLoadFuncs)
-				func();
+				Log(`Failed to load audio-file at "${audioFilePath}":`, error);
+			else {
+				// apply delayed commands, since base-file's loaded now
+				for (let func of this.postLoadFuncs)
+					func();
+			}
 			if (onLoaded) onLoaded(error);
 		});
 		//this.PlayCount = -1;
@@ -67,8 +84,9 @@ export class AudioFile {
 	// volume range is 0-1
 	GetVolume() { return this.baseFile.getVolume(); }
 	SetVolume(volume) {
-		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.SetVolume(volume)); return; }
+		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.SetVolume(volume)); return this; }
 		this.baseFile.setVolume(volume);
+		return this;
 	}
 
 	AddVolume(amount) { return this.SetVolume(this.GetVolume() + amount); }

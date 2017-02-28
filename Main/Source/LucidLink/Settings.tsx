@@ -1,4 +1,4 @@
-import {FromVDF, ToVDF} from "../Frame/Globals";
+import {FromVDF, ToVDF, Global} from "../Frame/Globals";
 import {BaseComponent} from "../Frame/ReactGlobals";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import DialogAndroid from "react-native-dialogs";
@@ -19,6 +19,7 @@ import {_Enum, Enum} from "../Frame/General/Enums";
 	Female = this
 }
 
+@Global
 export class Settings extends Node {	
 	// general
 	@O @P() applyScriptsOnLaunch = false;
@@ -41,17 +42,16 @@ export class Settings extends Node {
 	@O @P() sessionSaveInterval = 5;
 
 	// audio
-	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [];
+	@T("List(AudioFileEntry)") @P(true, true) audioFiles = [] as AudioFileEntry[];
 
 	ui = null;
 }
-global.Extend({Settings});
 
+@Global
 export class AudioFileEntry {
-	@P() name = null;
-	@P() path = null;
+	@P() name = null as string;
+	@P() path = null as string;
 }
-global.Extend({AudioFileEntry});
 
 export class SettingsUI extends BaseComponent<any, any> {
 	constructor(props) {

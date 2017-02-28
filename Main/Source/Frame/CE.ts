@@ -126,11 +126,11 @@ Object.prototype._AddFunction_Inline = function CallBaseConstructor(constructorA
 	//return this.prototype.__proto__.apply(this, V.AsArray(arguments));
 	//this.__proto__.__proto__.constructor.apply(this, V.AsArray(arguments));
     var derivedClassFunc = arguments.callee.caller;
-	derivedClassFunc.prototype.__proto__.constructor.apply(this, V.AsArray(arguments));
+	derivedClassFunc.prototype.__proto__.constructor.apply(this, V_.AsArray(arguments));
 	return this;
 };
 Object.prototype._AddFunction_Inline = function CallBaseConstructor_Manual(derivedClassFunc, constructorArgs___) {
-	derivedClassFunc.prototype.__proto__.constructor.apply(this, V.AsArray(arguments));
+	derivedClassFunc.prototype.__proto__.constructor.apply(this, V_.AsArray(arguments));
 	return this;
 };
 
@@ -325,7 +325,7 @@ Function.prototype._AddFunction_Inline = function GetTags(/*o:*/ type) {
 	return (this.tags || []).Where(a=>type == null || a instanceof type);
 };
 
-Function.prototype._AddFunction_Inline = function AsStr(args___) { return V.Multiline.apply(null, [this].concat(V.AsArray(arguments))); };
+Function.prototype._AddFunction_Inline = function AsStr(args___) { return V_.Multiline.apply(null, [this].concat(V_.AsArray(arguments))); };
 
 Function.prototype._AddFunction_Inline = function RunThenReturn(args___) { this.apply(null, arguments); return this; };
 
@@ -381,7 +381,7 @@ Number.prototype._AddFunction_Inline = function Distance(other) {
 
 interface String { TrimEnd: (chars___)=>string; }
 String.prototype.TrimEnd = function(chars___) {
-	var chars = V.Slice(arguments);
+	var chars = V_.Slice(arguments);
 
 	var result = "";
 	var doneTrimming = false;
@@ -784,7 +784,7 @@ Array.prototype._AddFunction_Inline = function OrderBy(valFunc = a=>a) {
 	/*var temp = this.ToList();
 	temp.sort((a, b)=>V.Compare(valFunc(a), valFunc(b)));
 	return temp;*/
-    return V.StableSort(this, (a, b)=>V.Compare(valFunc(a), valFunc(b)));
+    return V_.StableSort(this, (a, b)=>V_.Compare(valFunc(a), valFunc(b)));
 };
 interface Array<T> { Distinct(): T[]; }
 Array.prototype._AddFunction_Inline = function Distinct() {
@@ -886,5 +886,6 @@ interface Error { readonly Stack: string; }
 // ==========
 
 // use "require" instead, so doesn't make TS see this as an external module (and thus disable interface extension)
-var V = require("../Packages/V/V").default;
-var {IsNumberString} = require("./Globals");
+// use alternate names, so doesn't get used in other files
+var V_ = require("../Packages/V/V").default;
+var {IsNumberString_} = require("./Globals");
