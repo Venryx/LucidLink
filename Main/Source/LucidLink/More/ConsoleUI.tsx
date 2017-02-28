@@ -2,6 +2,7 @@ import {BaseComponent, Column, Panel, VButton} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {Debugger, E, HandleError} from "../../Frame/Globals";
 import {TextInput} from "react-native";
+import {VTextInput} from "../../Packages/ReactNativeComponents/VTextInput";
 
 export default class ConsoleUI extends BaseComponent<any, any> {
 	render() {
@@ -20,7 +21,7 @@ export default class ConsoleUI extends BaseComponent<any, any> {
 						</Panel>
 					</Panel>
 				</Panel>
-				<TextInput {...{onChangeText}} style={textStyle} multiline={true} editable={true} value={text}/>
+				<VTextInput {...{onChangeText}} style={textStyle} multiline={true} editable={true} value={text}/>
 			</Column>
 		);
 	}

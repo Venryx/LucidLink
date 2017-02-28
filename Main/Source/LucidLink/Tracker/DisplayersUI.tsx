@@ -74,7 +74,7 @@ export default class DisplayersUI extends Component<{}, {scriptLastRunsOutdated}
 						<VTextInput value={selectedScript ? selectedScript.text : ""}
 							accessible={true} accessibilityLabel="@ConvertStartSpacesToTabs"
 							editable={selectedScript != null}
-							onChange={text=> {
+							onChangeText={text=> {
 								if (!selectedScript.editable) return;
 								transaction(()=> {
 									selectedScript.text = text;

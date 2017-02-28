@@ -211,7 +211,7 @@ export class ScriptsUI extends Component<any, any> {
 							accessible={true} accessibilityLabel="@ConvertStartSpacesToTabs"
 							//editable={selectedScript ? selectedScript.editable : false}
 							editable={selectedScript != null}
-							onChange={text=> {
+							onChangeText={text=> {
 								if (!selectedScript.editable) return;
 								transaction(()=> {
 									selectedScript.text = text;

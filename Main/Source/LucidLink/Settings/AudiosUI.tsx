@@ -4,6 +4,7 @@ import {Log, DN} from "../../Frame/Globals";
 import {NativeModules} from "react-native";
 import {TextInput} from "react-native";
 import {LL} from "../../LucidLink";
+import {VTextInput} from "../../Packages/ReactNativeComponents/VTextInput";
 var FilePickerManager = NativeModules.FilePickerManager;
 
 export default class AudiosUI extends BaseComponent<{}, {}> {
@@ -14,10 +15,10 @@ export default class AudiosUI extends BaseComponent<{}, {}> {
 				{node.audioFiles.map((audioFile, index)=> {
 					return (
 						<Row key={index} height={35}>
-							<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
+							<VTextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 								editable={true} value={audioFile.name}
 								onChangeText={text=>DN(audioFile.name = text, this.forceUpdate())}/>
-							<TextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
+							<VTextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
 								editable={true} value={audioFile.path}
 								onChangeText={text=>DN(audioFile.path = text, this.forceUpdate())}/>
 							<VButton text="Select" style={{alignItems: "flex-end", width: 100, height: 28}} textStyle={{marginBottom: 3}}

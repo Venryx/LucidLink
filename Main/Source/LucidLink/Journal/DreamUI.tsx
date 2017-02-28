@@ -7,6 +7,7 @@ import Moment from "moment";
 import {Dream} from "../Journal";
 import {LL} from "../../LucidLink";
 import {observer} from "mobx-react/native";
+import {VTextInput} from "../../Packages/ReactNativeComponents/VTextInput";
 
 @observer
 export default class DreamUI extends Component<{onBack: Function, dream: Dream}, {}> {
@@ -36,7 +37,7 @@ export default class DreamUI extends Component<{onBack: Function, dream: Dream},
 					}}/>
 				</Row>
 				<Row>
-					<TextInput ref="dateInput" style={{flex: .8}} value={dream.date.format("YYYY-MM-DD (MMMM Do)")}
+					<VTextInput ref="dateInput" style={{flex: .8}} value={dream.date.format("YYYY-MM-DD (MMMM Do)")}
 						onFocus={async ()=> {
 							(this.refs as any).dateInput.blur();
 							const {action, year, month, day} = await DatePickerAndroid.open({
@@ -49,7 +50,7 @@ export default class DreamUI extends Component<{onBack: Function, dream: Dream},
 							dream.date = Moment(date);
 							dream.fileOutdated = true;
 						}}/>
-					<TextInput ref="timeInput" style={{flex: .2}} value={dream.date.format("HH:mm (h:mma)")}
+					<VTextInput ref="timeInput" style={{flex: .2}} value={dream.date.format("HH:mm (h:mma)")}
 						onFocus={async ()=> {
 							(this.refs as any).timeInput.blur();
 							const {action, hour, minute} = await TimePickerAndroid.open({
@@ -62,14 +63,14 @@ export default class DreamUI extends Component<{onBack: Function, dream: Dream},
 					<VSwitch_Auto text="Lucid" path={()=>dream.p.lucid} containerStyle={{marginTop: 15}}/>
 				</Row>
 				<Row>
-					<TextInput style={{flex: 1}} editable={true} value={dream.name}
+					<VTextInput style={{flex: 1}} editable={true} value={dream.name}
 						onChangeText={text=> {
 							dream.name = text;
 							dream.fileOutdated = true;
 						}}/>
 				</Row>
 				<Row style={{flex: 1}}>
-					<TextInput style={{flex: 1, textAlignVertical: "top"}} editable={true} multiline={true} value={dream.text}
+					<VTextInput style={{flex: 1, textAlignVertical: "top"}} editable={true} multiline={true} value={dream.text}
 						onChangeText={text=> {
 							dream.text = text;
 							dream.fileOutdated = true;

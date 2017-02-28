@@ -32,7 +32,7 @@ export default class BackgroundMusicConfigUI extends Component<{node: FBA | RVP}
 									return (
 										<Row key={index} height={35}>
 											<VTextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-												editable={true} value={name} onChange={text=>node.backgroundMusic_tracks[index] = text}/>
+												editable={true} value={name} onChangeText={text=>node.backgroundMusic_tracks[index] = text}/>
 											<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}}
 												textStyle={{marginBottom: 3}} onPress={()=>node.backgroundMusic_tracks.RemoveAt(index)}/>
 										</Row>

@@ -374,7 +374,7 @@ export class VButton extends BaseComponent<
 	}
 }
 
-export class AutoExpandingTextInput extends BaseComponent<{style?} & TextInputProperties, {height, text}> {
+/*export class AutoExpandingTextInput extends BaseComponent<{style?} & TextInputProperties, {height, text}> {
 	constructor(props) {
   		super(props);
 		var {defaultValue, height} = props;
@@ -395,4 +395,6 @@ export class AutoExpandingTextInput extends BaseComponent<{style?} & TextInputPr
 			/>
 		);
 	}
-}
+}*/
+
+//export type AutoProps = {path: ()=>any};

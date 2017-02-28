@@ -147,13 +147,14 @@ export function E(...objExtends: any[]) {
 	//return StyleSheet.create(result);
 }
 // for react-native-chart modifications...
-g.E = E;
+g.Extend({E});
 
 // methods: serialization
 // ==========
 
 // object-Json
 export function FromJSON(json) { return JSON.parse(json); }
+g.Extend({FromJSON});
 export function ToJSON(obj, ...excludePropNames) {
 	try {
 		if (arguments.length > 1) {
@@ -171,6 +172,7 @@ export function ToJSON(obj, ...excludePropNames) {
 		throw ex;
 	}
 }
+g.Extend({ToJSON});
 export function ToJSON_Safe(obj, excludePropNames___) {
 	var excludePropNames = V.Slice(arguments, 1);
 
@@ -194,6 +196,7 @@ export function ToJSON_Safe(obj, excludePropNames___) {
 		result = "[was circular]" + result;
 	return result;
 }
+g.Extend({ToJSON_Safe});
 
 export function ToJSON_Try(...args) {
 	try {
@@ -201,6 +204,7 @@ export function ToJSON_Try(...args) {
 	} catch (ex) {}
 	return "[converting to JSON failed]";
 }
+g.Extend({ToJSON_Try});
 
 // object-VDF
 // ----------

@@ -209,7 +209,7 @@ export class RVPUI extends Component<{}, {}> {
 								return (
 									<Row key={index} height={35}>
 										<VTextInput style={{flex: 1, paddingTop: 0, paddingBottom: 0, height: 35}}
-											editable={true} value={name} onChange={text=>node.names[index] = text}/>
+											editable={true} value={name} onChangeText={text=>node.names[index] = text}/>
 										<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}}
 											textStyle={{marginBottom: 3}} onPress={()=>node.names.RemoveAt(index)}/>
 									</Row>

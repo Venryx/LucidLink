@@ -7,6 +7,7 @@ import {Session, Event} from "../Session";
 import SleepSession from "../Session/SleepSession";
 import {SleepSegment} from "../Session/SleepSession";
 import {colors} from "../../../Frame/Styles";
+import {VTextInput} from "../../../Packages/ReactNativeComponents/VTextInput";
 var Moment = require("moment");
 
 export default class SessionUI extends Component<{onBack: Function, session: Session}, any> {
@@ -25,8 +26,8 @@ export default class SessionUI extends Component<{onBack: Function, session: Ses
 						session.Delete(true, ()=>onBack(false));
 					}}/>
 				<Row>
-					<TextInput ref="dateInput" editable={false} style={{flex: .8}} value={session.date.format("YYYY-MM-DD (MMMM Do)")}/>
-					<TextInput ref="timeInput" editable={false} style={{flex: .2}} value={session.date.format("HH:mm (h:mma)")}/>
+					<VTextInput ref="dateInput" editable={false} style={{flex: .8}} value={session.date.format("YYYY-MM-DD (MMMM Do)")}/>
+					<VTextInput ref="timeInput" editable={false} style={{flex: .2}} value={session.date.format("HH:mm (h:mma)")}/>
 				</Row>
 				<Text>Events:</Text>
 				<ScrollView style={{flex: 1, flexDirection: "column", borderTopWidth: 1}}

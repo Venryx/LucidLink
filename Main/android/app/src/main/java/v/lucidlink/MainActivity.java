@@ -151,20 +151,16 @@ public class MainActivity extends BaseBluetoothActivity {
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event)  {
-		if (LL.mainModule == null) super.onKeyDown(keyCode, event);
-
 		char keyChar = (char)event.getUnicodeChar();
 		JSBridge.SendEvent("OnKeyDown", keyCode, String.valueOf(keyChar));
-		if (LL.mainModule.blockUnusedKeys)
+		if (LL.mainModule != null && LL.mainModule.blockUnusedKeys)
 			return true;
 		return super.onKeyDown(keyCode, event);
 	}
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		if (LL.mainModule == null) super.onKeyUp(keyCode, event);
-
 		char keyChar = (char)event.getUnicodeChar();
 		JSBridge.SendEvent("OnKeyUp", keyCode, String.valueOf(keyChar));
-		if (LL.mainModule.blockUnusedKeys)
+		if (LL.mainModule != null && LL.mainModule.blockUnusedKeys)
 			return true;
 		return super.onKeyUp(keyCode, event);
 	}
