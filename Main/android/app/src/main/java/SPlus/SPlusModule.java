@@ -9,13 +9,12 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
 
 import v.lucidlink.MainActivity;
-import v.lucidlink.V;
+import vpackages.V;
 
 import static v.lucidlink.LLHolder.LL;
 
@@ -131,6 +130,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		MainActivity.main.sendRpcToBed(RPCMapper.main.closeSession());
 		sessionConnector.service.sleepSessionManager.stopCalculateAndSendResults();
 		currentSessionType = null;
-		V.Log("Stopping session...");
+		V.Log("Stopping session..." + V.GetStackTrace());
 	}
 }

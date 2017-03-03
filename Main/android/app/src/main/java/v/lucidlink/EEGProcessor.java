@@ -7,13 +7,14 @@ import com.facebook.react.bridge.WritableMap;
 import v.lucidlink.Frame.Vector2i;
 import v.LibMuse.LibMuseModule;
 import v.LibMuse.VMuseDataPacket;
+import vpackages.V;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static v.lucidlink.LLHolder.LL;
-import static v.lucidlink.V.ToWritableArray;
+import static vpackages.V.ToWritableArray;
 
 class EEGProcessor {
 	public EEGProcessor() {

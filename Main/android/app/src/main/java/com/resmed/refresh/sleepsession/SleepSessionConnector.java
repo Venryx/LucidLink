@@ -1,10 +1,7 @@
 package com.resmed.refresh.sleepsession;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.resmed.refresh.bed.RPCMapper;
@@ -23,10 +20,8 @@ import com.resmed.refresh.utils.LOGGER;
 import com.resmed.refresh.utils.Log;
 import com.resmed.rm20.SleepParams;
 
-import org.acra.ACRAConstants;
-
 import SPlus.SPlusModule;
-import v.lucidlink.V;
+import vpackages.V;
 
 public class SleepSessionConnector {
 	private BaseBluetoothActivity bAct;

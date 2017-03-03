@@ -15,23 +15,10 @@
 package com.resmed.rm20;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.os.Build;
-import com.resmed.rm20.RM20Callbacks;
-import com.resmed.rm20.SleepParams;
-import com.resmed.rm20.SmartAlarmInfo;
-import com.resmed.rm20.UserInfo;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
-import v.lucidlink.V;
+import java.io.File;
+
+import vpackages.V;
 
 // the app sends raw bio-data to this external library, and it sends back higher-level calculations (eg, sleep-stage, breathing-rate)
 public class RM20JNI {

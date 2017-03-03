@@ -1,13 +1,13 @@
 package v.lucidlink;
 
-import android.content.Context;
-
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import vpackages.V;
 
 import static v.lucidlink.LLHolder.LL;
 
@@ -26,8 +26,12 @@ public class JSBridge {
 		Event event = new Event(name, args);
 		if (LL.mainModule == null || !LL.reactContext.hasActiveCatalystInstance()) {
 			bufferedEvents.add(event);
+
+			V.LogJava("Can't send event with name:" + event.name);
 			return;
 		}
+
+		V.LogJava("Can send event with name:" + event.name);
 
 		if (bufferedEvents.size() > 0) {
 			for (Event bufferedEvent : bufferedEvents)
@@ -43,5 +47,7 @@ public class JSBridge {
 
 		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = LL.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(event.name, argsList);
+
+		V.LogJava("Sent event with name:" + event.name);
 	}
 }

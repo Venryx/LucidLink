@@ -87,9 +87,31 @@ DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
 	} catch (ex) {}
 });
 
+DeviceEventEmitter.addListener("PreAppClose", (args: any)=> {
+	//throw new Error("Test100");
+	if (this.tracker.currentSession.CurrentSleepSession)
+		this.tracker.currentSession.CurrentSleepSession.End();
+	Log("PreAppClose done!");
+});
+
+/*var receivedNextHeartBeat = false;
+DeviceEventEmitter.addListener("OnPause_HeartBeat", (args: any)=> {
+	receivedNextHeartBeat = true;
+});
+setInterval(()=> {
+	if (g.appState == "background" && !receivedNextHeartBeat) {
+		alert("Not receiving heartbeat! (ie closing)");
+	}
+}, 1000);*/
+
+AppRegistry.registerHeadlessTask('PreAppClose2', ()=> {
+	Log("PreAppClose2 done!");
+});
+
 var g: any = global;
 
 /*import Orientation from "react-native-orientation";
+import {EveryXSecondsDo} from "./LucidLink/Scripts/ScriptGlobals";
 g.isLandscape = Orientation.getInitialOrientation() == "LANDSCAPE";
 Orientation.addOrientationListener(orientation=> {
 	g.isLandscape = orientation == "LANDSCAPE";
@@ -150,8 +172,6 @@ export class LucidLink extends Node {
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 
 	SaveFileSystemData() {
-		if (this.tracker.currentSession.CurrentSleepSession)
-			this.tracker.currentSession.CurrentSleepSession.End();
 		this.SaveMainData();
 		
 		this.tracker.SaveFileSystemData();

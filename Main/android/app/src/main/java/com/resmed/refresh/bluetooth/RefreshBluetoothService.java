@@ -1,9 +1,7 @@
 package com.resmed.refresh.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 
@@ -26,7 +24,7 @@ import com.resmed.rm20.RM20JNI;
 import java.io.ByteArrayInputStream;
 
 import v.lucidlink.MainActivity;
-import v.lucidlink.V;
+import vpackages.V;
 
 import static v.lucidlink.LLHolder.LL;
 

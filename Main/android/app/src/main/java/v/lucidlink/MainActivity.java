@@ -34,9 +34,12 @@ import com.resmed.refresh.utils.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
+import vpackages.V;
 
 import static v.lucidlink.LLHolder.LL;
 
@@ -56,10 +59,79 @@ public class MainActivity extends BaseBluetoothActivity {
 		LL.appContext = (MainApplication)getApplicationContext();
 		LL.analytics = FirebaseAnalytics.getInstance(this);
 		MainActivity.main.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+		startService(new Intent(this, MainService.class));
 	}
 	@Override protected void onDestroy() {
-		super.onDestroy();
+		JSBridge.SendEvent("PreAppClose" + V.GetStackTrace());
+
+		V.Log("OnDestroy");
 		SPlusModule.main.ShutDown();
+
+		StopWhenPausedTimer();
+
+		try {
+			for (int i = 0; i < 500; i++)
+				Thread.sleep(1);
+		} catch (Throwable e) {
+			throw new Error(e);
+		}
+
+		new Thread() {
+			public void run() {
+				try {
+					V.Log("Test102 Yay!");
+					Thread.sleep(100);
+					runOnUiThread(()-> {
+						V.Log("Test103 Yay2!");
+					});
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+
+		/*if (1 == 1)
+			throw new Error("MWAAHAHAHAHAHA!");*/
+
+		startService(new Intent(this, HeadlessService.class));
+
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		super.onDestroy();
+
+			/*ReactActivityDelegate del = (ReactActivityDelegate)VReflection.GetField(this, "mDelegate");
+		new ReactContext(). mReactRootView.unmountReactApplication();
+			mReactRootView = null;
+		if (getReactNativeHost().hasInstance()) {
+			getReactNativeHost().getReactInstanceManager().onHostDestroy(getPlainActivity());
+		}*/
+	}
+
+	Timer whenPausedTimer;
+	void StopWhenPausedTimer() {
+		if (whenPausedTimer != null) {
+			whenPausedTimer.cancel();
+			whenPausedTimer = null;
+		}
+	}
+	@Override protected void onResume() {
+		super.onResume();
+		StopWhenPausedTimer();
+	}
+	@Override protected void onPause() {
+		super.onPause();
+		whenPausedTimer = new Timer();
+		whenPausedTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				JSBridge.SendEvent("OnPause_HeartBeat");
+			}
+		}, 700, 700);
 	}
 
 	List<BroadcastReceiver> receivers = new ArrayList<>();

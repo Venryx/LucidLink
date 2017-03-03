@@ -1,6 +1,8 @@
 rootProject.name = "LucidLink"
 
 include ":app"
+include ':ReactAndroid'
+project(':ReactAndroid').projectDir = new File(rootProject.projectDir, '../node_modules/react-native/ReactAndroid')
 include ":react-native-dialogs"
 project(":react-native-dialogs").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-dialogs/android")
 include ":react-native-numberpicker-dialog"
@@ -27,17 +29,11 @@ include ':react-native-keep-awake'
 project(':react-native-keep-awake').projectDir = new File(rootProject.projectDir,   '../node_modules/react-native-keep-awake/android')
 
 String userConfig = new File('../UserConfig.json').text
-
 include ":react-native-libmuse"
 if (userConfig.contains("reactNativeLibMuse_external: true"))
     project(":react-native-libmuse").projectDir = new File("../../../@Modules/react-native-libmuse/Main/android")
 else
     project(":react-native-libmuse").projectDir = new File(rootProject.projectDir, "../node_modules/react-native-libmuse/android")
-
-if (userConfig.contains("mpChartLib_external: true")) {
-    include ":MPChartLib"
+include ":MPChartLib"
+if (userConfig.contains("mpChartLib_external: true"))
     project(":MPChartLib").projectDir = new File("../../../@Modules/MPAndroidChart/Custom/MPChartLib")
-}
-
-include ':ReactAndroid'
-project(':ReactAndroid').projectDir = new File(rootProject.projectDir, '../node_modules/react-native/ReactAndroid')
