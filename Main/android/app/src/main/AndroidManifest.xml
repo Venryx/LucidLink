@@ -45,5 +45,6 @@
 
         <!-- <service android:name="v.lucidlink.MainService" android:process=":MainService"/> -->
         <service android:name="v.lucidlink.MainService"/>
+        <service android:name="v.lucidlink.HeadlessService"/>
     </application>
 </manifest>

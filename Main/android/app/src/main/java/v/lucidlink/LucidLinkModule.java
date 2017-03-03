@@ -44,17 +44,28 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 
     public LucidLinkModule(ReactApplicationContext reactContext) {
         super(reactContext);
-		// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
-		firstLaunch = LL.mainModule == null;
-		if (!firstLaunch)
-			LL.mainModule.Shutdown();
+
+		//headlessLaunch = LL == null;
+		headlessLaunch = MainActivity.main == null;
+		if (headlessLaunch) {
+			LL = new LucidLink();
+			firstLaunch = true;
+		} else {
+			// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
+			firstLaunch = LL.mainModule == null;
+			if (!firstLaunch)
+				LL.mainModule.Shutdown();
+		}
 
 		LL.reactContext = reactContext;
 		LL.mainModule = this;
 
-		MainActivity.main.EnsurePermissionsGranted();
-		MainActivity.main.PostModuleInit();
+		if (!headlessLaunch) {
+			MainActivity.main.EnsurePermissionsGranted();
+			MainActivity.main.PostModuleInit();
+		}
     }
+    public boolean headlessLaunch;
 	public boolean firstLaunch;
 
 	@ReactMethod

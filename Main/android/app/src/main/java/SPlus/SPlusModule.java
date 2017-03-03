@@ -19,16 +19,17 @@ import vpackages.V;
 import static v.lucidlink.LLHolder.LL;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
-	public static Activity mainActivity;
+	//public static Activity mainActivity;
 	public static SPlusModule main;
 	public SPlusModule(ReactApplicationContext reactContext) {
 		super(reactContext);
 		main = this;
 		this.reactContext = reactContext;
 
-		//Init(); // just call it right away
-		if (mainActivity == null)
-			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
+		if (LL.mainModule.headlessLaunch) return;
+
+		/*if (mainActivity == null)
+			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");*/
 		this.sessionConnector = new SleepSessionConnector(MainActivity.main, false);
 		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
 	}
@@ -46,12 +47,6 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	}
 
 	public SleepSessionConnector sessionConnector;
-	/*@ReactMethod public void Init() {
-		if (mainActivity == null)
-			throw new RuntimeException("SPlusModule.mainActivity not set. (set it in your main-activity's constructor)");
-		this.sessionConnector = new SleepSessionConnector(MainActivity.main, false);
-		//this.sessionConnector.setHasAutoRecoveredFromCrash(this.hasAutoRecoveredFromCrash);
-	}*/
 
 	public boolean connectorActive;
 	@ReactMethod public void Connect() {

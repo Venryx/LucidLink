@@ -87,25 +87,18 @@ DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
 	} catch (ex) {}
 });
 
-DeviceEventEmitter.addListener("PreAppClose", (args: any)=> {
+var startTime = new Date().getTime();
+DeviceEventEmitter.addListener("PreAppClose", async (args: any)=> {
 	//throw new Error("Test100");
-	if (this.tracker.currentSession.CurrentSleepSession)
-		this.tracker.currentSession.CurrentSleepSession.End();
-	Log("PreAppClose done!");
+	Log(`PreAppClose starting! Time since start: ${new Date().getTime() - startTime}ms`);
+	if (LL.tracker.currentSession.CurrentSleepSession)
+		LL.tracker.currentSession.CurrentSleepSession.End();
+	await LL.SaveFileSystemData();
+	Log(`PreAppClose done! Time since start: ${new Date().getTime() - startTime}ms`);
 });
 
-/*var receivedNextHeartBeat = false;
-DeviceEventEmitter.addListener("OnPause_HeartBeat", (args: any)=> {
-	receivedNextHeartBeat = true;
-});
-setInterval(()=> {
-	if (g.appState == "background" && !receivedNextHeartBeat) {
-		alert("Not receiving heartbeat! (ie closing)");
-	}
-}, 1000);*/
-
-AppRegistry.registerHeadlessTask('PreAppClose2', ()=> {
-	Log("PreAppClose2 done!");
+(AppRegistry as any).registerHeadlessTask('PreAppClose2', async taskData=> {
+	Log(`PreAppClose2 done! Time since start: ${new Date().getTime() - startTime}ms`);
 });
 
 var g: any = global;
@@ -171,11 +164,12 @@ export class LucidLink extends Node {
 
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
 
-	SaveFileSystemData() {
-		this.SaveMainData();
-		
-		this.tracker.SaveFileSystemData();
-		this.scripts.SaveFileSystemData();
+	async SaveFileSystemData() {
+		await Promise.all([
+			this.SaveMainData(),
+			this.tracker.SaveFileSystemData(),
+			this.scripts.SaveFileSystemData()
+		]);
 	}
 	async SaveMainData() {
 		var mainDataVDF = ToVDF(LL, false);

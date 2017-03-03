@@ -88,10 +88,12 @@ export class Tracker extends Node {
 		if (onDone) onDone();
 	}
 
-	SaveFileSystemData() {
+	async SaveFileSystemData() {
 		//this.SaveScripts();
-		this.SaveScriptMetas();
-		this.SaveCurrentSession();
+		await Promise.all([
+			this.SaveScriptMetas(),
+			this.SaveCurrentSession(),
+		]);
 	}
 	async SaveScriptMetas() {
 		var {displayerScripts} = this;

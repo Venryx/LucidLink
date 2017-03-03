@@ -85,9 +85,9 @@ export class Scripts extends Node {
 		Log("Finished loading scripts.");
 	}
 
-	SaveFileSystemData() {
+	async SaveFileSystemData() {
 		//this.SaveScripts();
-		this.SaveScriptMetas();
+		await this.SaveScriptMetas();
 	}
 	/*async SaveScripts() {
 		var {scripts} = this;

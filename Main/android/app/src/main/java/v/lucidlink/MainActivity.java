@@ -49,7 +49,6 @@ public class MainActivity extends BaseBluetoothActivity {
 		super();
 		main = this;
 		LibMuseModule.mainActivity = this;
-		SPlusModule.mainActivity = this;
 	}
 
 	@Override protected void onCreate(Bundle bundle) {
@@ -68,70 +67,29 @@ public class MainActivity extends BaseBluetoothActivity {
 		V.Log("OnDestroy");
 		SPlusModule.main.ShutDown();
 
-		StopWhenPausedTimer();
-
-		try {
-			for (int i = 0; i < 500; i++)
-				Thread.sleep(1);
-		} catch (Throwable e) {
-			throw new Error(e);
-		}
-
-		new Thread() {
+		/*new Thread() {
 			public void run() {
 				try {
-					V.Log("Test102 Yay!");
+					V.Log("In other thread.");
 					Thread.sleep(100);
 					runOnUiThread(()-> {
-						V.Log("Test103 Yay2!");
+						V.Log("Back in ui thread.");
+						startService(new Intent(MainActivity.this, HeadlessService.class));
 					});
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-		}.start();
-
-		/*if (1 == 1)
-			throw new Error("MWAAHAHAHAHAHA!");*/
-
-		startService(new Intent(this, HeadlessService.class));
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		}.start();*/
 
 		super.onDestroy();
 
-			/*ReactActivityDelegate del = (ReactActivityDelegate)VReflection.GetField(this, "mDelegate");
+		/*ReactActivityDelegate del = (ReactActivityDelegate)VReflection.GetField(this, "mDelegate");
 		new ReactContext(). mReactRootView.unmountReactApplication();
 			mReactRootView = null;
 		if (getReactNativeHost().hasInstance()) {
 			getReactNativeHost().getReactInstanceManager().onHostDestroy(getPlainActivity());
 		}*/
-	}
-
-	Timer whenPausedTimer;
-	void StopWhenPausedTimer() {
-		if (whenPausedTimer != null) {
-			whenPausedTimer.cancel();
-			whenPausedTimer = null;
-		}
-	}
-	@Override protected void onResume() {
-		super.onResume();
-		StopWhenPausedTimer();
-	}
-	@Override protected void onPause() {
-		super.onPause();
-		whenPausedTimer = new Timer();
-		whenPausedTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				JSBridge.SendEvent("OnPause_HeartBeat");
-			}
-		}, 700, 700);
 	}
 
 	List<BroadcastReceiver> receivers = new ArrayList<>();
