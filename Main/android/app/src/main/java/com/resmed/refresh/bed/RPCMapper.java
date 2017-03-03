@@ -11,7 +11,7 @@ import com.resmed.refresh.utils.Log;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class RPCMapper {
 	public static RPCMapper main = new RPCMapper();

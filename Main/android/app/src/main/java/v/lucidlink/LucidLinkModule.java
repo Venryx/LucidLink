@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class LucidLinkModule extends ReactContextBaseJavaModule {
     private static final String DURATION_SHORT_KEY = "SHORT";
@@ -45,6 +45,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
     public LucidLinkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
+		//headlessLaunch = LL == null;
 		headlessLaunch = MainActivity.main == null;
 		if (headlessLaunch) {
 			LL = new LucidLink();

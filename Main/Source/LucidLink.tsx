@@ -94,8 +94,15 @@ DeviceEventEmitter.addListener("PreAppClose", async (args: any)=> {
 	if (LL.tracker.currentSession.CurrentSleepSession)
 		LL.tracker.currentSession.CurrentSleepSession.End();
 	await LL.SaveFileSystemData();
-	SPBridge.ShutDown();
 	Log(`PreAppClose done! Time since start: ${new Date().getTime() - startTime}ms`);
+});
+
+(AppRegistry as any).registerHeadlessTask('PreAppClose2', async taskData=> {
+	Log(`PreAppClose2 starting! Time since start: ${new Date().getTime() - startTime}ms`);
+	if (LL.tracker.currentSession.CurrentSleepSession)
+		LL.tracker.currentSession.CurrentSleepSession.End();
+	await LL.SaveFileSystemData();
+	Log(`PreAppClose2 done! Time since start: ${new Date().getTime() - startTime}ms`);
 });
 
 var g: any = global;
@@ -269,6 +276,7 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 		SPBridge.Init();
 	autorun(()=> {
 		if (LL.tools.spMonitor.connect) {
+			console.log(`About to connect: ${new Error().stack}`)
 			SPBridge.Connect();
 		} else {
 			//SPBridge.StopSession();

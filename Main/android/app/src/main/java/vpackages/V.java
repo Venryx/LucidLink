@@ -40,7 +40,7 @@ import java.util.Map;
 import v.lucidlink.JSBridge;
 import v.lucidlink.MainActivity;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class V {
 	// ui

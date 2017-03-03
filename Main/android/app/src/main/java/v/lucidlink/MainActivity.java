@@ -41,7 +41,7 @@ import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 import vpackages.V;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class MainActivity extends BaseBluetoothActivity {
 	public static MainActivity main;
@@ -61,8 +61,8 @@ public class MainActivity extends BaseBluetoothActivity {
 
 		startService(new Intent(this, MainService.class));
 	}
-	@Override protected void onDestroy() {
-		JSBridge.SendEvent("PreAppClose");
+	/*@Override protected void onDestroy() {
+		//JSBridge.SendEvent("PreAppClose");
 		//SPlusModule.main.ShutDown();
 
 		try {
@@ -72,7 +72,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		}
 
 		super.onDestroy();
-	}
+	}*/
 
 	List<BroadcastReceiver> receivers = new ArrayList<>();
 	private void AddAndRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {

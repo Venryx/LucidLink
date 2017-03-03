@@ -26,7 +26,7 @@ import java.io.ByteArrayInputStream;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class RefreshBluetoothService {
 	public final class MessageType {
@@ -61,7 +61,7 @@ public class RefreshBluetoothService {
 	public static final String REFRESH_BT_SERVICE_RUNNING = "REFRESH_BT_SERVICE_RUNNING";
 
 	public RefreshBluetoothService() {
-		V.LogJava("Starting RefreshBluetoothService");
+		V.LogJava("Starting bluetooth service!");
 		this.isHandleBulkTransfer = false;
 		this.sessionToBeStopped = false;
 

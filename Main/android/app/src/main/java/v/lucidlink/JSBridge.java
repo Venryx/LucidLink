@@ -1,9 +1,5 @@
 package v.lucidlink;
 
-import android.app.Activity;
-import android.app.Application;
-
-import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -13,7 +9,7 @@ import java.util.List;
 
 import vpackages.V;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 class Event {
 	public Event(String name, Object... args) {
@@ -28,9 +24,9 @@ public class JSBridge {
 	static List<Event> bufferedEvents = new ArrayList<>();
 	public static void SendEvent(String name, Object... args) {
 		Event event = new Event(name, args);
-		//if (LucidLink.mainModule == null || !LucidLink.reactContext.hasActiveCatalystInstance()) {
-		if (!LucidLink.reactContext.hasActiveCatalystInstance()) {
+		if (LL.mainModule == null || !LL.reactContext.hasActiveCatalystInstance()) {
 			bufferedEvents.add(event);
+
 			V.LogJava("Can't send event with name:" + event.name);
 			return;
 		}
@@ -49,7 +45,7 @@ public class JSBridge {
 		for (Object arg : event.args)
 			V.WritableArray_Add(argsList, arg);
 
-		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = LucidLink.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = LL.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(event.name, argsList);
 
 		V.LogJava("Sent event with name:" + event.name);

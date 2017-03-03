@@ -16,7 +16,7 @@ import com.resmed.refresh.sleepsession.SleepSessionConnector;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	//public static Activity mainActivity;
@@ -53,7 +53,12 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (connectorActive) return;
 		connectorActive = true;
 
-		SPlusModule.main.sessionConnector.service.StartConnector();
+		// temp fix for error when run in headless-mode
+		try {
+			SPlusModule.main.sessionConnector.service.StartConnector();
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+		}
 	}
 	@ReactMethod public void Disconnect() {
 		if (!connectorActive) return;
@@ -68,7 +73,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
 	}
 
-	@ReactMethod public void ShutDown() {
+	public void ShutDown() {
 		Disconnect();
 	}
 

@@ -32,6 +32,9 @@ ErrorUtils.setGlobalHandler((error, isFatal)=> {
 	ErrorUtils._globalHandler_orig(error, isFatal);
 });
 export function HandleError(error, isFatal = false) {
+	// temp fix for annoying headless-js error
+	if (error.contains("Object is not a function (evaluating 'taskProvider()(data)')")) return;
+
 	Log(`${error}
 Stack) ${error.stack}
 Fatal) ${isFatal}`);

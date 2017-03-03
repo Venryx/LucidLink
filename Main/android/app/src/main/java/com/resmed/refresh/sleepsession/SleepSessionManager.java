@@ -41,7 +41,7 @@ import SPlus.SPlusModule;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLS.LL;
+import static v.lucidlink.LLHolder.LL;
 
 public class SleepSessionManager implements EdfLibCallbackHandler, RM20Callbacks {
 	public static String ParamAlarmFireEpoch = "alarmFireEpoch";
