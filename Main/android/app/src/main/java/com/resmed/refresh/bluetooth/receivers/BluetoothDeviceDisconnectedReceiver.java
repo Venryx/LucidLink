@@ -6,7 +6,7 @@ import android.bluetooth.*;
 import com.resmed.refresh.bluetooth.*;
 import com.resmed.refresh.utils.*;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class BluetoothDeviceDisconnectedReceiver extends BroadcastReceiver {
 	private BluetoothSetup bluetoothManager;

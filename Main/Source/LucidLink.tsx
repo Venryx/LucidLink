@@ -94,11 +94,8 @@ DeviceEventEmitter.addListener("PreAppClose", async (args: any)=> {
 	if (LL.tracker.currentSession.CurrentSleepSession)
 		LL.tracker.currentSession.CurrentSleepSession.End();
 	await LL.SaveFileSystemData();
+	SPBridge.ShutDown();
 	Log(`PreAppClose done! Time since start: ${new Date().getTime() - startTime}ms`);
-});
-
-(AppRegistry as any).registerHeadlessTask('PreAppClose2', async taskData=> {
-	Log(`PreAppClose2 done! Time since start: ${new Date().getTime() - startTime}ms`);
 });
 
 var g: any = global;

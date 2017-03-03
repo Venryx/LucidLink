@@ -16,7 +16,7 @@ import com.resmed.refresh.sleepsession.SleepSessionConnector;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	//public static Activity mainActivity;
@@ -68,7 +68,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
 	}
 
-	public void ShutDown() {
+	@ReactMethod public void ShutDown() {
 		Disconnect();
 	}
 

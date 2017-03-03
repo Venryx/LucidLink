@@ -41,7 +41,7 @@ import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class MainActivity extends BaseBluetoothActivity {
 	public static MainActivity main;
@@ -62,34 +62,16 @@ public class MainActivity extends BaseBluetoothActivity {
 		startService(new Intent(this, MainService.class));
 	}
 	@Override protected void onDestroy() {
-		JSBridge.SendEvent("PreAppClose" + V.GetStackTrace());
+		JSBridge.SendEvent("PreAppClose");
+		//SPlusModule.main.ShutDown();
 
-		V.Log("OnDestroy");
-		SPlusModule.main.ShutDown();
-
-		/*new Thread() {
-			public void run() {
-				try {
-					V.Log("In other thread.");
-					Thread.sleep(100);
-					runOnUiThread(()-> {
-						V.Log("Back in ui thread.");
-						startService(new Intent(MainActivity.this, HeadlessService.class));
-					});
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();*/
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		super.onDestroy();
-
-		/*ReactActivityDelegate del = (ReactActivityDelegate)VReflection.GetField(this, "mDelegate");
-		new ReactContext(). mReactRootView.unmountReactApplication();
-			mReactRootView = null;
-		if (getReactNativeHost().hasInstance()) {
-			getReactNativeHost().getReactInstanceManager().onHostDestroy(getPlainActivity());
-		}*/
 	}
 
 	List<BroadcastReceiver> receivers = new ArrayList<>();

@@ -27,7 +27,7 @@ import SPlus.SPlusModule;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class BluetoothSetup {
 	public class ConnectThread extends Thread {
