@@ -10,7 +10,7 @@ import com.facebook.soloader.SoLoader;
 
 import vpackages.V;
 
-public class HeadlessService extends HeadlessJsTaskService {
+/*public class HeadlessService extends HeadlessJsTaskService {
 	@Override @Nullable protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
 		Bundle extras = intent.getExtras();
 		V.LogJava("Getting HeadlessService task-config.");
@@ -20,4 +20,4 @@ public class HeadlessService extends HeadlessJsTaskService {
 		//return new HeadlessJsTaskConfig("PreAppClose2", Arguments.createMap(), 5000);
 		return new HeadlessJsTaskConfig("PreAppClose2", null, 5000);
 	}
-}
+}*/

@@ -16,7 +16,7 @@ import com.resmed.refresh.sleepsession.SleepSessionConnector;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class SPlusModule extends ReactContextBaseJavaModule {
 	//public static Activity mainActivity;
@@ -53,12 +53,8 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (connectorActive) return;
 		connectorActive = true;
 
-		// temp fix for error when run in headless-mode
-		try {
-			SPlusModule.main.sessionConnector.service.StartConnector();
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-		}
+		V.Log("Connecting to S+...");
+		SPlusModule.main.sessionConnector.service.StartConnector();
 	}
 	@ReactMethod public void Disconnect() {
 		if (!connectorActive) return;
@@ -67,13 +63,14 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		//if (SPlusModule.main.sessionConnector.service.sleepSessionManager == null || !SPlusModule.main.sessionConnector.service.sleepSessionManager.isActive) return;
 		//baseManager.stop();
 
+		V.Log("Disconnecting from S+...");
 		StopSession();
 		//this.sessionConnector.stopSleepSession();
 		SPlusModule.main.sessionConnector.service.StopConnector();
 		MainActivity.main.handleConnectionStatus(CONNECTION_STATE.SOCKET_NOT_CONNECTED);
 	}
 
-	public void ShutDown() {
+	@ReactMethod public void ShutDown() {
 		Disconnect();
 	}
 
@@ -123,6 +120,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 	@ReactMethod public void StopSession() {
 		if (currentSessionType == null) return;
 
+		V.Log("Stopping session...");
 		if (currentSessionType.equals("real time"))
 			MainActivity.main.sendRpcToBed(RPCMapper.main.stopRealTimeStream()); // quick fix, since lazy
 		else //if (currentSessionType == "sleep")
@@ -130,6 +128,5 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		MainActivity.main.sendRpcToBed(RPCMapper.main.closeSession());
 		sessionConnector.service.sleepSessionManager.stopCalculateAndSendResults();
 		currentSessionType = null;
-		V.Log("Stopping session..." + V.GetStackTrace());
 	}
 }

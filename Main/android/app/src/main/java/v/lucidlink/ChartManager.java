@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 class RelativeLayout_NonReactRoot extends RelativeLayout {
 	public RelativeLayout_NonReactRoot(Context context) {

@@ -27,7 +27,7 @@ import SPlus.SPlusModule;
 import v.lucidlink.MainActivity;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class BluetoothSetup {
 	public class ConnectThread extends Thread {
@@ -277,8 +277,13 @@ public class BluetoothSetup {
 		receivers.add(receiver);
 	}
 	public void RemoveReceivers() {
-		for (BroadcastReceiver receiver : receivers)
-			MainActivity.main.unregisterReceiver(receiver);
+		for (BroadcastReceiver receiver : receivers) {
+			try {
+				MainActivity.main.unregisterReceiver(receiver);
+			} catch (IllegalArgumentException ex) {
+				// "Receiver not registered" exception can occur, I think when the main-activity is destroyed, but then this method runs; just ignore
+			}
+		}
 		receivers.clear();
 	}
 

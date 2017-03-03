@@ -130,6 +130,9 @@ export class SPBridgeClass {
 	Disconnect() {
 		core.Disconnect();
 	}
+	ShutDown() {
+		core.ShutDown();
+	}
 
 	SetUserInfo(age: number, gender: "male" | "female") {
 		core.SetUserInfo(age, gender);

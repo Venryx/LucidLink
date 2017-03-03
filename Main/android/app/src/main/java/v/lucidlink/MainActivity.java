@@ -41,7 +41,7 @@ import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 import vpackages.V;
 
-import static v.lucidlink.LLHolder.LL;
+import static v.lucidlink.LLS.LL;
 
 public class MainActivity extends BaseBluetoothActivity {
 	public static MainActivity main;
@@ -75,7 +75,7 @@ public class MainActivity extends BaseBluetoothActivity {
 	}*/
 
 	List<BroadcastReceiver> receivers = new ArrayList<>();
-	private void AddAndRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+	public void AddAndRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
 		MainActivity.main.registerReceiver(receiver, filter);
 		receivers.add(receiver);
 	}
