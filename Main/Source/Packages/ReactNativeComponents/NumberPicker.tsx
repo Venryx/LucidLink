@@ -1,6 +1,6 @@
 import {BaseComponent as Component, VButton} from "../../Frame/ReactGlobals";
 import NumberPickerDialog from "react-native-numberpicker-dialog";
-import {E, JavaLog} from "../../Frame/Globals";
+import {E, LogJava} from "../../Frame/Globals";
 import Node from "../VTree/Node";
 import {observer} from "mobx-react/native";
 import V from "../V/V";

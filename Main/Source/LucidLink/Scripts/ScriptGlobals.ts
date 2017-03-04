@@ -111,13 +111,13 @@ export function AddPattern(info) {
 	scriptContext.patterns.push(pattern);
 }
 
-export function CreateTimer(intervalInSec: number, func: Function, maxCallCount = -1, asBackground = true) {
+export function CreateTimer(intervalInSec: number, func: ()=>void, maxCallCount = -1, asBackground = true) {
 	return new Timer(intervalInSec, func, maxCallCount, asBackground).SetContext(scriptContext.timerContext);
 }
-export function WaitXThenDo(seconds, func, asBackground = true) {
+export function WaitXThenDo(seconds: number, func: ()=>void, asBackground = true) {
 	return CreateTimer(seconds, func, 1, asBackground).Start();
 }
-export function EveryXSecondsDo(seconds, func, maxCallCount = -1, asBackground = true) {
+export function EveryXSecondsDo(seconds: number, func: ()=>void, maxCallCount = -1, asBackground = true) {
 	return CreateTimer(seconds, func, maxCallCount, asBackground).Start();
 }
 

@@ -1,8 +1,9 @@
 import {BaseComponent} from "../ReactGlobals";
 import V from "../../Packages/V/V";
 import BackgroundTimer from "react-native-background-timer";
-import {Global, Log} from "../Globals";
+import {Global, IDProvider, Log} from "../Globals";
 import {LL} from "../../LucidLink";
+import {Assert} from "../../Packages/VDF/VDF";
 
 export class TimerContext {
 	timers = [] as Timer[];
@@ -43,21 +44,21 @@ export function DoNothingXTimesThenDoY(doNothingCount: number, func: Function, k
 
 // interval is in seconds (can be decimal)
 export class Timer {
-	constructor(interval, func, maxCallCount = -1, asBackground = false) {
-	    this.interval = interval;
+	constructor(intervalInS: number, func: ()=>void, maxCallCount = -1, asBackground = false) {
+	    this.intervalInS = intervalInS;
 	    this.func = func;
 	    this.maxCallCount = maxCallCount;
 		this.asBackground = asBackground;
 	}
 
-	interval: number;
-	func: Function;
+	intervalInS: number;
+	func: ()=>void;
 	maxCallCount: number;
 	asBackground: boolean;
 
-	SetContext(contextOrComp: TimerContext | BaseComponent<any, any>) {
-		if (contextOrComp)
-			contextOrComp.timers.push(this);
+	SetContext(timerContext: TimerContext | BaseComponent<any, any>) {
+		Assert(timerContext, "TimerContext cannot be null.");
+		timerContext.timers.push(this);
 		return this;
 	}
 
@@ -73,8 +74,8 @@ export class Timer {
 				this.Stop();
 		};
 		this.timerID = this.asBackground
-			? BackgroundTimer.setInterval(wrapperFunc, this.interval * 1000)
-			: setInterval(wrapperFunc, this.interval * 1000);
+			? BackgroundTimer.setInterval(wrapperFunc, this.intervalInS * 1000)
+			: setInterval(wrapperFunc, this.intervalInS * 1000);
 		return this;
 	}
 	Stop() {
@@ -92,14 +93,19 @@ export class TimerMS extends Timer {
 }
 
 export class Sequence {
+	static idProvider = new IDProvider();
 	constructor(asBackground = true) {
+		this.id = Sequence.idProvider.GetID();
 		this.asBackground = asBackground;
 	}
+	id: number;
 	asBackground: boolean;
 
-	context: TimerContext;
-	SetContext(context: TimerContext) {
-		this.context = context;
+	timerContext: TimerContext;
+	SetContext(timerContext: TimerContext) {
+		Assert(timerContext, "Timer-context cannot be null.");
+		Assert(this.Active, "Can't set timer-context after starting.");
+		this.timerContext = timerContext;
 		return this;
 	}
 	
@@ -108,41 +114,56 @@ export class Sequence {
 		this.segments.push(new SequenceSegment(delayInS, func));
 	}
 
-	enabled = true;
-	currentSegmentTimeout = null as Timer;
-	get Active() { return this.currentSegmentTimeout != null; }
+	nextSegment = null as SequenceSegment;
+	get Active() { return this.nextSegment != null; }
 
 	Start() {
-		this.currentSegmentTimeout = this.segments[0].StartDelay(this, this.asBackground).SetContext(this.context);
+		Log(`Starting sequence ${this.id}`);
+		this.nextSegment = this.segments[0];
+		this.nextSegment.StartDelay(this, this.asBackground);
 	}
 	OnCompleteSegment(segment: SequenceSegment) {
-		this.currentSegmentTimeout = null;
-		if (this.enabled) {
-			let nextSegment = this.segments[this.segments.indexOf(segment) + 1];
-			if (nextSegment) {
-				this.currentSegmentTimeout = nextSegment.StartDelay(this, this.asBackground).SetContext(this.context);
-			}
+		if (this.Active) {
+			this.nextSegment = this.segments[this.segments.indexOf(segment) + 1];
+			this.nextSegment.StartDelay(this, this.asBackground);
+		} else {
+			this.nextSegment = null;
 		}
+		Log(`Completed segment ${segment.id} of sequence ${this.id}. Next segment: ${this.nextSegment ? this.nextSegment.id : -1}`);
 	}
 	Stop() {
-		this.currentSegmentTimeout.Stop();
-		this.currentSegmentTimeout = null;
-		this.enabled = false;
+		Log(`Stopping sequence ${this.id}`);
+		if (this.nextSegment)
+			this.nextSegment.Stop();
+		this.nextSegment = null;
 	}
 }
 class SequenceSegment {
+	static idProvider = new IDProvider();
 	constructor(delayInS: number, func: Function) {
+		this.id = SequenceSegment.idProvider.GetID();
 		this.delayInS = delayInS;
 		this.func = func;
 	}
+	id: number;
 	delayInS = 0;
 	func = null as Function;
 
-	StartDelay(sequence: Sequence, asBackground: boolean): Timer {
-		return new Timer(this.delayInS, ()=> {
+	timer: Timer;
+	StartDelay(sequence: Sequence, asBackground: boolean) {
+		Log(`Starting segment ${this.id}`);
+		this.timer = new Timer(this.delayInS, ()=> {
+			Log(`Running-and-ending segment ${this.id}`);
 			this.func();
 			sequence.OnCompleteSegment(this);
 		}, 1, asBackground).Start();
+		if (sequence.timerContext)
+			this.timer.SetContext(sequence.timerContext);
+	}
+	Stop() {
+		Log(`Stopping segment ${this.id} (timer call-count: ${this.timer ? this.timer.callCount : -1})`);
+		if (this.timer)
+			this.timer.Stop();
 	}
 }
 

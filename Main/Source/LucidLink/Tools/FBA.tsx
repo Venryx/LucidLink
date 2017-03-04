@@ -42,8 +42,7 @@ export class FBA extends Node {
 					if (this.enabled) {
 						this.currentRun = new FBARun();
 						this.currentRun.Start();
-					}
-					else {
+					} else {
 						if (this.currentRun)
 							this.currentRun.Stop();
 						this.currentRun = null;
@@ -89,7 +88,7 @@ class FBARun {
 	
 	remSequence: Sequence;
 	StopSequence() {
-		if (this.remSequence && this.remSequence.currentSegmentTimeout)
+		if (this.remSequence)
 			this.remSequence.Stop();
 	}
 	
@@ -128,7 +127,7 @@ class FBARun {
 				this.RunActions();
 				this.StopSequence();
 
-				this.remSequence = new Sequence();
+				this.remSequence = new Sequence().SetContext(this.timerContext);
 				for (var i = 0; i <= 100; i++) {
 					this.remSequence.AddSegment(node.promptInterval * 60, ()=>this.RunActions());
 				}
@@ -200,6 +199,22 @@ export class FBAUI extends Component<{}, {}> {
 						</Row>
 					</Row>
 					<BackgroundMusicConfigUI node={node}/>
+
+					{/*<VButton text="Test1" ml={5} plr={10} style={{height: 40}}
+						onPress={()=> {
+							var sequence = new Sequence();
+							sequence.AddSegment(3, ()=> {
+								Toast("3");
+							});
+							sequence.AddSegment(3, ()=> {
+								Toast("6");
+								sequence.Stop();
+							});
+							sequence.AddSegment(3, ()=> {
+								Toast("9");
+							});
+							sequence.Start();
+						}}/>*/}
 				</Row>
 			</ScrollView>
 		);

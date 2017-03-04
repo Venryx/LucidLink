@@ -55,11 +55,11 @@ export function Log(...args) {
 	} catch (ex) {}
 	if (sendToJava) {
 		//try {
-			JavaLog(type, message);
+			LogJava(type, message);
 		//} catch (ex) {}
 	}
 }
-export function JavaLog(...args) {
+export function LogJava(...args) {
 	var type = "general", message;
 	if (args.length == 1) [message] = args;
 	else if (args.length == 2) [type, message] = args;
@@ -315,4 +315,11 @@ export function Global(target: Function) {
 	var name = (target as any).GetName();
 	//console.log("Globalizing: " + name);
 	g[name] = target;
+}
+
+export class IDProvider {
+	lastID = -1;
+	GetID() {
+		return ++this.lastID;
+	}
 }
