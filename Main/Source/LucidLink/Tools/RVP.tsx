@@ -21,9 +21,6 @@ import {VTextInput, VTextInput_Auto} from "../../Packages/ReactNativeComponents/
 import BackgroundMusicConfigUI from "./@Shared/BackgroundMusicSelectorUI";
 import V from "../../Packages/V/V";
 
-var audioFileManager = new AudioFileManager();
-var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);
-
 @Global
 export class RVP extends Node {
 	constructor() {
@@ -78,17 +75,18 @@ export class RVP extends Node {
 	];
 
 	timerContext = new TimerContext();
+	audioFileManager = new AudioFileManager();
 	Start() {
 		if (this.backgroundMusic_enabled) {
 			for (let track of this.backgroundMusic_tracks) {
-				var audioFile = GetAudioFile(track);
+				var audioFile = this.audioFileManager.GetAudioFile(track);
 				audioFile.PlayCount = -1;
 				//audioFile.Stop().SetVolume(0);
 				audioFile.Play().SetVolume(this.backgroundMusic_volume);
 			}
 			new Timer(30, ()=> {
 				for (let track of this.backgroundMusic_tracks) {
-					var audioFile = GetAudioFile(track);
+					var audioFile = this.audioFileManager.GetAudioFile(track);
 					audioFile.Play().SetVolume(this.backgroundMusic_volume);
 				}
 			}).Start().SetContext(this.timerContext);
@@ -118,12 +116,9 @@ export class RVP extends Node {
 	}
 	Stop() {
 		if (this.timerContext.timers.length == 0) return;
-		this.timerContext.CloseAndReset();
-
-		// stop and clear (background-music) audio-files
-		for (let audioFile of audioFileManager.audioFiles.Props.Select(a=>a.value))
-			audioFile.Stop();
-		audioFileManager.audioFiles = [];
+		this.timerContext.Reset();
+		this.audioFileManager.Reset();
+		if (g.RVP_PostStop) g.RVP_PostStop();
 	}
 }
 

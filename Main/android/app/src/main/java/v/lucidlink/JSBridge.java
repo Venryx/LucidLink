@@ -28,8 +28,8 @@ public class JSBridge {
 	static List<Event> bufferedEvents = new ArrayList<>();
 	public static void SendEvent(String name, Object... args) {
 		Event event = new Event(name, args);
-		//if (LucidLink.mainModule == null || !LucidLink.reactContext.hasActiveCatalystInstance()) {
-		if (!LucidLink.reactContext.hasActiveCatalystInstance()) {
+		//if (LL.mainModule == null || !LL.reactContext.hasActiveCatalystInstance()) {
+		if (LL.reactContext == null || !LL.reactContext.hasActiveCatalystInstance()) {
 			bufferedEvents.add(event);
 			return;
 		}
@@ -46,7 +46,7 @@ public class JSBridge {
 		for (Object arg : event.args)
 			V.WritableArray_Add(argsList, arg);
 
-		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = LucidLink.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = LL.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(event.name, argsList);
 	}
 }

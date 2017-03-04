@@ -56,7 +56,7 @@ export default class ScriptContext {
 		//LL.monitor.eegProcessor = new EEGProcessor();
 		LL.tools.monitor.eegProcessor.ResetScriptsRelatedStuff();
 		
-		this.timerContext.CloseAndReset();
+		this.timerContext.Reset();
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
 

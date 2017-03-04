@@ -6,7 +6,7 @@ import {LL} from "../../LucidLink";
 
 export class TimerContext {
 	timers = [] as Timer[];
-	CloseAndReset() {
+	Reset() {
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];

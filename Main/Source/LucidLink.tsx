@@ -89,7 +89,6 @@ DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
 
 var startTime = new Date().getTime();
 DeviceEventEmitter.addListener("PreAppClose", async (args: any)=> {
-	//throw new Error("Test100");
 	Log(`PreAppClose starting! Time since start: ${new Date().getTime() - startTime}ms`);
 	if (LL.tracker.currentSession.CurrentSleepSession)
 		LL.tracker.currentSession.CurrentSleepSession.End();
@@ -98,7 +97,7 @@ DeviceEventEmitter.addListener("PreAppClose", async (args: any)=> {
 	Log(`PreAppClose done! Time since start: ${new Date().getTime() - startTime}ms`);
 });
 
-var g: any = global;
+var g = global as any;
 
 /*import Orientation from "react-native-orientation";
 import {EveryXSecondsDo} from "./LucidLink/Scripts/ScriptGlobals";
@@ -130,6 +129,8 @@ Keyboard.addListener("keyboardDidHide", ()=> {
 	if (LL && LL.ui)
 		LL.ui.forceUpdate();
 }, null);
+
+console.assert = (...args)=> { require("./Frame/General/Assert").Assert(...args); };
 
 @Global
 export class LucidLink extends Node {

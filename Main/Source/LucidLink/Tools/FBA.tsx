@@ -24,9 +24,7 @@ import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
 import V from "../../Packages/V/V";
-
-var audioFileManager = new AudioFileManager();
-var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);
+import {Action, SpeakText, PlayAudioFile} from "./@Shared/Action";
 
 @Global
 export class FBA extends Node {
@@ -60,7 +58,8 @@ export class FBA extends Node {
 	@O @P() bluetoothVolume = .15;
 	@O @P() promptStartDelay = 3;
 	@O @P() promptInterval = 3;
-	@O @P() phrase = "Remember lucid dream.";
+
+	@O @P() promptActions = [] as Action[];
 
 	@O @P() backgroundMusic_enabled = false;
 	@O @P() backgroundMusic_volume = .05;
@@ -75,7 +74,7 @@ export class ListenersContext {
 		list.push(entry);
 		this.listEntries.push({list, entry});
 	}
-	CloseAndReset() {
+	Reset() {
 		for (let {list, entry} of this.listEntries) {
 			list.Remove(entry);
 		}
@@ -86,6 +85,7 @@ export class ListenersContext {
 class FBARun {
 	timerContext = new TimerContext();
 	listenersContext = new ListenersContext();
+	audioFileManager = new AudioFileManager();
 	
 	remSequence: Sequence;
 	StopSequence() {
@@ -97,19 +97,17 @@ class FBARun {
 	currentSegment_startTime: Moment.Moment = null;
 	Start() {
 		let node = LL.tools.fba;
-
 		JavaBridge.Main.SetVolumes(node.normalVolume, node.bluetoothVolume);
-		
 		if (node.backgroundMusic_enabled) {
 			for (let track of node.backgroundMusic_tracks) {
-				var audioFile = GetAudioFile(track);
+				var audioFile = this.audioFileManager.GetAudioFile(track);
 				audioFile.PlayCount = -1;
 				//audioFile.Stop().SetVolume(0);
 				audioFile.Play().SetVolume(node.backgroundMusic_volume);
 			}
 			new Timer(30, ()=> {
 				for (let track of node.backgroundMusic_tracks) {
-					var audioFile = GetAudioFile(track);
+					var audioFile = this.audioFileManager.GetAudioFile(track);
 					audioFile.Play().SetVolume(node.backgroundMusic_volume);
 				}
 			}).Start().SetContext(this.timerContext);
@@ -127,33 +125,35 @@ class FBARun {
 
 			var timeInSegment = Moment().diff(this.currentSegment_startTime, "minutes", true);
 			if (stage == SleepStage.V.Rem && timeInSegment >= node.promptStartDelay) {
-				Speak({text: node.phrase});
-				Log(node.phrase);
+				this.RunActions();
 				this.StopSequence();
 
 				this.remSequence = new Sequence();
 				for (var i = 0; i <= 100; i++) {
-					this.remSequence.AddSegment(3 * 100, function() {
-						Speak({text: node.phrase});
-						Log(node.phrase);
-					})
+					this.remSequence.AddSegment(node.promptInterval * 60, ()=>this.RunActions());
 				}
 				this.remSequence.Start();
 			}
 		});
-		
 		if (g.FBA_PostStart) g.FBA_PostStart();
 	}
+
+	RunActions() {
+		let node = LL.tools.fba;
+		for (let action of node.promptActions) {
+			if (action instanceof PlayAudioFile)
+				action.Run(this.audioFileManager);
+			else
+				action.Run();
+		}
+	}
+
 	Stop() {
-		this.timerContext.CloseAndReset();
-		this.listenersContext.CloseAndReset();
-
+		this.timerContext.Reset();
+		this.listenersContext.Reset();
+		this.audioFileManager.Reset();
 		LL.tracker.currentSession.CurrentSleepSession.End();
-
-		// stop and clear (background-music) audio-files
-		for (let audioFile of audioFileManager.audioFiles.Props.Select(a=>a.value))
-			audioFile.Stop();
-		audioFileManager.audioFiles = [];
+		if (g.FBA_PostStop) g.FBA_PostStop();
 	}
 }
 
@@ -182,11 +182,23 @@ export class FBAUI extends Component<{}, {}> {
 						<VText mt={5} mr={10}>Prompt interval:</VText>
 						<NumberPicker_Auto path={()=>node.p.promptInterval} format={a=>a + " minutes"}/>
 					</Row>
-					<Row height={35}>
-						<VText mt={5} mr={10}>Prompt phrase:</VText>
-						<VTextInput_Auto style={{flex: 1, height: 35}} editable={true} path={()=>node.p.phrase}/>
+					<Row>
+						<VText mt={5} mr={10}>Prompt actions:</VText>
 					</Row>
-
+					<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
+						<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
+							{node.promptActions.map((action, index)=> {
+								return action.CreateUI(index, ()=>node.promptActions.Remove(action));
+							})}
+						</Column>
+						<Row mt={10} height={45}>
+							<VText mt={9}>Add: </VText>
+							<VButton text="Speak text" plr={10} style={{height: 40}}
+								onPress={()=>node.promptActions.push(new SpeakText())}/>
+							<VButton text="Play audio file" ml={5} plr={10} style={{height: 40}}
+								onPress={()=>node.promptActions.push(new PlayAudioFile())}/>
+						</Row>
+					</Row>
 					<BackgroundMusicConfigUI node={node}/>
 				</Row>
 			</ScrollView>

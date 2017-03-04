@@ -15,6 +15,11 @@ export class AudioFileManager {
 		}
 		return this.audioFiles[name];
 	}
+	Reset() {
+		for (let audioFile of this.audioFiles.Props.Select(a=>a.value))
+			audioFile.Stop();
+		this.audioFiles = [];
+	}
 }
 
 export class AudioFile {

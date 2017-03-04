@@ -45,40 +45,29 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
     public LucidLinkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
-		headlessLaunch = MainActivity.main == null;
-		if (headlessLaunch) {
-			LL = new LucidLink();
-			firstLaunch = true;
-		} else {
-			// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
-			firstLaunch = LL.mainModule == null;
-			if (!firstLaunch)
-				LL.mainModule.Shutdown();
-		}
+		// when the react-native Reload button is pressed, a new LucidLinkModule class instance is created; check if this just happened
+		firstLaunch = LL.mainModule == null;
+		if (!firstLaunch)
+			LL.mainModule.Shutdown();
 
 		LL.reactContext = reactContext;
 		LL.mainModule = this;
 
-		if (!headlessLaunch) {
-			MainActivity.main.EnsurePermissionsGranted();
-			MainActivity.main.PostModuleInit();
-		}
+		MainActivity.main.EnsurePermissionsGranted();
+		MainActivity.main.PostModuleInit();
     }
     public boolean headlessLaunch;
 	public boolean firstLaunch;
 
-	@ReactMethod
-	public void ArePermissionsGranted(Promise promise) {
+	@ReactMethod public void ArePermissionsGranted(Promise promise) {
 		promise.resolve(MainActivity.main.ArePermissionsGranted());
 	}
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "LucidLink";
     }
 
-    @Override
-    public Map<String, Object> getConstants() {
+    @Override public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
         constants.put(DURATION_SHORT_KEY, Toast.LENGTH_SHORT);
         constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG);
@@ -86,8 +75,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
     }
 
 	Toast lastToast;
-    @ReactMethod
-    public void ShowToast(String message, int duration) {
+    @ReactMethod public void ShowToast(String message, int duration) {
 		MainActivity.main.runOnUiThread(()-> {
 			if (lastToast != null)
 				lastToast.cancel();
