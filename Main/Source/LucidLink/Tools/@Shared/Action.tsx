@@ -18,8 +18,8 @@ export abstract class Action {
 
 @Global
 export class SpeakText extends Node implements Action {
-	text = "Text to speak";
-	pitch = 1;
+	@O text = "Text to speak";
+	@O pitch = 1;
 
 	Run() {
 		Speak({text: this.text, pitch: this.pitch});
@@ -40,8 +40,8 @@ export class SpeakText extends Node implements Action {
 }
 @Global
 export class PlayAudioFile extends Node implements Action {
-	audioFileName = "waterfall";
-	volume = 1;
+	@O audioFileName = "waterfall";
+	@O volume = 1;
 
 	Run(audioFileManager: AudioFileManager) {
 		audioFileManager.GetAudioFile(this.audioFileName).Play().SetVolume(this.volume);
