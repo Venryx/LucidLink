@@ -7,6 +7,7 @@ import {Row, VText, VButton} from "../../../Frame/ReactGlobals";
 import {VTextInput_Auto} from "../../../Packages/ReactNativeComponents/VTextInput";
 import Node from "../../../Packages/VTree/Node";
 import {NumberPicker_Auto} from "../../../Packages/ReactNativeComponents/NumberPicker";
+import {P} from "../../../Packages/VDF/VDFTypeInfo";
 
 /*var audioFileManager = new AudioFileManager();
 var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);*/
@@ -18,8 +19,8 @@ export abstract class Action {
 
 @Global
 export class SpeakText extends Node implements Action {
-	@O text = "Text to speak";
-	@O pitch = 1;
+	@O @P() text = "Text to speak";
+	@O @P() pitch = 1;
 
 	Run() {
 		Speak({text: this.text, pitch: this.pitch});
@@ -40,8 +41,8 @@ export class SpeakText extends Node implements Action {
 }
 @Global
 export class PlayAudioFile extends Node implements Action {
-	@O audioFileName = "waterfall";
-	@O volume = 1;
+	@O @P() audioFileName = "waterfall";
+	@O @P() volume = 1;
 
 	Run(audioFileManager: AudioFileManager) {
 		audioFileManager.GetAudioFile(this.audioFileName).Play().SetVolume(this.volume);
