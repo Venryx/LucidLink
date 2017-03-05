@@ -104,7 +104,7 @@ export class Sequence {
 	timerContext: TimerContext;
 	SetContext(timerContext: TimerContext) {
 		Assert(timerContext, "Timer-context cannot be null.");
-		Assert(this.Active, "Can't set timer-context after starting.");
+		Assert(!this.Active, "Can't set timer-context after starting.");
 		this.timerContext = timerContext;
 		return this;
 	}

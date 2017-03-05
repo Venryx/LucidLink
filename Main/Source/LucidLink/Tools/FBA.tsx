@@ -120,12 +120,13 @@ class FBARun {
 				this.currentSegment_startTime = Moment();
 				//Log("New sleep stage: " + stage)
 				this.StopSequence();
+				this.triggeredForThisSegment = false;
 			}
 
 			var timeInSegment = Moment().diff(this.currentSegment_startTime, "minutes", true);
-			if (stage == SleepStage.V.Rem && timeInSegment >= node.promptStartDelay) {
+			if (stage == SleepStage.V.Rem && timeInSegment >= node.promptStartDelay && !this.triggeredForThisSegment) {
+				this.triggeredForThisSegment = true;
 				this.RunActions();
-				this.StopSequence();
 
 				this.remSequence = new Sequence().SetContext(this.timerContext);
 				for (var i = 0; i <= 100; i++) {
@@ -137,6 +138,7 @@ class FBARun {
 		if (g.FBA_PostStart) g.FBA_PostStart();
 	}
 
+	triggeredForThisSegment = false;
 	RunActions() {
 		let node = LL.tools.fba;
 		for (let action of node.promptActions) {
