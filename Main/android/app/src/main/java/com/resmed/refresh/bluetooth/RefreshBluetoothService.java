@@ -80,7 +80,7 @@ public class RefreshBluetoothService {
 
 	// handles requests from our code, concerning bluetooth things (so some send commands to device)
 	public void handleMessage(Message msg) {
-		RefreshTools.writeTimeStampToFile(LL.reactContext, System.currentTimeMillis());
+		//RefreshTools.writeTimeStampToFile(LL.reactContext, System.currentTimeMillis());
 		Bundle b;
 		switch (msg.what) {
 			case MessageType.DISCOVER_PAIR_CONNECT_RESMED:

@@ -202,12 +202,12 @@ public abstract class BaseBluetoothActivity extends ReactActivity implements Blu
 		}
 	}
 
-	protected boolean checkForFirmwareUpgrade(String var1) {
+	/*protected boolean checkForFirmwareUpgrade(String var1) {
 		Log.d("com.resmed.refresh.ui", "checkForFirmwareUpgrade firmware version :" + var1);
 		String var3 = RefreshTools.getFirmwareBinaryVersion(this.getApplicationContext());
 		boolean needsUpdate = RefreshTools.compareFirmwareVersions(var1.replace("Release", "").split(" ")[0], var3) < 0;
 		return needsUpdate;
-	}
+	}*/
 
 	public void handleConnectionStatus(CONNECTION_STATE newState) {
 		// also transmit to connector

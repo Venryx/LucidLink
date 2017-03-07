@@ -1,12 +1,12 @@
 package v.lucidlink;
 
-	import android.app.Notification;
-	import android.app.Service;
-	import android.content.Intent;
-	import android.graphics.BitmapFactory;
-	import android.os.IBinder;
+import android.app.Notification;
+import android.app.Service;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.IBinder;
 
-	import vpackages.V;
+import vpackages.V;
 
 public class MainService extends Service {
 	@Override public IBinder onBind(Intent intent) {
