@@ -1,7 +1,6 @@
 package com.resmed.refresh.packets;
 
 import android.support.v4.view.MotionEventCompat;
-import com.google.android.vending.expansion.downloader.impl.DownloaderService;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -143,13 +142,13 @@ public abstract class PacketsByteValuesReader {
 		if (input < 160) {
 			return ((input - 128) * 8) + 256;
 		}
-		if (input < DownloaderService.STATUS_RUNNING) {
+		if (input < 192) {
 			return ((input - 160) * 16) + 512;
 		}
 		if (input < 240) {
 			return ((input - 192) * 64) + 1024;
 		}
-		if (input < MotionEventCompat.ACTION_MASK) {
+		if (input < 255) {
 			return ((input - 240) * 128) + 4096;
 		}
 		return 6000;

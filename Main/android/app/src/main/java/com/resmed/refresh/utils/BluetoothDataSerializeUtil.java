@@ -3,7 +3,6 @@ package com.resmed.refresh.utils;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import com.google.gson.Gson;
-import com.resmed.refresh.R;
 import com.resmed.refresh.packets.PacketsByteValuesReader;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BluetoothDataSerializeUtil {
-    public static boolean clearJSONFile(Context context) {
+    /*public static boolean clearJSONFile(Context context) {
         new File(RefreshTools.getFilesPath(), context.getString(R.string.bluetooth_device_file_name)).delete();
         return true;
-    }
+    }*/
 
     public static synchronized boolean writeBulkBioDataFile(Context context, byte[] buffer) {
         synchronized (BluetoothDataSerializeUtil.class) {

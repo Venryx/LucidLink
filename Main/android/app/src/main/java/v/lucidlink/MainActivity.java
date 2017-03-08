@@ -285,7 +285,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			if (VLPacketType.PACKET_TYPE_RETURN.ordinal() == packetType) {
 				String strPacket = new String(bytes);
 				try {
-					JsonRPC receivedRPC = (JsonRPC) new Gson().fromJson(strPacket, JsonRPC.class);
+					JsonRPC receivedRPC = new Gson().fromJson(strPacket, JsonRPC.class);
 					Log.d(LOGGER.TAG_UI, " handleStreamPacket() rpc id : " + receivedRPC.getId() + " strPacket : " + strPacket);
 					handleReceivedRpc(receivedRPC);
 					JsonRPC rpcSent = (JsonRPC) BaseBluetoothActivity.CommandStack.remove(receivedRPC.getId());
