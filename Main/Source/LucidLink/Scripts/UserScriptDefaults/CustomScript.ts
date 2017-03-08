@@ -2,11 +2,11 @@ export default `
 // startup
 // ==========
 
-var waker = GetAudioFile("game")
-waker.PlayCount = -1 // loop
-waker.Stop()
+var waterfall = GetAudioFile("waterfall")
+waterfall.PlayCount = -1 // loop
+waterfall.Stop()
 
-AddEvent("SS") // starting scripts
+//AddEvent("SS") // starting scripts
 
 var lastPacket = {}
 WhenMusePacketReceived(function(packet) {

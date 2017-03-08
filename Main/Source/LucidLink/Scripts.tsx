@@ -77,7 +77,7 @@ export class Scripts extends Node {
 			this.scripts.push(script);
 		}
 
-		this.selectedScript = this.scripts.First(a=>a.Name == this.selectedScriptName);
+		this.selectedScript = this.scripts.FirstOrX(a=>a.Name == this.selectedScriptName);
 
 		if (LL.settings.applyScriptsOnLaunch)
 			this.ApplyScripts();

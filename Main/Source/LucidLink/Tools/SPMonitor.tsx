@@ -20,8 +20,8 @@ import {autorun} from "mobx";
 @Global
 export class SPMonitor extends Node {
 	@O @P() connect = true;
-	@O @P() monitor = true;
-	@O @P() process = true;
+	/*@O @P() monitor = true;
+	@O @P() process = true;*/
 
 	//@O @P() calculateBreathingRate = true;
 }
@@ -55,15 +55,16 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 						<VButton text="Options" plr={10} onPress={this.ToggleSidePanelOpen}/>
 						<Panel style={{flex: 1}}/>
 
-						{["unknown", "disconnected", "needs_update"].Contains(bridge.status) && node.connect &&
+						{/*{["unknown", "disconnected", "needs_update"].Contains(bridge.status) && node.connect &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Searching for S+ device...</Text>}
 						{bridge.status == "connecting" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connecting...</Text>}
 						{bridge.status == "connected" &&
 							<Text style={{height: 50, top: 10, textAlignVertical: "top"}}>Connected</Text>}
-						<VSwitch_Auto mt={6} path={()=>node.p.connect}/>
-						<VSwitch_Auto text="Monitor" ml={5} mt={6} path={()=>node.p.monitor}/>
-						<VSwitch_Auto text="Process" ml={5} mt={6} path={()=>node.p.process}/>
+						<VSwitch_Auto mt={6} path={()=>node.p.connect}/>*/}
+						<VSwitch_Auto text="Connect" mt={6} path={()=>node.p.connect}/>
+						{/*<VSwitch_Auto text="Monitor" ml={5} mt={6} path={()=>node.p.monitor}/>
+						<VSwitch_Auto text="Process" ml={5} mt={6} path={()=>node.p.process}/>*/}
 						
 						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
 							//LL.tracker.currentSession.StartSleepSession_RealTime();

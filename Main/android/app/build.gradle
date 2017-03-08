@@ -70,6 +70,7 @@ plugins {
 project.ext.react = [
     // the entry file for bundle generation
     entryFile: "Build/Source/index.android.js",
+    extraPackagerArgs: ["--sourcemap-output", file("$buildDir/outputs/index.android.js.map")],
 ];
 apply from: "../../node_modules/react-native/react.gradle"
 

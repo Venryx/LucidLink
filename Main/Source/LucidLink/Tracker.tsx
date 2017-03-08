@@ -78,7 +78,7 @@ export class Tracker extends Node {
 			this.displayerScripts.push(script);
 		}
 
-		this.selectedDisplayerScript = this.displayerScripts.First(a=>a.Name == this.selectedDisplayerScriptName);
+		this.selectedDisplayerScript = this.displayerScripts.FirstOrX(a=>a.Name == this.selectedDisplayerScriptName);
 
 		//if (LL.settings.applyScriptsOnLaunch)
 		this.ApplyDisplayerScripts();

@@ -66,8 +66,12 @@ public class RefreshBluetoothService {
 		this.sessionToBeStopped = false;
 
 		Log.d("com.resmed.refresh.bluetooth", "::onStartCommand, bluetooth");
-		EdfLibJNI.loadLibrary(LL.appContext);
-		RM20JNI.loadLibrary(LL.appContext);
+		try {
+			EdfLibJNI.loadLibrary(LL.appContext);
+			RM20JNI.loadLibrary(LL.appContext);
+		} catch (UnsatisfiedLinkError ex) {
+			V.Toast("Could not load S+ jni-libraries. (is your platform not armeabi-v7a?)");
+		}
 	}
 
 	//public RefreshBluetoothManager bluetoothManager;

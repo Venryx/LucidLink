@@ -133,7 +133,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		// workaround for runtime bug of ContextCompat evaluating to the old version (in S+ jar)
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
 			return true;
-		return ContextCompat.checkSelfPermission(LL.reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+		return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
 	}
 	public void EnsurePermissionsGranted() {
 		boolean hasPermission = ArePermissionsGranted();

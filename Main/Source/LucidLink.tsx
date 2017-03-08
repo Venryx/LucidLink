@@ -197,14 +197,18 @@ export async function Init(ui) {
 
 	var mainDataFile = LL.RootFolder.GetFile("MainData.vdf");
 	var mainDataVDF = await mainDataFile.Exists() && await mainDataFile.ReadAllText();
-	if (mainDataVDF) {
+	if (!mainDataVDF) {
+		TestData.LoadInto(LL);
+	} else {
 		var node = FromVDFToNode(mainDataVDF, "LucidLink");
-		var data = FromVDFNode(node, "LucidLink");
+		var data = FromVDFNode(node, "LucidLink") as LucidLink;
 		for (var propName of node.mapChildren.keys) {
 			LL[propName] = data[propName];
 		}
-	} else {
-		TestData.LoadInto(LL);
+		
+		// upgrade: 1.0.1=>1.1.0
+		if (!LL.settings.audioFiles.Any(a=>a.name == "waterfall"))
+			LL.settings.audioFiles.push({name: "waterfall", path: "assets/Waterfall.mp3"});
 	}
 
 	await LL.tracker.SetUpCurrentSession();
