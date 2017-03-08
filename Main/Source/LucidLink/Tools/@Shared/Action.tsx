@@ -45,7 +45,7 @@ export class PlayAudioFile extends Node implements Action {
 	@O @P() volume = 1;
 
 	Run(audioFileManager: AudioFileManager) {
-		audioFileManager.GetAudioFile(this.audioFileName).Play().SetVolume(this.volume);
+		audioFileManager.GetAudioFile(this.audioFileName).SetVolume(this.volume).Play();
     }
 	CreateUI(index, onClickRemove: ()=>void) {
         return (

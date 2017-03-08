@@ -102,12 +102,12 @@ class FBARun {
 				var audioFile = this.audioFileManager.GetAudioFile(track);
 				audioFile.PlayCount = -1;
 				//audioFile.Stop().SetVolume(0);
-				audioFile.Play().SetVolume(node.backgroundMusic_volume);
+				audioFile.Play({delay: 0}).SetVolume(node.backgroundMusic_volume);
 			}
 			new Timer(30, ()=> {
 				for (let track of node.backgroundMusic_tracks) {
 					var audioFile = this.audioFileManager.GetAudioFile(track);
-					audioFile.Play().SetVolume(node.backgroundMusic_volume);
+					audioFile.Play({delay: 0}).SetVolume(node.backgroundMusic_volume);
 				}
 			}).Start().SetContext(this.timerContext);
 		}

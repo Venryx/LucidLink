@@ -1,8 +1,9 @@
 import {Assert, Log} from "../Packages/VDF/VDF";
 import {Timer, WaitXThenRun} from "./General/Timers";
 import Sound from "react-native-sound";
-import {LL} from "../LucidLink";
+import {LL, RunPostInit} from "../LucidLink";
 import V from "../Packages/V/V";
+import {WaitXThenDo} from "../LucidLink/Scripts/ScriptGlobals";
 
 export class AudioFileManager {
 	audioFiles = {};
@@ -20,6 +21,18 @@ export class AudioFileManager {
 			audioFile.Stop();
 		this.audioFiles = [];
 	}
+}
+
+// internal version
+export var audioFileManager_system = new AudioFileManager();
+export var GetAudioFile_System = V.Bind(audioFileManager_system.GetAudioFile, audioFileManager_system);
+RunPostInit(()=> {
+	GetAudioFile_System("waterfall"); // pre-load waterfall audio
+});
+
+class AudioFile_PlayOptions {
+	delay = 1; // default to a 1-second delay, in case playing on bluetooth speaker (which requires warmup/activation period)
+	whiteNoiseVolume = 0;
 }
 
 export class AudioFile {
@@ -40,10 +53,26 @@ export class AudioFile {
 	baseFile;
 	postLoadFuncs = [] as (()=>void)[];
 
-	Play() {
-		if (!this.baseFile._loaded) { this.postLoadFuncs.push(()=>this.Play()); return this; }
-		this.playStartTime = new Date().getTime();
-		this.baseFile.play();
+	Play(optionsDelta?: Partial<AudioFile_PlayOptions>) {
+		let options = new AudioFile_PlayOptions().Extended(optionsDelta);
+		let Proceed = ()=> {
+			if (!this.baseFile._loaded) {
+				this.postLoadFuncs.push(()=>this.Play(optionsDelta.Extended({delay: 0})));
+				return;
+			}
+			this.playStartTime = new Date().getTime();
+			this.baseFile.play();
+		};
+		if (options.delay) {
+			// start silent waterfall audio, then delay speaking by 1 second, so bluetooth speaker can activate in time
+			GetAudioFile_System("waterfall").SetVolume(options.whiteNoiseVolume).Play({delay: 0});
+			WaitXThenDo(options.delay, ()=> {
+				Proceed();
+				GetAudioFile_System("waterfall").Stop();
+			});
+		} else {
+			Proceed();
+		}
 		return this;
 	}
 	Pause() {

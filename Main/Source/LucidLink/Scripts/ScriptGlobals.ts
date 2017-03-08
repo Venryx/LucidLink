@@ -6,7 +6,7 @@ import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL, LucidLink, RunPostInit} from "../../LucidLink";
-import {AudioFile, AudioFileManager} from "../../Frame/AudioFile";
+import {AudioFile, AudioFileManager, GetAudioFile_System} from "../../Frame/AudioFile";
 import {Sleep, Timer, WaitXThenRun, Sequence} from "../../Frame/General/Timers";
 import Speech from "react-native-android-speech";
 import SPBridge from "../../Frame/SPBridge";
@@ -156,13 +156,6 @@ export function AddListener_OnUpdatePatternMatchProbabilities(func) {
 export var audioFileManager = new AudioFileManager();
 export var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);
 
-// internal version
-var audioFileManager_internal = new AudioFileManager();
-var GetAudioFile_Internal = V.Bind(audioFileManager_internal.GetAudioFile, audioFileManager_internal);
-RunPostInit(()=> {
-	GetAudioFile_Internal("waterfall"); // pre-load waterfall audio
-});
-
 // text-to-speech
 // ==========
 
@@ -170,29 +163,30 @@ class SpeakOptions {
 	text: string;
 	forceStop = true;
 	pitch = 1;
-	delayLength = 1;
+	delay = 1; // default to a 1-second delay, in case playing on bluetooth speaker (which requires warmup/activation period)
 	whiteNoiseVolume = 0;
 }
 export function Speak(optionsDelta: Partial<SpeakOptions>) {
 	let options = new SpeakOptions().Extended(optionsDelta);
 	options.text = options.text.toString();
 	return new Promise((resolve, reject)=> {
-		function Speak() {
+		function Proceed() {
 			Speech.speak(options).then(resolve).catch(ex=> {
 				if (ex.toString().contains("TTS is already speaking something")) return;
-				throw ex;
+				//throw ex;
+				reject(ex);
 			});
 		}
 		
-		if (options.delayLength) {
+		if (options.delay) {
 			// start silent waterfall audio, then delay speaking by 1 second, so bluetooth speaker can activate in time
-			GetAudioFile_Internal("waterfall").SetVolume(options.whiteNoiseVolume).Play();
-			WaitXThenDo(options.delayLength, ()=> {
-				Speak();
-				GetAudioFile_Internal("waterfall").Stop();
+			GetAudioFile_System("waterfall").SetVolume(options.whiteNoiseVolume).Play({delay: 0});
+			WaitXThenDo(options.delay, ()=> {
+				Proceed();
+				GetAudioFile_System("waterfall").Stop();
 			});
 		} else {
-			Speak();
+			Proceed();
 		}
 	});
 };
