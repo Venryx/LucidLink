@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-	"dev": "node \".\node_modules\typescript\bin\tsc.js\" -w -p .",
+	"dev": "node \"./node_modules/typescript/bin/tsc\" -w -p .",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
 	"release": "cd android && gradlew assembleRelease"

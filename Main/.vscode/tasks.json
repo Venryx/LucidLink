@@ -6,7 +6,7 @@
 	//"command": "node",
 	"command": "npm",
 	"isShellCommand": true,
-	//"args": [".\\node_modules\\typescript\\lib\\tsc.js", "-w", "-p", "."],
+	//"args": ["./node_modules/typescript/lib/tsc", "-w", "-p", "."],
 	"args": ["run", "dev"],
 	//"showOutput": "silent",
 	"isBackground": true,
