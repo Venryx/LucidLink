@@ -57,7 +57,7 @@ export default class V {
 
 		var firstCharPos = text.indexOf("\n", text.indexOf("/*")) + 1;
 		return text.substring(firstCharPos, text.lastIndexOf("\n"));
-	};
+	}
 	static Multiline_NotCommented(functionWithCode) {
 		var text = functionWithCode.toString().replace(/\r/g, "");
 		var firstCharOfSecondLinePos = text.indexOf("\n") + 1;

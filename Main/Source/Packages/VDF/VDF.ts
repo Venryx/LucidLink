@@ -43,6 +43,7 @@ Object.defineProperty(Object.prototype, "_AddProperty", {
 	enumerable: false,
 	value: function(name, value) {
 		Object.defineProperty(this, name, {
+			configurable: true,
 			enumerable: false,
 			value: value
 		});

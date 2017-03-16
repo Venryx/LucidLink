@@ -37,7 +37,7 @@ class AudioFile_PlayOptions {
 
 export class AudioFile {
 	constructor(filePath: string, onLoaded?: Function) {
-		let [basePath, fileName] = filePath.SplitAt(filePath.lastIndexOf("/"), false);
+		let [basePath, fileName] = filePath.SplitAt(filePath.lastIndexOf("/"));
 		this.baseFile = new Sound(fileName, basePath, error=> {
 			if (error)
 				Log(`Failed to load audio-file at "${filePath}":`, error);

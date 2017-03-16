@@ -10,14 +10,18 @@ import {Dimensions, StyleSheet,
 import RNFS from "react-native-fs";
 //import autobind from "react-autobind"; // caused error in Babel transpiler
 import ShallowCompare from "react-addons-shallow-compare";
-
 import Button from "apsl-react-native-button"
+import EStyleSheet from "react-native-extended-stylesheet";
+import Bind from "autobind-decorator";
+import autoBind from "react-autobind";
+import {Assert} from "./General/Assert";
+import {WaitXThenRun, WaitXThenRun_BuiltIn, Timer} from "./General/Timers";
+import {ViewProperties, TouchableOpacityProperties, ButtonProperties, TextProperties, TextInputProperties} from "react-native";
+import {IsString} from "./Types";
 
-var globalComps = {React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
-	DatePickerAndroid, TimePickerAndroid};
 var g: any = global;
-for (let key in globalComps)
-	g[key] = globalComps[key];
+g.Extend({React, View, Text, TextInput, Switch, ScrollView, TouchableOpacity, TouchableHighlight, Dimensions, StyleSheet,
+	DatePickerAndroid, TimePickerAndroid});
 
 // maybe temp: re-export some external-library stuff, since auto-importer fails for some
 //export {TextInput} from "react";
@@ -50,16 +54,8 @@ AddEarlyStyle(Text, {color: colors.text});
 AddEarlyStyle(TextInput, {color: colors.text});
 
 // component.js
-import EStyleSheet from "react-native-extended-stylesheet";
-import Bind from "autobind-decorator";
 // calculate styles
 EStyleSheet.build();
-
-import autoBind from "react-autobind";
-import {Assert} from "./General/Assert";
-import {WaitXThenRun, WaitXThenRun_BuiltIn, Timer} from "./General/Timers";
-import {ViewProperties, TouchableOpacityProperties, ButtonProperties, TextProperties, TextInputProperties} from "react-native";
-import {IsString} from "./Types";
 
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/

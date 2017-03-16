@@ -518,7 +518,7 @@ String.prototype._AddFunction_Inline = function splitByAny() {
 	return this.split(splitStr);
 };
 interface String { SplitAt: (index: number, includeCharAtIndex?)=>[string, string]; }
-String.prototype.SplitAt = function(index: number, includeCharAtIndex = true) {
+String.prototype.SplitAt = function(index: number, includeCharAtIndex = false) {
 	if (index == -1) // if no split-index, pass source-string as part2 (makes more sense for paths and such)
 		return ["", this];
 	let part1 = this.substr(0, index);
