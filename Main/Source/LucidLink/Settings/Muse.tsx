@@ -1,5 +1,5 @@
 import {Range} from "../../Frame/Globals";
-import {BaseComponent as Component, Panel, Row, RowLR, VButton, VText, BaseProps} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, Row, RowLR, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {Observer, observer} from "mobx-react/native";
 import {Text, Switch} from "react-native";
@@ -7,6 +7,7 @@ import NumberPickerDialog from "react-native-numberpicker-dialog";
 import {LL} from "../../LucidLink";
 import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPicker";
 import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitch";
+import VText from "../../Frame/Components/VText";
 
 @observer
 export default class MuseUI extends Component<{}, {}> { 

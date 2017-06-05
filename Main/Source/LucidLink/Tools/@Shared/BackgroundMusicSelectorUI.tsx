@@ -1,4 +1,4 @@
-import {Column, Panel, Row, VButton, VText, BaseComponent as Component} from "../../../Frame/ReactGlobals";
+import {Column, Panel, Row, VButton, BaseComponent as Component} from "../../../Frame/ReactGlobals";
 import {VSwitch_Auto} from "../../../Packages/ReactNativeComponents/VSwitch";
 import {colors} from "../../../Frame/Styles";
 import {NumberPicker_Auto} from "../../../Packages/ReactNativeComponents/NumberPicker";
@@ -6,6 +6,7 @@ import {FBA} from "../FBA";
 import {RVP} from "../RVP";
 import {VTextInput} from "../../../Packages/ReactNativeComponents/VTextInput";
 import {observer} from "mobx-react/native";
+import VText from "../../../Frame/Components/VText";
 
 @observer
 export default class BackgroundMusicConfigUI extends Component<{node: FBA | RVP}, {}> {

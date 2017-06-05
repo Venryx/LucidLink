@@ -6,7 +6,8 @@
 	"dev": "node \"./node_modules/typescript/bin/tsc\" -w -p .",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-	"release": "cd android && gradlew assembleRelease"
+	"release": "cd android && gradlew assembleRelease",
+	"run-android": "cd \".\\android\" && gradlew clean && cd \"..\\\" && react-native run-android"
   },
   "dependencies": {
     "apsl-react-native-button": "^3.0.2",

@@ -21,6 +21,8 @@ export default class V {
 	static PropNameToTitle(propName: string) {
 		// demo string: somePropName
 		return propName
+			// some_prop -> some - prop
+			.replace(/_/g, " - ")
 			// somePropName -> some prop name
 			.replace(/[A-Z]/g, a=>" " + a.toLowerCase())
 			// some prop name -> Some prop name

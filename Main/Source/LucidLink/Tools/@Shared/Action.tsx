@@ -3,11 +3,12 @@ import {Speak} from "../../Scripts/ScriptGlobals";
 import {Log, Global} from "../../../Frame/Globals";
 import {AudioFileManager} from "../../../Frame/AudioFile";
 import V from "../../../Packages/V/V";
-import {Row, VText, VButton} from "../../../Frame/ReactGlobals";
+import {Row, VButton} from "../../../Frame/ReactGlobals";
 import {VTextInput_Auto} from "../../../Packages/ReactNativeComponents/VTextInput";
 import Node from "../../../Packages/VTree/Node";
 import {NumberPicker_Auto} from "../../../Packages/ReactNativeComponents/NumberPicker";
 import {P} from "../../../Packages/VDF/VDFTypeInfo";
+import VText from "../../../Frame/Components/VText";
 
 /*var audioFileManager = new AudioFileManager();
 var GetAudioFile = V.Bind(audioFileManager.GetAudioFile, audioFileManager);*/

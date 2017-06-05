@@ -2,9 +2,10 @@ import {observer} from "mobx-react/native";
 import {colors} from "../../../Frame/Styles";
 import {Text} from "react-native";
 import Spinner from "rn-spinner";
-import {BaseComponent, Column, Row, VText} from "../../../Frame/ReactGlobals";
+import {BaseComponent, Column, Row} from "../../../Frame/ReactGlobals";
 import {LL} from "../../../LucidLink";
 import {VSwitch, VSwitch_Auto} from "../../../Packages/ReactNativeComponents/VSwitch";
+import VText from "../../../Frame/Components/VText";
 
 @observer
 export default class OptionsPanel extends BaseComponent<any, any> {

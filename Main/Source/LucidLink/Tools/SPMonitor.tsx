@@ -82,10 +82,11 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 								SPBridge.StopSession();
 						}}/>
 					</Row>
-					<Panel style={{marginTop: -7, flex: 1}}>
-						<GraphUI/>
+					{/*<Panel style={{marginTop: -7, flex: 1}}>*/}
+					<Column>
+						{/*<GraphUI/>*/}
 						<GraphOverlayUI/>
-					</Panel>
+					</Column>
 				</Column>
 			</Drawer>
 		);
@@ -93,14 +94,14 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 }
 
 class GraphUI extends Component<{}, {}> {
-    render() {
-        return (
+	render() {
+		return (
 			<View style={{flex: 1, backgroundColor: colors.background}}/>
-        );
-    }
+		);
+	}
 }
 
-class GraphOverlayUI extends Component<{}, {}> {
+export class GraphOverlayUI extends Component<{}, {}> {
 	timer: Timer;
 	ComponentDidMount() {
 		SPBridge.listeners_onReceiveTemp.push(this.OnReceiveTemp);
@@ -109,6 +110,7 @@ class GraphOverlayUI extends Component<{}, {}> {
 		SPBridge.listeners_onReceiveBreathingRate.push(this.OnReceiveBreathingRate);
 		SPBridge.listeners_onReceiveSleepStage.push(this.OnReceiveSleepStage);
 		this.timer = new Timer(1, ()=> {
+			if (!this.mounted) return;
 			this.forceUpdate();
 		}).Start();
 	}
@@ -144,15 +146,15 @@ class GraphOverlayUI extends Component<{}, {}> {
 		this.sleepStage = sleepStage;
 	}
 
-    render() {
-        return (
-			<Column style={{position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: colors.background}}>
+	render() {
+		return (
+			<Column style={{/*position: "absolute", left: 0, right: 0, top: 0, bottom: 0,*/ backgroundColor: colors.background}}>
 				<Text>Temp: {this.temp}f</Text>
 				<Text>Light: {this.light}</Text>
 				<Text>Breath: {this.breath}</Text>
 				<Text>Breathing rate: {this.breathingRate}</Text>
 				<Text>Sleep stage: {this.sleepStage ? this.sleepStage.name : "Unknown"}</Text>
 			</Column>
-        );
-    }
+		);
+	}
 }

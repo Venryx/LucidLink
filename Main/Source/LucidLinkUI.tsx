@@ -1,5 +1,5 @@
 import {LL, Init} from "./LucidLink";
-import {BaseComponent as Component, Panel, Column, VButton, Row, VText, SimpleShouldUpdate} from "./Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, Column, VButton, Row, SimpleShouldUpdate} from "./Frame/ReactGlobals";
 import {JavaBridge, Log} from "./Frame/Globals";
 import {TrackerUI} from "./LucidLink/Tracker";
 import {JournalUI} from "./LucidLink/Journal";
@@ -15,6 +15,7 @@ import {A} from "./Frame/General/Assert";
 import Chart from "react-native-chart";
 import {ChartUI} from "./LucidLink/Tracker/Graph/GraphUI";
 import {colors} from "./Frame/Styles";
+import VText from "./Frame/Components/VText";
 
 // note: we have to alias BaseComponent as Component, because otherwise react-native's hot-reloading breaks
 // (see here for some info: https://github.com/gaearon/react-transform-hmr/issues/82)

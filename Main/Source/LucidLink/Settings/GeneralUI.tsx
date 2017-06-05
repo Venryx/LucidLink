@@ -1,5 +1,5 @@
 import {Range} from "../../Frame/Globals";
-import {BaseComponent as Component, Panel, Row, RowLR, VButton, VText, BaseProps} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Panel, Row, RowLR, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors} from "../../Frame/Styles";
 import {Observer, observer} from "mobx-react/native";
 import {Text, Switch} from "react-native";
@@ -10,6 +10,7 @@ import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitc
 import Select from "../../Packages/ReactNativeComponents/Select";
 import {Gender} from "../Settings";
 import {Select_Auto} from "../../Packages/ReactNativeComponents/Select";
+import VText from "../../Frame/Components/VText";
 
 @observer
 export default class GeneralUI extends Component<{}, {}> { 

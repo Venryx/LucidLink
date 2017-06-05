@@ -11,7 +11,8 @@ import {P, T} from "../Packages/VDF/VDFTypeInfo";
 import {MonitorUI, Monitor} from "./Tools/Monitor";
 import {RVPUI, RVP} from "./Tools/RVP";
 import {SPMonitor, SPMonitorUI} from "./Tools/SPMonitor";
-import {FBA, FBAUI} from "./Tools/FBA";
+import {FBA} from "./Tools/FBA";
+import FBAUI from "./Tools/FBAUI";
 
 @Global
 export class Tools extends Node {

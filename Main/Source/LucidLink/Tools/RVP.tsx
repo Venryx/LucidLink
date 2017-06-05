@@ -1,5 +1,5 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, VText, BaseProps} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Vector2i} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
@@ -20,6 +20,7 @@ import {WaitXThenRun, Timer, TimerContext} from "../../Frame/General/Timers";
 import {VTextInput, VTextInput_Auto} from "../../Packages/ReactNativeComponents/VTextInput";
 import BackgroundMusicConfigUI from "./@Shared/BackgroundMusicSelectorUI";
 import V from "../../Packages/V/V";
+import VText from "../../Frame/Components/VText";
 
 @Global
 export class RVP extends Node {

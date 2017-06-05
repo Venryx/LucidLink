@@ -1,4 +1,4 @@
-import {BaseComponent as Component, Column, Panel, Row, VButton, VText, BaseProps} from "../../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../../Frame/ReactGlobals";
 import {colors, styles} from "../../../Frame/Styles";
 import {VRect} from "../../../Frame/Graphics/VectorStructs";
 import Drawer from "react-native-drawer";
@@ -17,6 +17,7 @@ import {Notify} from "../../../Frame/Globals";
 import {Session} from "../Session";
 import SleepSegmentsUI from "./SleepSegmentsUI";
 import SleepSession from "../Session/SleepSession";
+import VText from "../../../Frame/Components/VText";
 
 @observer
 export default class GraphUI extends Component<{}, {}> {

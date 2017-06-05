@@ -1,5 +1,5 @@
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
-import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, VText, BaseProps} from "../../Frame/ReactGlobals";
+import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, BaseProps, BaseComponent} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Vector2i} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
@@ -25,6 +25,7 @@ import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
 import V from "../../Packages/V/V";
 import {Action, SpeakText, PlayAudioFile} from "./@Shared/Action";
+import VText from "../../Frame/Components/VText";
 
 @Global
 export class FBA extends Node {
@@ -64,7 +65,22 @@ export class FBA extends Node {
 	@O @P() backgroundMusic_volume = .05;
 	@O @P() backgroundMusic_tracks = [];
 
+	@O @P() commandListener = new FBA_CommandListener();
+	@O @P() statusReporter = new FBA_StatusReporter();
+
 	currentRun: FBARun;
+}
+
+@Global
+export class FBA_CommandListener extends Node {
+	@O @P() sequenceDisabler_breathDepthCutoff = 10;
+	@O @P() sequenceDisabler_disableLength = 15;
+}
+
+@Global
+export class FBA_StatusReporter extends Node {
+	@O @P() reportInterval = 1;
+	@O @P() reportText = "depth @breathDepth, sequence @remSequenceEnabled, stage @sleepStage for @sleepStageTime"
 }
 
 export class ListenersContext {
@@ -155,70 +171,5 @@ class FBARun {
 		this.audioFileManager.Reset();
 		LL.tracker.currentSession.CurrentSleepSession.End();
 		if (g.FBA_PostStop) g.FBA_PostStop();
-	}
-}
-
-@observer
-export class FBAUI extends Component<{}, {}> {
-	render() {
-		var node = LL.tools.fba;
-		return (
-			<ScrollView style={{flex: 1, flexDirection: "column"}}>
-				<Row style={{flex: 1, flexDirection: "column", padding: 10}}>
-					<Row>
-						<VText mt={2} mr={10}>Enabled: </VText>
-						<VSwitch_Auto path={()=>node.p.enabled}/>
-					</Row>
-					<Row>
-						<VText mt={5} mr={10}>Volume, normal:</VText>
-						<NumberPicker_Auto path={()=>node.p.normalVolume} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
-						<VText mt={5} ml={10} mr={10}>Bluetooth:</VText>
-						<NumberPicker_Auto path={()=>node.p.bluetoothVolume} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
-					</Row>
-					<Row>
-						<VText mt={5} mr={10}>Prompt delay from REM onset:</VText>
-						<NumberPicker_Auto path={()=>node.p.promptStartDelay} format={a=>a + " minutes"}/>
-					</Row>
-					<Row>
-						<VText mt={5} mr={10}>Prompt interval:</VText>
-						<NumberPicker_Auto path={()=>node.p.promptInterval} format={a=>a + " minutes"}/>
-					</Row>
-					<Row>
-						<VText mt={5} mr={10}>Prompt actions:</VText>
-					</Row>
-					<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
-						<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
-							{node.promptActions.map((action, index)=> {
-								return action.CreateUI(index, ()=>node.promptActions.Remove(action));
-							})}
-						</Column>
-						<Row mt={10} height={45}>
-							<VText mt={9}>Add: </VText>
-							<VButton text="Speak text" plr={10} style={{height: 40}}
-								onPress={()=>node.promptActions.push(new SpeakText())}/>
-							<VButton text="Play audio file" ml={5} plr={10} style={{height: 40}}
-								onPress={()=>node.promptActions.push(new PlayAudioFile())}/>
-						</Row>
-					</Row>
-					<BackgroundMusicConfigUI node={node}/>
-
-					{/*<VButton text="Test1" ml={5} plr={10} style={{height: 40}}
-						onPress={()=> {
-							var sequence = new Sequence();
-							sequence.AddSegment(3, ()=> {
-								Toast("3");
-							});
-							sequence.AddSegment(3, ()=> {
-								Toast("6");
-								sequence.Stop();
-							});
-							sequence.AddSegment(3, ()=> {
-								Toast("9");
-							});
-							sequence.Start();
-						}}/>*/}
-				</Row>
-			</ScrollView>
-		);
 	}
 }

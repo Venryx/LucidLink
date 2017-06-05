@@ -276,14 +276,14 @@ export class Panel extends BaseComponent<PanelProps, {}> {
 		var {touchable, style, children, ...rest} = this.props;
 		if (touchable) {
 			return (
-				<TouchableOpacity {...rest} ref={c=>this.root = c}
+				<TouchableOpacity {...rest as any} ref={c=>this.root = c}
 						style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
 					{children}
 				</TouchableOpacity>
 			);
 		}
 		return (
-			<View {...rest} ref={c=>this.root = c}
+			<View {...rest as any} ref={c=>this.root = c}
 					style={E({backgroundColor: "transparent"}, BasicStyles(this.props), style)}>
 				{children}
 			</View>
@@ -328,22 +328,6 @@ export class Column extends BaseComponent<{width?, style?} & PanelProps, {}> {
 			<Panel {...rest} style={E({flexDirection: "column"}, BasicStyles(this.props), style, width != null ? {width} : {flex: 1})}>
 				{children}
 			</Panel>
-		);
-	}
-}
-
-export class VText extends BaseComponent<{style?} & TextProperties, {}> {
-	render() {
-		var {style, children, ...rest} = this.props as any;
-		return (
-			<Text {...rest}
-					style={E(
-						{},
-						BasicStyles(this.props),
-						style
-					)}>
-				{children}
-			</Text>
 		);
 	}
 }

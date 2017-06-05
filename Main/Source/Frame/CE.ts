@@ -573,21 +573,6 @@ Array.prototype._AddFunction_Inline = function ContainsAny(...items) {
             return true;
     return false;
 };
-Array.prototype._AddFunction_Inline = function Indexes()
-{
-	var result = {};
-	for (var i = 0; i < this.length; i++)
-		result[i] = null; //this[i]; //null;
-	return result;
-};
-Array.prototype._AddFunction_Inline = function Strings() // not recommended, because it doesn't allow for duplicates
-{
-	var result = {};
-	for (var key in this)
-		if (this.hasOwnProperty(key))
-			result[this[key]] = null;
-	return result;
-};
 
 // for some reason, this platform doesn't have entries() defined
 Array.prototype._AddFunction_Inline = function entries() {
