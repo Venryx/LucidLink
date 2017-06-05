@@ -170,7 +170,7 @@ class SpeakOptions {
 export function Speak(optionsDelta: Partial<SpeakOptions>) {
 	let options = new SpeakOptions().Extended(optionsDelta);
 	options.text = options.text.toString();
-	if (options.volume == null || options.volume == -1) delete options.volume;
+	if (options.volume == null || options.volume == -.01) delete options.volume;
 	return new Promise((resolve, reject)=> {
 		function Proceed() {
 			Speech.speak(options).then(resolve).catch(ex=> {

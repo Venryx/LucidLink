@@ -6,10 +6,10 @@ import {Enum, _Enum} from "./General/Enums";
 
 @_Enum export class SleepStage extends Enum { static V: SleepStage;
 	Absent = this
-    Wake = this
-    Light = this
-    Deep = this
-    Rem = this
+	Wake = this
+	Light = this
+	Deep = this
+	Rem = this
 
 	static FromJavaStageValue(stageValue: number) {
 		let stageValueToStageMap = {

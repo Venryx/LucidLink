@@ -24,7 +24,7 @@ import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
 import V from "../../Packages/V/V";
-import {Action, SpeakText, PlayAudioFile} from "./@Shared/Action";
+import {Action, SpeakText, PlayAudioFile, Wait, RepeatSteps, ChangeVolume} from "./@Shared/Action";
 import VText from "../../Frame/Components/VText";
 import GraphUI from "./SPMonitor/SPGraphUI";
 
@@ -89,25 +89,44 @@ export class REMStartSequenceUI extends BaseComponent<{}, {}> {
 					<NumberPicker_Auto path={()=>node.p.promptStartDelay} min={0} max={100} format={a=>a + " minutes"}/>
 					<VText mt={5} ml={5}>+ 20s</VText>
 				</Row>
-				<Row>
+				{/*<Row>
 					<VText mt={5} mr={10}>Sequence repeat interval:</VText>
 					<NumberPicker_Auto path={()=>node.p.promptInterval} min={1} max={100} format={a=>a + " minutes"}/>
-				</Row>
+				</Row>*/}
 				<Row>
 					<VText mr={10}>Sequence actions:</VText>
 				</Row>
 				<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
 					<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
 						{node.promptActions.map((action, index)=> {
-							return action.CreateUI(index, ()=>node.promptActions.Remove(action));
+							return (
+								<Row key={index}>
+									{action.CreateUI()}
+									<VButton text="▲" ml={5} style={{height: 28}} textStyle={{marginBottom: 3}} onPress={()=> {
+										node.promptActions.RemoveAt(index);
+										node.promptActions.Insert(index - 1, action);
+									}}/>
+									<VButton text="▼" ml={5} style={{height: 28}} textStyle={{marginBottom: 3}} onPress={()=> {
+										node.promptActions.RemoveAt(index);
+										node.promptActions.Insert(index + 1, action);
+									}}/>
+									<VButton text="X" ml={5} style={{width: 28, height: 28}} textStyle={{marginBottom: 3}} onPress={()=>node.promptActions.Remove(action)}/>
+								</Row>
+							);
 						})}
 					</Column>
 					<Row mt={10} height={45}>
 						<VText mt={9}>Add: </VText>
-						<VButton text="Speak text" plr={10} style={{height: 40}}
+						<VButton text="Wait" plr={10} style={{height: 40}}
+							onPress={()=>node.promptActions.push(new Wait())}/>
+						<VButton text="Speak text" ml={5} plr={10} style={{height: 40}}
 							onPress={()=>node.promptActions.push(new SpeakText())}/>
 						<VButton text="Play audio file" ml={5} plr={10} style={{height: 40}}
 							onPress={()=>node.promptActions.push(new PlayAudioFile())}/>
+						<VButton text="Change volume" ml={5} plr={10} style={{height: 40}}
+							onPress={()=>node.promptActions.push(new ChangeVolume())}/>
+						<VButton text="Repeat steps" ml={5} plr={10} style={{height: 40}}
+							onPress={()=>node.promptActions.push(new RepeatSteps())}/>
 					</Row>
 				</Row>
 				<BackgroundMusicConfigUI node={node}/>
@@ -135,8 +154,8 @@ export class CommandListenerUI extends BaseComponent<{}, {}> {
 					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_disableLength} min={0} max={100} format={a=>a + " minutes"}/>
 				</Row>
 				<Row>
-					<VText mt={10}>2) </VText>
-					{node.sequenceDisabler_messageSpeakAction.CreateUI(0, null)}
+					<VText mt={5}>2) </VText>
+					{node.sequenceDisabler_messageSpeakAction.CreateUI()}
 				</Row>
 			</Column>
 		);
@@ -168,8 +187,9 @@ export class StatusReporterUI extends BaseComponent<{}, {}> {
 @temp, @light
 @breathVal, @breathVal_min, @breathVal_max, @breathVal_avg
 @breathingDepth_prev, @breathingDepth_last, @breathingRate
-@sleepStage, @sleepStageTime, @remSequenceEnabled
-`.trim());
+@sleepStage`.trim()
+//@sleepStageTime, @remSequenceEnabled
+						);
 					}}/>
 				</Row>
 				<Row>

@@ -2,7 +2,7 @@ import {Global, JavaBridge, Log, Toast} from "../../Frame/Globals";
 import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
-import {Vector2i} from "../../Frame/Graphics/VectorStructs";
+import {Vector2i, VVector2} from "../../Frame/Graphics/VectorStructs";
 import {Observer, observer} from "mobx-react/native";
 import Drawer from "react-native-drawer";
 import {MKRangeSlider} from "react-native-material-kit";
@@ -18,14 +18,87 @@ import {Timer} from "../../Frame/General/Timers";
 import {autorun} from "mobx";
 import {GraphOverlayUI} from "./SPMonitor/SPGraphUI";
 import GraphUI from "./SPMonitor/SPGraphUI";
+import {ListenersContext} from "./FBA/FBARun";
+import { Assert } from "../../Frame/General/Assert";
 
 @Global
 export class SPMonitor extends Node {
+	/*constructor() {
+		super();
+		this.monitor.Start(); // just have it always running in the background
+	}*/
+
 	@O @P() connect = true;
 	/*@O @P() monitor = true;
 	@O @P() process = true;*/
 
 	//@O @P() calculateBreathingRate = true;
+
+	monitor = new SPMonitorClass();
+}
+
+export class SPMonitorClass {
+	constructor() {
+		// for now, just auto-start (and have it running in the background, as singleton basically)
+		this.Start();
+	}
+
+	listenersContext = new ListenersContext();
+	Start() {
+		Assert(this.listenersContext.listEntries.length == 0, "Cannot start SPMonitorClass twice.");
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveTemp, this.OnReceiveTemp.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveLightValue, this.OnReceiveLightValue.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathValues, this.OnReceiveBreathValues.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathValueMinMaxAndAverages, this.OnReceiveBreathValueMinMaxAndAverage.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathingDepth, this.OnReceiveBreathingDepth.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathingRate, this.OnReceiveBreathingRate.bind(this));
+		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveSleepStage, this.OnReceiveSleepStage.bind(this));
+	}
+	/*Reset() {
+		this.listenersContext.Reset();
+	}*/
+
+	// raw data
+	// ==========
+
+	temp = -1;
+	OnReceiveTemp(tempInC: number, tempInF: number) {
+		this.temp = tempInF;
+	}
+	light = -1;
+	OnReceiveLightValue(lightVal: number) {
+		this.light = lightVal;
+	}
+	breathVal = new VVector2(0, 0);
+	OnReceiveBreathValues(breathVal1: number, breathVal2: number) {
+		this.breathVal = new VVector2(breathVal1, breathVal2);
+	}
+
+	// calculated data
+	// ==========
+
+	breathVal_min = new VVector2(0, 0);
+	breathVal_max = new VVector2(0, 0);
+	breathVal_avg = new VVector2(0, 0);
+	OnReceiveBreathValueMinMaxAndAverage(min_1: number, min_2: number, max_1: number, max_2: number, avg_1: number, avg_2: number) {
+		this.breathVal_min = new VVector2(min_1, min_2);
+		this.breathVal_max = new VVector2(max_1, max_2);
+		this.breathVal_avg = new VVector2(avg_1, avg_2);
+	}
+	breathingDepth_prev = -1;
+	breathingDepth_last = -1;
+	OnReceiveBreathingDepth(breathingDepth_prev: number, breathingDepth_last: number) {
+		this.breathingDepth_prev = breathingDepth_prev;
+		this.breathingDepth_last = breathingDepth_last;
+	}
+	breathingRate = -1;
+	OnReceiveBreathingRate(breathingRate: number) {
+		this.breathingRate = breathingRate;
+	}
+	sleepStage: SleepStage;
+	OnReceiveSleepStage(sleepStage: SleepStage) {
+		this.sleepStage = sleepStage;
+	}
 }
 
 @observer

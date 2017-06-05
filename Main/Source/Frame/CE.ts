@@ -295,8 +295,9 @@ Object.prototype._AddFunction_Inline = function AddProp(name, value) {
 	return this;
 };*/
 
+interface Object { VAct<T>(this: T, func: (self: T)=>any): T; }
 Object.prototype._AddFunction_Inline = function VAct(action) {
-	action.call(this);
+	action.call(this, this);
 	return this;
 };
 
@@ -874,6 +875,11 @@ Object.prototype._AddFunction_Inline = function plus(offset) { return { left: th
 // ==========
 
 interface Error { readonly Stack: string; }
+
+// require other CE modules
+// ==========
+
+require("./CE_Number");
 
 // late-require things from other modules, that are used in the methods
 // ==========

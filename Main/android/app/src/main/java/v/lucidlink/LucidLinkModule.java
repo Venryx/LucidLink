@@ -333,8 +333,17 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 	double normalVolumeToApply = -1;
 	double bluetoothVolumeToApply = -1;
 	@ReactMethod public void SetVolumes(double normalVolume, double bluetoothVolume) {
-		this.normalVolumeToApply = normalVolume;
-		this.bluetoothVolumeToApply = bluetoothVolume;
+		if (normalVolume != -1000)
+			this.normalVolumeToApply = normalVolume;
+		if (bluetoothVolume != -1000)
+			this.bluetoothVolumeToApply = bluetoothVolume;
+		this.ApplyVolumeForCurrentType();
+	}
+	@ReactMethod public void IncreaseVolumes(double normalVolume, double bluetoothVolume) {
+		if (normalVolume != -1000)
+			this.normalVolumeToApply += normalVolume;
+		if (bluetoothVolume != -1000)
+			this.bluetoothVolumeToApply += bluetoothVolume;
 		this.ApplyVolumeForCurrentType();
 	}
 	public void ApplyVolumeForCurrentType() {

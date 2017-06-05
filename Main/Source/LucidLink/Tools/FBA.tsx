@@ -58,7 +58,6 @@ export class FBA extends Node {
 	@O @P() normalVolume = .15;
 	@O @P() bluetoothVolume = .15;
 	@O @P() promptStartDelay = 3;
-	@O @P() promptInterval = 3;
 
 	@O @P() promptActions = [] as Action[];
 
@@ -74,7 +73,7 @@ export class FBA extends Node {
 
 @Global
 export class FBA_CommandListener extends Node {
-	@O @P() sequenceDisabler_breathDepthCutoff = 10;
+	@O @P() sequenceDisabler_breathDepthCutoff = 50;
 	@O @P() sequenceDisabler_disableLength = 15;
 	@O @P() sequenceDisabler_messageSpeakAction = new SpeakText({text: "Movement detected, disabling rem-sequence."});
 }
@@ -82,7 +81,8 @@ export class FBA_CommandListener extends Node {
 @Global
 export class FBA_StatusReporter extends Node {
 	@O @P() reportInterval = 1;
-	@O @P() reportText = "stage @sleepStage for @sleepStageTime, sequence @remSequenceEnabled"
+	//@O @P() reportText = "stage @sleepStage for @sleepStageTime, sequence @remSequenceEnabled"
+	@O @P() reportText = "stage @sleepStage"
 	@O @P() volume = -.01;
 	@O @P() pitch = 1;
 }

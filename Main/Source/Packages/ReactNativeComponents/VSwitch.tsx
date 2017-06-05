@@ -19,7 +19,7 @@ export class VSwitch extends Component<{text?, value?, onChange?, style?, contai
 		return (
 			<Row style={E(BasicStyles(this.props), containerStyle)}>
 				{text && <Text style={{marginLeft: 5, height: 20}}>{text}</Text>}
-				<Switch {...rest} {...{value, onValueChange: onChange}}
+				<Switch {...rest as any} {...{value, onValueChange: onChange}}
 					style={E(
 						{height: 20, marginBottom: 3},
 						style

@@ -21,15 +21,15 @@ import VText from "./Frame/Components/VText";
 // (see here for some info: https://github.com/gaearon/react-transform-hmr/issues/82)
 @observer
 export default class LucidLinkUI extends Component<{}, {}> {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 		if (LL == null)
 			Init(this);
-    }
+	}
 
 	state = {activeTab: -1};
 
-    render() {
+	render() {
 		// if main-data not yet loaded, render blank ui
 		if (LL == null || LL.mainDataLoaded == false) {
 			var marker = null;
