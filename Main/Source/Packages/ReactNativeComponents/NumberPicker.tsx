@@ -5,8 +5,8 @@ import Node from "../VTree/Node";
 import {observer} from "mobx-react/native";
 import V from "../V/V";
 
-export default class NumberPicker extends Component<
-		{min?, max?, step?,
+export default class NumberPicker extends Component
+		<{min?, max?, step?,
 			values?, // alternative to min-max-step
 			precision?, format?,
 			value?, enabled?, style?,
@@ -29,7 +29,7 @@ export default class NumberPicker extends Component<
 
 	    return (
 			<VButton text={format(value)}
-				style={E({width: 100, height: 32}, style)}
+				style={E({/*width: 100,*/ height: 32}, style)}
 				onPress={async ()=> {
 					var id = await NumberPickerDialog.show({
 						title: dialogTitle || "",
@@ -50,8 +50,8 @@ export default class NumberPicker extends Component<
 }
 
 @observer
-export class NumberPicker_Auto extends Component<
-		{min?, max?, step?,
+export class NumberPicker_Auto extends Component
+		<{min?, max?, step?,
 			values?, // alternative to step-min-max
 			precision?, format?,
 			value?, enabled?, style?,

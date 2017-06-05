@@ -14,7 +14,7 @@ export default class BackgroundMusicConfigUI extends Component<{node: FBA | RVP}
 		var {node} = this.props;
 		return (
 			<Row style={{flex: 1, flexDirection: "column"}}>
-				<Row mt={30} height={30}>
+				<Row mt={10} height={30}>
 					<VText mt={1}>Background music: </VText>
 					<VSwitch_Auto path={()=>node.p.backgroundMusic_enabled}/>
 				</Row>

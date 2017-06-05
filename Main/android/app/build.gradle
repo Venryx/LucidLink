@@ -152,8 +152,7 @@ android {
             def versionCodes = ["armeabi-v7a": 1, "x86": 2]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                        versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                output.versionCodeOverride = versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
         }
     }
@@ -212,7 +211,6 @@ configurations.all {
 }
 
 dependencies {
-
     //compile "com.android.support:appcompat-v7:23.0.1"
 
     //compile "com.facebook.react:react-native:0.42.0-rc.3" // From node_modules
@@ -220,12 +218,12 @@ dependencies {
     // android support
     compile 'com.android.support:support-v4:25.1.0'
     /*{
-            force = true
-        }*/
+        force = true
+    }*/
     compile 'com.android.support:appcompat-v7:25.1.0'
     /*{
-            force = true
-        }*/
+        force = true
+    }*/
     compile project(':react-native-dialogs')
     compile project(':react-native-numberpicker-dialog')
     compile project(':react-native-file-picker')
@@ -246,8 +244,8 @@ dependencies {
         compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
     compile fileTree(include: ['*.jar'], dir: 'libs')
     /*compile(files("libs/com.resmed.refresh-158.jar")) {
-            exclude group: "com.android.support"
-        }*/
+        exclude group: "com.android.support"
+    }*/
     compile 'com.android.support:support-annotations:25.1.0'
     compile 'com.android.support:design:25.1.0'
     compile 'com.android.support:percent:25.1.0'

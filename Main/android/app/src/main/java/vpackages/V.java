@@ -431,6 +431,13 @@ public class V {
 		if (val > max) return max;
 		return val;
 	}
+	// integer version -- ie. for arrays
+	public static int WrapToRange_MaxOut(int val, int min, int maxOut) {
+		int size = maxOut - min;
+		while (val < min) val += size;
+		while (val >= maxOut) val -= size;
+		return val;
+	}
 
 	public static IntentFilter IntentFilter(String... actions) {
 		IntentFilter result = new IntentFilter();

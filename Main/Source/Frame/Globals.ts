@@ -139,6 +139,14 @@ export function Debugger_If(condition) {
 // general
 // ==========
 
+g.G = G; declare global { function G(...globalHolders); }
+function G(...globalHolders) {
+	for (let globalHolder of globalHolders) {
+		g.Extend(globalHolder);
+	}
+}
+
+G({E}); // for react-native-chart modifications...
 export function E(...objExtends: any[]) {
     var result = {};
     for (var extend of objExtends)
@@ -146,8 +154,6 @@ export function E(...objExtends: any[]) {
 	return result;
 	//return StyleSheet.create(result);
 }
-// for react-native-chart modifications...
-g.Extend({E});
 
 // methods: serialization
 // ==========

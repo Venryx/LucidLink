@@ -332,8 +332,8 @@ export class Column extends BaseComponent<{width?, style?} & PanelProps, {}> {
 	}
 }
 
-export class VButton extends BaseComponent<
-		{text, caps?, style?, textStyle?, enabled?, title?} & Partial<ButtonProperties>, {}> {
+export class VButton extends BaseComponent
+		<{text, caps?, style?, textStyle?, enabled?, title?} & Partial<ButtonProperties>, {}> {
 	static defaultProps = {caps: true, enabled: true};
 	render() {
 		var {text, caps, style, textStyle, enabled, ...rest} = this.props;
@@ -344,6 +344,7 @@ export class VButton extends BaseComponent<
 			<Button {...rest} isDisabled={!enabled}
 					style={E(
 						{borderColor: "#777", backgroundColor: "#777", borderRadius: 3},
+						(style || {}).width == null && {paddingLeft: 10, paddingRight: 10},
 						BasicStyles(this.props),
 						style
 					)}

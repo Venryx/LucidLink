@@ -163,12 +163,14 @@ class SpeakOptions {
 	text: string;
 	forceStop = true;
 	pitch = 1;
+	volume: number;
 	delay = 1; // default to a 1-second delay, in case playing on bluetooth speaker (which requires warmup/activation period)
 	whiteNoiseVolume = 0;
 }
 export function Speak(optionsDelta: Partial<SpeakOptions>) {
 	let options = new SpeakOptions().Extended(optionsDelta);
 	options.text = options.text.toString();
+	if (options.volume == null || options.volume == -1) delete options.volume;
 	return new Promise((resolve, reject)=> {
 		function Proceed() {
 			Speech.speak(options).then(resolve).catch(ex=> {

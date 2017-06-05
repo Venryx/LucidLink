@@ -16,6 +16,8 @@ import {P} from "../../Packages/VDF/VDFTypeInfo";
 import SPBridge, {SleepStage} from "../../Frame/SPBridge";
 import {Timer} from "../../Frame/General/Timers";
 import {autorun} from "mobx";
+import {GraphOverlayUI} from "./SPMonitor/SPGraphUI";
+import GraphUI from "./SPMonitor/SPGraphUI";
 
 @Global
 export class SPMonitor extends Node {
@@ -30,10 +32,11 @@ export class SPMonitor extends Node {
 export class SPMonitorUI extends Component<BaseProps, {}> {
 	sidePanel = null;
 	ToggleSidePanelOpen() {
-		if (this.sidePanel._open)
+		if (this.sidePanel._open) {
 			this.sidePanel.close();
-		else
+		} else {
 			this.sidePanel.open();
+		}
 	}
 
 	render() {
@@ -68,93 +71,28 @@ export class SPMonitorUI extends Component<BaseProps, {}> {
 						
 						<VButton text="RealTime" ml={10} plr={10} onPress={()=> {
 							//LL.tracker.currentSession.StartSleepSession_RealTime();
-							if (LL.tracker.currentSession.CurrentSleepSession)
+							if (LL.tracker.currentSession.CurrentSleepSession) {
 								LL.tracker.currentSession.CurrentSleepSession.End();
+							}
 							SPBridge.StartRealTimeSession();
 						}}/>
 						<VButton text="Sleep" ml={10} plr={10} onPress={()=> {
 							LL.tracker.currentSession.StartSleepSession();
 						}}/>
 						<VButton text="Stop" ml={10} plr={10} onPress={()=> {
-							if (LL.tracker.currentSession.CurrentSleepSession)
+							if (LL.tracker.currentSession.CurrentSleepSession) {
 								LL.tracker.currentSession.CurrentSleepSession.End();
-							else
+							} else {
 								SPBridge.StopSession();
+							}
 						}}/>
 					</Row>
 					{/*<Panel style={{marginTop: -7, flex: 1}}>*/}
 					<Column>
-						{/*<GraphUI/>*/}
-						<GraphOverlayUI/>
+						<GraphUI/>
 					</Column>
 				</Column>
 			</Drawer>
-		);
-	}
-}
-
-class GraphUI extends Component<{}, {}> {
-	render() {
-		return (
-			<View style={{flex: 1, backgroundColor: colors.background}}/>
-		);
-	}
-}
-
-export class GraphOverlayUI extends Component<{}, {}> {
-	timer: Timer;
-	ComponentDidMount() {
-		SPBridge.listeners_onReceiveTemp.push(this.OnReceiveTemp);
-		SPBridge.listeners_onReceiveLightValue.push(this.OnReceiveLightValue);
-		SPBridge.listeners_onReceiveBreathValue.push(this.OnReceiveBreathValue);
-		SPBridge.listeners_onReceiveBreathingRate.push(this.OnReceiveBreathingRate);
-		SPBridge.listeners_onReceiveSleepStage.push(this.OnReceiveSleepStage);
-		this.timer = new Timer(1, ()=> {
-			if (!this.mounted) return;
-			this.forceUpdate();
-		}).Start();
-	}
-	ComponentWillUnmount() {
-		SPBridge.listeners_onReceiveTemp.Remove(this.OnReceiveTemp);
-		SPBridge.listeners_onReceiveLightValue.Remove(this.OnReceiveLightValue);
-		SPBridge.listeners_onReceiveBreathValue.Remove(this.OnReceiveBreathValue);
-		SPBridge.listeners_onReceiveBreathingRate.Remove(this.OnReceiveBreathingRate);
-		SPBridge.listeners_onReceiveSleepStage.Remove(this.OnReceiveSleepStage);
-		this.timer.Stop();
-	}
-
-	// raw data
-	temp = -1;
-	OnReceiveTemp(tempInC: number, tempInF: number) {
-		this.temp = tempInF;
-	}
-	light = -1;
-	OnReceiveLightValue(lightVal: number) {
-		this.light = lightVal;
-	}
-	breath = -1;
-	OnReceiveBreathValue(breathVal: number) {
-		this.breath = breathVal;
-	}
-	// calculated data
-	breathingRate = -1;
-	OnReceiveBreathingRate(breathingRate: number) {
-		this.breathingRate = breathingRate;
-	}
-	sleepStage = null as SleepStage;
-	OnReceiveSleepStage(sleepStage: SleepStage) {
-		this.sleepStage = sleepStage;
-	}
-
-	render() {
-		return (
-			<Column style={{/*position: "absolute", left: 0, right: 0, top: 0, bottom: 0,*/ backgroundColor: colors.background}}>
-				<Text>Temp: {this.temp}f</Text>
-				<Text>Light: {this.light}</Text>
-				<Text>Breath: {this.breath}</Text>
-				<Text>Breathing rate: {this.breathingRate}</Text>
-				<Text>Sleep stage: {this.sleepStage ? this.sleepStage.name : "Unknown"}</Text>
-			</Column>
 		);
 	}
 }

@@ -35,7 +35,7 @@ export default class LucidLinkUI extends Component<{}, {}> {
 			var marker = null;
 			return (
 				<Column>
-					<VText>Loading...</VText>
+					<VText style={{color: "#000", fontSize: 32, height: "100%", textAlign: "center", textAlignVertical: "center"}}>Loading...</VText>
 				</Column>
 			);
 		}

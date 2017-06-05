@@ -14,7 +14,7 @@ import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitc
 import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPicker";
 import {autorun} from "mobx";
 import {EveryXSecondsDo, GetRandomNumber, Speak, WhenXMinutesIntoSleepStageYDo, CreateSequence} from "../Scripts/ScriptGlobals";
-import {Log, Global, JavaBridge, Toast} from "../../Frame/Globals";
+import {Log, Global, JavaBridge, Toast, Notify} from "../../Frame/Globals";
 import Sound from "react-native-sound";
 import {AudioFile, AudioFileManager} from "../../Frame/AudioFile";
 import {Sequence, Timer, TimerContext, WaitXThenRun} from "../../Frame/General/Timers";
@@ -26,7 +26,7 @@ import Moment from "moment";
 import V from "../../Packages/V/V";
 import {Action, SpeakText, PlayAudioFile} from "./@Shared/Action";
 import VText from "../../Frame/Components/VText";
-import { GraphOverlayUI } from "../Tools/SPMonitor";
+import GraphUI from "./SPMonitor/SPGraphUI";
 
 @observer
 export default class FBAUI extends Component<{}, {}> {
@@ -40,15 +40,19 @@ export default class FBAUI extends Component<{}, {}> {
 						<VSwitch_Auto path={()=>node.p.enabled}/>
 					</Row>
 					<Row>
-						<VText mt={5} mr={10}>Start volume. Normal:</VText>
+						<VText mt={5} mr={10}>Overall volume start-values. Normal:</VText>
 						<NumberPicker_Auto path={()=>node.p.normalVolume} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
 						<VText mt={5} ml={10} mr={10}>Bluetooth:</VText>
 						<NumberPicker_Auto path={()=>node.p.bluetoothVolume} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
+					</Row>
+					<Row>
+						<VText>Note: The FBA engine requires an S+ sleep-monitor device (by ResMed) to function. (connects through bluetooth)</VText>
 					</Row>
 
 					<REMStartSequenceUI/>
 					<CommandListenerUI/>
 					<StatusReporterUI/>
+					<CurrentStatusUI/>
 
 					{/*<VButton text="Test1" ml={5} plr={10} style={{height: 40}}
 						onPress={()=> {
@@ -76,20 +80,21 @@ export class REMStartSequenceUI extends BaseComponent<{}, {}> {
 	render() {
 		var node = LL.tools.fba;
 		return (
-			<Column>
+			<Column mt={30}>
 				<Row>
 					<VText mt={5} mr={10} style={{fontSize: 20, fontWeight: "bold"}}>REM start sequence</VText>
 				</Row>
 				<Row>
 					<VText mt={5} mr={10}>Sequence delay from REM onset:</VText>
 					<NumberPicker_Auto path={()=>node.p.promptStartDelay} min={0} max={100} format={a=>a + " minutes"}/>
+					<VText mt={5} ml={5}>+ 20s</VText>
 				</Row>
 				<Row>
 					<VText mt={5} mr={10}>Sequence repeat interval:</VText>
 					<NumberPicker_Auto path={()=>node.p.promptInterval} min={1} max={100} format={a=>a + " minutes"}/>
 				</Row>
 				<Row>
-					<VText mt={5} mr={10}>Sequence actions:</VText>
+					<VText mr={10}>Sequence actions:</VText>
 				</Row>
 				<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
 					<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
@@ -116,16 +121,22 @@ export class CommandListenerUI extends BaseComponent<{}, {}> {
 	render() {
 		var node = LL.tools.fba.commandListener;
 		return (
-			<Column>
+			<Column mt={30}>
 				<Row>
 					<VText mt={5} mr={10} style={{fontSize: 20, fontWeight: "bold"}}>Command listener</VText>
 				</Row>
 				<Row>
-					<VText mt={5}>When breathing-depth drops below </VText>
-					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_breathDepthCutoff} min={0} max={50} format={a=>a + "%"}/>
-					<VText mt={5}> , reset and disable the rem-start sequence for </VText>
+					<VText mt={5}>When breathing-depth of last 15s changes by </VText>
+					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_breathDepthCutoff} min={0} max={100} format={a=>a + "%"}/>
+					<VText mt={5}> from that of previous 15s:</VText>
+				</Row>
+				<Row>
+					<VText mt={5}>1) Reset and disable the rem-start sequence for </VText>
 					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_disableLength} min={0} max={100} format={a=>a + " minutes"}/>
-					<VText mt={5}>.</VText>
+				</Row>
+				<Row>
+					<VText mt={10}>2) </VText>
+					{node.sequenceDisabler_messageSpeakAction.CreateUI(0, null)}
 				</Row>
 			</Column>
 		);
@@ -137,7 +148,7 @@ export class StatusReporterUI extends BaseComponent<{}, {}> {
 	render() {
 		var node = LL.tools.fba.statusReporter;
 		return (
-			<Column>
+			<Column mt={30}>
 				<Row>
 					<VText mt={5} mr={10} style={{fontSize: 20, fontWeight: "bold"}}>Status reporter</VText>
 				</Row>
@@ -146,14 +157,44 @@ export class StatusReporterUI extends BaseComponent<{}, {}> {
 					<NumberPicker_Auto path={()=>node.p.reportInterval} min={0} max={1000} format={a=>a + " minutes"}/>
 				</Row>
 				<Row>
-					<VText mt={5} mr={10}>Report text: (variables: @breathValue, @breathRate, @breathDepth, @temp, @light, @sleepStage, @sleepStageTime, @remSequenceEnabled)</VText>
+					<VButton text="Show list of variables" onPress={()=> {
+						/*Notify(`
+@temp, @light, ${""
+}@breathVal, @breathVal_min, @breathVal_max, @breathVal_avg, ${""
+}@breathingDepth_prev, @breathingDepth_last, @breathingRate, ${""
+}@sleepStage, @sleepStageTime, @remSequenceEnabled
+`.trim());*/
+						Notify(`
+@temp, @light
+@breathVal, @breathVal_min, @breathVal_max, @breathVal_avg
+@breathingDepth_prev, @breathingDepth_last, @breathingRate
+@sleepStage, @sleepStageTime, @remSequenceEnabled
+`.trim());
+					}}/>
 				</Row>
 				<Row>
+					<VText mt={10} mr={10}>Report text: </VText>
 					<VTextInput_Auto path={()=>node.p.reportText}/>
+					<VText mt={5} mr={10}>Volume:</VText>
+					<NumberPicker_Auto path={()=>node.p.volume} min={-.01} max={2} step={.01} format={a=>a == -.01 ? "(no change)" : (a * 100).toFixed() + "%"} style={{width: 100}}/>
+					<VText mt={5} ml={10} mr={10}>Pitch:</VText>
+					<NumberPicker_Auto path={()=>node.p.pitch} max={2} step={.01} format={a=>(a * 100).toFixed() + "%"} style={{width: 100}}/>
 				</Row>
-				<VText mr={10}>Current S+ data:</VText>
-				<Row ml={10}>
-					<GraphOverlayUI/>
+			</Column>
+		);
+	}
+}
+
+@observer
+export class CurrentStatusUI extends BaseComponent<{}, {}> {
+	render() {
+		return (
+			<Column mt={30}>
+				<Row>
+					<VText mt={5} mr={10} style={{fontSize: 20, fontWeight: "bold"}}>Current status</VText>
+				</Row>
+				<Row>
+					<GraphUI/>
 				</Row>
 			</Column>
 		);

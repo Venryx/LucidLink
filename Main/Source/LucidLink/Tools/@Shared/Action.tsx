@@ -1,6 +1,6 @@
 import {_Enum} from "../../../Frame/General/Enums";
-import {Speak} from "../../Scripts/ScriptGlobals";
-import {Log, Global} from "../../../Frame/Globals";
+import {Speak, WaitXThenDo} from "../../Scripts/ScriptGlobals";
+import {Log, Global, JavaBridge, E} from "../../../Frame/Globals";
 import {AudioFileManager} from "../../../Frame/AudioFile";
 import V from "../../../Packages/V/V";
 import {Row, VButton} from "../../../Frame/ReactGlobals";
@@ -20,22 +20,31 @@ export abstract class Action {
 
 @Global
 export class SpeakText extends Node implements Action {
+	constructor(options?: Partial<SpeakText>) {
+		super();
+		this.Extend(options);
+	}
 	@O @P() text = "Text to speak";
 	@O @P() pitch = 1;
+	@O @P() volume = -.01;
 
 	Run() {
-		Speak({text: this.text, pitch: this.pitch});
+		Speak({text: this.text, pitch: this.pitch, volume: this.volume});
 		Log(this.text);
-    }
+	}
 	CreateUI(index, onClickRemove: ()=>void) {
-        return (
-			<Row key={index}>
+		let inline = onClickRemove == null;
+		return (
+			<Row key={index} style={E(inline && {flex: 1})}>
 				<VText mt={5} mr={10}>Speak text:</VText>
 				<VTextInput_Auto style={{flex: 1, height: 35}} editable={true} path={()=>this.p.text}/>
-				<VText mt={5} mr={10}>Pitch:</VText>
+				<VText mt={5} mr={10}>Volume:</VText>
+				<NumberPicker_Auto path={()=>this.p.volume} min={-.01} max={2} step={.01} format={a=>a == -.01 ? "(no change)" : (a * 100).toFixed() + "%"} style={{width: 100}}/>
+				<VText mt={5} ml={10} mr={10}>Pitch:</VText>
 				<NumberPicker_Auto path={()=>this.p.pitch} max={2} step={.01} format={a=>(a * 100).toFixed() + "%"} style={{width: 100}}/>
-				<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
-					onPress={onClickRemove}/>
+				{onClickRemove != null &&
+					<VButton text="X" style={{alignItems: "flex-end", marginLeft: 5, width: 28, height: 28}} textStyle={{marginBottom: 3}}
+						onPress={onClickRemove}/>}
 			</Row>
 		);
     }

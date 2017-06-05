@@ -50,7 +50,7 @@ export default class GraphOverlayUI extends Component<
 					return <EventBox key={index}
 						ref={comp=>this.eventBoxes[index] = comp}
 						parent={this} rowHeight={height}
-						{...{overlay, event, x, renderInfo}}/>;
+						{...{event, x, renderInfo}}/>;
 				})}
 			</View>
 		);

@@ -75,10 +75,20 @@ export class SPBridgeClass {
 			for (let listener of this.listeners_onReceiveLightValue)
 				listener(lightValue);
 		});
-		DeviceEventEmitter.addListener("OnReceiveBreathValue", (args: any)=> {
-			var [breathValue] = args;
-			for (let listener of this.listeners_onReceiveBreathValue)
-				listener(breathValue);
+		DeviceEventEmitter.addListener("OnReceiveBreathValues", (args: any)=> {
+			var [breathValue1, breathValue2] = args;
+			for (let listener of this.listeners_onReceiveBreathValues)
+				listener(breathValue1, breathValue2);
+		});
+		DeviceEventEmitter.addListener("OnReceiveBreathValueMinMaxAndAverages", (args: any)=> {
+			var [min_1, min_2, max_1, max_2, avg_1, avg_2] = args;
+			for (let listener of this.listeners_onReceiveBreathValueMinMaxAndAverages)
+				listener(min_1, min_2, max_1, max_2, avg_1, avg_2);
+		});
+		DeviceEventEmitter.addListener("OnReceiveBreathingDepth", (args: any)=> {
+			var [breathingDepth_prev, breathingDepth_last] = args;
+			for (let listener of this.listeners_onReceiveBreathingDepth)
+				listener(breathingDepth_prev, breathingDepth_last);
 		});
 		DeviceEventEmitter.addListener("OnReceiveBreathingRate", (args: any)=> {
 			var [breathingRate] = args;
@@ -102,8 +112,10 @@ export class SPBridgeClass {
 	// raw data
 	listeners_onReceiveTemp: ((tempInCelsius: number, tempInFarenheit: number)=>void)[] = [];
 	listeners_onReceiveLightValue: ((lightValue: number)=>void)[] = [];
-	listeners_onReceiveBreathValue: ((breathValue: number)=>void)[] = [];
+	listeners_onReceiveBreathValues: ((breathValue1: number, breathValue2: number)=>void)[] = [];
 	// calculated data
+	listeners_onReceiveBreathValueMinMaxAndAverages: ((min_1: number, min_2: number, max_1: number, max_2: number, avg_1: number, avg_2: number)=>void)[] = [];
+	listeners_onReceiveBreathingDepth: ((breathingDepth_prev: number, breathingDepth_last: number)=>void)[] = [];
 	listeners_onReceiveBreathingRate: ((breathingRate: number)=>void)[] = [];
 	listeners_onReceiveSleepStage: ((sleepStage: SleepStage)=>void)[] = [];
 
@@ -150,7 +162,12 @@ export class SPBridgeClass {
 	StopSession() {
 		core.StopSession();
 	}
+
+	RestartDataStream() {
+		core.RestartDataStream();
+	}
 }
 
 var SPBridge = new SPBridgeClass();
+G({SPBridge});
 export default SPBridge;

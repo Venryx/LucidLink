@@ -112,8 +112,13 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 
 		V.Log("Starting sleep session...");
 		this.sessionConnector.StartNewSession();
-		MainActivity.main.sendRpcToBed(RPCMapper.main.startNightTracking());
-		currentSessionType = "sleep";
+
+		/*MainActivity.main.sendRpcToBed(RPCMapper.main.startNightTracking());
+		currentSessionType = "sleep";*/
+		// Actually, use real-time tracking, so we can more quickly react to breathing changes and such.
+		// Unfortunately, real-time tracking seems to disconnect/stop after a while, so we have to reconnect/restart whenever that happens.
+		MainActivity.main.sendRpcToBed(RPCMapper.main.startRealTimeStream());
+		currentSessionType = "real time";
 
 		LL.analytics.logEvent("StartSleepSession", new Bundle());
 	}
@@ -121,12 +126,24 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (currentSessionType == null) return;
 
 		V.Log("Stopping session...");
-		if (currentSessionType.equals("real time"))
+		V.Log(V.GetStackTrace());
+		if (currentSessionType.equals("real time")) {
 			MainActivity.main.sendRpcToBed(RPCMapper.main.stopRealTimeStream()); // quick fix, since lazy
-		else //if (currentSessionType == "sleep")
+		} else { //if (currentSessionType == "sleep")
 			MainActivity.main.sendRpcToBed(RPCMapper.main.stopNightTimeTracking()); // quick fix, since lazy
+		}
 		MainActivity.main.sendRpcToBed(RPCMapper.main.closeSession());
 		sessionConnector.service.sleepSessionManager.stopCalculateAndSendResults();
 		currentSessionType = null;
+	}
+
+	@ReactMethod public void RestartDataStream() {
+		if (currentSessionType.equals("real time")) {
+			MainActivity.main.sendRpcToBed(RPCMapper.main.stopRealTimeStream());
+			MainActivity.main.sendRpcToBed(RPCMapper.main.startRealTimeStream());
+		} else {
+			MainActivity.main.sendRpcToBed(RPCMapper.main.stopNightTimeTracking());
+			MainActivity.main.sendRpcToBed(RPCMapper.main.startNightTracking());
+		}
 	}
 }

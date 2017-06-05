@@ -526,7 +526,6 @@ public class BluetoothSetup {
 		}
 	}
 
-
 	public void pairDevice(final BluetoothDevice bluetoothDevice) {
 		if (10 == bluetoothDevice.getBondState()) {
 			Log.d("com.resmed.refresh.bluetooth", "bluetooth device bonding");

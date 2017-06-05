@@ -1,4 +1,4 @@
-import {FromVDF, GetTypeNameOf, ToVDF} from "../../Frame/Globals";
+import {FromVDF, GetTypeNameOf, ToVDF, Global} from "../../Frame/Globals";
 import {autorun} from 'mobx';
 import {LL} from "../../LucidLink";
 import Moment from "moment";
@@ -9,6 +9,7 @@ import {BufferAction} from "../../Frame/General/Timers";
 import SleepSession from "./Session/SleepSession";
 import SPBridge from "../../Frame/SPBridge";
 
+@Global
 export class Session {
 	static async Load(folder) {
 		var mainFile = folder.GetFile("Main.vdf");
@@ -118,16 +119,17 @@ export class Session {
 		this.BufferSave();
 	}*/
 	StartSleepSession() {
-		if (LL.tracker.currentSession.CurrentSleepSession)
+		if (LL.tracker.currentSession.CurrentSleepSession) {
 			LL.tracker.currentSession.CurrentSleepSession.End();
+		}
 		var session = new SleepSession();
 		this.sleepSessions.push(session);
 		SPBridge.StartSleepSession();
 		this.BufferSave();
 	}
 }
-global.Extend({Session});
 
+@Global
 export class Event {
 	constructor(type, args) {
 		if (type == null) return; // if called by VDF, don't do anything
@@ -139,4 +141,3 @@ export class Event {
 	@P() type: string = null;
 	@P() args = [];
 }
-global.Extend({Event});

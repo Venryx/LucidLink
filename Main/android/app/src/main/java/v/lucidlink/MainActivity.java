@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.annimon.stream.Stream;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -34,14 +35,21 @@ import com.resmed.refresh.utils.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
 import vpackages.V;
 
 import static v.lucidlink.LLS.LL;
+
+class BreathValuePair {
+	public BreathValuePair(double val1, double val2) {
+		this.val1 = val1;
+		this.val2 = val2;
+	}
+	public double val1;
+	public double val2;
+}
 
 public class MainActivity extends BaseBluetoothActivity {
 	public static MainActivity main;
@@ -193,9 +201,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			}
 		}, intervalInMS, intervalInMS);*/
 
-		bioCount = 0;
-		lastEpochIndex = -1;
-		lastStageValue = -1;
+		ResetTrackerData();
 	}
 	void OnRealTimeStreamEnd() {
 		/*V.Assert(getSleepStateTimer != null, "Timer should not be null on real-time-stream end!");
@@ -216,9 +222,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			}
 		}, intervalInMS, intervalInMS);*/
 
-		bioCount = 0;
-		lastEpochIndex = -1;
-		lastStageValue = -1;
+		ResetTrackerData();
 	}
 	void OnNightTrackEnd() {
 		/*V.Assert(getBioBufferTimer != null, "Timer should not be null on night-track end!");
@@ -324,20 +328,125 @@ public class MainActivity extends BaseBluetoothActivity {
 	}
 	private void handleBioToGraph(byte[] decobbed) {
 		if (decobbed.length == 0) return;
-		int[] bioData = PacketsByteValuesReader.readBioData(decobbed);
+		int[] breathValues = PacketsByteValuesReader.readBioData(decobbed);
+		BreathValuePair breathValuePair = new BreathValuePair(breathValues[0], breathValues[1]);
 		//V.Log("BreathVal:" + bioData[0] + ";" + bioData[1] + ";" + bioData.length);
-		SPlusModule.main.SendEvent("OnReceiveBreathValue", bioData[0]);
-		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.writeSampleData(bioData[0], bioData[1]);
-		bioCount++;
-		// only request user-sleep-state every 16-samples/1-second (sleep-stage is only actually recalculated every epoch/480-samples/30-seconds, but we request
-		// ...a refresh every second, since samples can be dropped leading to offsets)
-		if (bioCount % 16 == 0)
+		SPlusModule.main.SendEvent("OnReceiveBreathValues", breathValues[0], breathValues[1]);
+		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.writeSampleData(breathValues[0], breathValues[1]);
+		breathVals_count++;
+
+		// Only request user-sleep-state every 16-samples/1-second.
+		// (Sleep-stage is only actually recalculated every epoch/480-samples/30-seconds, but we
+		// 		request a refresh every second, since samples can be dropped leading to offsets)
+		if (breathVals_count % 16 == 0)
 			SPlusModule.main.sessionConnector.service.sleepSessionManager.requestUserSleepState();
+
+		/*if (breathVals_last15Sec_avg == null) {
+			breathVals_last15Sec_avg = breathValuePair;
+		} else {
+			breathVals_last15Sec_avg = new BreathValuePair(
+				(int)((((double)breathVals_last15Sec_avg.val1 * (BREATH_VALUES_PER_AVERAGE_PERIOD - 1)) + breathValuePair.val1) / BREATH_VALUES_PER_AVERAGE_PERIOD),
+				(int)((((double)breathVals_last15Sec_avg.val2 * (BREATH_VALUES_PER_AVERAGE_PERIOD - 1)) + breathValuePair.val2) / BREATH_VALUES_PER_AVERAGE_PERIOD)
+			);
+		}
+		SPlusModule.main.SendEvent("OnReceiveBreathValueAverage", breathVals_last15Sec_avg.val1, breathVals_last15Sec_avg.val2);*/
+
+		int newEntryIndex = breathVals_last30Sec_lastEntryIndex < BREATH_VALUES_PER_30S - 1 ? breathVals_last30Sec_lastEntryIndex + 1 : 0;
+		breathVals_last30Sec[newEntryIndex] = breathValuePair;
+		breathVals_last30Sec_lastEntryIndex = newEntryIndex;
+
+		CalculateBreathValueDerivatives(newEntryIndex);
+	}
+	void CalculateBreathValueDerivatives(int newEntryIndex) {
+		int breathVals_last30Sec_filledCount = (int)Stream.of(breathVals_last30Sec).filter(a->a != null).count();
+		BreathValuePair breathVals_last15Sec_min = new BreathValuePair(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		BreathValuePair breathVals_last15Sec_max = new BreathValuePair(0, 0);
+		//BreathValuePair breathVals_last30Sec_total = new BreathValuePair(0, 0);
+		BreathValuePair breathVals_prev15Sec_total = new BreathValuePair(0, 0);
+		BreathValuePair breathVals_last15Sec_total = new BreathValuePair(0, 0);
+		for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
+			BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
+			if (pair == null) continue;
+
+			boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;
+			if (inCurrentSegment) {
+				breathVals_last15Sec_min.val1 = Math.min(breathVals_last15Sec_min.val1, pair.val1);
+				breathVals_last15Sec_min.val2 = Math.min(breathVals_last15Sec_min.val2, pair.val2);
+				breathVals_last15Sec_max.val1 = Math.max(breathVals_last15Sec_max.val1, pair.val1);
+				breathVals_last15Sec_max.val2 = Math.max(breathVals_last15Sec_max.val2, pair.val2);
+			}
+			BreathValuePair pairToUpdate = inCurrentSegment ? breathVals_last15Sec_total : breathVals_prev15Sec_total;
+			pairToUpdate.val1 += pair.val1;
+			pairToUpdate.val2 += pair.val2;
+		}
+		BreathValuePair breathVals_prev15Sec_avg = new BreathValuePair(
+			breathVals_prev15Sec_total.val1 / (breathVals_last30Sec_filledCount - BREATH_VALUES_PER_15S),
+			breathVals_prev15Sec_total.val2 / (breathVals_last30Sec_filledCount - BREATH_VALUES_PER_15S)
+		);
+		BreathValuePair breathVals_last15Sec_avg = new BreathValuePair(
+			breathVals_last15Sec_total.val1 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount),
+			breathVals_last15Sec_total.val2 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount)
+		);
+		SPlusModule.main.SendEvent("OnReceiveBreathValueMinMaxAndAverages",
+			breathVals_last15Sec_min.val1, breathVals_last15Sec_min.val2,
+			breathVals_last15Sec_max.val1, breathVals_last15Sec_max.val2,
+			breathVals_last15Sec_avg.val1, breathVals_last15Sec_avg.val2
+		);
+
+		// if data from last 30-seconds is all filled, calculate breathing-depth
+		if (breathVals_last30Sec_filledCount == BREATH_VALUES_PER_30S) {
+			BreathValuePair breathVals_prev15Sec_totalDevianceFromAverage = new BreathValuePair(0, 0);
+			BreathValuePair breathVals_last15Sec_totalDevianceFromAverage = new BreathValuePair(0, 0);
+			for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
+				BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
+				boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;
+				if (inCurrentSegment) {
+					breathVals_last15Sec_totalDevianceFromAverage.val1 += V.Distance(pair.val1, breathVals_last15Sec_avg.val1);
+					breathVals_last15Sec_totalDevianceFromAverage.val2 += V.Distance(pair.val2, breathVals_last15Sec_avg.val2);
+				} else {
+					breathVals_prev15Sec_totalDevianceFromAverage.val1 += V.Distance(pair.val1, breathVals_prev15Sec_avg.val1);
+					breathVals_prev15Sec_totalDevianceFromAverage.val2 += V.Distance(pair.val2, breathVals_prev15Sec_avg.val2);
+				}
+			}
+
+			BreathValuePair breathVals_prev15Sec_averageDeviance = new BreathValuePair(
+				breathVals_prev15Sec_totalDevianceFromAverage.val1 / BREATH_VALUES_PER_15S,
+				breathVals_prev15Sec_totalDevianceFromAverage.val2 / BREATH_VALUES_PER_15S
+			);
+			BreathValuePair breathVals_last15Sec_averageDeviance = new BreathValuePair(
+				breathVals_last15Sec_totalDevianceFromAverage.val1 / BREATH_VALUES_PER_15S,
+				breathVals_last15Sec_totalDevianceFromAverage.val2 / BREATH_VALUES_PER_15S
+			);
+
+			SPlusModule.main.SendEvent("OnReceiveBreathingDepth", breathVals_prev15Sec_averageDeviance.val1, breathVals_last15Sec_averageDeviance.val1);
+		}
 	}
 
-	int bioCount;
+	final int SAMPLES_PER_SECOND = 16;
+	final int BREATH_VALUES_PER_15S = SAMPLES_PER_SECOND * 15; // base breath-value average on the last 15-seconds
+	final int BREATH_VALUES_PER_30S = SAMPLES_PER_SECOND * 30; // store data from the last 30-seconds
+
+	// data being tracked
+	int breathVals_count;
+	BreathValuePair[] breathVals_last30Sec = new BreathValuePair[BREATH_VALUES_PER_30S];
+	int breathVals_last30Sec_lastEntryIndex = -1;
+	/*BreathValuePair breathVals_last15Sec_min;
+	BreathValuePair breathVals_last15Sec_max;
+	BreathValuePair breathVals_last15Sec_avg;*/
 	int lastEpochIndex = -1;
 	int lastStageValue = -1;
+	//int[] breathValues = new int[SAMPLES_PER_SECOND * ];
+	void ResetTrackerData() {
+		breathVals_count = 0;
+		breathVals_last30Sec = new BreathValuePair[BREATH_VALUES_PER_30S];
+		breathVals_last30Sec_lastEntryIndex = -1;
+		/*breathVals_last15Sec_min = new BreathValuePair(0, 0);
+		breathVals_last15Sec_max = new BreathValuePair(0, 0);
+		breathVals_last15Sec_avg = new BreathValuePair(0, 0);*/
+		lastEpochIndex = -1;
+		lastStageValue = -1;
+	}
+
 	public void handleUserSleepState(Bundle bundle) {
 		// also transmit to connector
 		if (SPlusModule.main.sessionConnector != null)
@@ -351,7 +460,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			lastEpochIndex = epochIndex;
 			lastStageValue = stageValue;
 			V.Log("Got sleep-stage: " + stageValue + " (" + SleepStage.values()[stageValue - 1].name() + ") @epoch:" + epochIndex
-				+ " @bioCount:" + bioCount);
+				+ " @breathVals_count:" + breathVals_count);
 
 			/*V.Log("BaseBluetoothActivity.handleUserSleepState. BUNDLE_SLEEP_STATE:" + stage
 				+ ";BUNDLE_SLEEP_EPOCH_INDEX:" + bundle.getInt("BUNDLE_SLEEP_EPOCH_INDEX"));

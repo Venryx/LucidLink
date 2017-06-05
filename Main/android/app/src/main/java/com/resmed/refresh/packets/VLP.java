@@ -1,7 +1,7 @@
 package com.resmed.refresh.packets;
 
-	import java.nio.ByteBuffer;
-	import java.util.Arrays;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class VLP {
 	public static int CHECKSUMBYTE = 1;
