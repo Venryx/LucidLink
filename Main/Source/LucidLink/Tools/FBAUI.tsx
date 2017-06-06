@@ -14,7 +14,7 @@ import {VSwitch, VSwitch_Auto} from "../../Packages/ReactNativeComponents/VSwitc
 import {NumberPicker_Auto} from "../../Packages/ReactNativeComponents/NumberPicker";
 import {autorun} from "mobx";
 import {EveryXSecondsDo, GetRandomNumber, Speak, WhenXMinutesIntoSleepStageYDo, CreateSequence} from "../Scripts/ScriptGlobals";
-import {Log, Global, JavaBridge, Toast, Notify} from "../../Frame/Globals";
+import {Log, Global, JavaBridge, Toast, Notify, Range} from "../../Frame/Globals";
 import Sound from "react-native-sound";
 import {AudioFile, AudioFileManager} from "../../Frame/AudioFile";
 import {Sequence, Timer, TimerContext, WaitXThenRun} from "../../Frame/General/Timers";
@@ -146,12 +146,12 @@ export class CommandListenerUI extends BaseComponent<{}, {}> {
 				</Row>
 				<Row>
 					<VText mt={5}>When breathing-depth of last 15s changes by </VText>
-					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_breathDepthCutoff} min={0} max={100} format={a=>a + "%"}/>
+					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_minPercentDiff} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
 					<VText mt={5}> from that of previous 15s:</VText>
 				</Row>
 				<Row>
 					<VText mt={5}>1) Reset and disable the rem-start sequence for </VText>
-					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_disableLength} min={0} max={100} format={a=>a + " minutes"}/>
+					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_disableLength} max={100} format={a=>a + " minutes"}/>
 				</Row>
 				<Row>
 					<VText mt={5}>2) </VText>
@@ -173,7 +173,7 @@ export class StatusReporterUI extends BaseComponent<{}, {}> {
 				</Row>
 				<Row>
 					<VText mt={5} mr={10}>Report interval:</VText>
-					<NumberPicker_Auto path={()=>node.p.reportInterval} min={0} max={1000} format={a=>a + " minutes"}/>
+					<NumberPicker_Auto path={()=>node.p.reportInterval} values={Range(0, 1, .1).concat(Range(1, 10, .5)).concat(Range(11, 1000))} format={a=>a.toFixed(1) + " minutes"}/>
 				</Row>
 				<Row>
 					<VButton text="Show list of variables" onPress={()=> {

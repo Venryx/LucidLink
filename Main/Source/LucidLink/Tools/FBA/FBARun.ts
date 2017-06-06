@@ -68,12 +68,12 @@ export default class FBARun {
 	}
 
 	remSequenceEnabledAt = 0;
-	get REMSequenceEnabled() { return Date.now() < this.remSequenceEnabledAt; }
+	get REMSequenceEnabled() { return Date.now() >= this.remSequenceEnabledAt; }
 	StartREMStartListener() {
 		let node = LL.tools.fba;
 		this.remSequenceEnabledAt = 0;
 		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveSleepStage, (stage: SleepStage)=> {
-			if (this.REMSequenceEnabled) return;
+			if (!this.REMSequenceEnabled) return;
 
 			if (stage != this.currentSegment_stage) {
 				this.currentSegment_stage = stage as SleepStage;
@@ -125,12 +125,16 @@ export default class FBARun {
 		let node = LL.tools.fba;
 		let monitor = LL.tools.spMonitor.monitor;
 		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathingDepth, (depth_prev: number, depth_last: number)=> {
-			let depth_lastVSPrev = monitor.breathingDepth_last / monitor.breathingDepth_prev;
-			if (depth_lastVSPrev.Distance(0) >= node.commandListener.sequenceDisabler_breathDepthCutoff) {
+			let percentDiff = (monitor.breathingDepth_last / monitor.breathingDepth_prev).Distance(1);
+			if (percentDiff >= node.commandListener.sequenceDisabler_minPercentDiff) {
+				let wasEnabled = this.REMSequenceEnabled;
 				this.StopSequence();
 				this.triggeredForThisSegment = false; // allow sequence to restart, during this same segment (it might be long)
 				this.remSequenceEnabledAt = Date.now() + (node.commandListener.sequenceDisabler_disableLength * 60 * 1000);
-				node.commandListener.sequenceDisabler_messageSpeakAction.Run();
+				if (wasEnabled) { // if was enabled, but just became disabled, then speak the message
+				//if (true) { // for testing
+					node.commandListener.sequenceDisabler_messageSpeakAction.Run();
+				}
 			}
 		});
 	}
@@ -179,15 +183,15 @@ function ReplaceVariablesInReportText(text: string) {
 	let node = LL.tools.fba;
 	let monitor = LL.tools.spMonitor.monitor;
 	result = result
-		.replace(/@temp/g, ()=>monitor.temp+"")
-		.replace(/@light/g, ()=>monitor.light+"")
-		.replace(/@breathVal/g, ()=>monitor.breathVal+"")
-		.replace(/@breathVal_min/g, ()=>monitor.breathVal_min+"")
-		.replace(/@breathVal_max/g, ()=>monitor.breathVal_max+"")
-		.replace(/@breathVal_avg/g, ()=>monitor.breathVal_avg+"")
-		.replace(/@breathingDepth_prev/g, ()=>monitor.breathingDepth_prev+"")
-		.replace(/@breathingDepth_last/g, ()=>monitor.breathingDepth_last+"")
-		.replace(/@breathingRate/g, ()=>monitor.breathingRate+"")
+		.replace(/@temp/g, ()=>monitor.temp.toFixed())
+		.replace(/@light/g, ()=>monitor.light.toFixed())
+		.replace(/@breathVal/g, ()=>monitor.breathVal.x.toFixed())
+		.replace(/@breathVal_min/g, ()=>monitor.breathVal_min.x.toFixed())
+		.replace(/@breathVal_max/g, ()=>monitor.breathVal_max.x.toFixed())
+		.replace(/@breathVal_avg/g, ()=>monitor.breathVal_avg.x.toFixed())
+		.replace(/@breathingDepth_prev/g, ()=>monitor.breathingDepth_prev.toFixed())
+		.replace(/@breathingDepth_last/g, ()=>monitor.breathingDepth_last.toFixed())
+		.replace(/@breathingRate/g, ()=>monitor.breathingRate.toFixed())
 		.replace(/@sleepStage/g, ()=>SleepStage[monitor.sleepStage as any as number])
 		/*.replace(/@sleepStageTime/g, ()=>monitor.sleepStageTime+"")
 		.replace(/@remSequenceEnabled/g, ()=>monitor.remSequenceEnabled+"")*/
