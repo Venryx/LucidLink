@@ -1,12 +1,12 @@
 {
-    "compilerOptions": {
-        "target": "es2015",
-        "allowJs": true,
-        "jsx": "react",
-        "outDir": "Build",
-        "rootDir": "./",
-        "sourceMap": true,
-        "noImplicitAny": false,
+	"compilerOptions": {
+		"target": "es2015",
+		"allowJs": true,
+		"jsx": "react",
+		"rootDir": "Source",
+		"outDir": "Build",
+		"sourceMap": true,
+		"noImplicitAny": false,
 		//"noImplicitUseStrict": true, // maybe temp; for eval-based module extract stuff
 
 		"moduleResolution": "node",
@@ -23,23 +23,23 @@
 		/*"module": "es2015",
 		"allowSyntheticDefaultImports": true,
 		"preserveConstEnums": true,*/
-    },
-    "include": [
-        "Typings/**/*.d.ts",
+	},
+	"include": [
+		"Typings/**/*.d.ts",
 		//"Typings/globals/**/*.d.ts",
 		"index.android.tsx",
-        "Source/**/*.ts",
-        "Source/**/*.tsx",
+		"Source/**/*.ts",
+		"Source/**/*.tsx",
 		"Source/**/*.js",
 		"Source/**/*.jsx"
-    ],
-    "exclude": [
-        "Build"
-        /*"node_modules"
+	],
+	"exclude": [
+		"Build"
+		/*"node_modules"
 		"Typings/main",
-        "Typings/main.d.ts",
-        "Typings/browser",
-        "Typings/browser.d.ts",*/
-    ],
+		"Typings/main.d.ts",
+		"Typings/browser",
+		"Typings/browser.d.ts",*/
+	],
 	"compileOnSave": true
 }

@@ -66,7 +66,7 @@ class BundleInfo {
 	get LateDataLoaded() { return this.text != null; }
 	async LoadLateData() {
 		// "text" is needed, so jquery doesn't try to run it!
-		//var text = await $.get({url: `http://192.168.0.100:8081/Build/Source/index.android.bundle`, dataType: "text"});
+		//var text = await $.get({url: `http://192.168.0.100:8081/Build/index.android.bundle`, dataType: "text"});
 		let response = await fetch("https://mywebsite.com/mydata.json");
 		let text = await response
 		this.text = text;

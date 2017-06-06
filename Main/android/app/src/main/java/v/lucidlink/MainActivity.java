@@ -331,7 +331,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		int[] breathValues = PacketsByteValuesReader.readBioData(decobbed);
 		BreathValuePair breathValuePair = new BreathValuePair(breathValues[0], breathValues[1]);
 		//V.Log("BreathVal:" + bioData[0] + ";" + bioData[1] + ";" + bioData.length);
-		SPlusModule.main.SendEvent("OnReceiveBreathValues", breathValues[0], breathValues[1]);
+		SPlusModule.main.SendEvent_Buffered("OnReceiveBreathValues", 300, breathValues[0], breathValues[1]);
 		SPlusModule.main.sessionConnector.service.sleepSessionManager.rm20Manager.writeSampleData(breathValues[0], breathValues[1]);
 		breathVals_count++;
 
@@ -387,7 +387,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			breathVals_last15Sec_total.val1 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount),
 			breathVals_last15Sec_total.val2 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount)
 		);
-		SPlusModule.main.SendEvent("OnReceiveBreathValueMinMaxAndAverages",
+		SPlusModule.main.SendEvent_Buffered("OnReceiveBreathValueMinMaxAndAverages", 300,
 			breathVals_last15Sec_min.val1, breathVals_last15Sec_min.val2,
 			breathVals_last15Sec_max.val1, breathVals_last15Sec_max.val2,
 			breathVals_last15Sec_avg.val1, breathVals_last15Sec_avg.val2
@@ -418,7 +418,7 @@ public class MainActivity extends BaseBluetoothActivity {
 				breathVals_last15Sec_totalDevianceFromAverage.val2 / BREATH_VALUES_PER_15S
 			);
 
-			SPlusModule.main.SendEvent("OnReceiveBreathingDepth", breathVals_prev15Sec_averageDeviance.val1, breathVals_last15Sec_averageDeviance.val1);
+			SPlusModule.main.SendEvent_Buffered("OnReceiveBreathingDepth", 300, breathVals_prev15Sec_averageDeviance.val1, breathVals_last15Sec_averageDeviance.val1);
 		}
 	}
 

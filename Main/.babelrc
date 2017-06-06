@@ -1,6 +1,9 @@
 {
 	"presets": ["react-native"],
-    "plugins": [
-        "transform-decorators-legacy"
-    ]
+	"plugins": [
+		"transform-decorators-legacy"
+		/*["babel-plugin-module-alias", [
+			{"src": "./Source/Frame", "expose": "Frame" }
+		]]*/
+	]
 }

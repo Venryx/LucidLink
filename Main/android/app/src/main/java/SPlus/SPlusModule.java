@@ -1,6 +1,5 @@
 package SPlus;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.facebook.react.bridge.Arguments;
@@ -12,6 +11,11 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.resmed.refresh.bed.RPCMapper;
 import com.resmed.refresh.bluetooth.CONNECTION_STATE;
 import com.resmed.refresh.sleepsession.SleepSessionConnector;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import v.lucidlink.MainActivity;
 import vpackages.V;
@@ -44,6 +48,40 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 			V.WritableArray_Add(argsList, arg);
 		DeviceEventManagerModule.RCTDeviceEventEmitter jsModuleEventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 		jsModuleEventEmitter.emit(eventName, argsList);
+	}
+	class CallBuffer {
+		CallBuffer(String eventName) {
+			this.eventName = eventName;
+		}
+		String eventName;
+		List<WritableArray> callArgumentSets = new ArrayList<>();
+		double scheduledTime;
+		public void ScheduleToRun(double scheduledTime) {
+			this.scheduledTime = scheduledTime;
+			V.WaitXThenRun((int)(scheduledTime - new Date().getTime()), ()-> {
+				/*for (Object[] callArgumentSet : callArgumentSets) {
+					SendEvent(eventName + "_Buffered", callArgumentSet);
+				}*/
+				SendEvent(eventName + "_Buffered", V.ToWritableArray(callArgumentSets));
+				SendEvent_Buffered_buffers.remove(eventName);
+			});
+		}
+	}
+	HashMap<String, Double> SendEvent_Buffered_lastSendTimes = new HashMap<>();
+	HashMap<String, CallBuffer> SendEvent_Buffered_buffers = new HashMap<>();
+	public void SendEvent_Buffered(String eventName, double bufferLengthMS, Object... args) {
+		Double lastSendTime = SendEvent_Buffered_lastSendTimes.containsKey(eventName) ? SendEvent_Buffered_lastSendTimes.get(eventName) : 0d;
+		Double minNextSendTime = lastSendTime + bufferLengthMS;
+		if (minNextSendTime <= new Date().getTime()) {
+			SendEvent(eventName, args);
+		} else {
+			if (!SendEvent_Buffered_buffers.containsKey(eventName)) {
+				SendEvent_Buffered_buffers.put(eventName, new CallBuffer(eventName));
+			}
+			CallBuffer buffer = SendEvent_Buffered_buffers.get(eventName);
+			buffer.callArgumentSets.add(V.ToWritableArray(args));
+			buffer.ScheduleToRun(minNextSendTime);
+		}
 	}
 
 	public SleepSessionConnector sessionConnector;

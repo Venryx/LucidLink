@@ -3,6 +3,7 @@ import {JavaBridge, Toast, Log} from "./Globals";
 import {Assert} from "./General/Assert";
 import {NativeModules, DeviceEventEmitter} from "react-native";
 import {Enum, _Enum} from "./General/Enums";
+import { AddEventListener } from "./Bridge/Events";
 
 @_Enum export class SleepStage extends Enum { static V: SleepStage;
 	Absent = this
@@ -65,37 +66,37 @@ export class SPBridgeClass {
 	Init() {
 		//core.Init();
 
-		DeviceEventEmitter.addListener("OnReceiveTemp", (args: any)=> {
+		AddEventListener("OnReceiveTemp", (args: any)=> {
 			var [tempInCelsius, tempInFarenheit] = args;
 			for (let listener of this.listeners_onReceiveTemp)
 				listener(tempInCelsius, tempInFarenheit);
 		});
-		DeviceEventEmitter.addListener("OnReceiveLightValue", (args: any)=> {
+		AddEventListener("OnReceiveLightValue", (args: any)=> {
 			var [lightValue] = args;
 			for (let listener of this.listeners_onReceiveLightValue)
 				listener(lightValue);
 		});
-		DeviceEventEmitter.addListener("OnReceiveBreathValues", (args: any)=> {
+		AddEventListener("OnReceiveBreathValues", (args: any)=> {
 			var [breathValue1, breathValue2] = args;
 			for (let listener of this.listeners_onReceiveBreathValues)
 				listener(breathValue1, breathValue2);
 		});
-		DeviceEventEmitter.addListener("OnReceiveBreathValueMinMaxAndAverages", (args: any)=> {
+		AddEventListener("OnReceiveBreathValueMinMaxAndAverages", (args: any)=> {
 			var [min_1, min_2, max_1, max_2, avg_1, avg_2] = args;
 			for (let listener of this.listeners_onReceiveBreathValueMinMaxAndAverages)
 				listener(min_1, min_2, max_1, max_2, avg_1, avg_2);
 		});
-		DeviceEventEmitter.addListener("OnReceiveBreathingDepth", (args: any)=> {
+		AddEventListener("OnReceiveBreathingDepth", (args: any)=> {
 			var [breathingDepth_prev, breathingDepth_last] = args;
 			for (let listener of this.listeners_onReceiveBreathingDepth)
 				listener(breathingDepth_prev, breathingDepth_last);
 		});
-		DeviceEventEmitter.addListener("OnReceiveBreathingRate", (args: any)=> {
+		AddEventListener("OnReceiveBreathingRate", (args: any)=> {
 			var [breathingRate] = args;
 			for (let listener of this.listeners_onReceiveBreathingRate)
 				listener(breathingRate);
 		});
-		DeviceEventEmitter.addListener("OnReceiveSleepStage", (args: any)=> {
+		AddEventListener("OnReceiveSleepStage", (args: any)=> {
 			var [stageValue] = args as [number];
 			/*var stageEnum_detailed_name =  SleepState_Detailed[stageValue];
 			var stageEnum_detailed: SleepState_Detailed = SleepState_Detailed[stageEnum_detailed_name];
