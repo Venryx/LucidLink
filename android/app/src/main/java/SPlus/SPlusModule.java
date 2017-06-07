@@ -164,7 +164,7 @@ public class SPlusModule extends ReactContextBaseJavaModule {
 		if (currentSessionType == null) return;
 
 		V.Log("Stopping session...");
-		V.Log(V.GetStackTrace());
+		//V.Log(V.GetStackTrace());
 		if (currentSessionType.equals("real time")) {
 			MainActivity.main.sendRpcToBed(RPCMapper.main.stopRealTimeStream()); // quick fix, since lazy
 		} else { //if (currentSessionType == "sleep")
