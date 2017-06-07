@@ -49,6 +49,8 @@ export default class FBAUI extends Component<{}, {}> {
 						<VText>Note: The FBA engine requires an S+ sleep-monitor device (by ResMed) to function. (connects through bluetooth)</VText>
 					</Row>
 
+					<VText>Test1</VText>
+
 					<REMStartSequenceUI/>
 					<CommandListenerUI/>
 					<StatusReporterUI/>

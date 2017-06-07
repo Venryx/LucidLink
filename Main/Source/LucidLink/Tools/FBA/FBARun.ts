@@ -120,11 +120,18 @@ export default class FBARun {
 		this.remSequence.Start();
 	}
 
+	static SAMPLES_PER_SECOND = 16;
+	static BREATH_VALUES_PER_15S = FBARun.SAMPLES_PER_SECOND * 15; // base breath-value average on the last 15-seconds
+	static BREATH_VALUES_PER_30S = FBARun.SAMPLES_PER_SECOND * 30; // store data from the last 30-seconds
 
+	bufferCount = 0;
 	StartCommandListener() {
 		let node = LL.tools.fba;
 		let monitor = LL.tools.spMonitor.monitor;
 		this.listenersContext.AddListEntry(SPBridge.listeners_onReceiveBreathingDepth, (depth_prev: number, depth_last: number)=> {
+			this.bufferCount++;
+			if (this.bufferCount < FBARun.BREATH_VALUES_PER_30S) return;
+
 			let percentDiff = (monitor.breathingDepth_last / monitor.breathingDepth_prev).Distance(1);
 			if (percentDiff >= node.commandListener.sequenceDisabler_minPercentDiff) {
 				let wasEnabled = this.REMSequenceEnabled;
@@ -173,6 +180,7 @@ export default class FBARun {
 		this.listenersContext.Reset();
 		this.audioFileManager.Reset();
 		LL.tracker.currentSession.CurrentSleepSession.End();
+		this.bufferCount = 0;
 		if (g.FBA_PostStop) g.FBA_PostStop();
 	}
 }

@@ -4,7 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "node \"./node_modules/typescript/bin/tsc\" -w -p .",
-    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "@start": "node node_modules/react-native/local-cli/cli.js start",
+	 "@@start": "pushd \"node_modules\\react-native\\packager\" && node \"C:\\Root\\Apps\\@V\\LucidLink\\Main\\node_modules\\react-native\\packager\\..\\local-cli\\cli.js\" start",
+	 "@@@start": "cmd /C \"cd \"\"\"node_modules\\react-native\\packager\"\"\" & start \"\"\"C:\\Root\\Apps\\@V\\LucidLink\\Main\\node_modules\\react-native\\packager\\launchPackager.bat\"\"\"\"",
+	 "@@@@start": "cd \"node_modules\\react-native\\packager\" & launchPackager.bat",
+	 "@#": "The above all SHOULD work, but they don't. Instead, we must run the launchPackager.bat file directly, for some reason.",
+	 "@@@@@start": "node_modules\\react-native\\packager\\launchPackager.bat",
+	 "start": "node Scripts/StartPackager.js",
     "test": "jest",
     "release": "cd android && gradlew assembleRelease",
     "#run-android": "cd \".\\android\" && gradlew clean && cd \"..\\\" && react-native run-android"

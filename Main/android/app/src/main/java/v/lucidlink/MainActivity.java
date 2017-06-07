@@ -384,8 +384,7 @@ public class MainActivity extends BaseBluetoothActivity {
 			breathVals_prev15Sec_total.val2 / (breathVals_last30Sec_filledCount - BREATH_VALUES_PER_15S)
 		);
 		BreathValuePair breathVals_last15Sec_avg = new BreathValuePair(
-			breathVals_last15Sec_total.val1 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount),
-			breathVals_last15Sec_total.val2 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount)
+			breathVals_last15Sec_total.val1 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount), breathVals_last15Sec_total.val2 / Math.min(BREATH_VALUES_PER_15S, breathVals_last30Sec_filledCount)
 		);
 		SPlusModule.main.SendEvent_Buffered("OnReceiveBreathValueMinMaxAndAverages", 300,
 			breathVals_last15Sec_min.val1, breathVals_last15Sec_min.val2,
@@ -394,32 +393,31 @@ public class MainActivity extends BaseBluetoothActivity {
 		);
 
 		// if data from last 30-seconds is all filled, calculate breathing-depth
-		if (breathVals_last30Sec_filledCount == BREATH_VALUES_PER_30S) {
-			BreathValuePair breathVals_prev15Sec_totalDevianceFromAverage = new BreathValuePair(0, 0);
-			BreathValuePair breathVals_last15Sec_totalDevianceFromAverage = new BreathValuePair(0, 0);
-			for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
-				BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
-				boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;
-				if (inCurrentSegment) {
-					breathVals_last15Sec_totalDevianceFromAverage.val1 += V.Distance(pair.val1, breathVals_last15Sec_avg.val1);
-					breathVals_last15Sec_totalDevianceFromAverage.val2 += V.Distance(pair.val2, breathVals_last15Sec_avg.val2);
-				} else {
-					breathVals_prev15Sec_totalDevianceFromAverage.val1 += V.Distance(pair.val1, breathVals_prev15Sec_avg.val1);
-					breathVals_prev15Sec_totalDevianceFromAverage.val2 += V.Distance(pair.val2, breathVals_prev15Sec_avg.val2);
-				}
+		// Note: Right after a reconnect/stream-restart, this if statement seems to pass, even though
+		// 		some of the breathVals_last30Sec values end up being null! (which used to cause error)
+		//if (breathVals_last30Sec_filledCount == BREATH_VALUES_PER_30S) {
+
+		// deviance: items.sum(item=>item.DistanceFrom(average));
+		BreathValuePair breathVals_prev15Sec_totalDeviance = new BreathValuePair(0, 0);
+		BreathValuePair breathVals_last15Sec_totalDeviance = new BreathValuePair(0, 0);
+		for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
+			BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
+			if (pair == null) continue;
+
+			boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;
+			if (inCurrentSegment) {
+				breathVals_last15Sec_totalDeviance.val1 += V.Distance(pair.val1, breathVals_last15Sec_avg.val1);
+				breathVals_last15Sec_totalDeviance.val2 += V.Distance(pair.val2, breathVals_last15Sec_avg.val2);
+			} else {
+				breathVals_prev15Sec_totalDeviance.val1 += V.Distance(pair.val1, breathVals_prev15Sec_avg.val1);
+				breathVals_prev15Sec_totalDeviance.val2 += V.Distance(pair.val2, breathVals_prev15Sec_avg.val2);
 			}
-
-			BreathValuePair breathVals_prev15Sec_averageDeviance = new BreathValuePair(
-				breathVals_prev15Sec_totalDevianceFromAverage.val1 / BREATH_VALUES_PER_15S,
-				breathVals_prev15Sec_totalDevianceFromAverage.val2 / BREATH_VALUES_PER_15S
-			);
-			BreathValuePair breathVals_last15Sec_averageDeviance = new BreathValuePair(
-				breathVals_last15Sec_totalDevianceFromAverage.val1 / BREATH_VALUES_PER_15S,
-				breathVals_last15Sec_totalDevianceFromAverage.val2 / BREATH_VALUES_PER_15S
-			);
-
-			SPlusModule.main.SendEvent_Buffered("OnReceiveBreathingDepth", 300, breathVals_prev15Sec_averageDeviance.val1, breathVals_last15Sec_averageDeviance.val1);
 		}
+		BreathValuePair breathVals_prev15Sec_averageDeviance = new BreathValuePair(
+			breathVals_prev15Sec_totalDeviance.val1 / BREATH_VALUES_PER_15S, breathVals_prev15Sec_totalDeviance.val2 / BREATH_VALUES_PER_15S);
+		BreathValuePair breathVals_last15Sec_averageDeviance = new BreathValuePair(
+			breathVals_last15Sec_totalDeviance.val1 / BREATH_VALUES_PER_15S, breathVals_last15Sec_totalDeviance.val2 / BREATH_VALUES_PER_15S);
+		SPlusModule.main.SendEvent_Buffered("OnReceiveBreathingDepth", 300, breathVals_prev15Sec_averageDeviance.val1, breathVals_last15Sec_averageDeviance.val1);
 	}
 
 	final int SAMPLES_PER_SECOND = 16;
