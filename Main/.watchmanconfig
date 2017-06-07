@@ -1,9 +1,0 @@
-{
-	"ignore_dirs": [
-		"android",
-		"android/build",
-		"android\\build",
-		"android/app/build",
-		"android\\app\\build"
-	]
-}
