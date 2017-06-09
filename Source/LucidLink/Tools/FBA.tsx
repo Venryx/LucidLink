@@ -76,6 +76,7 @@ export class FBA_CommandListener extends Node {
 	@O @P() sequenceDisabler_minPercentDiff = .5;
 	@O @P() sequenceDisabler_disableLength = 15;
 	@O @P() sequenceDisabler_messageSpeakAction = new SpeakText({text: "Movement detected, disabling rem-sequence."});
+	@O @P() sequenceDisabler_promptMinInterval = 1;
 }
 
 @Global

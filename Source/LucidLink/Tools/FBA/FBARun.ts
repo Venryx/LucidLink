@@ -125,6 +125,7 @@ export default class FBARun {
 	static BREATH_VALUES_PER_30S = FBARun.SAMPLES_PER_SECOND * 30; // store data from the last 30-seconds
 
 	bufferCount = 0;
+	lastPromptTime = 0;
 	StartCommandListener() {
 		let node = LL.tools.fba;
 		let monitor = LL.tools.spMonitor.monitor;
@@ -138,8 +139,10 @@ export default class FBARun {
 				this.StopSequence();
 				this.triggeredForThisSegment = false; // allow sequence to restart, during this same segment (it might be long)
 				this.remSequenceEnabledAt = Date.now() + (node.commandListener.sequenceDisabler_disableLength * 60 * 1000);
-				if (wasEnabled) { // if was enabled, but just became disabled, then speak the message
-				//if (true) { // for testing
+
+				let timeSinceLastPromptMS = Date.now() - this.lastPromptTime;
+				if (timeSinceLastPromptMS >= node.commandListener.sequenceDisabler_promptMinInterval * 60 * 1000) {
+					this.lastPromptTime = Date.now();
 					node.commandListener.sequenceDisabler_messageSpeakAction.Run();
 				}
 			}

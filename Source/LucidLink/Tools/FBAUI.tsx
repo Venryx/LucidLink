@@ -157,6 +157,10 @@ export class CommandListenerUI extends BaseComponent<{}, {}> {
 					<VText mt={5}>2) </VText>
 					{node.sequenceDisabler_messageSpeakAction.CreateUI()}
 				</Row>
+				<Row>
+					<VText mt={5}>Min interval between "speak text" calls: </VText>
+					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_promptMinInterval} values={Range(0, 1, .1).concat(Range(1, 10, .5)).concat(Range(11, 500))} format={a=>a.toFixed(1) + " minutes"}/>
+				</Row>
 			</Column>
 		);
 	}
