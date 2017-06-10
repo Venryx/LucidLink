@@ -30,7 +30,7 @@ export class Wait extends Node implements Action {
 		return (
 			<Row style={{flex: 1}}>
 				<VText mt={5} mr={10}>Wait for:</VText>
-				<NumberPicker_Auto path={()=>this.p.waitTime} values={Range(0, 1, .1).concat(Range(1, 10, .5)).concat(Range(11, 500))} format={a=>a.toFixed(1) + " minutes"}/>
+				<NumberPicker_Auto path={()=>this.p.waitTime} values={[].concat(Range(0, 1, .1, false), Range(1, 10, .5, false), Range(10, 500))} format={a=>a + " minutes"}/>
 			</Row>
 		);
     }
@@ -101,7 +101,7 @@ export class ChangeVolume extends Node implements Action {
 	@O @P() type = ChangeVolume_Type.V.Both;
 	@O @P() amount = 1;
 
-	Run(audioFileManager: AudioFileManager) {
+	Run() {
 		let amount_normal = this.type == ChangeVolume_Type.V.Both || this.type == ChangeVolume_Type.V.Normal ? this.amount : -1000;
 		let amount_bluetooth = this.type == ChangeVolume_Type.V.Both || this.type == ChangeVolume_Type.V.Bluetooth ? this.amount : -1000;
 		JavaBridge.Main[`${this.increase ? "Increase" : "Set"}Volumes`](amount_normal, amount_bluetooth);

@@ -330,54 +330,6 @@ Function.prototype._AddFunction_Inline = function AsStr(args___) { return V_.Mul
 
 Function.prototype._AddFunction_Inline = function RunThenReturn(args___) { this.apply(null, arguments); return this; };
 
-// Number
-// ==========
-
-Number.prototype._AddFunction_Inline = function IfN1Then(valIfSelfIsNeg1) {
-	return this != -1 ? this : valIfSelfIsNeg1;
-};
-
-//Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) { return Math.round(new Number(this) / step) * step; }; //return this.lastIndexOf(str, 0) === 0; };
-interface Number { ToPercentStr: (precision?: number)=>string; }
-Number.prototype._AddFunction_Inline = function ToPercentStr(precision?: number) {
-	let number = this * 100;
-	if (precision != null)
-		return number.toFixed(precision) + "%";
-	return number.toString() + "%";
-};
-Number.prototype._AddFunction_Inline = function RoundToMultipleOf(step) {
-	var integeredAndRounded = Math.round((new Number(this) as any) / step);
-	var result = (integeredAndRounded * step).toFixed(step.toString().TrimStart("0").length); // - 1);
-	if (result.contains("."))
-		result = result.TrimEnd("0").TrimEnd(".");
-	return result;
-};
-
-interface Number { KeepAtLeast: (min: number)=>number; }
-Number.prototype._AddFunction_Inline = function KeepAtLeast(min) {
-	return Math.max(min, this);
-};
-interface Number { KeepAtMost: (max: number)=>number; }
-Number.prototype._AddFunction_Inline = function KeepAtMost(max) {
-	return Math.min(max, this);
-};
-interface Number { KeepBetween: (min: number, max: number)=>number; }
-Number.prototype._AddFunction_Inline = function KeepBetween(min, max) {
-	return Math.min(max, Math.max(min, this));
-};
-interface Number { WrapToRange: (min: number, max: number, asInt?: boolean)=>number; }
-Number.prototype._AddFunction_Inline = function WrapToRange(min, max, asInt = true) {
-	let val = this;
-	let size = asInt ? 1 + (max - min) : max - min;
-	while (val < min) val += size;
-	while (val > max) val -= size;
-	return val;
-};
-Number.prototype._AddFunction_Inline = function Distance(other) {
-	return Math.abs(this - other);
-};
-
-// String
 // ==========
 
 interface String { TrimEnd: (chars___)=>string; }

@@ -1,5 +1,5 @@
 import {TimerContext, Sequence, Timer} from "../../../Frame/General/Timers";
-import {AudioFileManager} from "../../../Frame/AudioFile";
+import {AudioFileManager, AudioFile} from "../../../Frame/AudioFile";
 import {SleepStage} from "../../../Frame/SPBridge";
 import Moment from "moment";
 import {LL} from "../../../LucidLink";
@@ -7,7 +7,7 @@ import {JavaBridge} from "../../../Frame/Globals";
 import SPBridge from "../../../Frame/SPBridge";
 import {PlayAudioFile, Wait, Action, RepeatSteps} from "../@Shared/Action";
 import {Log} from "../../../Packages/VDF/VDF";
-import {WaitXThenDo, Speak} from "../../Scripts/ScriptGlobals";
+import { WaitXThenDo, Speak, audioFileManager } from "../../Scripts/ScriptGlobals";
 
 export class ListenersContext {
 	listEntries = [] as {list, entry}[];
@@ -29,7 +29,7 @@ export default class FBARun {
 	audioFileManager = new AudioFileManager();
 	
 	remSequence: Sequence;
-	StopSequence() {
+	StopREMSequence() {
 		if (this.remSequence)
 			this.remSequence.Stop();
 	}
@@ -79,7 +79,7 @@ export default class FBARun {
 				this.currentSegment_stage = stage as SleepStage;
 				this.currentSegment_startTime = Moment();
 				//Log("New sleep stage: " + stage)
-				this.StopSequence();
+				this.StopREMSequence();
 				this.triggeredForThisSegment = false;
 			}
 
@@ -98,27 +98,9 @@ export default class FBARun {
 		/*for (var i = 0; i <= 100; i++) {
 			this.remSequence.AddSegment(node.promptInterval * 60, ()=>this.RunActions());
 		}*/
-		function AddActionsToREMSequence(actions: Action[], asRepeat = false) {
-			for (let action of actions) {
-				if (action instanceof Wait) {
-					this.remSequence.AddSegment(action.waitTime, ()=>{});
-				} else if (action instanceof RepeatSteps) {
-					if (!asRepeat) { // don't apply a RepeatSteps meta-action, if we're already within the application of an earlier RepeatSteps
-						let actionsToRepeat = node.promptActions.slice(action.firstStep - 1, (action.lastStep - 1) + 1);
-						for (let i = 0; i < action.repeatCount; i++) {
-							AddActionsToREMSequence(actionsToRepeat, true);
-						}
-					}
-				} else if (action instanceof PlayAudioFile) {
-					this.remSequence.AddSegment(0, ()=>action.Run(this.audioFileManager));
-				} else {
-					action.Run();
-				}
-			}
-		}
-		AddActionsToREMSequence(node.promptActions);
+		AddActionsToREMSequence({audioFileManager: this.audioFileManager}, this.remSequence, node.promptActions, node.promptActions);
 		this.remSequence.Start();
-	}
+	};
 
 	static SAMPLES_PER_SECOND = 16;
 	static BREATH_VALUES_PER_15S = FBARun.SAMPLES_PER_SECOND * 15; // base breath-value average on the last 15-seconds
@@ -136,7 +118,7 @@ export default class FBARun {
 			let percentDiff = (monitor.breathingDepth_last / monitor.breathingDepth_prev).Distance(1);
 			if (percentDiff >= node.commandListener.sequenceDisabler_minPercentDiff) {
 				let wasEnabled = this.REMSequenceEnabled;
-				this.StopSequence();
+				this.StopREMSequence();
 				this.triggeredForThisSegment = false; // allow sequence to restart, during this same segment (it might be long)
 				this.remSequenceEnabledAt = Date.now() + (node.commandListener.sequenceDisabler_disableLength * 60 * 1000);
 
@@ -179,12 +161,35 @@ export default class FBARun {
 	triggeredForThisSegment = false;
 
 	Stop() {
+		this.StopREMSequence();
 		this.timerContext.Reset();
 		this.listenersContext.Reset();
 		this.audioFileManager.Reset();
 		LL.tracker.currentSession.CurrentSleepSession.End();
 		this.bufferCount = 0;
 		if (g.FBA_PostStop) g.FBA_PostStop();
+	}
+}
+
+interface Context {
+	audioFileManager: AudioFileManager;
+}
+function AddActionsToREMSequence(context: Context, sequence: Sequence, originalActions: Action[], newActions: Action[], asRepeat = false) {
+	for (let action of newActions) {
+		if (action instanceof Wait) {
+			sequence.AddSegment(action.waitTime * 60, ()=>{}, ` @type:${action.constructor.name}`);
+		} else if (action instanceof RepeatSteps) {
+			if (!asRepeat) { // don't apply a RepeatSteps meta-action, if we're already within the application of an earlier RepeatSteps
+				let actionsToRepeat = originalActions.slice(action.firstStep - 1, (action.lastStep - 1) + 1);
+				for (let i = 0; i < action.repeatCount; i++) {
+					AddActionsToREMSequence(context, sequence, originalActions, actionsToRepeat, true);
+				}
+			}
+		} else if (action instanceof PlayAudioFile) {
+			sequence.AddSegment(0, ()=>action.Run(context.audioFileManager), ` @type:${action.constructor.name}`);
+		} else {
+			sequence.AddSegment(0, ()=>action.Run(), ` @type:${action.constructor.name}`);
+		}
 	}
 }
 

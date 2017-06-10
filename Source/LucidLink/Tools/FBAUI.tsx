@@ -27,6 +27,7 @@ import V from "../../Packages/V/V";
 import {Action, SpeakText, PlayAudioFile, Wait, RepeatSteps, ChangeVolume} from "./@Shared/Action";
 import VText from "../../Frame/Components/VText";
 import GraphUI from "./SPMonitor/SPGraphUI";
+import FBARun from "./FBA/FBARun";
 
 @observer
 export default class FBAUI extends Component<{}, {}> {
@@ -79,6 +80,7 @@ export default class FBAUI extends Component<{}, {}> {
 export class REMStartSequenceUI extends BaseComponent<{}, {}> {
 	render() {
 		var node = LL.tools.fba;
+
 		return (
 			<Column mt={30}>
 				<Row>
@@ -88,19 +90,31 @@ export class REMStartSequenceUI extends BaseComponent<{}, {}> {
 					<VText mt={5} mr={10}>Sequence delay from REM onset:</VText>
 					<NumberPicker_Auto path={()=>node.p.promptStartDelay} min={0} max={100} format={a=>a + " minutes"}/>
 					<VText mt={5} ml={5}>+ 20s</VText>
+					<View style={{flex: 1}}/>
+					<VText mt={2} mr={10}>Test run: </VText>
+					<VSwitch_Auto path={()=>node.p.testRun_enabled} onChange={val=> {
+						if (val) {
+							node.testRun = new FBARun();
+							node.testRun.StartREMSequence();
+						} else {
+							node.testRun.StopREMSequence();
+							delete node.testRun;
+						}
+					}}/>
 				</Row>
 				{/*<Row>
 					<VText mt={5} mr={10}>Sequence repeat interval:</VText>
 					<NumberPicker_Auto path={()=>node.p.promptInterval} min={1} max={100} format={a=>a + " minutes"}/>
 				</Row>*/}
 				<Row>
-					<VText mr={10}>Sequence actions:</VText>
+					<VText mr={10}>Sequence steps:</VText>
 				</Row>
 				<Row style={{backgroundColor: colors.background_dark, flexDirection: "column", padding: 5}}>
 					<Column style={{flex: 1, backgroundColor: colors.background, padding: 10}}>
 						{node.promptActions.map((action, index)=> {
 							return (
 								<Row key={index}>
+									<VText mt={5}>{index + 1}) </VText>
 									{action.CreateUI()}
 									<VButton text="▲" ml={5} style={{height: 28}} textStyle={{marginBottom: 3}} onPress={()=> {
 										node.promptActions.RemoveAt(index);
@@ -116,7 +130,7 @@ export class REMStartSequenceUI extends BaseComponent<{}, {}> {
 						})}
 					</Column>
 					<Row mt={10} height={45}>
-						<VText mt={9}>Add: </VText>
+						<VText mt={9}>Add step: </VText>
 						<VButton text="Wait" plr={10} style={{height: 40}}
 							onPress={()=>node.promptActions.push(new Wait())}/>
 						<VButton text="Speak text" ml={5} plr={10} style={{height: 40}}

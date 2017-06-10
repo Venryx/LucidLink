@@ -21,7 +21,7 @@ export default class NumberPicker extends Component
 		if (values == null) {
 			values = [];
 			//for (let val = min; val <= max; val += step)
-			for (let val = min; val.RoundToMultipleOf(step) <= max; val += step)
+			for (let val = min; val.RoundTo(step) <= max; val += step)
 				values.push(val);
 		}
 		var names = values.Select(format);

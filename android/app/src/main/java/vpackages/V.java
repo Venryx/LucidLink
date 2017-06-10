@@ -1,13 +1,10 @@
 package vpackages;
 
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.text.style.ReplacementSpan;
 import android.util.Log;
 import android.view.View;
@@ -24,12 +21,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -431,13 +423,14 @@ public class V {
 		if (val > max) return max;
 		return val;
 	}
-	// integer version -- ie. for arrays
-	public static int WrapToRange_MaxOut(int val, int min, int maxOut) {
-		int size = maxOut - min;
+	public static int WrapXToRange(int val, int min, int max) { return WrapXToRange(val, min, max, true); }
+	public static int WrapXToRange(int val, int min, int max, boolean maxOut) {
+		int size = max - min;
 		while (val < min) val += size;
-		while (val >= maxOut) val -= size;
+		while (maxOut ? val >= max : val > max) val -= size;
 		return val;
 	}
+
 
 	public static IntentFilter IntentFilter(String... actions) {
 		IntentFilter result = new IntentFilter();

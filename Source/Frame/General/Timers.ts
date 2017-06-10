@@ -109,27 +109,27 @@ export class Sequence {
 		return this;
 	}
 	
-	segments = [] as SequenceSegment[];
-	AddSegment(delayInS: number, func: Function) {
-		this.segments.push(new SequenceSegment(delayInS, func));
+	segments = [] as SequenceStep[];
+	AddSegment(delayInS: number, func: Function, infoStr?: string) {
+		this.segments.push(new SequenceStep(delayInS, func, infoStr));
 	}
 
-	nextSegment = null as SequenceSegment;
+	nextSegment = null as SequenceStep;
 	get Active() { return this.nextSegment != null; }
 
 	Start() {
+		Assert(this.segments.length, "Cannot start a sequence with no segments.");
 		Log(`Starting sequence ${this.id}`);
 		this.nextSegment = this.segments[0];
 		this.nextSegment.StartDelay(this, this.asBackground);
 	}
-	OnCompleteSegment(segment: SequenceSegment) {
-		if (this.Active) {
-			this.nextSegment = this.segments[this.segments.indexOf(segment) + 1];
-			this.nextSegment.StartDelay(this, this.asBackground);
-		} else {
-			this.nextSegment = null;
-		}
+	OnCompleteSegment(segment: SequenceStep) {
+		Assert(this.Active, "OnCompleteSegment() was called when the sequence was not active.");
+		this.nextSegment = this.segments[this.segments.indexOf(segment) + 1];
 		Log(`Completed segment ${segment.id} of sequence ${this.id}. Next segment: ${this.nextSegment ? this.nextSegment.id : -1}`);
+		if (this.nextSegment) {
+			this.nextSegment.StartDelay(this, this.asBackground);
+		}
 	}
 	Stop() {
 		Log(`Stopping sequence ${this.id}`);
@@ -138,20 +138,22 @@ export class Sequence {
 		this.nextSegment = null;
 	}
 }
-class SequenceSegment {
+class SequenceStep {
 	static idProvider = new IDProvider();
-	constructor(delayInS: number, func: Function) {
-		this.id = SequenceSegment.idProvider.GetID();
+	constructor(delayInS: number, func: Function, infoStr?: string) {
+		this.id = SequenceStep.idProvider.GetID();
 		this.delayInS = delayInS;
 		this.func = func;
+		this.infoStr = infoStr;
 	}
 	id: number;
 	delayInS = 0;
 	func = null as Function;
+	infoStr: string;
 
 	timer: Timer;
 	StartDelay(sequence: Sequence, asBackground: boolean) {
-		Log(`Starting segment ${this.id}`);
+		Log(`Starting segment ${this.id}${this.infoStr||""}`);
 		this.timer = new Timer(this.delayInS, ()=> {
 			Log(`Running-and-ending segment ${this.id}`);
 			this.func();

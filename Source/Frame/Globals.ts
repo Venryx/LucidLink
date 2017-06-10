@@ -310,10 +310,15 @@ var ObservableArray = observableHelper.test1.constructor;
 // others
 // ==========
 
-export function Range(min: number, max: number, step = 1, includeMax = true) {
+export function Range(min: number, max: number, step = 1, includeMax = true, roundToStep = true) {
 	var result: number[] = [];
-	for (let i = min; includeMax ? i <= max : i < max; i += step)
+	for (
+		let i = min;
+		includeMax ? i <= max : i < max;
+		i = roundToStep ? (i + step).RoundTo(step) : i + step
+	) {
 		result.push(i);
+	}
 	return result;
 }
 

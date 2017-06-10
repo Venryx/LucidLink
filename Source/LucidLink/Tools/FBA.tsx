@@ -68,6 +68,9 @@ export class FBA extends Node {
 	@O @P() commandListener = new FBA_CommandListener();
 	@O @P() statusReporter = new FBA_StatusReporter();
 
+	testRun: FBARun;
+	@O testRun_enabled = false;
+
 	currentRun: FBARun;
 }
 

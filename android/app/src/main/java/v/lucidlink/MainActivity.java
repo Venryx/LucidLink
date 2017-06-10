@@ -38,6 +38,7 @@ import java.util.List;
 
 import SPlus.SPlusModule;
 import v.LibMuse.LibMuseModule;
+import v.lucidlink.Frame.VolumeManager;
 import vpackages.V;
 
 import static v.lucidlink.LLS.LL;
@@ -111,7 +112,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		if (connected == bluetoothConnected) return;
 
 		bluetoothConnected = connected;
-		LL.mainModule.ApplyVolumeForCurrentType();
+		VolumeManager.TryToApplyVolumeChanges(VolumeManager.GetCurrentChannel());
 		V.Log(bluetoothConnected ? "Bluetooth speaker connected." : "Bluetooth speaker disconnected.");
 	}
 
@@ -365,7 +366,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		BreathValuePair prev15Sec_total = new BreathValuePair(0, 0);
 		BreathValuePair last15Sec_total = new BreathValuePair(0, 0);
 		for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
-			BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
+			BreathValuePair pair = breathVals_last30Sec[V.WrapXToRange(i, 0, BREATH_VALUES_PER_30S)];
 			if (pair == null) continue;
 
 			boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;
@@ -402,7 +403,7 @@ public class MainActivity extends BaseBluetoothActivity {
 		BreathValuePair prev15Sec_totalDeviance = new BreathValuePair(0, 0);
 		BreathValuePair last15Sec_totalDeviance = new BreathValuePair(0, 0);
 		for (int i = newEntryIndex; i > newEntryIndex - BREATH_VALUES_PER_30S; i--) {
-			BreathValuePair pair = breathVals_last30Sec[V.WrapToRange_MaxOut(i, 0, BREATH_VALUES_PER_30S)];
+			BreathValuePair pair = breathVals_last30Sec[V.WrapXToRange(i, 0, BREATH_VALUES_PER_30S)];
 			if (pair == null) continue;
 
 			boolean inCurrentSegment = i > newEntryIndex - BREATH_VALUES_PER_15S;

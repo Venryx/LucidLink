@@ -23,6 +23,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.views.textinput.ReactEditText;
 import v.lucidlink.Frame.Vector2i;
+import v.lucidlink.Frame.VolumeManager;
 import vpackages.V;
 import vpackages.VFile;
 
@@ -330,31 +331,24 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		eegProcessor.ResetLastNPositions();
 	}
 
-	double normalVolumeToApply = -1;
-	double bluetoothVolumeToApply = -1;
 	@ReactMethod public void SetVolumes(double normalVolume, double bluetoothVolume) {
-		if (normalVolume != -1000)
-			this.normalVolumeToApply = normalVolume;
-		if (bluetoothVolume != -1000)
-			this.bluetoothVolumeToApply = bluetoothVolume;
-		this.ApplyVolumeForCurrentType();
-	}
-	@ReactMethod public void IncreaseVolumes(double normalVolume, double bluetoothVolume) {
-		if (normalVolume != -1000)
-			this.normalVolumeToApply += normalVolume;
-		if (bluetoothVolume != -1000)
-			this.bluetoothVolumeToApply += bluetoothVolume;
-		this.ApplyVolumeForCurrentType();
-	}
-	public void ApplyVolumeForCurrentType() {
 		AudioManager audioManager = (AudioManager)MainActivity.main.getSystemService(Context.AUDIO_SERVICE);
 		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		if (!MainActivity.main.bluetoothConnected && normalVolumeToApply != -1) {
-			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (normalVolumeToApply * maxVolume), 0);
-			normalVolumeToApply = -1;
-		} else if (MainActivity.main.bluetoothConnected && bluetoothVolumeToApply != -1) {
-			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (bluetoothVolumeToApply * maxVolume), 0);
-			bluetoothVolumeToApply = -1;
+		if (normalVolume != -1000) {
+			VolumeManager.SetVolume(VolumeManager.VolumeChannel.Normal, (int)(normalVolume * maxVolume));
+		}
+		if (bluetoothVolume != -1000) {
+			VolumeManager.SetVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(normalVolume * maxVolume));
+		}
+	}
+	@ReactMethod public void IncreaseVolumes(double normalVolumeChange, double bluetoothVolumeChange) {
+		AudioManager audioManager = (AudioManager)MainActivity.main.getSystemService(Context.AUDIO_SERVICE);
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		if (normalVolumeChange != -1000) {
+			VolumeManager.IncreaseVolume(VolumeManager.VolumeChannel.Normal, (int)(normalVolumeChange * maxVolume));
+		}
+		if (bluetoothVolumeChange != -1000) {
+			VolumeManager.IncreaseVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(normalVolumeChange * maxVolume));
 		}
 	}
 
