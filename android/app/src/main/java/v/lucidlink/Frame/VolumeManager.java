@@ -46,6 +46,7 @@ public class VolumeManager {
 	}
 	public static void TryToApplyVolumeChanges(VolumeChannel channel) {
 		if (GetCurrentChannel() != channel) return;
+		if (!volumeChangesToApply.containsKey(channel)) return;
 
 		AudioManager audioManager = (AudioManager)MainActivity.main.getSystemService(Context.AUDIO_SERVICE);
 		for (VolumeChange change: volumeChangesToApply.get(channel)) {
