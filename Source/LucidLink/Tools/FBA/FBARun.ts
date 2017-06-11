@@ -30,8 +30,10 @@ export default class FBARun {
 	
 	remSequence: Sequence;
 	StopREMSequence() {
-		if (this.remSequence)
+		if (this.remSequence) { //&& this.remSequence.Active) {
 			this.remSequence.Stop();
+			this.remSequence = null;
+		}
 	}
 	
 	currentSegment_stage = null as SleepStage;
@@ -117,7 +119,7 @@ export default class FBARun {
 
 			let percentDiff = (monitor.breathingDepth_last / monitor.breathingDepth_prev).Distance(1);
 			if (percentDiff >= node.commandListener.sequenceDisabler_minPercentDiff) {
-				let wasEnabled = this.REMSequenceEnabled;
+				//let wasEnabled = this.REMSequenceEnabled;
 				this.StopREMSequence();
 				this.triggeredForThisSegment = false; // allow sequence to restart, during this same segment (it might be long)
 				this.remSequenceEnabledAt = Date.now() + (node.commandListener.sequenceDisabler_disableLength * 60 * 1000);

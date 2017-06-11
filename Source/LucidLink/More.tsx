@@ -27,8 +27,9 @@ export class LogEntry {
 		var dateStartPos = dateStr.IndexOf_X(3, " ") + 1;
 		dateStr = dateStr.substring(dateStartPos, dateStr.indexOf(" ", dateStartPos));*/
 		if (showMoreInfo) {
-			var dateStr = Moment(this.time).format("YYYY-M-D HH:mm:ss.SSS")			
-			return `[${dateStr}, ${this.type}] ${this.message}`;
+			//var dateStr = Moment(this.time).format("YYYY-M-D HH:mm:ss.SSS");
+			var dateStr = Moment(this.time).format("D HH:mm:ss.SSS");
+			return `[D${dateStr}, ${this.type}] ${this.message}`;
 		}
 		var dateStr = Moment(this.time).format("HH:mm:ss")
 		return `[${dateStr}] ${this.message}`;

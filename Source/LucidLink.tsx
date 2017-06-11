@@ -41,6 +41,7 @@ import LibMuse from "react-native-libmuse";
 import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
 import {Tools} from "./LucidLink/Tools";
 import SPBridge from "./Frame/SPBridge";
+var Moment = require("moment");
 
 //Assert([].Except instanceof Function, "Could not add extension-methods. Make sure function names are preserved by js-minifier.");
 if (!([].Except instanceof Function))
@@ -216,7 +217,7 @@ export async function Init(ui) {
 	LL.mainDataLoaded = true;
 	LL.ui.forceUpdate();
 	//ui.forceUpdate();
-	Log("Finished loading main-data.");
+	Log(`Finished loading main-data at ${Moment().format("YYYY-M-D HH:mm:ss.SSS")}.`);
 	Log("Logging to: " + LL.tracker.currentSession.logFile.path);
 
 	LL.tracker.LoadFileSystemData();
