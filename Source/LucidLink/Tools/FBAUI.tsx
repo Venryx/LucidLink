@@ -160,7 +160,7 @@ export class CommandListenerUI extends BaseComponent<{}, {}> {
 				</Row>
 				<Row>
 					<VText mt={5}>When breathing-depth of last 15s changes by </VText>
-					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_minPercentDiff} max={1} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
+					<NumberPicker_Auto path={()=>node.p.sequenceDisabler_minPercentDiff} max={10} step={.01} format={a=>(a * 100).toFixed() + "%"}/>
 					<VText mt={5}> from that of previous 15s:</VText>
 				</Row>
 				<Row>
