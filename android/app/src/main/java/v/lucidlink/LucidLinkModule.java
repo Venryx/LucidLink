@@ -338,7 +338,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 			VolumeManager.SetVolume(VolumeManager.VolumeChannel.Normal, (int)(normalVolume * maxVolume));
 		}
 		if (bluetoothVolume != -1000) {
-			VolumeManager.SetVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(normalVolume * maxVolume));
+			VolumeManager.SetVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(bluetoothVolume * maxVolume));
 		}
 	}
 	@ReactMethod public void IncreaseVolumes(double normalVolumeChange, double bluetoothVolumeChange) {
@@ -348,7 +348,7 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 			VolumeManager.IncreaseVolume(VolumeManager.VolumeChannel.Normal, (int)(normalVolumeChange * maxVolume));
 		}
 		if (bluetoothVolumeChange != -1000) {
-			VolumeManager.IncreaseVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(normalVolumeChange * maxVolume));
+			VolumeManager.IncreaseVolume(VolumeManager.VolumeChannel.Bluetooth, (int)(bluetoothVolumeChange * maxVolume));
 		}
 	}
 
