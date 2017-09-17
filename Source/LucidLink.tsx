@@ -78,6 +78,13 @@ DeviceEventEmitter.addListener("OnKeyDown", (args: any)=> {
 		Log("keyboard", "KeyDown: " + keyCode);
 		LL.scripts.scriptRunner.TriggerKeyDown(keyCode);
 		LL.journal.OnKeyDown(keyCode, keyChar);
+
+		if (keyCode == 111) { // escape
+			if (LL.tools.fba.enabled && LL.tools.fba.currentRun) {
+				LL.tools.fba.currentRun.StopREMSequence();
+				LL.tools.fba.commandListener.sequenceDisabler_messageSpeakAction.Run();
+			}
+		}
 	} catch (ex) {}
 });
 DeviceEventEmitter.addListener("OnKeyUp", (args: any)=> {
