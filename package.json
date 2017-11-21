@@ -11,6 +11,7 @@
 		"@#": "The above all SHOULD work, but they don't. Instead, we must run the launchPackager.bat file directly, for some reason.",
 		"@@@@@start": "node_modules\\react-native\\packager\\launchPackager.bat",
 		"@@@@@@start": "node Scripts/StartPackager.js",
+		"start2": "runas.exe /user:Stephen_2 /savecred /env \"C:\\Users\\Stephen\\AppData\\Roaming\\nvm\\v6.9.1\\react-native.cmd start & pause\"",
 		"test": "jest",
 		"release": "cd android && gradlew assembleRelease",
 		"#run-android": "cd \".\\android\" && gradlew clean && cd \"..\\\" && react-native run-android"
