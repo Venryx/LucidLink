@@ -25,6 +25,7 @@ import {Text, View, KeyboardAvoidingView, ViewPagerAndroid} from "react-native";
 //import Moment from "moment";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 
+import {MonitorUI, Monitor} from "./LucidLink/Tools/Monitor";
 import {TrackerUI, Tracker} from "./LucidLink/Tracker";
 import {JournalUI, Journal} from "./LucidLink/Journal";
 import {ScriptsUI, Scripts} from "./LucidLink/Scripts";
@@ -32,9 +33,13 @@ import {SettingsUI, Settings} from "./LucidLink/Settings";
 import {MoreUI, More} from "./LucidLink/More";
 
 import KeepAwake from "react-native-keep-awake";
+import MuseBridge from "./Frame/MuseBridge";
 import {Folder, VFile} from "./Packages/V/VFile";
 import {autorun} from "mobx";
 import TestData from "./Frame/TestData";
+//import LibMuse from "react-native-libmuse";
+import LibMuse from "./react-native-libmuse/index.js";
+
 import {P, T, VDFType} from "./Packages/VDF/VDFTypeInfo";
 import {Tools} from "./LucidLink/Tools";
 import SPBridge from "./Frame/SPBridge";
@@ -156,10 +161,16 @@ export class LucidLink extends Node {
 
 	PushBasicDataToJava() {
 		var basicData = {};
+		// monitor
+		for (let prop of ["updateInterval", "channel1", "channel2", "channel3", "channel4", "monitor", "patternMatch"])
+			basicData[prop] = LL.tools.monitor[prop];
 		// settings
-		for (let prop of ["blockUnusedKeys"])
+		for (let prop of ["blockUnusedKeys", "patternMatchInterval", "patternMatchOffset", "museEEGPacketBufferSize",
+				"eyeTracker_horizontalSensitivity", "eyeTracker_verticalSensitivity", "eyeTracker_offScreenGravity",
+				"eyeTracker_relaxVSTenseIntensity", "eyeTraceSegmentSize", "eyeTraceSegmentCount"])
 			basicData[prop] = LL.settings[prop];
 		JavaBridge.Main.SetBasicData(basicData);
+		LibMuse.reconnectAttemptInterval = LL.settings.reconnectAttemptInterval * 1000;
 	}
 
 	get RootFolder() { return new Folder(VFile.ExternalStorageDirectoryPath + "/Lucid Link/"); }
@@ -261,6 +272,16 @@ async function CheckIfInEmulator_ThenMaybeInitAndStartSearching() {
 		Log("general", `In emulator: ${inEmulator}`);
 		return;
 	}
+
+	if (!MuseBridge.initialized)
+		MuseBridge.Init();
+	autorun(()=> {
+		if (LL.tools.monitor.connect) {
+			MuseBridge.StartSearch(); // start listening for a muse headband
+		} else {
+			MuseBridge.Disconnect();
+		}
+	});
 
 	// also for sp-monitor
 	if (!SPBridge.initialized)

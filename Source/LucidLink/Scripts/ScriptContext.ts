@@ -1,9 +1,11 @@
 import {scriptContext, SetScriptContext, WhenXMinutesIntoSleepStageDo_Entry} from "./ScriptGlobals";
+import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {Log} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 
 import * as Globals from "../../Frame/Globals";
 import * as ScriptGlobals from "./ScriptGlobals";
+import {Pattern} from "../../Frame/Patterns/Pattern";
 import {WaitXThenRun, Timer, TimerContext} from "../../Frame/General/Timers";
 import Moment from "moment";
 import {SleepStage} from "../../Frame/SPBridge";
@@ -17,6 +19,8 @@ export default class ScriptContext {
 
 	// general
 	// ==========
+
+	patterns = [] as Pattern[]; // func-based patterns
 
 	timerContext = new TimerContext();
 	keyDownListeners = [];
@@ -34,6 +38,11 @@ export default class ScriptContext {
 		}
 	}
 	
+	listeners_whenChangeMuseConnectStatus = [];
+	listeners_whenMusePacketReceived = [];
+	/*listeners_whenViewDirectionUpdated = [];
+	listeners_whenViewDistanceUpdated = [];*/
+	listeners_onUpdatePatternMatchProbabilities = [];
 	listeners_whenChangeSleepStage = [];
 	
 	currentSegment_stage = null as SleepStage;
@@ -41,10 +50,19 @@ export default class ScriptContext {
 	listeners_whenXMinutesIntoSleepStageY = [] as WhenXMinutesIntoSleepStageDo_Entry[];
 
 	Reset() {
+		this.patterns = [];
+		//this.patternMatchAttempts = {};
+		//LL.monitor.eegProcessor.patternMatchAttempts = {};
+		//LL.monitor.eegProcessor = new EEGProcessor();
+		LL.tools.monitor.eegProcessor.ResetScriptsRelatedStuff();
+
 		this.timerContext.Reset();
 		this.keyDownListeners = [];
 		this.keyUpListeners = [];
 
+		this.listeners_whenChangeMuseConnectStatus = [];
+		this.listeners_whenMusePacketReceived = [LL.tools.monitor.eegProcessor.OnReceiveMusePacket];
+		this.listeners_onUpdatePatternMatchProbabilities = [];
 		this.listeners_whenChangeSleepStage = [];
 		this.listeners_whenXMinutesIntoSleepStageY = [];
 	}

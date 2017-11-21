@@ -9,6 +9,7 @@ import com.zmxv.RNSound.RNSoundPackage;
 import SPlus.SPlusPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
+import v.LibMuse.LibMusePackage;
 
 import com.rnfs.RNFSPackage;
 import com.filepicker.FilePickerPackage;
@@ -32,21 +33,22 @@ public class MainApplication extends Application implements ReactApplication {
 
 		@Override
 		public boolean getUseDeveloperSupport() {
-		  return BuildConfig.DEBUG;
+		  	return BuildConfig.DEBUG;
 		}
 
 		// use LL.reactContext.getNativeModule(SomeModule.class) to access the modules for these later
 		@Override protected List<ReactPackage> getPackages() {
 			return Arrays.asList(
 				new MainReactPackage(),
-            	new ReactMaterialKitPackage(),
-           		new RNNumberPickerDialogPackage(),
+				new ReactMaterialKitPackage(),
+				new RNNumberPickerDialogPackage(),
 				new LucidLinkPackage(),
 				new RNFSPackage(),
 				new FilePickerPackage(),
 				//new OrientationPackage(),
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
+				new LibMusePackage(),
 				new SPlusPackage(),
 				new RCTTextToSpeechModule(),
 				new ReactSnackbarPackage(),

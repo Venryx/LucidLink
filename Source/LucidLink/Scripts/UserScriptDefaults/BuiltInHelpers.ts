@@ -42,6 +42,16 @@ WhenXMinutesIntoSleepStageYDo(5, "Rem", function() {
 	// code here runs whenever you reach 5 minutes into a rem-sleep segment
 })
 
+// muse
+// ==========
+
+WhenChangeMuseConnectStatus(function(status) {
+	Log("New status: " + status)
+})
+WhenMusePacketReceived(function(packet) {
+	Log("Received packet: " + ToJSON(packet))
+})
+
 // pattern matching
 // ==========
 

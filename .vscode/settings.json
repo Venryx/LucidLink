@@ -5,6 +5,11 @@
 		"**/.git": true,         // this is a default value
 		"**/.DS_Store": true,    // this is a default value
 		// custom
-		"android": true
-  }
+		//"android": true
+	},
+	"search.exclude": {
+		"android": true,
+		"ios": true,
+		"Source/react-native-libmuse": true, // temp
+	}
 }

@@ -2,6 +2,7 @@ import ScriptContext from "./ScriptContext";
 import {Assert} from "../../Frame/General/Assert";
 import {E} from "../../Frame/Globals";
 import {Event} from "../Tracker/Session";
+import {Pattern, Matcher, Gap} from "../../Frame/Patterns/Pattern";
 import Sound from "react-native-sound";
 import {DeviceEventEmitter} from "react-native";
 import {LL, LucidLink, RunPostInit} from "../../LucidLink";
@@ -24,7 +25,7 @@ export {
 	// values (ie normal variables)
 	LL,
 	// classes
-	V,
+	V, Pattern, Matcher, Gap,
 	// enums
 	SleepStage,
 	// functions,
@@ -33,6 +34,19 @@ export {
 
 // listeners
 // ==========
+
+export function WhenChangeMuseConnectStatus(func) {
+	scriptContext.listeners_whenChangeMuseConnectStatus.push(func);
+}
+export function WhenMusePacketReceived(func) {
+	scriptContext.listeners_whenMusePacketReceived.push(func);
+}
+/*export function WhenViewDirectionUpdated(func) {
+	currentScriptContext.listeners_whenViewDirectionUpdated.push(func);
+}
+export function WhenViewDistanceUpdated(func) {
+	currentScriptContext.listeners_whenViewDistanceUpdated.push(func);
+}*/
 
 export function WhenChangeSleepStageDo(func) {
 	scriptContext.listeners_whenChangeSleepStage.push(func);
@@ -95,6 +109,11 @@ export function AddEvent(type, ...args) {
 	LL.tracker.currentSession.AddEvent(event);
 }
 
+export function AddPattern(info) {
+	var pattern = new Pattern(info);
+	scriptContext.patterns.push(pattern);
+}
+
 export function CreateTimer(intervalInSec: number, func: ()=>void, maxCallCount = -1, asBackground = true) {
 	return new Timer(intervalInSec, func, maxCallCount, asBackground).SetContext(scriptContext.timerContext);
 }
@@ -119,6 +138,19 @@ export function AddKeyDownListener(keyCode, func) {
 }
 export function AddKeyUpListener(keyCode, func) {
 	scriptContext.keyDownListeners.push({keyCode: keyCode, func: func});
+}
+
+// pattern matching
+// ==========
+
+DeviceEventEmitter.addListener("OnSetPatternMatchProbabilities", (args: any)=> {
+	var [x, probabilities] = args;
+	//Log(`X: ${x}; Probabilities: ${ToJSON(probabilities)}`);
+	for (let listener of scriptContext.listeners_onUpdatePatternMatchProbabilities)
+		listener(probabilities, x);
+});
+export function AddListener_OnUpdatePatternMatchProbabilities(func) {
+	scriptContext.listeners_onUpdatePatternMatchProbabilities.push(func);
 }
 
 // audio playback

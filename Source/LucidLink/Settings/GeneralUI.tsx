@@ -44,6 +44,11 @@ export default class GeneralUI extends Component<{}, {}> {
 						<NumberPicker_Auto path={()=>node.p.sessionSaveInterval} min={1} max={100}
 							dialogTitle="Session save interval"/>
 					</Row>
+					<Row>
+						<VText mt={5} mr={10}>Log stats every X minutes</VText>
+						<NumberPicker_Auto path={()=>node.p.sessionSaveInterval} min={1} max={100}
+							dialogTitle="Session save interval"/>
+					</Row>
 				</Row>
             </Panel>
 		);
