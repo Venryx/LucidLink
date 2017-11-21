@@ -40,7 +40,9 @@ let config = {
 		//return [path.resolve(), path.resolve("Build")];
 		//return [path.resolve().replace(/\\/g, "/"), path.resolve("Build").replace(/\\/g, "/")];
 		//return [path.resolve("C:/Root/Apps/@V/LucidLink/Main"), path.resolve("C:/Root/Apps/@V/LucidLink/Main/Build")]
-		return [path.resolve("node_modules"), path.resolve("Build")]
+		//return [path.resolve("node_modules"), path.resolve("Build")] // this was code when second-fix apparently worked
+		//return [path.resolve("C:/Root/Apps/@V/LucidLink/Main/node_modules"), path.resolve("C:/Root/Apps/@V/LucidLink/Main/Build")]
+		return [path.resolve("../../../node_modules"), path.resolve("../../../Build")]
 	},
 	/*getBlacklistRE() {
 		console.log("Getting blacklist... @path:" + path.resolve());

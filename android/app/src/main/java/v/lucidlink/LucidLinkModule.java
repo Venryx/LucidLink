@@ -125,48 +125,13 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		promise.resolve(result);
 	}
 
-	// monitor
-	public int updateInterval;
-	public boolean channel1;
-	public boolean channel2;
-	public boolean channel3;
-	public boolean channel4;
-	public boolean monitor;
-	public boolean patternMatch;
-
 	// settings
 	public boolean blockUnusedKeys;
-	public int museEEGPacketBufferSize;
-
-	public double eyeTracker_horizontalSensitivity;
-	public double eyeTracker_verticalSensitivity;
-	public double eyeTracker_offScreenGravity;
-
-	public double eyeTracker_relaxVSTenseIntensity;
-	public double eyeTraceSegmentSize;
-	public int eyeTraceSegmentCount;
 
 	@ReactMethod public void SetBasicData(ReadableMap data) {
-		// monitor
-		this.updateInterval = data.getInt("updateInterval");
-		this.channel1 = data.getBoolean("channel1");
-		this.channel2 = data.getBoolean("channel2");
-		this.channel3 = data.getBoolean("channel3");
-		this.channel4 = data.getBoolean("channel4");
-		this.monitor = data.getBoolean("monitor");
-		this.patternMatch = data.getBoolean("patternMatch");
 		// settings
 		this.blockUnusedKeys = data.getBoolean("blockUnusedKeys");
-		this.museEEGPacketBufferSize = data.getInt("museEEGPacketBufferSize");
-		this.eyeTracker_horizontalSensitivity = data.getDouble("eyeTracker_horizontalSensitivity");
-		this.eyeTracker_verticalSensitivity = data.getDouble("eyeTracker_verticalSensitivity");
-		this.eyeTracker_offScreenGravity = data.getDouble("eyeTracker_offScreenGravity");
-		this.eyeTracker_relaxVSTenseIntensity = data.getDouble("eyeTracker_relaxVSTenseIntensity");
-		this.eyeTraceSegmentSize = data.getDouble("eyeTraceSegmentSize");
-		this.eyeTraceSegmentCount = data.getInt("eyeTraceSegmentCount");
 	}
-
-	EEGProcessor eegProcessor = new EEGProcessor();
 
 	// special
 	//public BluetoothDevice targetDevice;
@@ -186,39 +151,10 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		}
 	}
 
-	/*@ReactMethod public void SendFakeMuseDataPacket(ReadableArray args) {
-		String type = args.getString(0);
-		ReadableArray column = args.getArray(1);
-		ArrayList<Double> columnFinal = new ArrayList<>(column.size());
-		for (int i = 0; i < column.size(); i++)
-			columnFinal.set(i, column.getDouble(i));
-		mainChartManager.OnReceiveMusePacket(type, columnFinal);
-	}*/
-
-
 	@ReactMethod public void OnTabSelected(int tab) {
 	}
 
 	@ReactMethod public void AddChart() {
-		Timer chartAttachTimer = new Timer();
-		chartAttachTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				MainActivity.main.runOnUiThread(()-> {
-					//if (!mainChartManager.initialized)
-					eegProcessor.chartManager.TryToInit();
-
-					// if we just succeeded, Disable timer and run post-init code
-					if (eegProcessor.chartManager.initialized) {
-						chartAttachTimer.cancel();
-
-						//mainChartManager.SetChartVisible(true);
-						//SendEvent("PostAddChart");
-					}
-				});
-			}
-		}, 1000, 1000);
-
 		SetUpUITimer();
 	}
 	void SetUpUITimer() {
@@ -270,14 +206,6 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		}, 1000, 1000);
 	}
 
-
-	@ReactMethod public void UpdateChartBounds() {
-		if (!eegProcessor.chartManager.initialized) return;
-		//V.WaitXThenRun(500, ()-> {
-		eegProcessor.chartManager.UpdateChartBounds();
-		//});
-	}
-
 	/*@ReactMethod public void OnMonitorChangeVisible(boolean visible) {
 	}*/
 
@@ -289,46 +217,6 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 		Uri uri = Uri.parse(uriStr);
 		String path = VFile.URIToPath(uri);
 		promise.resolve(path);
-	}
-
-	/*@ReactMethod public void OnSetPatternMatchProbability(int x, double probability) {
-		if (mainChartManager.initialized)
-			mainChartManager.OnSetPatternMatchProbability(x, probability);
-	}*/
-
-	@ReactMethod public void StartPatternGrab(int minX, int maxX, Promise promise) {
-		WritableArray channelPointsGrabbed = Arguments.createArray();
-		for (int ch = 0; ch < 4; ch++) {
-			Vector2i[] channelPoints = eegProcessor.channelPoints.get(ch);
-
-			WritableArray thisChannelPointsGrabbed = Arguments.createArray();
-			for (int x = minX; x <= maxX; x++)
-				thisChannelPointsGrabbed.pushMap(channelPoints[x].ToMap());
-			channelPointsGrabbed.pushArray(thisChannelPointsGrabbed);
-		}
-
-		WritableMap result = Arguments.createMap();
-		result.putArray("channelPointsGrabbed", channelPointsGrabbed);
-		result.putArray("channelBaselines", V.ToWritableArray(V.ToObjectArray(eegProcessor.channelBaselines)));
-		promise.resolve(result);
-	}
-	/*@ReactMethod public void GetChannelPoints(Promise promise) {
-		WritableArray channel_pointsGrabbed = Arguments.createArray();
-		for (int ch = 0; ch < 4; ch++) {
-			Vector2i[] channelPoints = this.mainChartManager.processor.channelPoints.get(ch);
-
-			WritableArray channelPointsGrabbed = Arguments.createArray();
-			for (int x = minX; x <= maxX; x++)
-				channelPointsGrabbed.pushMap(channelPoints[x].ToMap());
-			channel_pointsGrabbed.pushArray(channelPointsGrabbed);
-		}
-		promise.resolve(channel_pointsGrabbed);
-	}*/
-
-	@ReactMethod public void CenterEyeTracker() {
-		eegProcessor.eyePosX = .5;
-		eegProcessor.viewDistanceY = .5;
-		eegProcessor.ResetLastNPositions();
 	}
 
 	@ReactMethod public void SetVolumes(double normalVolume, double bluetoothVolume) {
@@ -379,7 +267,5 @@ public class LucidLinkModule extends ReactContextBaseJavaModule {
 
 	void Shutdown() {
 		V.Log("Shutting down...");
-
-		eegProcessor.chartManager.Shutdown();
 	}
 }

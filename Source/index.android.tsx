@@ -1,7 +1,5 @@
 import {AppRegistry, NativeModules} from "react-native";
 
-// for some reason, a native (C++) error occurs for certain NativeModules, unless we import them early
-import "react-native-libmuse";
 import "./EarlyRun";
 
 //Object.getOwnPropertyDescriptor(NativeModules, "SPlus");

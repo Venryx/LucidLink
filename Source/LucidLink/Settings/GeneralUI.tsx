@@ -39,6 +39,11 @@ export default class GeneralUI extends Component<{}, {}> {
 						<VText mt={5} mr={10}>Gender:</VText>
 						<Select_Auto path={()=>node.p.gender} options={Gender} dialogTitle="Gender"/>
 					</Row>
+					<Row>
+						<VText mt={5} mr={10}>Log stats every X minutes</VText>
+						<NumberPicker_Auto path={()=>node.p.sessionSaveInterval} min={1} max={100}
+							dialogTitle="Session save interval"/>
+					</Row>
 				</Row>
             </Panel>
 		);

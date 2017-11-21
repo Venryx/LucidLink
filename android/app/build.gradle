@@ -234,12 +234,9 @@ dependencies {
     compile project(':react-native-android-snackbar')
     compile project(':react-native-background-timer')
     compile project(':react-native-keep-awake')
-    compile project(':react-native-libmuse')
     compile project(':MPChartLib')
     compile project(':RNMaterialKit')
     compile project(':RNSound')
-    if (userConfig.contains("reactNativeLibMuse_external: true"))
-        compile project(":react-native-libmuse")
     if (userConfig.contains("mpChartLib_external: true"))
         compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
     compile fileTree(include: ['*.jar'], dir: 'libs')

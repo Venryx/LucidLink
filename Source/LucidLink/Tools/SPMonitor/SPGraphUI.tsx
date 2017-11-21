@@ -1,5 +1,4 @@
 import {Global, JavaBridge, Log, Toast} from "../../../Frame/Globals";
-import {EEGProcessor} from "../../../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, BaseProps} from "../../../Frame/ReactGlobals";
 import {colors, styles} from "../../../Frame/Styles";
 import {Vector2i, VVector2} from "../../../Frame/Graphics/VectorStructs";

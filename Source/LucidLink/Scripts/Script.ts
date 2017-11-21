@@ -6,7 +6,6 @@ import {File} from "../../Packages/V/VFile";
 
 import scriptDefaultText_BuiltInHelpers from "./UserScriptDefaults/BuiltInHelpers";
 /*import scriptDefaultText_BuiltInScript from "./UserScriptDefaults/BuiltInScript";
-import scriptDefaultText_FakeDataProvider from "./UserScriptDefaults/FakeDataProvider";
 import scriptDefaultText_CustomHelpers from "./UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./UserScriptDefaults/CustomScript";
 import scriptDefaultText_CustomPatterns from "./UserScriptDefaults/CustomPatterns";*/

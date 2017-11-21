@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import SPlus.SPlusModule;
-import v.LibMuse.LibMuseModule;
 import v.lucidlink.Frame.VolumeManager;
 import vpackages.V;
 
@@ -57,7 +56,6 @@ public class MainActivity extends BaseBluetoothActivity {
 	public MainActivity() {
 		super();
 		main = this;
-		LibMuseModule.mainActivity = this;
 	}
 
 	@Override protected void onCreate(Bundle bundle) {

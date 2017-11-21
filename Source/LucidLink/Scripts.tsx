@@ -11,7 +11,6 @@ import ScriptContext from "./Scripts/ScriptContext";
 
 import scriptDefaultText_BuiltInHelpers from "./Scripts/UserScriptDefaults/BuiltInHelpers";
 import scriptDefaultText_BuiltInScript from "./Scripts/UserScriptDefaults/BuiltInScript";
-import scriptDefaultText_FakeDataProvider from "./Scripts/UserScriptDefaults/FakeDataProvider";
 import scriptDefaultText_CustomHelpers from "./Scripts/UserScriptDefaults/CustomHelpers";
 import scriptDefaultText_CustomScript from "./Scripts/UserScriptDefaults/CustomScript";
 import scriptDefaultText_CustomPatterns from "./Scripts/UserScriptDefaults/CustomPatterns";
@@ -60,8 +59,8 @@ export class Scripts extends Node {
 		if (!scriptsFolderExists) {
 			await scriptsFolder.GetFile("Built-in script.js").WriteAllText(scriptDefaultText_BuiltInScript);
 			await scriptsFolder.GetFile("Built-in script.meta").WriteAllText(ToJSON({index: 2, editable: true, enabled: true}));
-			await scriptsFolder.GetFile("Fake-data provider.js").WriteAllText(scriptDefaultText_FakeDataProvider);
-			await scriptsFolder.GetFile("Fake-data provider.meta").WriteAllText(ToJSON({index: 3, editable: true, enabled: false}));
+			/*await scriptsFolder.GetFile("Fake-data provider.js").WriteAllText(scriptDefaultText_FakeDataProvider);
+			await scriptsFolder.GetFile("Fake-data provider.meta").WriteAllText(ToJSON({index: 3, editable: true, enabled: false}));*/
 			await scriptsFolder.GetFile("Custom helpers.js").WriteAllText(scriptDefaultText_CustomHelpers);
 			await scriptsFolder.GetFile("Custom helpers.meta").WriteAllText(ToJSON({index: 4, editable: true, enabled: true}));
 			await scriptsFolder.GetFile("Custom script.js").WriteAllText(scriptDefaultText_CustomScript);
@@ -127,7 +126,7 @@ This will permanently remove all custom code from the script.`,
 
 				let nameToTextMap = {
 					"Built-in script": scriptDefaultText_BuiltInScript,
-					"Fake-data provider": scriptDefaultText_FakeDataProvider,
+					//"Fake-data provider": scriptDefaultText_FakeDataProvider,
 					"Custom script": scriptDefaultText_CustomScript,
 					"Custom patterns": scriptDefaultText_CustomPatterns,
 				};

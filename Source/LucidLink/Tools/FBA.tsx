@@ -1,4 +1,3 @@
-import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {BaseComponent as Component, Column, Panel, Row, VButton, RowLR, BaseProps, BaseComponent} from "../../Frame/ReactGlobals";
 import {colors, styles} from "../../Frame/Styles";
 import {Vector2i} from "../../Frame/Graphics/VectorStructs";

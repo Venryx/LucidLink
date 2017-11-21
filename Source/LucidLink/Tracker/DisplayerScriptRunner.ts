@@ -1,4 +1,3 @@
-import {EEGProcessor} from "../../Frame/Patterns/EEGProcessor";
 import {Log} from "../../Frame/Globals";
 import {LL} from "../../LucidLink";
 

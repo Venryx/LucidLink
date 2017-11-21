@@ -9,7 +9,6 @@ import com.zmxv.RNSound.RNSoundPackage;
 import SPlus.SPlusPackage;
 import fr.bamlab.reactnativenumberpickerdialog.RNNumberPickerDialogPackage;
 import com.github.xinthink.rnmk.ReactMaterialKitPackage;
-import v.LibMuse.LibMusePackage;
 
 import com.rnfs.RNFSPackage;
 import com.filepicker.FilePickerPackage;
@@ -48,7 +47,6 @@ public class MainApplication extends Application implements ReactApplication {
 				//new OrientationPackage(),
 				new RNSoundPackage(),
 				new ReactNativeDialogsPackage(),
-				new LibMusePackage(),
 				new SPlusPackage(),
 				new RCTTextToSpeechModule(),
 				new ReactSnackbarPackage(),
