@@ -63,9 +63,9 @@ import com.android.build.OutputFile
  * ]
  */
 
-plugins {
+/*plugins {
     id "me.tatarka.retrolambda" version "3.4.0"
-}
+}*/
 
 project.ext.react = [
     // the entry file for bundle generation
@@ -184,7 +184,7 @@ repositories {
     jcenter()
 }
 
-String userConfig = new File("../UserConfig.json").text
+//String userConfig = new File("../UserConfig.json").text
 
 /*configurations.all((Closure) {
     resolutionStrategy {
@@ -237,8 +237,8 @@ dependencies {
     compile project(':MPChartLib')
     compile project(':RNMaterialKit')
     compile project(':RNSound')
-    if (userConfig.contains("mpChartLib_external: true"))
-        compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
+    //if (userConfig.contains("mpChartLib_external: true"))
+    compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
     compile fileTree(include: ['*.jar'], dir: 'libs')
     /*compile(files("libs/com.resmed.refresh-158.jar")) {
         exclude group: "com.android.support"
