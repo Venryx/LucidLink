@@ -101,8 +101,13 @@ android {
         versionCode 3
         versionName "1.1.0"
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a"
+            //, "x86"
         }
+
+        /*jackOptions {
+            enabled true
+        }*/
 
         multiDexEnabled true
     }
@@ -114,14 +119,15 @@ android {
         javaMaxHeapSize "3g" // Use gig increments depending on needs
     }
 
-    splits {
+    /*splits {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi-v7a"
+            //, "x86"
         }
-    }
+    }*/
 
     // signing
     signingConfigs {
@@ -206,15 +212,18 @@ configurations {
     all*.exclude module: "support-v4"*/
 }
 
-configurations.all {
+// have other modules use the react-native version from-source (as used below, in [compile project...])
+/*configurations.all {
     exclude group: "com.facebook.react", module: "react-native"
-}
+}*/
 
 dependencies {
     //compile "com.android.support:appcompat-v7:23.0.1"
 
     //compile "com.facebook.react:react-native:0.42.0-rc.3" // From node_modules
-    compile project(':ReactAndroid')
+    //compile project(':ReactAndroid')
+    compile "com.facebook.react:react-native:+"
+
     // android support
     compile 'com.android.support:support-v4:25.1.0'
     /*{
@@ -234,11 +243,11 @@ dependencies {
     compile project(':react-native-android-snackbar')
     compile project(':react-native-background-timer')
     compile project(':react-native-keep-awake')
-    compile project(':MPChartLib')
     compile project(':RNMaterialKit')
     compile project(':RNSound')
-    //if (userConfig.contains("mpChartLib_external: true"))
-    compile "com.github.PhilJay:MPAndroidChart:v3.0.1"
+    /*compile project(':MPChartLib')
+    if (userConfig.contains("mpChartLib_external: true"))
+      compile "com.github.PhilJay:MPAndroidChart:v3.0.1"*/
     compile fileTree(include: ['*.jar'], dir: 'libs')
     /*compile(files("libs/com.resmed.refresh-158.jar")) {
         exclude group: "com.android.support"

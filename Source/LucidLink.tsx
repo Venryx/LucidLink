@@ -55,7 +55,10 @@ ScrollableTabView.defaultProps = E(ScrollableTabView.defaultProps,
 		contentProps: E(ScrollableTabView.defaultProps.contentProps, {
 			//style: E(ScrollableTabView.defaultProps.contentProps.style, {backgroundColor: colors.background}),
 			contentContainerStyle: {backgroundColor: colors.background},
-		})
+		}),
+		style: {
+			backgroundColor: colors.background,
+		}
 	}
 );
 

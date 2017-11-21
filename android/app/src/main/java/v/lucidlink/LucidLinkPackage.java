@@ -13,7 +13,7 @@ import java.util.List;
 class LucidLinkPackage implements ReactPackage {
 	public static ReactApplicationContext reactContext;
 
-    @Override
+    //@Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

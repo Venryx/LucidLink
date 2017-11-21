@@ -12,6 +12,7 @@ import {RVPUI, RVP} from "./Tools/RVP";
 import {SPMonitor, SPMonitorUI} from "./Tools/SPMonitor";
 import {FBA} from "./Tools/FBA";
 import FBAUI from "./Tools/FBAUI";
+import {View} from "react-native";
 
 @Global
 export class Tools extends Node {
@@ -20,8 +21,13 @@ export class Tools extends Node {
 	@T("SPMonitor") @P(true, true) spMonitor = new SPMonitor();
 }
 
-export class ToolsUI extends BaseComponent<BaseProps & {}, {}> {
+export class ToolsUI extends BaseComponent<BaseProps & {}, {show: boolean}> {
+	ComponentDidMount() {
+		// fixes that first-tab's tab-view would not display
+		setTimeout(()=>this.setState({show: true}), 0);
+	}
 	render() {
+		if (!this.state.show) return <View/>;
 		return (
 			<ScrollableTabView style={{flex: 1}}>
 				<FBAUI tabLabel="FBA Technique"/>
