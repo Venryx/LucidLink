@@ -93,11 +93,11 @@ export class RVP extends Node {
 		}
 		new Timer(this.interval, ()=> {
 			var name = this.names[GetRandomNumber({min: 0, max: this.names.length - 1, mustBeInteger: true})];
-			var namePitch = GetRandomNumber({min: .01, max: 2});
+			var namePitch = GetRandomNumber({min: this.part1_minPitch, max: this.part1_maxPitch});
 			var phraseText_final = this.phrase.replace("$name", name);
 			Speak({text: phraseText_final, pitch: namePitch});
 			
-			WaitXThenRun(3000, function() {
+			WaitXThenRun(3000, ()=> {
 				var odd = GetRandomNumber({min: 0, max: 1}) >= .5;
 
 				var text = "";
@@ -106,7 +106,7 @@ export class RVP extends Node {
 					text += " " + (odd ? 1 + base : base);
 				}
 
-				var numberPitch = GetRandomNumber({min: .01, max: 1.5});
+				var numberPitch = GetRandomNumber({min: this.part2_minPitch, max: this.part2_maxPitch});
 				Speak({text: text, pitch: numberPitch});
 
 				Log(`Name: ${name} (${namePitch}) Number: ${text} (${numberPitch})`);
@@ -154,11 +154,11 @@ export class RVPUI extends Component<{}, {}> {
 					<Row>
 						<VText mt={5} mr={10}>Part 1 (phrase) pitch, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_minPitch}
-							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
+							min={.01} max={3} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) min-pitch"/>
 						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part1_maxPitch}
-							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
+							min={.01} max={3} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 1 (phrase) max-pitch"/>
 					</Row>
 
@@ -182,11 +182,11 @@ export class RVPUI extends Component<{}, {}> {
 					<Row>
 						<VText mt={5} mr={10}>Part 2 (number) pitch, min: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_minPitch}
-							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
+							min={.01} max={3} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) min-pitch"/>
 						<VText mt={5} ml={10} mr={10}>max: </VText>
 						<NumberPicker_Auto path={()=>node.p.part2_maxPitch}
-							min={.01} max={2} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
+							min={.01} max={3} step={.01} format={val=>(val * 100).toFixed(0) + "%"}
 							dialogTitle="Part 2 (number) max-pitch"/>
 					</Row>
 

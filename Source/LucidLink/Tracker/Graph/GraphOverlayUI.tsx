@@ -112,7 +112,7 @@ Our fixed rect: ${rect}`);*/
 		}
 
 		return (
-			<Text ref={c=>this.root = c} //onLayout={this.OnLayout}
+			<Text ref={c=>this.root = c as any} //onLayout={this.OnLayout}
 				style={{position: "absolute", left: rect.x, top: rect.y, height: rect.height, color: renderInfo.color || "#ffffff"}}>
 				{renderInfo.text}
 			</Text>

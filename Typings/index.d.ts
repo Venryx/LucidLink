@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/@types/react-native/index.d.ts"/>
 /// <reference path="../node_modules/@types/react/index.d.ts"/>
 
+declare var global;
 declare var g;
 //declare var LL;
 

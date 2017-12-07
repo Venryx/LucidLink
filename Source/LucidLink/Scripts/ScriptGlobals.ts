@@ -12,6 +12,7 @@ import SPBridge from "../../Frame/SPBridge";
 import {SleepStage} from "../../Frame/SPBridge";
 import Moment from "moment";
 import V from "../../Packages/V/V";
+//import {IsNumber} from "../../Frame/Types";
 
 export var scriptContext: ScriptContext = null; // set to LL.scripts.scriptContext;
 export function SetScriptContext(context) { scriptContext = context; }
@@ -81,6 +82,8 @@ export function WhenXMinutesIntoSleepStageYDo(minutes: number, sleepStageName: s
 
 export function GetRandomNumber(options) {
 	var {min, max, mustBeInteger} = options;
+	/*Assert(IsNumber(min), `Min must be a number. (not: ${min})`);
+	Assert(IsNumber(max), `Max must be a number. (not: ${max})`);*/
 	var range = max - min;
 	if (options.mustBeInteger)
 		return min + Math.floor(Math.random() * (range + 1));

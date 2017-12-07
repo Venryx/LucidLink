@@ -60,6 +60,7 @@ EStyleSheet.build();
 /*export class BaseComponent<P, S> extends Component<P, S> {
 }*/
 
+@HasSealedProps
 export class BaseComponent<P, S> extends Component<P & BaseProps, S> {
 	constructor(props) {
 		super(props);
@@ -140,16 +141,16 @@ export class BaseComponent<P, S> extends Component<P & BaseProps, S> {
 	autoRemoveChangeListeners = true;
 	ComponentWillMount(): void {};
 	ComponentWillMountOrReceiveProps(props: any, forMount?: boolean): void {};
-	private componentWillMount() {
+	@Sealed componentWillMount() {
 		if (this.autoRemoveChangeListeners)
 			this.RemoveChangeListeners();
 		this.ComponentWillMount(); 
-	    this.ComponentWillMountOrReceiveProps(this.props, true); 
+		this.ComponentWillMountOrReceiveProps(this.props, true); 
 	}
 	ComponentDidMount(...args: any[]): void {};
 	ComponentDidMountOrUpdate(forMount: boolean): void {};
 	mounted = false;
-	private componentDidMount(...args) {
+	@Sealed componentDidMount(...args) {
 		this.ComponentDidMount(...args);
 		this.ComponentDidMountOrUpdate(true);
 		this.mounted = true;
@@ -163,7 +164,7 @@ export class BaseComponent<P, S> extends Component<P & BaseProps, S> {
 			});*/
 		}
 	}
-	private componentWillUnmount() {
+	@Sealed componentWillUnmount() {
 		for (let timer of this.timers)
 			timer.Stop();
 		this.timers = [];
@@ -171,14 +172,14 @@ export class BaseComponent<P, S> extends Component<P & BaseProps, S> {
 	}
 	
 	ComponentWillReceiveProps(newProps: any[]): void {};
-	private componentWillReceiveProps(newProps) {
+	@Sealed componentWillReceiveProps(newProps) {
 		if (this.autoRemoveChangeListeners)
 			this.RemoveChangeListeners();
 		this.ComponentWillReceiveProps(newProps);
 	    this.ComponentWillMountOrReceiveProps(newProps, false);
 	}
 	ComponentDidUpdate(...args: any[]): void {};
-	private componentDidUpdate(...args) {
+	@Sealed componentDidUpdate(...args) {
 	    this.ComponentDidUpdate(...args);
 		this.ComponentDidMountOrUpdate(false);
 		if (this.PostRender) {
@@ -379,3 +380,19 @@ export class VButton extends BaseComponent
 }*/
 
 //export type AutoProps = {path: ()=>any};
+
+function HasSealedProps(target: Object) {
+	let oldConstructor = target.constructor;
+	target.constructor = function() {
+		for (let key in target["prototype"]) {
+			let method = target["prototype"][key];
+			if (method.sealed) {
+				Assert(this[key] == method, `Cannot override sealed method "${key}".`);
+			}
+		}
+		return oldConstructor.apply(this, arguments);
+	};
+}
+function Sealed(target: Object, key: string) {
+	target[key].sealed = true;
+}
